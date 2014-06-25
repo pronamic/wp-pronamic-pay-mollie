@@ -1,0 +1,9 @@
+{
+	"name": "wp-pay-gateways/mollie",
+	"description": "Mollie driver for the WordPress payment processing library.",
+	"keywords": ["wordpress", "wp", "pay", "mollie", "gateway", "pronamic"],
+	"homepage": "https://github.com/wp-pay-gateways/mollie",
+	"autoload": {
+		"classmap": ["src/"]
+	}
+}
