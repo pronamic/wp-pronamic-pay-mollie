@@ -55,15 +55,15 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 	public static function transform( $status ) {
 		switch ( $status ) {
 			case Pronamic_Gateways_Mollie_Statuses::OPEN :
-				return Pronamic_Pay_Gateways_IDeal_Statuses::OPEN;
+				return Pronamic_WP_Pay_Statuses::OPEN;
 			case Pronamic_Gateways_Mollie_Statuses::CANCELLED :
-				return Pronamic_Pay_Gateways_IDeal_Statuses::CANCELLED;
+				return Pronamic_WP_Pay_Statuses::CANCELLED;
 			case Pronamic_Gateways_Mollie_Statuses::PAID_OUT :
-				return Pronamic_Pay_Gateways_IDeal_Statuses::SUCCESS;
+				return Pronamic_WP_Pay_Statuses::SUCCESS;
 			case Pronamic_Gateways_Mollie_Statuses::PAID :
-				return Pronamic_Pay_Gateways_IDeal_Statuses::SUCCESS;
+				return Pronamic_WP_Pay_Statuses::SUCCESS;
 			case Pronamic_Gateways_Mollie_Statuses::EXPIRED :
-				return Pronamic_Pay_Gateways_IDeal_Statuses::EXPIRED;
+				return Pronamic_WP_Pay_Statuses::EXPIRED;
 			default:
 				return null;
 		}
