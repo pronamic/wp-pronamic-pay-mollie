@@ -14,5 +14,5 @@
 	],
 	"require": {
 		"wp-pay/core": "dev-develop"
-	},
+	}
 }
