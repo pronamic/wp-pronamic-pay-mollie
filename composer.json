@@ -14,5 +14,8 @@
 	],
 	"require": {
 		"wp-pay/core": "dev-develop"
+	},
+	"require-dev": {
+		"satooshi/php-coveralls": "dev-master"
 	}
 }
