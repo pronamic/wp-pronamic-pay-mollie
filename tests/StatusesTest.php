@@ -26,6 +26,7 @@ class Pronamic_WP_Pay_Mollie_StatusesTest extends PHPUnit_Framework_TestCase {
 			array( Pronamic_WP_Pay_Mollie_Statuses::PAID_OUT, Pronamic_WP_Pay_Statuses::SUCCESS ),
 			array( Pronamic_WP_Pay_Mollie_Statuses::PAID, Pronamic_WP_Pay_Statuses::SUCCESS ),
 			array( Pronamic_WP_Pay_Mollie_Statuses::EXPIRED, Pronamic_WP_Pay_Statuses::EXPIRED ),
+			array( 'not existing status', null ),
 		);
     }
 }
