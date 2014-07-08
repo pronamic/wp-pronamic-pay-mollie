@@ -27,6 +27,7 @@
 		"classmap": ["src/"]
 	},
 	"require": {
+		"php": ">=5.2.4",
 		"wp-pay/core": "dev-develop"
 	},
 	"require-dev": {
