@@ -104,10 +104,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		return $result;
 	}
 
-	public function get_payment( $id ) {
+	public function get_payment( $payment_id ) {
 		$result = null;
 
-		$response = $this->send_request( 'payments/' . $id, 'GET' );
+		$response = $this->send_request( 'payments/' . $payment_id, 'GET' );
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 
