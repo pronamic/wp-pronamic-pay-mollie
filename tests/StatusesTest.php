@@ -11,15 +11,15 @@
  */
 class Pronamic_WP_Pay_Mollie_StatusesTest extends PHPUnit_Framework_TestCase {
 	/**
-	 * @dataProvider statusMatrixProvider
+	 * @dataProvider status_matrix_provider
 	 */
-	public function testTransform( $mollieStatus, $expected ) {
-		$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $mollieStatus );
+	public function test_transform( $mollie_status, $expected ) {
+		$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_status );
 
 		$this->assertEquals( $expected, $status );
 	}
 
-	public function statusMatrixProvider() {
+	public function status_matrix_provider() {
 		return array(
 			array( Pronamic_WP_Pay_Mollie_Statuses::OPEN, Pronamic_WP_Pay_Statuses::OPEN ),
 			array( Pronamic_WP_Pay_Mollie_Statuses::CANCELLED, Pronamic_WP_Pay_Statuses::CANCELLED ),
@@ -28,5 +28,5 @@ class Pronamic_WP_Pay_Mollie_StatusesTest extends PHPUnit_Framework_TestCase {
 			array( Pronamic_WP_Pay_Mollie_Statuses::EXPIRED, Pronamic_WP_Pay_Statuses::EXPIRED ),
 			array( 'not existing status', null ),
 		);
-    }
+	}
 }
