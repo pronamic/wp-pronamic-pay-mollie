@@ -1,11 +1,13 @@
 # Build
-/build
+/build/
 
 # Composer
-/vendor
-composer.lock
+/vendor/
 
 # Eclipse
-.buildpath
-.project
-.settings
+/.buildpath
+/.project
+/.settings
+
+# Node.js
+/node_modules/
