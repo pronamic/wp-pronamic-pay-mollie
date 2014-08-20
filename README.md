@@ -13,3 +13,4 @@
 ## Documentation
 
 *	[Mollie API](https://www.mollie.nl/files/documentatie/payments-api.html)
+*	[GitHub repository Mollie API client for PHP](https://github.com/mollie/mollie-api-php)
