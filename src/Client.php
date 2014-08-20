@@ -96,9 +96,9 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		} else {
 			$body = wp_remote_retrieve_body( $response );
 
-			$r = json_decode( $body );
+			$mollie_result = json_decode( $body );
 
-			$this->error = new WP_Error( 'mollie_error', $r->error->message, $r->error );
+			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
 		}
 
 		return $result;
