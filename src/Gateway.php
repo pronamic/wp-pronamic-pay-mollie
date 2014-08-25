@@ -21,7 +21,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	/**
 	 * Constructs and initializes an Mollie gateway
 	 *
-	 * @param Pronamic_Gateways_Mollie_IDeal_Config $config
+	 * @param Pronamic_WP_Pay_Gateways_Mollie_Config $config
 	 */
 	public function __construct( Pronamic_WP_Pay_Gateways_Mollie_Config $config ) {
 		parent::__construct( $config );
@@ -48,7 +48,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$request->amount       = $data->get_amount();
 		$request->description  = $data->get_description();
 		$request->redirect_url = add_query_arg( 'payment', $payment->get_id(), home_url( '/' ) );
-		
+
 		if ( isset( $payment_method ) ) {
 			if ( 'mister_cash' == $payment_method ) {
 				$request->method = 'mistercash';
@@ -77,14 +77,14 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		if ( $mollie_payment ) {
 			$payment->set_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_payment->status ) );
-			
+
 			if ( isset( $mollie_payment->details ) ) {
 				$details = $mollie_payment->details;
-				
-				if ( isset( $details->consumerName ) ) { 
+
+				if ( isset( $details->consumerName ) ) {
 					$payment->set_consumer_name( $details->consumerName );
 				}
-				
+
 				if ( isset( $details->consumerAccount ) ) {
 					$payment->set_consumer_iban( $details->consumerAccount );
 				}
