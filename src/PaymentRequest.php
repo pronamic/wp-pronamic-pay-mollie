@@ -19,6 +19,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 
 	public $meta_data;
 
+	public $locale;
+
 	/////////////////////////////////////////////////
 
 	public function __construct() {
@@ -34,6 +36,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 			'method'      => $this->method,
 			'redirectUrl' => $this->redirect_url,
 			'metadata'    => $this->meta_data,
+			'locale'      => strtolower( $this->locale ),
 		);
 
 		// Array filter will remove values NULL, FALSE and empty strings ('')
