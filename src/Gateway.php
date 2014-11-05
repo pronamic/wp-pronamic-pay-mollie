@@ -50,10 +50,15 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$request->redirect_url = add_query_arg( 'payment', $payment->get_id(), home_url( '/' ) );
 		$request->locale       = $data->get_language();
 
-		if ( isset( $payment_method ) ) {
-			if ( 'mister_cash' == $payment_method ) {
-				$request->method = 'mistercash';
-			}
+		switch ( $payment_method ) {
+			case Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD :
+				$request->method = Pronamic_WP_Pay_Mollie_Methods::CREDITCARD;
+
+				break;
+			case Pronamic_WP_Pay_PaymentMethods::MISTER_CASH :
+				$request->method = Pronamic_WP_Pay_Mollie_Methods::MISTERCASH;
+
+				break;
 		}
 
 		$result = $this->client->create_payment( $request );
