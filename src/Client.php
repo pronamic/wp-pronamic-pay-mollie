@@ -69,7 +69,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		return wp_remote_request( $url, array(
 			'method'    => $method,
-			'sslverify' => false,
 			'headers'   => array(
 				'Authorization' => 'Bearer ' . $this->api_key,
 			),
