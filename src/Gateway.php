@@ -6,7 +6,7 @@
  * Copyright: Copyright (c) 2005 - 2014
  * Company: Pronamic
  * @author Remco Tolsma
- * @version 1.0.0
+ * @version 1.1.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	/**
@@ -48,7 +48,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$request->amount       = $data->get_amount();
 		$request->description  = $data->get_description();
 		$request->redirect_url = add_query_arg( 'payment', $payment->get_id(), home_url( '/' ) );
-		$request->locale       = $data->get_language();
+		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $data->get_language() );
 
 		switch ( $payment_method ) {
 			case Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD :
