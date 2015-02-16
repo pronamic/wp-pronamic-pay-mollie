@@ -4,20 +4,20 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "71be58ee381034b6e3f40021b2b78ff2",
+    "hash": "7fba12d6262373f94be887ddc1b4e407",
     "packages": [
         {
             "name": "wp-pay/core",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-pay/core.git",
-                "reference": "526115e9d2d07f5721a66c3e84b4289316e3596a"
+                "reference": "b6d083e4efb4f22739412c2e083fe723256be4b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-pay/core/zipball/526115e9d2d07f5721a66c3e84b4289316e3596a",
-                "reference": "526115e9d2d07f5721a66c3e84b4289316e3596a",
+                "url": "https://api.github.com/repos/wp-pay/core/zipball/b6d083e4efb4f22739412c2e083fe723256be4b0",
+                "reference": "b6d083e4efb4f22739412c2e083fe723256be4b0",
                 "shasum": ""
             },
             "require": {
@@ -57,7 +57,7 @@
                 "wordpress",
                 "wp"
             ],
-            "time": "2015-01-19 15:26:05"
+            "time": "2015-02-16 12:45:59"
         }
     ],
     "packages-dev": [
@@ -577,6 +577,7 @@
         "satooshi/php-coveralls": 20
     },
     "prefer-stable": false,
+    "prefer-lowest": false,
     "platform": {
         "php": ">=5.2.4"
     },
