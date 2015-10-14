@@ -11,6 +11,8 @@
  */
 class Pronamic_WP_Pay_Mollie_LocaleHelperTest extends PHPUnit_Framework_TestCase {
 	/**
+	 * Test transform.
+	 *
 	 * @dataProvider locale_matrix_provider
 	 */
 	public function test_get_locale( $locale, $expected ) {

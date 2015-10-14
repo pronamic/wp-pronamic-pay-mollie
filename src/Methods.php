@@ -10,56 +10,56 @@
  */
 class Pronamic_WP_Pay_Mollie_Methods {
 	/**
-	 * iDEAL
+	 * Constant for the iDEAL method.
 	 *
 	 * @var string
 	 */
 	const IDEAL = 'ideal';
 
 	/**
-	 * Credit Card
+	 * Constant for the Credit Card method.
 	 *
 	 * @var string
 	 */
 	const CREDITCARD = 'creditcard';
 
 	/**
-	 * Mister Cash
+	 * Constant for the Mister Cash method.
 	 *
 	 * @var string
 	 */
 	const MISTERCASH = 'mistercash';
 
 	/**
-	 * Sofort
+	 * Constant for the Sofort method.
 	 *
 	 * @var string
 	 */
 	const SOFORT = 'sofort';
 
 	/**
-	 * Bank transfer
+	 * Constant for the Bank transfer method.
 	 *
 	 * @var string
 	 */
 	const BANKTRANSFER = 'banktransfer';
 
 	/**
-	 * Bitcoin
+	 * Constant for the Bitcoin method.
 	 *
 	 * @var string
 	 */
 	const BITCOIN = 'bitcoin';
 
 	/**
-	 * PayPal
+	 * Constant for the PayPal method.
 	 *
 	 * @var string
 	 */
 	const PAYPAL = 'paypal';
 
 	/**
-	 * Paysafecard
+	 * Constant for the Paysafecard method.
 	 *
 	 * @var string
 	 */

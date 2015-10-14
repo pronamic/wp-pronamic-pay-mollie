@@ -63,8 +63,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				$request->method = Pronamic_WP_Pay_Mollie_Methods::SOFORT;
 
 				break;
-
 			case Pronamic_WP_Pay_PaymentMethods::IDEAL :
+				// @since 1.1.2
 				$request->method = Pronamic_WP_Pay_Mollie_Methods::IDEAL;
 
 				break;
