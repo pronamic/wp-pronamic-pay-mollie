@@ -10,7 +10,7 @@
  */
 class Pronamic_WP_Pay_Mollie_LocaleHelper {
 	/**
-	 * Get Mollie locale by the specified WordPress locale
+	 * Get Mollie locale by the specified WordPress locale.
 	 *
 	 * @return string|null
 	 */

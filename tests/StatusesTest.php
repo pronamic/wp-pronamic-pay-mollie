@@ -11,6 +11,8 @@
  */
 class Pronamic_WP_Pay_Mollie_StatusesTest extends PHPUnit_Framework_TestCase {
 	/**
+	 * Test transform.
+	 *
 	 * @dataProvider status_matrix_provider
 	 */
 	public function test_transform( $mollie_status, $expected ) {
