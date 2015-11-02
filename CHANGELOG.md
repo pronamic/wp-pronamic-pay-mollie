@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Added an gateway settings class.
 
 ## [1.1.2] - 2015-10-14
 - Add support for direct iDEAL payment method.
