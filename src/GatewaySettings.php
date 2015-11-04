@@ -29,6 +29,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_GatewaySettings extends Pronamic_WP_Pay_Ga
 	public function fields( array $fields ) {
 		// API Key
 		$fields[] = array(
+			'filter'      => FILTER_SANITIZE_STRING,
 			'section'     => 'mollie',
 			'meta_key'    => '_pronamic_gateway_mollie_api_key',
 			'title'       => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
