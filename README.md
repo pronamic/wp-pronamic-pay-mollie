@@ -10,6 +10,10 @@
 [![License](https://poser.pugx.org/wp-pay-gateways/mollie/license.svg)](https://packagist.org/packages/wp-pay-gateways/mollie)
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
+## Links
+
+*	http://www.mollie.nl/
+
 ## Documentation
 
 *	[Mollie API](https://www.mollie.nl/files/documentatie/payments-api.html)
