@@ -37,6 +37,83 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	/////////////////////////////////////////////////
 
 	/**
+	 * Get issuers
+	 *
+	 * @see Pronamic_WP_Pay_Gateway::get_issuers()
+	 */
+	public function get_issuers() {
+		$groups = array();
+
+		$result = $this->client->get_issuers();
+
+		if ( $result ) {
+			$groups[] = array(
+				'options' => $result,
+			);
+		} else {
+			$this->error = $this->client->get_error();
+		}
+
+		return $groups;
+	}
+
+	/////////////////////////////////////////////////
+
+	public function get_issuer_field() {
+		if ( Pronamic_WP_Pay_PaymentMethods::IDEAL === $this->get_payment_method() ) {
+			return array (
+				'id'       => 'pronamic_ideal_issuer_id',
+				'name'     => 'pronamic_ideal_issuer_id',
+				'label'    => __( 'Choose your bank', 'pronamic_ideal' ),
+				'required' => true,
+				'type'     => 'select',
+				'choices'  => $this->get_transient_issuers(),
+			);
+		}
+	}
+
+	/////////////////////////////////////////////////
+
+	/**
+	 * Get payment methods
+	 *
+	 * @see Pronamic_WP_Pay_Gateway::get_payment_methods()
+	 */
+	public function get_payment_methods() {
+		$groups = array();
+
+		$result = $this->client->get_payment_methods();
+
+		if ( $result ) {
+			$groups[] = array(
+				'options' => $result,
+			);
+		} else {
+			$this->error = $this->client->get_error();
+		}
+
+		return $groups;
+	}
+
+	/////////////////////////////////////////////////
+
+	/**
+	 * Get supported payment methods
+	 *
+	 * @see Pronamic_WP_Pay_Gateway::get_supported_payment_methods()
+	 */
+	public function get_supported_payment_methods() {
+		return array(
+			Pronamic_WP_Pay_PaymentMethods::IDEAL       => Pronamic_WP_Pay_Mollie_Methods::IDEAL,
+			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD => Pronamic_WP_Pay_Mollie_Methods::CREDITCARD,
+			Pronamic_WP_Pay_PaymentMethods::MISTER_CASH => Pronamic_WP_Pay_Mollie_Methods::MISTERCASH,
+			Pronamic_WP_Pay_PaymentMethods::SOFORT      => Pronamic_WP_Pay_Mollie_Methods::SOFORT,
+		);
+	}
+
+	/////////////////////////////////////////////////
+
+	/**
 	 * Start
 	 *
 	 * @param Pronamic_Pay_PaymentDataInterface $data
@@ -47,7 +124,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		$request->amount       = $data->get_amount();
 		$request->description  = $data->get_description();
-		$request->redirect_url = add_query_arg( 'payment', $payment->get_id(), home_url( '/' ) );
+		$request->redirect_url = $payment->get_return_url();
+		$request->webhook_url  = add_query_arg( 'mollie_webhook', '', home_url( '/' ) );
 		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $data->get_language() );
 
 		switch ( $payment_method ) {
@@ -66,6 +144,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			case Pronamic_WP_Pay_PaymentMethods::IDEAL :
 				// @since 1.1.2
 				$request->method = Pronamic_WP_Pay_Mollie_Methods::IDEAL;
+				$request->issuer = $data->get_issuer_id();
 
 				break;
 		}
