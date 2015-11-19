@@ -28,7 +28,8 @@
 	},
 	"require": {
 		"php": ">=5.2.4",
-		"wp-pay/core": "dev-develop"
+		"wp-pay/core": "dev-develop",
+		"wp-pay-gateways/common": "dev-develop"
 	},
 	"require-dev": {
 		"satooshi/php-coveralls": "dev-master"

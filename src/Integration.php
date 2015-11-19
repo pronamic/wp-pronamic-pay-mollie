@@ -1,6 +1,6 @@
 <?php
 
-class Pronamic_WP_Pay_Gateways_Mollie_Integration {
+class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gateways_AbstractIntegration {
 	public function __construct() {
 		$this->id            = 'mollie';
 		$this->name          = 'Mollie';
