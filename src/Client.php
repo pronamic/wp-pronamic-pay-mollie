@@ -119,4 +119,76 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		return $result;
 	}
+
+	//////////////////////////////////////////////////
+
+	/**
+	 * Get issuers
+	 *
+	 * @return array
+	 */
+	public function get_issuers() {
+		$issuers = false;
+
+		$response = $this->send_request( 'issuers/', 'GET' );
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( $response_code == 200 ) {
+			$body = wp_remote_retrieve_body( $response );
+
+			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+			$result = json_decode( $body );
+
+			if ( null !== $result ) {
+				$issuers = array();
+
+				foreach ( $result->data as $issuer ) {
+					if ( Pronamic_WP_Pay_Mollie_Methods::IDEAL == $issuer->method ) {
+						$id   = Pronamic_WP_Pay_XML_Security::filter( $issuer->id );
+						$name = Pronamic_WP_Pay_XML_Security::filter( $issuer->name );
+
+						$issuers[ $id ] = $name;
+					}
+				}
+			}
+		}
+
+		return $issuers;
+	}
+
+	//////////////////////////////////////////////////
+
+	/**
+	 * Get payment methods
+	 *
+	 * @return array
+	 */
+	public function get_payment_methods() {
+		$payment_methods = false;
+
+		$response = $this->send_request( 'methods/', 'GET' );
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( $response_code == 200 ) {
+			$body = wp_remote_retrieve_body( $response );
+
+			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+			$result = json_decode( $body );
+
+			if ( null !== $result ) {
+				$payment_methods = array();
+
+				foreach ( $result->data as $payment_method ) {
+					$id   = Pronamic_WP_Pay_XML_Security::filter( $payment_method->id );
+					$name = Pronamic_WP_Pay_XML_Security::filter( $payment_method->description );
+
+					$payment_methods[ $id ] = $name;
+				}
+			}
+		}
+
+		return $payment_methods;
+	}
 }

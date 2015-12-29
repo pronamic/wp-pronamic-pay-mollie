@@ -21,6 +21,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 
 	public $locale;
 
+	public $webhook_url;
+
+	public $issuer;
+
 	/////////////////////////////////////////////////
 
 	public function __construct() {
@@ -37,6 +41,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 			'redirectUrl' => $this->redirect_url,
 			'metadata'    => $this->meta_data,
 			'locale'      => $this->locale,
+			'webhookUrl'  => $this->webhook_url,
+			'issuer'      => $this->issuer,
 		);
 
 		// Array filter will remove values NULL, FALSE and empty strings ('')
