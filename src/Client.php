@@ -87,7 +87,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 
-		if ( 201 === $response_code ) {
+		if ( 201 == $response_code ) { // WPCS: loose comparison ok.
 			$body = wp_remote_retrieve_body( $response );
 
 			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
@@ -110,7 +110,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 
-		if ( 200 === $response_code ) {
+		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
 			$body = wp_remote_retrieve_body( $response );
 
 			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
@@ -134,7 +134,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 
-		if ( $response_code == 200 ) {
+		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
 			$body = wp_remote_retrieve_body( $response );
 
 			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
@@ -144,7 +144,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 				$issuers = array();
 
 				foreach ( $result->data as $issuer ) {
-					if ( Pronamic_WP_Pay_Mollie_Methods::IDEAL == $issuer->method ) {
+					if ( Pronamic_WP_Pay_Mollie_Methods::IDEAL === $issuer->method ) {
 						$id   = Pronamic_WP_Pay_XML_Security::filter( $issuer->id );
 						$name = Pronamic_WP_Pay_XML_Security::filter( $issuer->name );
 
@@ -171,7 +171,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 
-		if ( $response_code == 200 ) {
+		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
 			$body = wp_remote_retrieve_body( $response );
 
 			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.

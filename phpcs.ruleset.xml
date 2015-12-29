@@ -6,4 +6,8 @@
 
 		<exclude name="Squiz.Commenting" />
 	</rule>
+
+	<rule ref="WordPress.VIP.SlowDBQuery.slow_db_query">
+		<exclude-pattern>src/Settings.php</exclude-pattern>
+	</rule>
 </ruleset>

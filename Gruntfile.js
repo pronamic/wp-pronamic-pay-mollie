@@ -21,6 +21,7 @@ module.exports = function( grunt ) {
 				],
 			},
 			options: {
+				bin: 'vendor/bin/phpcs',
 				standard: 'phpcs.ruleset.xml',
 				showSniffCodes: true
 			}

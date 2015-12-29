@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -ev
+
+# PHPUnit
+phpunit
+
+# Grunt
+if [[ '1' == $GRUNT ]]; then
+	vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs
+
+	npm install -g grunt-cli
+
+	npm install --no-optional
+
+	grunt
+fi
