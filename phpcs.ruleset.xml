@@ -10,4 +10,8 @@
 	<rule ref="WordPress.VIP.SlowDBQuery.slow_db_query">
 		<exclude-pattern>src/Settings.php</exclude-pattern>
 	</rule>
+
+	<rule ref="PEAR.Functions.FunctionCallSignature.Indent">
+		<exclude-pattern>src/Client.php</exclude-pattern>
+	</rule>
 </ruleset>
