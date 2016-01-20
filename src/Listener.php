@@ -19,7 +19,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Listener implements Pronamic_Pay_Gateways_
 
 			$payment = get_pronamic_payment_by_transaction_id( $transaction_id );
 
-			Pronamic_WP_Pay_Plugin::update_payment( $payment );
+			Pronamic_WP_Pay_Plugin::update_payment( $payment, false );
 		}
 	}
 }
