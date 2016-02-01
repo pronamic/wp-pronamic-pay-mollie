@@ -3,8 +3,9 @@
 /**
  * Title: Mollie locale helper tests
  * Description:
- * Copyright: Copyright (c) 2005 - 2015
+ * Copyright: Copyright (c) 2005 - 2016
  * Company: Pronamic
+ *
  * @author Remco Tolsma
  * @version 1.1.0
  * @see https://www.mollie.nl/support/documentatie/betaaldiensten/ideal/en/
