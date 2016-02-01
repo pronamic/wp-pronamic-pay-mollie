@@ -10,9 +10,30 @@
 [![License](https://poser.pugx.org/wp-pay-gateways/mollie/license.svg)](https://packagist.org/packages/wp-pay-gateways/mollie)
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
+
+## Wehook URL
+
+Please note that an webhook URL with the TLD `.dev` is not allowed, this library will check on 
+WordPress URL's on the `.dev` TLD and will not pass the `webhookUrl` paramater to Mollie.
+If you want to test the Mollie webhook URL on an local development environment you could use a 
+service like [ngrok](https://ngrok.com/).
+
+> Beste Remco,
+> 
+> Ja dit is inderdaad het probleem. .dev URL's worden niet ondersteunt. Deze zal ook niet bereikbaar zijn.
+> 
+> Als je report URL niet publiekelijk bereikbaar is zou je een service als https://ngrok.com kunnen gebruiken. Dit is een programma die je lokaal draait en als proxy werkt. Misschien heb je er iets aan.
+> 
+> Met vriendelijke groet,
+> 
+> Lennard van Gunst
+> Mollie
+
+
 ## Links
 
 *	http://www.mollie.nl/
+
 
 ## Documentation
 

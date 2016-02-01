@@ -1,6 +1,6 @@
 {
   "name": "mollie",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Mollie driver for the WordPress payment processing library.",
   "repository": {
     "type": "git",
@@ -33,9 +33,9 @@
   "homepage": "http://www.wp-pay.org/gateways/mollie/",
   "devDependencies": {
     "grunt": "~0.4.5",
-    "grunt-contrib-jshint": "^0.11.3",
+    "grunt-contrib-jshint": "^0.12.0",
     "grunt-phpcs": "^0.4.0",
-    "grunt-phplint": "0.0.6",
+    "grunt-phplint": "0.0.8",
     "grunt-phpmd": "^0.1.1",
     "grunt-phpunit": "^0.3.6",
     "load-grunt-tasks": "^3.4.0"

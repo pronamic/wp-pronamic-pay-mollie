@@ -3,8 +3,9 @@
 /**
  * Title: Mollie
  * Description:
- * Copyright: Copyright (c) 2005 - 2015
+ * Copyright: Copyright (c) 2005 - 2016
  * Company: Pronamic
+ *
  * @author Remco Tolsma
  * @version 1.1.0
  */
@@ -114,6 +115,26 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	/////////////////////////////////////////////////
 
 	/**
+	 * Get webhook URL for Mollie.
+	 *
+	 * @return string
+	 */
+	private function get_webhook_url() {
+		$url = home_url( '/' );
+
+		// Mollie doesn't allow the TLD .dev
+		if ( '.dev' === substr( parse_url( $url, PHP_URL_HOST ), -4 ) ) {
+			return false;
+		}
+
+		$url = add_query_arg( 'mollie_webhook', '', $url );
+
+		return $url;
+	}
+
+	/////////////////////////////////////////////////
+
+	/**
 	 * Start
 	 *
 	 * @param Pronamic_Pay_PaymentDataInterface $data
@@ -125,7 +146,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$request->amount       = $data->get_amount();
 		$request->description  = $data->get_description();
 		$request->redirect_url = $payment->get_return_url();
-		$request->webhook_url  = add_query_arg( 'mollie_webhook', '', home_url( '/' ) );
+		$request->webhook_url  = $this->get_webhook_url();
 		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $data->get_language() );
 
 		switch ( $payment_method ) {

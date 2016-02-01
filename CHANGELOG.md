@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
+-
+
+## [1.1.3] - 2016-02-01
 - Added an gateway settings class.
+- Don't redirect if webhook was called (allows for e-commerce tracking)
 
 ## [1.1.2] - 2015-10-14
 - Add support for direct iDEAL payment method.
@@ -20,7 +24,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.2...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.3...HEAD
+[1.1.3]: https://github.com/wp-pay-gateways/mollie/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/wp-pay-gateways/mollie/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/wp-pay-gateways/mollie/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/wp-pay-gateways/mollie/compare/1.0.0...1.1.0
