@@ -170,7 +170,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				break;
 
 			default:
-				if( is_string( $payment_method ) && ! empty( $payment_method ) ) {
+				if ( is_string( $payment_method ) && ! empty( $payment_method ) ) {
 					$request->method = $payment_method;
 				}
 		}
