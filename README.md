@@ -11,7 +11,7 @@
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
 
-## Wehook URL
+## Webhook URL
 
 Please note that an webhook URL with the TLD `.dev` is not allowed, this library will check on 
 WordPress URL's on the `.dev` TLD and will not pass the `webhookUrl` paramater to Mollie.
