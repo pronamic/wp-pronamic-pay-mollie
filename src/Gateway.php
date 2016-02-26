@@ -122,8 +122,13 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	private function get_webhook_url() {
 		$url = home_url( '/' );
 
-		// Mollie doesn't allow the TLD .dev
-		if ( '.dev' === substr( parse_url( $url, PHP_URL_HOST ), -4 ) ) {
+		$host = parse_url( $url, PHP_URL_HOST );
+
+		if ( 'localhost' === $host ) {
+			// Mollie doesn't allow localhost
+			return false;
+		} elseif ( '.dev' === substr( $host, -4 ) ) {
+			// Mollie doesn't allow the TLD .dev
 			return false;
 		}
 
