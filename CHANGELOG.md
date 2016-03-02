@@ -7,6 +7,12 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.4] - 2016-03-02
+- Improved support for custom payment methods through Gravity Forms.
+- Moved get_gateway_class() function to the configuration class.
+- Removed get_config_class(), no longer required.
+- Also added an check on localhost webhook URLs.
+
 ## [1.1.3] - 2016-02-01
 - Added an gateway settings class.
 - Don't redirect if webhook was called (allows for e-commerce tracking)
@@ -24,7 +30,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.3...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.4...HEAD
+[1.1.4]: https://github.com/wp-pay-gateways/mollie/compare/1.1.3...1.1.4
 [1.1.3]: https://github.com/wp-pay-gateways/mollie/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/wp-pay-gateways/mollie/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/wp-pay-gateways/mollie/compare/1.1.0...1.1.1
