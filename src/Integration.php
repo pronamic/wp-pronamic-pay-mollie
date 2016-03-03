@@ -11,10 +11,16 @@
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gateways_AbstractIntegration {
+	/**
+	 * @var string Dashboard URL
+	 */
+	var $dashboard_url = 'http://www.mollie.nl/beheer/';
+
 	public function __construct() {
 		$this->id            = 'mollie';
 		$this->name          = 'Mollie';
-		$this->dashboard_url = 'http://www.mollie.nl/';
+		$this->url           = 'http://www.mollie.com/en/';
+		$this->product_url   = __( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' );
 		$this->provider      = 'mollie';
 
 		// Actions
