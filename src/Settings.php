@@ -21,6 +21,14 @@ class Pronamic_WP_Pay_Gateways_Mollie_Settings extends Pronamic_WP_Pay_GatewaySe
 		$sections['mollie'] = array(
 			'title'   => __( 'Mollie', 'pronamic_ideal' ),
 			'methods' => array( 'mollie' ),
+			'description' => __( 'Account details are provided by the payment provider after registration. These settings need to match with the payment provider dashboard.', 'pronamic_ideal' ),
+		);
+
+		// Transaction eedback
+		$sections['mollie_feedback'] = array(
+			'title'       => __( 'Transaction feedback', 'pronamic_ideal' ),
+			'methods'     => array( 'mollie' ),
+			'description' => __( 'Payment status updates will be processed without any additional configuration. The <em>Webhook URL</em> is being used to receive the status updates.', 'pronamic_ideal' ),
 		);
 
 		// Return
@@ -37,17 +45,34 @@ class Pronamic_WP_Pay_Gateways_Mollie_Settings extends Pronamic_WP_Pay_GatewaySe
 			'type'        => 'text',
 			'classes'     => array( 'regular-text', 'code' ),
 			'methods'     => array( 'mollie' ),
+			'tooltip'     => sprintf(
+				'%s %s.',
+				__( 'API key', 'pronamic_ideal' ),
+				__( 'as mentioned in the payment provider dashboard', 'pronamic_ideal' )
+			),
+		);
+
+		// Transaction feedback
+		$fields[] = array(
+			'section'     => 'mollie',
+			'title'       => __( 'Transaction feedback', 'pronamic_ideal' ),
+			'type'        => 'description',
+			'html'        => sprintf(
+				'<span class="dashicons dashicons-yes pronamic-pay-yes"></span> %s',
+				__( 'Payment status updates will be processed without any additional configuration.', 'pronamic_ideal' )
+			),
 		);
 
 		// Webhook
 		$fields[] = array(
-			'section'     => 'mollie',
-			'title'       => __( 'Webhook', 'pronamic_ideal' ),
+			'section'     => 'mollie_feedback',
+			'title'       => __( 'Webhook URL', 'pronamic_ideal' ),
 			'type'        => 'text',
 			'classes'     => array( 'large-text', 'code' ),
 			'value'       => add_query_arg( 'mollie_webhook', '', home_url( '/' ) ),
 			'readonly'    => true,
 			'methods'     => array( 'mollie' ),
+			'tooltip'     => __( 'The Webhook URL as sent with each transaction to receive automatic payment status updates on.', 'pronamic_ideal' ),
 		);
 
 		// Return
