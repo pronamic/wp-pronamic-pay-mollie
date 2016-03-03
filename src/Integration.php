@@ -13,7 +13,7 @@
 class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gateways_AbstractIntegration {
 	/**
 	 * Dashboard URL.
-	 * 
+	 *
 	 * @var string
 	 */
 	var $dashboard_url = 'http://www.mollie.nl/beheer/';
