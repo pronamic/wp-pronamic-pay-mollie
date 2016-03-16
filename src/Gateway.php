@@ -156,8 +156,16 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $data->get_language() );
 
 		switch ( $payment_method ) {
+			case Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER :
+				$request->method = Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER;
+
+				break;
 			case Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD :
 				$request->method = Pronamic_WP_Pay_Mollie_Methods::CREDITCARD;
+
+				break;
+			case Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT :
+				$request->method = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
 
 				break;
 			case Pronamic_WP_Pay_PaymentMethods::MISTER_CASH :
