@@ -31,7 +31,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Settings extends Pronamic_WP_Pay_GatewaySe
 			'description' => __( 'Payment status updates will be processed without any additional configuration. The <em>Webhook URL</em> is being used to receive the status updates.', 'pronamic_ideal' ),
 		);
 
-		// Return
+		// Return sections
 		return $sections;
 	}
 
@@ -75,7 +75,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Settings extends Pronamic_WP_Pay_GatewaySe
 			'tooltip'     => __( 'The Webhook URL as sent with each transaction to receive automatic payment status updates on.', 'pronamic_ideal' ),
 		);
 
-		// Return
+		// Return fields
 		return $fields;
 	}
 }
