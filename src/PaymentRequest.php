@@ -46,7 +46,9 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 			'issuer'      => $this->issuer,
 		);
 
-		// Array filter will remove values NULL, FALSE and empty strings ('')
+		/*
+		 * Array filter will remove values NULL, FALSE and empty strings ('')
+		 */
 		$array = array_filter( $array );
 
 		return $array;

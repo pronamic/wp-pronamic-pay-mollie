@@ -4,26 +4,26 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "34747881ac9dbc5806aefa505db194d4",
-    "content-hash": "16a2dbce9afaf50c5a4b58ef73388d89",
+    "hash": "55cdb907cf2c67a1f89b27053c32272e",
+    "content-hash": "3a24f06dca74526c2eff0d763a7243ff",
     "packages": [
         {
             "name": "wp-pay-gateways/common",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-pay-gateways/common.git",
-                "reference": "954bdea818e682bf85ca47a81b5c08d73282a1ae"
+                "reference": "f55f2c0bb06eaebf47a63505740a7a331eb4724f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-pay-gateways/common/zipball/954bdea818e682bf85ca47a81b5c08d73282a1ae",
-                "reference": "954bdea818e682bf85ca47a81b5c08d73282a1ae",
+                "url": "https://api.github.com/repos/wp-pay-gateways/common/zipball/f55f2c0bb06eaebf47a63505740a7a331eb4724f",
+                "reference": "f55f2c0bb06eaebf47a63505740a7a331eb4724f",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.4",
-                "wp-pay/core": ">=1.3.0",
+                "wp-pay/core": "^1.3.5",
                 "xrstf/composer-php52": "1.*"
             },
             "require-dev": {
@@ -31,7 +31,7 @@
                 "satooshi/php-coveralls": "^0.7.1",
                 "squizlabs/php_codesniffer": "^2.2.0",
                 "wp-cli/wp-cli": "^0.21.1",
-                "wp-coding-standards/wpcs": "0.8.0"
+                "wp-coding-standards/wpcs": "0.9.0"
             },
             "type": "library",
             "autoload": {
@@ -67,20 +67,20 @@
                 "wordpress",
                 "wp"
             ],
-            "time": "2016-03-02 07:19:44"
+            "time": "2016-03-22 12:34:20"
         },
         {
             "name": "wp-pay/core",
-            "version": "1.3.4",
+            "version": "1.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-pay/core.git",
-                "reference": "24ce9a374a90d462bc5c321133beb71029fb7a70"
+                "reference": "6d29e36e13f919b4adad939a1ac1e1923749fddc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-pay/core/zipball/24ce9a374a90d462bc5c321133beb71029fb7a70",
-                "reference": "24ce9a374a90d462bc5c321133beb71029fb7a70",
+                "url": "https://api.github.com/repos/wp-pay/core/zipball/6d29e36e13f919b4adad939a1ac1e1923749fddc",
+                "reference": "6d29e36e13f919b4adad939a1ac1e1923749fddc",
                 "shasum": ""
             },
             "require": {
@@ -92,7 +92,7 @@
                 "satooshi/php-coveralls": "^0.7.1",
                 "squizlabs/php_codesniffer": "^2.2.0",
                 "wp-cli/wp-cli": "^0.21.1",
-                "wp-coding-standards/wpcs": "0.8.0"
+                "wp-coding-standards/wpcs": "0.9.0"
             },
             "type": "library",
             "autoload": {
@@ -128,7 +128,7 @@
                 "wordpress",
                 "wp"
             ],
-            "time": "2016-03-02 07:13:46"
+            "time": "2016-03-22 12:29:58"
         },
         {
             "name": "xrstf/composer-php52",
@@ -409,16 +409,16 @@
         },
         {
             "name": "pdepend/pdepend",
-            "version": "2.2.3",
+            "version": "2.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pdepend/pdepend.git",
-                "reference": "9d816dfa565b9c47685057761acaf432c9e8066a"
+                "reference": "b086687f3a01dc6bb92d633aef071d2c5dd0db06"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pdepend/pdepend/zipball/9d816dfa565b9c47685057761acaf432c9e8066a",
-                "reference": "9d816dfa565b9c47685057761acaf432c9e8066a",
+                "url": "https://api.github.com/repos/pdepend/pdepend/zipball/b086687f3a01dc6bb92d633aef071d2c5dd0db06",
+                "reference": "b086687f3a01dc6bb92d633aef071d2c5dd0db06",
                 "shasum": ""
             },
             "require": {
@@ -445,20 +445,20 @@
                 "BSD-3-Clause"
             ],
             "description": "Official version of pdepend to be handled with Composer",
-            "time": "2016-02-23 08:20:26"
+            "time": "2016-03-10 15:15:04"
         },
         {
             "name": "phpmd/phpmd",
-            "version": "2.3.2",
+            "version": "2.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpmd/phpmd.git",
-                "reference": "08b5bcd454a7148579b68931fc500d824afd3bb5"
+                "reference": "fccbdb6b222f6d7a6d35af1c396ba5435cec76a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpmd/phpmd/zipball/08b5bcd454a7148579b68931fc500d824afd3bb5",
-                "reference": "08b5bcd454a7148579b68931fc500d824afd3bb5",
+                "url": "https://api.github.com/repos/phpmd/phpmd/zipball/fccbdb6b222f6d7a6d35af1c396ba5435cec76a9",
+                "reference": "fccbdb6b222f6d7a6d35af1c396ba5435cec76a9",
                 "shasum": ""
             },
             "require": {
@@ -510,7 +510,7 @@
                 "phpmd",
                 "pmd"
             ],
-            "time": "2015-09-24 14:37:49"
+            "time": "2016-03-10 17:17:44"
         },
         {
             "name": "psr/log",
@@ -1116,7 +1116,7 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
@@ -1382,16 +1382,16 @@
         },
         {
             "name": "wp-coding-standards/wpcs",
-            "version": "0.8.0",
+            "version": "0.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git",
-                "reference": "b3d4d8eedd8b0b7f4fdf8764df1c8b23ff099334"
+                "reference": "b415094aa5fd24da6eba2295323bcff840902dd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/b3d4d8eedd8b0b7f4fdf8764df1c8b23ff099334",
-                "reference": "b3d4d8eedd8b0b7f4fdf8764df1c8b23ff099334",
+                "url": "https://api.github.com/repos/WordPress-Coding-Standards/WordPress-Coding-Standards/zipball/b415094aa5fd24da6eba2295323bcff840902dd3",
+                "reference": "b415094aa5fd24da6eba2295323bcff840902dd3",
                 "shasum": ""
             },
             "require": {
@@ -1414,7 +1414,7 @@
                 "standards",
                 "wordpress"
             ],
-            "time": "2015-10-02 22:20:22"
+            "time": "2016-02-01 16:14:59"
         }
     ],
     "aliases": [],

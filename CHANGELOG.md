@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.5] - 2016-03-22
+- Added product URL, updated dashboard URL.
+- Updated gateway settings.
+- Added support for bank transfer and direct debit payment methods.
+
 ## [1.1.4] - 2016-03-02
 - Improved support for custom payment methods through Gravity Forms.
 - Moved get_gateway_class() function to the configuration class.
@@ -30,7 +35,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.4...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.5...HEAD
+[1.1.5]: https://github.com/wp-pay-gateways/mollie/compare/1.1.4...1.1.5
 [1.1.4]: https://github.com/wp-pay-gateways/mollie/compare/1.1.3...1.1.4
 [1.1.3]: https://github.com/wp-pay-gateways/mollie/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/wp-pay-gateways/mollie/compare/1.1.1...1.1.2

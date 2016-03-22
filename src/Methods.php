@@ -25,6 +25,13 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	const CREDITCARD = 'creditcard';
 
 	/**
+	 * Constant for the Direct Debit method.
+	 *
+	 * @var string
+	 */
+	const DIRECT_DEBIT = 'directdebit';
+
+	/**
 	 * Constant for the Mister Cash method.
 	 *
 	 * @var string

@@ -32,11 +32,10 @@ class Pronamic_WP_Pay_Mollie_LocaleHelper {
 		$locale = strtolower( $locale );
 
 		// Is supported?
-		if ( in_array( $locale, $supported ) ) {
+		if ( in_array( $locale, $supported, true ) ) {
 			return $locale;
 		}
 
-		// Return
 		return null;
 	}
 }
