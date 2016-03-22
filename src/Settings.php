@@ -19,8 +19,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Settings extends Pronamic_WP_Pay_GatewaySe
 	public function sections( array $sections ) {
 		// iDEAL
 		$sections['mollie'] = array(
-			'title'   => __( 'Mollie', 'pronamic_ideal' ),
-			'methods' => array( 'mollie' ),
+			'title'       => __( 'Mollie', 'pronamic_ideal' ),
+			'methods'     => array( 'mollie' ),
 			'description' => __( 'Account details are provided by the payment provider after registration. These settings need to match with the payment provider dashboard.', 'pronamic_ideal' ),
 		);
 
