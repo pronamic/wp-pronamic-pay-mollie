@@ -41,13 +41,29 @@ class Pronamic_WP_Pay_Gateways_Mollie_Settings extends Pronamic_WP_Pay_GatewaySe
 			'filter'      => FILTER_SANITIZE_STRING,
 			'section'     => 'mollie',
 			'meta_key'    => '_pronamic_gateway_mollie_api_key',
-			'title'       => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
+			'title'       => _x( 'Live API Key', 'mollie', 'pronamic_ideal' ),
 			'type'        => 'text',
 			'classes'     => array( 'regular-text', 'code' ),
 			'methods'     => array( 'mollie' ),
 			'tooltip'     => sprintf(
 				'%s %s.',
-				__( 'API key', 'pronamic_ideal' ),
+				__( 'Live API key beginning with <code>live_</code>', 'pronamic_ideal' ),
+				__( 'as mentioned in the payment provider dashboard', 'pronamic_ideal' )
+			),
+		);
+
+		// Test API Key
+		$fields[] = array(
+			'filter'      => FILTER_SANITIZE_STRING,
+			'section'     => 'mollie',
+			'meta_key'    => '_pronamic_gateway_mollie_api_key_test',
+			'title'       => _x( 'Test API Key', 'mollie', 'pronamic_ideal' ),
+			'type'        => 'text',
+			'classes'     => array( 'regular-text', 'code' ),
+			'methods'     => array( 'mollie' ),
+			'tooltip'     => sprintf(
+				'%s %s.',
+				__( 'Test API key beginning with <code>test_</code>', 'pronamic_ideal' ),
 				__( 'as mentioned in the payment provider dashboard', 'pronamic_ideal' )
 			),
 		);
