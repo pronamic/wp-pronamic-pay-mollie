@@ -211,10 +211,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		$user = wp_get_current_user();
 
-		if ( $user->user_email !== $data->get_email() ) {
-			return $customer_id;
-		}
-
 		$customer_id = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', true );
 
 		if ( $customer_id ) {
