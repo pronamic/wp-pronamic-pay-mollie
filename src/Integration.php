@@ -31,6 +31,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gatewa
 		if ( ! has_action( 'wp_loaded', $function ) ) {
 			add_action( 'wp_loaded', $function );
 		}
+
+		add_filter( 'pronamic_pay_user_profile_fields', array( $this, 'user_profile_fields' ) );
 	}
 
 	public function get_config_factory_class() {
@@ -54,5 +56,14 @@ class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gatewa
 		$settings[] = 'mollie';
 
 		return $settings;
+	}
+
+	public function user_profile_fields( $fields ) {
+		$fields[] = array(
+			'name' => __( 'Mollie Customer ID', 'pronamic_ideal' ),
+			'key'  => '_pronamic_pay_mollie_customer_id',
+		);
+
+		return $fields;
 	}
 }
