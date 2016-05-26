@@ -162,7 +162,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
 		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $data->get_language() );
-		$request->customerId   = $customer_id;
+		$request->customer_id  = $customer_id;
 
 		switch ( $payment_method ) {
 			case Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER :
