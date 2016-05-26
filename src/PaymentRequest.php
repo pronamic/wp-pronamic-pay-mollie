@@ -26,6 +26,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 
 	public $issuer;
 
+	public $customerId;
+
 	/////////////////////////////////////////////////
 
 	public function __construct() {
@@ -44,6 +46,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 			'locale'      => $this->locale,
 			'webhookUrl'  => $this->webhook_url,
 			'issuer'      => $this->issuer,
+			'customerId'  => $this->customerId,
 		);
 
 		/*

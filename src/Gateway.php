@@ -153,6 +153,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 * @see Pronamic_WP_Pay_Gateway::start()
 	 */
 	public function start( Pronamic_Pay_PaymentDataInterface $data, Pronamic_Pay_Payment $payment, $payment_method = null ) {
+		$customer_id = $this->client->get_customer_id( $data );
+
 		$request = new Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest();
 
 		$request->amount       = $data->get_amount();
@@ -160,6 +162,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
 		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $data->get_language() );
+		$request->customerId   = $customer_id;
 
 		switch ( $payment_method ) {
 			case Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER :
