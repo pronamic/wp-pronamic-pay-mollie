@@ -205,46 +205,46 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	public function get_customer_id( Pronamic_WP_Pay_PaymentData $data ) {
 		$customer_id = null;
 
-		if ( '' === $data->get_email() ) {
+		if ( ! is_user_logged_in() ) {
 			return $customer_id;
 		}
 
-		$user = get_user_by( 'email', $data->get_email() );
+		$user = wp_get_current_user();
 
-		if ( $user ) {
-			$customer_id = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', true );
+		if ( $user->user_email !== $data->get_email() ) {
+			return $customer_id;
+		}
 
-			if ( $customer_id ) {
-				return $customer_id;
+		$customer_id = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', true );
+
+		if ( $customer_id ) {
+			return $customer_id;
+		}
+
+		$response = $this->send_request( 'customers/', 'POST', array(
+			'name'  => $data->get_customer_name(),
+			'email' => $data->get_email(),
+		) );
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 201 == $response_code ) { // WPCS: loose comparison ok.
+			$body = wp_remote_retrieve_body( $response );
+
+			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+			$result = json_decode( $body );
+
+			if ( null !== $result ) {
+				$customer_id = $result->id;
+
+				update_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', $customer_id );
 			}
+		} else {
+			$body = wp_remote_retrieve_body( $response );
 
-			$response = $this->send_request( 'customers/', 'POST', array(
-				'name'  => $data->get_customer_name(),
-				'email' => $data->get_email(),
-			) );
+			$mollie_result = json_decode( $body );
 
-			$response_code = wp_remote_retrieve_response_code( $response );
-
-			if ( 201 == $response_code ) { // WPCS: loose comparison ok.
-				$body = wp_remote_retrieve_body( $response );
-
-				// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-				$result = json_decode( $body );
-
-				if ( null !== $result ) {
-					$customer_id = $result->id;
-
-					if ( $user ) {
-						update_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', $customer_id );
-					}
-				}
-			} else {
-				$body = wp_remote_retrieve_body( $response );
-
-				$mollie_result = json_decode( $body );
-
-				$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
-			}
+			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
 		}
 
 		return $customer_id;
