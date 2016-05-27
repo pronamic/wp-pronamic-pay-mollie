@@ -32,7 +32,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gatewa
 			add_action( 'wp_loaded', $function );
 		}
 
-		add_filter( 'pronamic_pay_user_profile_fields', array( $this, 'user_profile_fields' ) );
+		if ( is_admin() ) {
+			add_action( 'show_user_profile', array( $this, 'user_profile' ) );
+			add_action( 'edit_user_profile', array( $this, 'user_profile' ) );
+		}
 	}
 
 	public function get_config_factory_class() {
@@ -58,12 +61,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gatewa
 		return $settings;
 	}
 
-	public function user_profile_fields( $fields ) {
-		$fields[] = array(
-			'name' => __( 'Mollie Customer ID', 'pronamic_ideal' ),
-			'key'  => '_pronamic_pay_mollie_customer_id',
-		);
-
-		return $fields;
+	/**
+	 * User profile.
+	 *
+	 * @see https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
+	 */
+	public function user_profile( $user ) {
+		include dirname( __FILE__ ) . '/../views/html-admin-user-profile.php';
 	}
 }
