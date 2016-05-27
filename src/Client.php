@@ -80,26 +80,27 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	/////////////////////////////////////////////////
 
 	public function create_payment( Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest $request ) {
-		$result = null;
-
 		$data = $request->get_array();
 
 		$response = $this->send_request( 'payments/', 'POST', $data );
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 
-		if ( 201 == $response_code ) { // WPCS: loose comparison ok.
-			$body = wp_remote_retrieve_body( $response );
-
-			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-			$result = json_decode( $body );
-		} else {
+		if ( 201 != $response_code ) { // WPCS: loose comparison ok.
 			$body = wp_remote_retrieve_body( $response );
 
 			$mollie_result = json_decode( $body );
 
 			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
+
+			return null;
 		}
+
+		// OK
+		$body = wp_remote_retrieve_body( $response );
+
+		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+		$result = json_decode( $body );
 
 		return $result;
 	}
