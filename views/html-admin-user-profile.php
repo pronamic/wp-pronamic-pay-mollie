@@ -9,7 +9,7 @@ $customer_id = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', tru
 	<tr>
 		<th>
 			<label for="pronamic_pay_mollie_customer_id">
-				<?php esc_html_e( 'Customer ID', 'magento' ); ?>
+				<?php esc_html_e( 'Customer ID', 'pronamic_ideal' ); ?>
 			</label>
 		</th>
 		<td>
