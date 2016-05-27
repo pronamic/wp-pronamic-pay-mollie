@@ -7,7 +7,9 @@
 		<exclude name="Squiz.Commenting" />
 
 		<exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar" />
+
 		<exclude name="WordPress.VIP.RestrictedFunctions.parse_url" />
+		<exclude name="WordPress.VIP.RestrictedFunctions.user_meta" />
 	</rule>
 
 	<rule ref="WordPress.VIP.SlowDBQuery.slow_db_query">
