@@ -72,4 +72,31 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 * @var string
 	 */
 	const PAYSAFECARD = 'paysafecard';
+
+	/////////////////////////////////////////////////
+
+	/**
+	 * Transform WordPress payment method to Mollie method.
+	 *
+	 * @param string $method
+	 * @return string
+	 */
+	public static function transform( $method ) {
+		switch ( $method ) {
+			case Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER :
+				return Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER;
+			case Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD :
+				return Pronamic_WP_Pay_Mollie_Methods::CREDITCARD;
+			case Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT :
+				return Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
+			case Pronamic_WP_Pay_PaymentMethods::MISTER_CASH :
+				return Pronamic_WP_Pay_Mollie_Methods::MISTERCASH;
+			case Pronamic_WP_Pay_PaymentMethods::SOFORT :
+				return Pronamic_WP_Pay_Mollie_Methods::SOFORT;
+			case Pronamic_WP_Pay_PaymentMethods::IDEAL :
+				return Pronamic_WP_Pay_Mollie_Methods::IDEAL;
+			default :
+				return null;
+		}
+	}
 }

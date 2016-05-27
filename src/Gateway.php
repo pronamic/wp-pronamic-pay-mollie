@@ -48,13 +48,15 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		$result = $this->client->get_issuers();
 
-		if ( $result ) {
-			$groups[] = array(
-				'options' => $result,
-			);
-		} else {
+		if ( ! $result ) {
 			$this->error = $this->client->get_error();
+
+			return $groups;
 		}
+
+		$groups[] = array(
+			'options' => $result,
+		);
 
 		return $groups;
 	}
@@ -86,13 +88,15 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		$result = $this->client->get_payment_methods();
 
-		if ( $result ) {
-			$groups[] = array(
-				'options' => $result,
-			);
-		} else {
+		if ( ! $result ) {
 			$this->error = $this->client->get_error();
+
+			return $groups;
 		}
+
+		$groups[] = array(
+			'options' => $result,
+		);
 
 		return $groups;
 	}
@@ -157,48 +161,28 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$request->webhook_url  = $this->get_webhook_url();
 		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $data->get_language() );
 		$request->customer_id  = $customer_id;
+		$request->method       = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
 
-		switch ( $payment_method ) {
-			case Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER :
-				$request->method = Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER;
+		if ( empty( $request->method ) && ! empty( $payment_method ) ) {
+			// Leap of faith if the WordPress payment method could not transform to a Mollie method?
+			$request->method = $payment_method;
+		}
 
-				break;
-			case Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD :
-				$request->method = Pronamic_WP_Pay_Mollie_Methods::CREDITCARD;
-
-				break;
-			case Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT :
-				$request->method = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
-
-				break;
-			case Pronamic_WP_Pay_PaymentMethods::MISTER_CASH :
-				$request->method = Pronamic_WP_Pay_Mollie_Methods::MISTERCASH;
-
-				break;
-			case Pronamic_WP_Pay_PaymentMethods::SOFORT :
-				$request->method = Pronamic_WP_Pay_Mollie_Methods::SOFORT;
-
-				break;
-			case Pronamic_WP_Pay_PaymentMethods::IDEAL :
-				$request->method = Pronamic_WP_Pay_Mollie_Methods::IDEAL;
-				$request->issuer = $data->get_issuer_id();
-
-				break;
-
-			default:
-				if ( is_string( $payment_method ) && ! empty( $payment_method ) ) {
-					$request->method = $payment_method;
-				}
+		if ( Pronamic_WP_Pay_PaymentMethods::IDEAL === $payment_method ) {
+			// If payment method is iDEAL we set the chosen issuer ID by user.
+			$request->issuer = $data->get_issuer_id();
 		}
 
 		$result = $this->client->create_payment( $request );
 
-		if ( $result ) {
-			$payment->set_transaction_id( $result->id );
-			$payment->set_action_url( $result->links->paymentUrl );
-		} else {
+		if ( ! $result ) {
 			$this->error = $this->client->get_error();
+
+			return;
 		}
+
+		$payment->set_transaction_id( $result->id );
+		$payment->set_action_url( $result->links->paymentUrl );
 	}
 
 	/////////////////////////////////////////////////
@@ -211,22 +195,24 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	public function update_status( Pronamic_Pay_Payment $payment ) {
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
 
-		if ( $mollie_payment ) {
-			$payment->set_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_payment->status ) );
-
-			if ( isset( $mollie_payment->details ) ) {
-				$details = $mollie_payment->details;
-
-				if ( isset( $details->consumerName ) ) {
-					$payment->set_consumer_name( $details->consumerName );
-				}
-
-				if ( isset( $details->consumerAccount ) ) {
-					$payment->set_consumer_iban( $details->consumerAccount );
-				}
-			}
-		} else {
+		if ( ! $mollie_payment ) {
 			$this->error = $this->client->get_error();
+
+			return;
+		}
+
+		$payment->set_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_payment->status ) );
+
+		if ( isset( $mollie_payment->details ) ) {
+			$details = $mollie_payment->details;
+
+			if ( isset( $details->consumerName ) ) {
+				$payment->set_consumer_name( $details->consumerName );
+			}
+
+			if ( isset( $details->consumerAccount ) ) {
+				$payment->set_consumer_iban( $details->consumerAccount );
+			}
 		}
 	}
 }
