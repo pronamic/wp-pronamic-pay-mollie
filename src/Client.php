@@ -204,10 +204,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * @return array
 	 */
 	public function get_customer_id( Pronamic_WP_Pay_PaymentData $data ) {
-		$customer_id = null;
-
 		if ( ! is_user_logged_in() ) {
-			return $customer_id;
+			return false;
 		}
 
 		$user = wp_get_current_user();
@@ -231,6 +229,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			$mollie_result = json_decode( $body );
 
 			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
+
+			return false;
 		}
 
 		// OK
@@ -239,11 +239,13 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
 		$result = json_decode( $body );
 
-		if ( null !== $result ) {
-			$customer_id = $result->id;
-
-			update_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', $customer_id );
+		if ( ! is_object( $result ) ) {
+			return false;
 		}
+
+		$customer_id = $result->id;
+
+		update_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', $customer_id );
 
 		// Return
 		return $customer_id;
