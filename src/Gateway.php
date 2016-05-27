@@ -33,13 +33,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$this->set_amount_minimum( 1.20 );
 		$this->set_slug( self::SLUG );
 
-		$api_key = $config->api_key;
-
-		if ( 'test' === $config->mode && ! empty( $config->api_key_test ) ) {
-			$api_key = $config->api_key_test;
-		}
-
-		$this->client = new Pronamic_WP_Pay_Gateways_Mollie_Client( $api_key );
+		$this->client = new Pronamic_WP_Pay_Gateways_Mollie_Client( $config->api_key );
 	}
 
 	/////////////////////////////////////////////////
