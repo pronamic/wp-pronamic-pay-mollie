@@ -247,7 +247,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		update_user_meta( $user_id, '_pronamic_pay_mollie_customer_id', $customer_id );
 
-		// Return
 		return $customer_id;
 	}
 }
