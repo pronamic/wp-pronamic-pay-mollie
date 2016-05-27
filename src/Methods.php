@@ -81,8 +81,8 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 * @param string $method
 	 * @return string
 	 */
-	public static function transform( $method ) {
-		switch ( $method ) {
+	public static function transform( $payment_method ) {
+		switch ( $payment_method ) {
 			case Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER :
 				return Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER;
 			case Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD :
