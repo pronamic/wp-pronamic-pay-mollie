@@ -208,9 +208,9 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			return false;
 		}
 
-		$user = wp_get_current_user();
+		$user_id = get_current_user_id();
 
-		$customer_id = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', true );
+		$customer_id = get_user_meta( $user_id, '_pronamic_pay_mollie_customer_id', true );
 
 		if ( $customer_id ) {
 			return $customer_id;
@@ -245,7 +245,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		$customer_id = $result->id;
 
-		update_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', $customer_id );
+		update_user_meta( $user_id, '_pronamic_pay_mollie_customer_id', $customer_id );
 
 		// Return
 		return $customer_id;
