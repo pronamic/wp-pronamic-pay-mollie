@@ -11,7 +11,7 @@
  */
 class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 	/**
-	 * The amount in EURO that you want to charge, e.g. `100.00` if you would want to charge 
+	 * The amount in EURO that you want to charge, e.g. `100.00` if you would want to charge
 	 * € 100,00.
 	 *
 	 * @see https://www.mollie.com/nl/docs/reference/payments/create
@@ -20,7 +20,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 	public $amount;
 
 	/**
-	 * The description of the payment you're creating. This will be shown to the consumer on their 
+	 * The description of the payment you're creating. This will be shown to the consumer on their
 	 * card or bank statement when possible.
 	 *
 	 * @see https://www.mollie.com/nl/docs/reference/payments/create
