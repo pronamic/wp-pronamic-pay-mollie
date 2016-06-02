@@ -101,13 +101,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 	public $customer_id;
 
 	/**
-	 * Constructs and initializes Mollie payment request object
-	 */
-	public function __construct() {
-
-	}
-
-	/**
 	 * Get array of this Mollie payment request object.
 	 *
 	 * @return array
