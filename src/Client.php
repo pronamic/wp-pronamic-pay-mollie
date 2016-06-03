@@ -203,22 +203,22 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 *
 	 * @return array
 	 */
-	public function get_customer_id( Pronamic_WP_Pay_PaymentData $data ) {
+	public function get_customer_id() {
 		if ( ! is_user_logged_in() ) {
 			return false;
 		}
 
-		$user_id = get_current_user_id();
+		$user = wp_get_current_user();
 
-		$customer_id = get_user_meta( $user_id, '_pronamic_pay_mollie_customer_id', true );
+		$customer_id = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', true );
 
 		if ( $customer_id ) {
 			return $customer_id;
 		}
 
 		$response = $this->send_request( 'customers/', 'POST', array(
-			'name'  => $data->get_customer_name(),
-			'email' => $data->get_email(),
+			'name'  => trim( '' . $user->user_firstname . ' ' . $user->user_lastname ),
+			'email' => $user->user_email,
 		) );
 
 		$response_code = wp_remote_retrieve_response_code( $response );

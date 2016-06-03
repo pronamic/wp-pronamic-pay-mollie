@@ -147,19 +147,20 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	/**
 	 * Start
 	 *
-	 * @param Pronamic_Pay_PaymentDataInterface $data
 	 * @see Pronamic_WP_Pay_Gateway::start()
 	 */
-	public function start( Pronamic_Pay_PaymentDataInterface $data, Pronamic_Pay_Payment $payment, $payment_method = null ) {
-		$customer_id = $this->client->get_customer_id( $data );
+	public function start( Pronamic_Pay_Payment $payment ) {
+		$customer_id = $this->client->get_customer_id();
 
 		$request = new Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest();
 
-		$request->amount       = $data->get_amount();
-		$request->description  = $data->get_description();
+		$payment_method = $payment->get_method();
+
+		$request->amount       = $payment->get_amount();
+		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
-		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $data->get_language() );
+		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $payment->get_language() );
 		$request->customer_id  = $customer_id;
 		$request->method       = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
 
@@ -170,7 +171,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		if ( Pronamic_WP_Pay_PaymentMethods::IDEAL === $payment_method ) {
 			// If payment method is iDEAL we set the user chosen issuer ID.
-			$request->issuer = $data->get_issuer_id();
+			$request->issuer = $payment->get_issuer();
 		}
 
 		$result = $this->client->create_payment( $request );
