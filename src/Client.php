@@ -7,7 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.0.0
+ * @version 1.1.6
+ * @since 1.0.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	/**
@@ -80,26 +81,27 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	/////////////////////////////////////////////////
 
 	public function create_payment( Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest $request ) {
-		$result = null;
-
 		$data = $request->get_array();
 
 		$response = $this->send_request( 'payments/', 'POST', $data );
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 
-		if ( 201 == $response_code ) { // WPCS: loose comparison ok.
-			$body = wp_remote_retrieve_body( $response );
-
-			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-			$result = json_decode( $body );
-		} else {
+		if ( 201 != $response_code ) { // WPCS: loose comparison ok.
 			$body = wp_remote_retrieve_body( $response );
 
 			$mollie_result = json_decode( $body );
 
 			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
+
+			return null;
 		}
+
+		// OK
+		$body = wp_remote_retrieve_body( $response );
+
+		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+		$result = json_decode( $body );
 
 		return $result;
 	}
@@ -191,5 +193,61 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		}
 
 		return $payment_methods;
+	}
+
+	//////////////////////////////////////////////////
+
+	/**
+	 * Get customer.
+	 *
+	 * @since 1.1.6
+	 * @param Pronamic_WP_Pay_PaymentData $data
+	 * @return array
+	 */
+	public function get_customer_id() {
+		if ( ! is_user_logged_in() ) {
+			return false;
+		}
+
+		$user = wp_get_current_user();
+
+		$customer_id = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', true );
+
+		if ( $customer_id ) {
+			return $customer_id;
+		}
+
+		$response = $this->send_request( 'customers/', 'POST', array(
+			'name'  => trim( '' . $user->user_firstname . ' ' . $user->user_lastname ),
+			'email' => $user->user_email,
+		) );
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 201 != $response_code ) { // WPCS: loose comparison ok.
+			$body = wp_remote_retrieve_body( $response );
+
+			$mollie_result = json_decode( $body );
+
+			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
+
+			return false;
+		}
+
+		// OK
+		$body = wp_remote_retrieve_body( $response );
+
+		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+		$result = json_decode( $body );
+
+		if ( ! is_object( $result ) ) {
+			return false;
+		}
+
+		$customer_id = $result->id;
+
+		update_user_meta( $user_id, '_pronamic_pay_mollie_customer_id', $customer_id );
+
+		return $customer_id;
 	}
 }

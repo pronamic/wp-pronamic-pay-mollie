@@ -45,11 +45,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Settings extends Pronamic_WP_Pay_GatewaySe
 			'type'        => 'text',
 			'classes'     => array( 'regular-text', 'code' ),
 			'methods'     => array( 'mollie' ),
-			'tooltip'     => sprintf(
-				'%s %s.',
-				__( 'API key', 'pronamic_ideal' ),
-				__( 'as mentioned in the payment provider dashboard', 'pronamic_ideal' )
-			),
+			'tooltip'     => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
 		);
 
 		// Transaction feedback
