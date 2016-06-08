@@ -7,7 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.0.0
+ * @version 1.1.6
+ * @since 1.0.0
  */
 class Pronamic_WP_Pay_Mollie_Methods {
 	/**
@@ -78,6 +79,7 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	/**
 	 * Transform WordPress payment method to Mollie method.
 	 *
+	 * @since 1.1.6
 	 * @param string $method
 	 * @return string
 	 */
