@@ -93,6 +93,8 @@ class Pronamic_WP_Pay_Mollie_Methods {
 				return Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
 			case Pronamic_WP_Pay_PaymentMethods::MISTER_CASH :
 				return Pronamic_WP_Pay_Mollie_Methods::MISTERCASH;
+			case Pronamic_WP_Pay_PaymentMethods::PAYPAL :
+				return Pronamic_WP_Pay_Mollie_Methods::PAYPAL;
 			case Pronamic_WP_Pay_PaymentMethods::SOFORT :
 				return Pronamic_WP_Pay_Mollie_Methods::SOFORT;
 			case Pronamic_WP_Pay_PaymentMethods::IDEAL :
