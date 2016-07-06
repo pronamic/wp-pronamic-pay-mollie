@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.6
+ * @version 1.1.7
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_Client {
@@ -246,7 +246,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		$customer_id = $result->id;
 
-		update_user_meta( $user_id, '_pronamic_pay_mollie_customer_id', $customer_id );
+		update_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', $customer_id );
 
 		return $customer_id;
 	}
