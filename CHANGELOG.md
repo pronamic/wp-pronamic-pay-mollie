@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.8] - 2016-07-06
+- Excluded non-essential files in .gitattributes.
+
 ## [1.1.7] - 2016-07-06
 - Added PayPal to gateway methods transformations.
 - Fixed undefined variable `$user_id`.
@@ -46,7 +49,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.7...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.8...HEAD
+[1.1.8]: https://github.com/wp-pay-gateways/mollie/compare/1.1.7...1.1.8
 [1.1.7]: https://github.com/wp-pay-gateways/mollie/compare/1.1.6...1.1.7
 [1.1.6]: https://github.com/wp-pay-gateways/mollie/compare/1.1.5...1.1.6
 [1.1.5]: https://github.com/wp-pay-gateways/mollie/compare/1.1.4...1.1.5
