@@ -11,6 +11,13 @@
  */
 class Pronamic_WP_Pay_Mollie_Statuses {
 	/**
+	 * Active
+	 *
+	 * @var string
+	 */
+	const ACTIVE = 'active';
+
+	/**
 	 * Open
 	 *
 	 * @var string
@@ -60,6 +67,7 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 				return Pronamic_WP_Pay_Statuses::CANCELLED;
 			case self::PAID_OUT :
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
+			case self::ACTIVE :
 			case self::PAID :
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
 			case self::EXPIRED :
