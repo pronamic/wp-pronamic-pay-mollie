@@ -34,6 +34,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$this->set_slug( self::SLUG );
 
 		$this->client = new Pronamic_WP_Pay_Gateways_Mollie_Client( $config->api_key );
+		$this->client->set_mode( $config->mode );
 	}
 
 	/////////////////////////////////////////////////
@@ -151,11 +152,13 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 * @see Pronamic_WP_Pay_Gateway::start()
 	 */
 	public function start( Pronamic_Pay_Payment $payment ) {
-		$customer_id = $this->client->get_customer_id();
-
 		$request = new Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest();
 
 		$payment_method = $payment->get_method();
+
+		$customer_id = $this->client->get_customer_id();
+
+		$payment->set_meta( 'mollie_customer_id', $customer_id );
 
 		$request->amount       = $payment->get_amount();
 		$request->description  = $payment->get_description();

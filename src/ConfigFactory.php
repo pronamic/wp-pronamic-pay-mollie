@@ -15,6 +15,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_ConfigFactory extends Pronamic_WP_Pay_Gate
 
 		$config->api_key  = get_post_meta( $post_id, '_pronamic_gateway_mollie_api_key', true );
 
+		$config->mode     = get_post_meta( $post_id, '_pronamic_gateway_mode', true );
+
 		return $config;
 	}
 }
