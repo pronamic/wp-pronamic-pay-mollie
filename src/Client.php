@@ -246,7 +246,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 			$response_code = wp_remote_retrieve_response_code( $response );
 
-			switch( $response_code ) {
+			switch ( $response_code ) {
 				case 200 :
 					return $customer_id;
 
