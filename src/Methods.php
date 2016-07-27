@@ -91,6 +91,7 @@ class Pronamic_WP_Pay_Mollie_Methods {
 				return Pronamic_WP_Pay_Mollie_Methods::CREDITCARD;
 			case Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT :
 				return Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
+			case Pronamic_WP_Pay_PaymentMethods::BANCONTACT :
 			case Pronamic_WP_Pay_PaymentMethods::MISTER_CASH :
 				return Pronamic_WP_Pay_Mollie_Methods::MISTERCASH;
 			case Pronamic_WP_Pay_PaymentMethods::PAYPAL :

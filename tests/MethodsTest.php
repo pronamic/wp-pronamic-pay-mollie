@@ -24,6 +24,7 @@ class Pronamic_WP_Pay_Mollie_MethodsTest extends PHPUnit_Framework_TestCase {
 
 	public function method_matrix_provider() {
 		return array(
+			array( Pronamic_WP_Pay_PaymentMethods::BANCONTACT, Pronamic_WP_Pay_Mollie_Methods::MISTERCASH ),
 			array( Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER, Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER ),
 			array( Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD, Pronamic_WP_Pay_Mollie_Methods::CREDITCARD ),
 			array( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT, Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT ),
