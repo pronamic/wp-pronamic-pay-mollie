@@ -30,6 +30,15 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	/////////////////////////////////////////////////
 
 	/**
+	 * Mode
+	 *
+	 * @var string
+	 */
+	private $mode;
+
+	/////////////////////////////////////////////////
+
+	/**
 	 * Error
 	 *
 	 * @var WP_Error
@@ -48,6 +57,17 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	}
 
 	/////////////////////////////////////////////////
+
+	/**
+	 * Set mode
+	 *
+	 * @param string $mode
+	 */
+	public function set_mode( $mode ) {
+		$this->mode = $mode;
+	}
+
+	//////////////////////////////////////////////////
 
 	/**
 	 * Error
@@ -211,12 +231,34 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		$user = wp_get_current_user();
 
-		$customer_id = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', true );
+		// Get customer ID from user meta
+		$meta_key = '_pronamic_pay_mollie_customer_id';
 
-		if ( $customer_id ) {
-			return $customer_id;
+		if ( 'test' === $this->mode ) {
+			$meta_key = '_pronamic_pay_mollie_customer_id_test';
 		}
 
+		$customer_id = get_user_meta( $user->ID, $meta_key, true );
+
+		// Return customer ID if valid
+		if ( $customer_id ) {
+			$response = $this->send_request( 'customers/' . $customer_id, 'GET' );
+
+			$response_code = wp_remote_retrieve_response_code( $response );
+
+			switch( $response_code ) {
+				case 200 :
+					return $customer_id;
+
+					break;
+				case 404:
+					return false;
+
+					break;
+			}
+		}
+
+		// Create new customer
 		$response = $this->send_request( 'customers/', 'POST', array(
 			'name'  => trim( '' . $user->user_firstname . ' ' . $user->user_lastname ),
 			'email' => $user->user_email,
@@ -246,7 +288,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		$customer_id = $result->id;
 
-		update_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', $customer_id );
+		update_user_meta( $user->ID, $meta_key, $customer_id );
 
 		return $customer_id;
 	}
@@ -344,7 +386,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			'amount'      => $amount,
 			'times'       => $times,
 			'interval'    => $interval,
-			'description' => time() . ' - ' . $description,
+			'description' => $description,
 			'method'      => null,
 			'webhookUrl'  => $webhook_url,
 		);
@@ -462,7 +504,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * @param $subscription_id
 	 *
 	 * @return array|bool
-	 * @see https://www.mollie.com/nl/docs/reference/subscriptions/list
+	 * @see https://www.mollie.com/nl/docs/reference/subscriptions/get
 	 *
 	 * @since unreleased
 	 */
