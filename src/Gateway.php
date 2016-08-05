@@ -74,12 +74,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			if ( $mandates ) {
 				echo '<h3>Mandates</h3>';
 
-				foreach( $mandates->data as $mandate ) {
+				foreach ( $mandates->data as $mandate ) {
 					printf(
 						'<code>%s</code> %s (%s)<br>',
-						$mandate->id,
-						$mandate->method,
-						$mandate->status
+						esc_html( $mandate->id ),
+						esc_html($mandate->method ),
+						esc_html( $mandate->status )
 					);
 				}
 			}
@@ -90,12 +90,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			if ( $subscriptions ) {
 				echo '<h3>Subscriptions</h3>';
 
-				foreach( $subscriptions->data as $subscription ) {
+				foreach ( $subscriptions->data as $subscription ) {
 					printf(
 						'<code>%s</code> %s (%s)<br>',
-						$subscription->id,
-						$subscription->description,
-						$subscription->status
+						esc_html( $subscription->id ),
+						esc_html( $subscription->description ),
+						esc_html( $subscription->status )
 					);
 				}
 			}
@@ -225,7 +225,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
 			$request->method         = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
 			$has_payment             = $subscription->has_valid_payment();
-			$user_interaction        = in_array( $payment->get_source(), array( 'gravityformsideal' ) );
+			$user_interaction        = in_array( $payment->get_source(), array( 'gravityformsideal' ), true );
 
 			if ( ! $has_payment || ( $user_interaction && ! $this->client->has_valid_mandate( $customer_id ) ) ) {
 				// First payment or if user interaction is possible and no valid mandates are found
@@ -276,7 +276,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		$payment->set_transaction_id( $result->id );
 
-		if( '' === $payment->get_action_url() ) {
+		if ( '' === $payment->get_action_url() ) {
 			$payment->set_action_url( $result->links->paymentUrl );
 		}
 	}
