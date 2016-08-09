@@ -147,12 +147,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 */
 	public function get_supported_payment_methods() {
 		return array(
-			Pronamic_WP_Pay_PaymentMethods::IDEAL             => Pronamic_WP_Pay_Mollie_Methods::IDEAL,
-			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD       => Pronamic_WP_Pay_Mollie_Methods::CREDITCARD,
-			Pronamic_WP_Pay_PaymentMethods::MISTER_CASH       => Pronamic_WP_Pay_Mollie_Methods::MISTERCASH,
-			Pronamic_WP_Pay_PaymentMethods::PAYPAL            => Pronamic_WP_Pay_Mollie_Methods::PAYPAL,
-			Pronamic_WP_Pay_PaymentMethods::SOFORT            => Pronamic_WP_Pay_Mollie_Methods::SOFORT,
-			Pronamic_WP_Pay_PaymentMethods::IDEAL_DIRECTDEBIT => Pronamic_WP_Pay_PaymentMethods::IDEAL_DIRECTDEBIT,
+			Pronamic_WP_Pay_PaymentMethods::IDEAL              => Pronamic_WP_Pay_Mollie_Methods::IDEAL,
+			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD        => Pronamic_WP_Pay_Mollie_Methods::CREDITCARD,
+			Pronamic_WP_Pay_PaymentMethods::MISTER_CASH        => Pronamic_WP_Pay_Mollie_Methods::MISTERCASH,
+			Pronamic_WP_Pay_PaymentMethods::PAYPAL             => Pronamic_WP_Pay_Mollie_Methods::PAYPAL,
+			Pronamic_WP_Pay_PaymentMethods::SOFORT             => Pronamic_WP_Pay_Mollie_Methods::SOFORT,
+			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL => Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
 		);
 	}
 
@@ -213,7 +213,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		// Subscriptions
 		$subscription = $payment->get_subscription();
 
-		if ( $subscription && Pronamic_WP_Pay_PaymentMethods::IDEAL_DIRECTDEBIT === $payment_method ) {
+		if ( $subscription && Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
 			if ( is_object( $this->client->get_error() ) ) {
 				// Set error if customer could not be created
 				$this->error = $this->client->get_error();
