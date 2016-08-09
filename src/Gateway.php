@@ -78,7 +78,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 					printf(
 						'<code>%s</code> %s (%s)<br>',
 						esc_html( $mandate->id ),
-						esc_html($mandate->method ),
+						esc_html( $mandate->method ),
 						esc_html( $mandate->status )
 					);
 				}
@@ -193,7 +193,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		$payment_method = $payment->get_method();
 
-		$customer_id = $this->client->get_customer_id();
+		$customer_id = $this->client->get_customer_id( $payment->get_customer_name() );
 
 		$payment->set_meta( 'mollie_customer_id', $customer_id );
 

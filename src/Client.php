@@ -224,7 +224,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * @param Pronamic_WP_Pay_PaymentData $data
 	 * @return array
 	 */
-	public function get_customer_id() {
+	public function get_customer_id( $name = '' ) {
 		if ( ! is_user_logged_in() ) {
 			return false;
 		}
@@ -259,8 +259,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		}
 
 		// Create new customer
+		if ( '' === $name ) {
+			$name = trim( sprintf( '%s %s', $user->user_firstname, $user->user_lastname ) );
+		}
+
 		$response = $this->send_request( 'customers/', 'POST', array(
-			'name'  => trim( '' . $user->user_firstname . ' ' . $user->user_lastname ),
+			'name'  => $name,
 			'email' => $user->user_email,
 		) );
 
