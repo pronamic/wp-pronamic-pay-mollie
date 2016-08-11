@@ -87,6 +87,8 @@ class Pronamic_WP_Pay_Mollie_Methods {
 		switch ( $payment_method ) {
 			case Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER :
 				return Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER;
+			case Pronamic_WP_Pay_PaymentMethods::BITCOIN :
+				return Pronamic_WP_Pay_Mollie_Methods::BITCOIN;
 			case Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD :
 				return Pronamic_WP_Pay_Mollie_Methods::CREDITCARD;
 			case Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT :
