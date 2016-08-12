@@ -8,7 +8,7 @@
 [![Total Downloads](https://poser.pugx.org/wp-pay-gateways/mollie/downloads.svg)](https://packagist.org/packages/wp-pay-gateways/mollie)
 [![Latest Unstable Version](https://poser.pugx.org/wp-pay-gateways/mollie/v/unstable.svg)](https://packagist.org/packages/wp-pay-gateways/mollie)
 [![License](https://poser.pugx.org/wp-pay-gateways/mollie/license.svg)](https://packagist.org/packages/wp-pay-gateways/mollie)
-[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+[![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/)
 
 
 ## Webhook URL
