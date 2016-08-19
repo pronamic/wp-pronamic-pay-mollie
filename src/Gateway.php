@@ -288,6 +288,26 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 *
 	 * @param Pronamic_Pay_Payment $payment
 	 */
+	public function payment( Pronamic_Pay_Payment $payment ) {
+		if ( ! $payment->get_subscription() ) {
+			return;
+		}
+
+		$subscription = $payment->get_subscription();
+
+		if ( Pronamic_WP_Pay_Statuses::SUCCESS === $subscription->get_status() ) {
+
+			Pronamic_WP_Pay_Plugin::update_payment( $payment, false );
+		}
+	}
+
+	/////////////////////////////////////////////////
+
+	/**
+	 * Update status of the specified payment
+	 *
+	 * @param Pronamic_Pay_Payment $payment
+	 */
 	public function update_status( Pronamic_Pay_Payment $payment ) {
 		$subscription = $payment->get_subscription();
 
@@ -310,7 +330,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				return;
 			}
 
-			$subscription->set_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_subscription->status ) );
+			$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_subscription->status );
+
+			$payment->set_status( $status );
+			$subscription->set_status( $status );
 
 			$this->update_subscription_payment_note( 'update_status', $subscription, $first, (array) $mollie_subscription );
 
@@ -340,9 +363,11 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			return;
 		}
 
-		$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_payment->status );
+		if ( ! isset( $status ) ) {
+			$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_payment->status );
 
-		$payment->set_status( $status );
+			$payment->set_status( $status );
+		}
 
 		if ( $subscription && '' === $subscription->get_transaction_id() ) {
 			// First payment, use payment status for subscription too
