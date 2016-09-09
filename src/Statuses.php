@@ -45,6 +45,20 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 	 */
 	const EXPIRED = 'expired';
 
+	/**
+	 * Pending
+	 *
+	 * @var string
+	 */
+	const PENDING = 'pending';
+
+	/**
+	 * Active
+	 *
+	 * @var string
+	 */
+	const ACTIVE = 'active';
+
 	/////////////////////////////////////////////////
 
 	/**
@@ -54,12 +68,14 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 	 */
 	public static function transform( $status ) {
 		switch ( $status ) {
+			case self::PENDING ;
 			case self::OPEN :
 				return Pronamic_WP_Pay_Statuses::OPEN;
 			case self::CANCELLED :
 				return Pronamic_WP_Pay_Statuses::CANCELLED;
 			case self::PAID_OUT :
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
+			case self::ACTIVE :
 			case self::PAID :
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
 			case self::EXPIRED :

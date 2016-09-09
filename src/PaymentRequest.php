@@ -102,21 +102,30 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 	public $customer_id;
 
 	/**
+	 * Recurring type for Mollie Recurring.
+	 *
+	 * @see https://www.mollie.com/nl/docs/recurring
+	 * @var string
+	 */
+	public $recurring_type;
+
+	/**
 	 * Get array of this Mollie payment request object.
 	 *
 	 * @return array
 	 */
 	public function get_array() {
 		$array = array(
-			'amount'      => number_format( $this->amount, 2, '.', '' ),
-			'description' => $this->description,
-			'method'      => $this->method,
-			'redirectUrl' => $this->redirect_url,
-			'metadata'    => $this->meta_data,
-			'locale'      => $this->locale,
-			'webhookUrl'  => $this->webhook_url,
-			'issuer'      => $this->issuer,
-			'customerId'  => $this->customer_id,
+			'amount'        => number_format( $this->amount, 2, '.', '' ),
+			'description'   => $this->description,
+			'method'        => $this->method,
+			'redirectUrl'   => $this->redirect_url,
+			'metadata'      => $this->meta_data,
+			'locale'        => $this->locale,
+			'webhookUrl'    => $this->webhook_url,
+			'issuer'        => $this->issuer,
+			'recurringType' => $this->recurring_type,
+			'customerId'    => $this->customer_id,
 		);
 
 		/*

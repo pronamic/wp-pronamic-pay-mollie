@@ -224,7 +224,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * @param Pronamic_WP_Pay_PaymentData $data
 	 * @return array
 	 */
-	public function get_customer_id() {
+	public function get_customer_id( $name = '' ) {
 		if ( ! is_user_logged_in() ) {
 			return false;
 		}
@@ -259,8 +259,13 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		}
 
 		// Create new customer
+		if ( '' === $name ) {
+			$name = trim( sprintf( '%s %s', $user->user_firstname, $user->user_lastname ) );
+		}
+
+		// Create new customer
 		$response = $this->send_request( 'customers/', 'POST', array(
-			'name'  => trim( '' . $user->user_firstname . ' ' . $user->user_lastname ),
+			'name'  => $name,
 			'email' => $user->user_email,
 		) );
 
@@ -291,5 +296,243 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		update_user_meta( $user->ID, $meta_key, $customer_id );
 
 		return $customer_id;
+	}
+
+	/**
+	 * Get mandates for customer.
+	 *
+	 * @param $customer_id
+	 *
+	 * @return array
+	 */
+	public function get_mandates( $customer_id ) {
+		$mandates = false;
+
+		if ( '' === $customer_id ) {
+			return false;
+		}
+
+		$response = $this->send_request( 'customers/' . $customer_id . '/mandates?count=250', 'GET' );
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
+			$body = wp_remote_retrieve_body( $response );
+
+			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+			$result = json_decode( $body );
+
+			if ( null !== $result ) {
+				$mandates = $result;
+
+				// DELETE all mandates
+				if ( 0 ) {
+					foreach ( $mandates->data as $mandate ) {
+						$this->send_request( 'customers/' . $customer_id . '/mandates/' . $mandate->id, 'DELETE' );
+					}
+				}
+			}
+		} else {
+			$body = wp_remote_retrieve_body( $response );
+
+			$mollie_result = json_decode( $body );
+
+			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
+		}
+
+		return $mandates;
+	}
+
+	/**
+	 * Get customer
+	 *
+	 * @param $customer_id
+	 *
+	 * @return array
+	 */
+	public function has_valid_mandate( $customer_id ) {
+		$mandates = $this->get_mandates( $customer_id );
+
+		if ( $mandates ) {
+			foreach ( $mandates->data as $mandate ) {
+				if ( 'valid' === $mandate->status ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	//////////////////////////////////////////////////
+
+	/***
+	 * Create subscription.
+	 *
+	 * @param $customer_id
+	 * @param $amount
+	 * @param $times
+	 * @param $interval
+	 * @param $description
+	 * @param $webhook_url
+	 *
+	 * @return bool|array
+	 *
+	 * @see https://www.mollie.com/nl/docs/reference/subscriptions/create
+	 *
+	 * @since unreleased
+	 */
+	public function create_subscription( $customer_id, $amount, $times, $interval, $description, $webhook_url ) {
+		if ( null === $customer_id ) {
+			return false;
+		}
+
+		$request = array(
+			'amount'      => $amount,
+			'times'       => $times,
+			'interval'    => $interval,
+			'description' => $description,
+			'method'      => null,
+			'webhookUrl'  => $webhook_url,
+		);
+
+		$response = $this->send_request( 'customers/' . $customer_id . '/subscriptions', 'POST', $request );
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		$body = wp_remote_retrieve_body( $response );
+
+		if ( 201 != $response_code ) { // WPCS: loose comparison ok.
+			$mollie_result = json_decode( $body );
+
+			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
+
+			return false;
+		}
+
+		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+		$result = json_decode( $body );
+
+		if ( null !== $result ) {
+			return $result;
+		}
+
+		return false;
+	}
+
+	/***
+	 * Cancel subscription.
+	 *
+	 * @param $customer_id
+	 * @param $subscription_id
+	 *
+	 * @return bool|array
+	 *
+	 * @see https://www.mollie.com/nl/docs/reference/subscriptions/delete
+	 *
+	 * @since unreleased
+	 */
+	public function cancel_subscription( $customer_id, $subscription_id ) {
+		if ( null === $subscription_id ) {
+			return false;
+		}
+
+		$response = $this->send_request( 'customers/' . $customer_id . '/subscriptions/' . $subscription_id, 'DELETE' );
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		$body = wp_remote_retrieve_body( $response );
+
+		if ( 200 != $response_code ) { // WPCS: loose comparison ok.
+			$mollie_result = json_decode( $body );
+
+			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
+
+			return false;
+		}
+
+		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+		$result = json_decode( $body );
+
+		if ( null !== $result ) {
+			return $result;
+		}
+
+		return false;
+	}
+
+	/***
+	 * Get subscriptions.
+	 *
+	 * @param $customer_id
+	 *
+	 * @return bool|array
+	 *
+	 * @see https://www.mollie.com/nl/docs/reference/subscriptions/list
+	 *
+	 * @since unreleased
+	 */
+	public function get_subscriptions( $customer_id ) {
+		if ( null === $customer_id ) {
+			return false;
+		}
+
+		$response = $this->send_request( 'customers/' . $customer_id . '/subscriptions?count=250', 'GET' );
+
+		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+		$result = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( 200 != wp_remote_retrieve_response_code( $response ) ) { // WPCS: loose comparison ok.
+			$this->error = new WP_Error( 'mollie_error', $result->error->message, $result->error );
+
+			return false;
+		}
+
+		if ( null !== $result ) {
+			// DELETE all subscriptions
+			if ( 0 ) {
+				foreach ( $result->data as $subscription ) {
+					$resp = $this->send_request( 'customers/' . $customer_id . '/subscriptions/' . $subscription->id, 'DELETE' );
+				}
+			}
+
+			return $result;
+		}
+
+		return false;
+	}
+
+	/***
+	 * Get subscription.
+	 *
+	 * @param $customer_id
+	 * @param $subscription_id
+	 *
+	 * @return array|bool
+	 * @see https://www.mollie.com/nl/docs/reference/subscriptions/get
+	 *
+	 * @since unreleased
+	 */
+	public function get_subscription( $customer_id, $subscription_id ) {
+		if ( null === $customer_id ) {
+			return false;
+		}
+
+		$response = $this->send_request( 'customers/' . $customer_id . '/subscriptions/' . $subscription_id, 'GET' );
+
+		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+		$result = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( 200 != wp_remote_retrieve_response_code( $response ) ) { // WPCS: loose comparison ok.
+			$this->error = new WP_Error( 'mollie_error', $result->error->message, $result->error );
+
+			return false;
+		}
+
+		if ( null !== $result ) {
+			return $result;
+		}
+
+		return false;
 	}
 }
