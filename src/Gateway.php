@@ -65,8 +65,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	/////////////////////////////////////////////////
 
 	public function get_issuer_field() {
+		$meta_key = sprintf( '_pronamic_pay_mollie_customer_id_%s', $this->config->mode );
+
 		if ( 1 ) {
-			$customer_id = get_user_meta( get_current_user_id(), '_pronamic_pay_mollie_customer_id_test', true );
+			$customer_id = get_user_meta( get_current_user_id(), $meta_key, true );
 
 			/* Mandates */
 			$mandates = $this->client->get_mandates( $customer_id );
@@ -104,6 +106,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		}
 
 		if ( Pronamic_WP_Pay_PaymentMethods::IDEAL === $this->get_payment_method() ) {
+			$customer_id = get_user_meta( get_current_user_id(), $meta_key, true );
+
+			if ( $this->client->has_valid_mandate( $customer_id ) ) {
+				return array();
+			}
+
 			return array(
 				'id'       => 'pronamic_ideal_issuer_id',
 				'name'     => 'pronamic_ideal_issuer_id',
