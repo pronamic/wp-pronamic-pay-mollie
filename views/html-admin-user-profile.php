@@ -17,7 +17,7 @@ $customer_id_test = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id_
 	<tr>
 		<th>
 			<label for="pronamic_pay_mollie_customer_id_live">
-				<?php esc_html_e( 'Customer ID (live)', 'pronamic_ideal' ); ?>
+				<?php esc_html_e( 'Customer live ID', 'pronamic_ideal' ); ?>
 			</label>
 		</th>
 		<td>
@@ -27,7 +27,7 @@ $customer_id_test = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id_
 	<tr>
 		<th>
 			<label for="pronamic_pay_mollie_customer_id_test">
-				<?php esc_html_e( 'Customer ID (test)', 'pronamic_ideal' ); ?>
+				<?php esc_html_e( 'Customer test ID', 'pronamic_ideal' ); ?>
 			</label>
 		</th>
 		<td>
