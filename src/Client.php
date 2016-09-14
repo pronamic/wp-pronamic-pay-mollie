@@ -344,11 +344,11 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	}
 
 	/**
-	 * Get customer
+	 * Is there a valid mandate for customer?
 	 *
 	 * @param $customer_id
 	 *
-	 * @return array
+	 * @return boolean
 	 */
 	public function has_valid_mandate( $customer_id ) {
 		$mandates = $this->get_mandates( $customer_id );
@@ -362,6 +362,39 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get formatted date and time of first valid mandate.
+	 *
+	 * @param $customer_id
+	 *
+	 * @return string
+	 */
+	public function get_first_valid_mandate_datetime( $customer_id ) {
+		$mandates = $this->get_mandates( $customer_id );
+
+		if ( $mandates ) {
+			$valid_mandates = array();
+
+			foreach ( $mandates->data as $mandate ) {
+				if ( 'valid' === $mandate->status ) {
+					$valid_mandates[ $mandate->createdDatetime ] = $mandate;
+				}
+			}
+
+			ksort( $valid_mandates );
+
+			$mandate = array_shift( $valid_mandates );
+
+			return sprintf(
+				__( '%1$s at %2$s', 'pronamic_ideal' ),
+				get_date_from_gmt( $mandate->createdDatetime, get_option( 'date_format' ) ),
+				get_date_from_gmt( $mandate->createdDatetime, get_option( 'time_format' ) )
+			);
+		}
+
+		return null;
 	}
 
 	//////////////////////////////////////////////////

@@ -65,11 +65,30 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	/////////////////////////////////////////////////
 
 	public function get_issuer_field() {
-		$meta_key = sprintf( '_pronamic_pay_mollie_customer_id_%s', $this->config->mode );
+		if ( Pronamic_WP_Pay_PaymentMethods::IDEAL === $this->get_payment_method() ) {
+			return array(
+				'id'       => 'pronamic_ideal_issuer_id',
+				'name'     => 'pronamic_ideal_issuer_id',
+				'label'    => __( 'Choose your bank', 'pronamic_ideal' ),
+				'required' => true,
+				'type'     => 'select',
+				'choices'  => $this->get_transient_issuers(),
+			);
+		}
+	}
+
+	/////////////////////////////////////////////////
+
+	/**
+	 * Is there a valid mandate for customer?
+	 *
+	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
+	 */
+	public function has_valid_mandate() {
+		$meta_key    = sprintf( '_pronamic_pay_mollie_customer_id_%s', $this->config->mode );
+		$customer_id = get_user_meta( get_current_user_id(), $meta_key, true );
 
 		if ( 1 ) {
-			$customer_id = get_user_meta( get_current_user_id(), $meta_key, true );
-
 			/* Mandates */
 			$mandates = $this->client->get_mandates( $customer_id );
 
@@ -105,22 +124,19 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			echo '<hr>';
 		}
 
-		if ( Pronamic_WP_Pay_PaymentMethods::IDEAL === $this->get_payment_method() ) {
-			$customer_id = get_user_meta( get_current_user_id(), $meta_key, true );
+		return $this->client->has_valid_mandate( $customer_id );
+	}
 
-			if ( $this->client->has_valid_mandate( $customer_id ) ) {
-				return array();
-			}
+	/**
+	 * Get formatted date and time of first valid mandate.
+	 *
+	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
+	 */
+	public function get_first_valid_mandate_datetime() {
+		$meta_key    = sprintf( '_pronamic_pay_mollie_customer_id_%s', $this->config->mode );
+		$customer_id = get_user_meta( get_current_user_id(), $meta_key, true );
 
-			return array(
-				'id'       => 'pronamic_ideal_issuer_id',
-				'name'     => 'pronamic_ideal_issuer_id',
-				'label'    => __( 'Choose your bank', 'pronamic_ideal' ),
-				'required' => true,
-				'type'     => 'select',
-				'choices'  => $this->get_transient_issuers(),
-			);
-		}
+		return $this->client->get_first_valid_mandate_datetime( $customer_id );
 	}
 
 	/////////////////////////////////////////////////
