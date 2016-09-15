@@ -349,20 +349,33 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				$payment->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
 				$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
 
-				$this->update_subscription_payment_note( 'update_status', $subscription, $first, $this->error );
+				$this->update_subscription_payment_note(
+					__( 'Error while checking for status of Mollie subscription.', 'pronamic_ideal' ),
+					$subscription,
+					$payment,
+					$this->error
+				);
 
 				return;
 			}
 
 			$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_subscription->status );
 
-			$payment->set_status( $status );
-			$subscription->set_status( $status );
+			if ( $status !== $payment->get_status() ) {
+				$payment->set_status( $status );
+				$subscription->set_status( $status );
 
-			$this->update_subscription_payment_note( 'update_status', $subscription, $first, (array) $mollie_subscription );
+				$this->update_subscription_payment_note(
+					__( 'Status updated based on Mollie subscription status.', 'pronamic_ideal' ),
+					$subscription,
+					$payment,
+					(array) $mollie_subscription,
+					true
+				);
+			}
 
 			if ( '' === $payment->get_transaction_id() ) {
-				// Auto recurring payment, use Mollie subscription status for payment
+				// Auto recurring payment; use Mollie subscription status if valid mandate exists.
 
 				$status = Pronamic_WP_Pay_Statuses::FAILURE;
 
@@ -378,8 +391,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		}
 
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
-
-		$payment->add_note( print_r( $mollie_payment, true ) );
 
 		if ( ! $mollie_payment ) {
 			$this->error = $this->client->get_error();
@@ -434,7 +445,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			$this->get_webhook_url()
 		);
 
-		$this->update_subscription_payment_note( 'create_subscription', $subscription, $payment, (array) $data );
+		$this->update_subscription_payment_note(
+			__('Created Mollie subscription.', 'pronamic_ideal' ),
+			$subscription,
+			$payment,
+			(array) $data
+		);
 
 		if ( is_wp_error( $this->client->get_error() ) ) {
 			// Set error if subscription could not be created
@@ -475,7 +491,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 			$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $response->status );
 
-			$this->update_subscription_payment_note( 'cancel_subscription', $subscription, $payment, (array) $response );
+			$this->update_subscription_payment_note(
+				__('Cancelled Mollie subscription.', 'pronamic_ideal' ),
+				$subscription,
+				$payment,
+				(array) $response
+			);
 		}
 
 		$subscription->set_status( $status );
@@ -489,15 +510,14 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 * @param Pronamic_Pay_Payment $payment
 	 * @param array $data
 	 */
-	private function update_subscription_payment_note( $src, Pronamic_Pay_Subscription $subscription, Pronamic_Pay_Payment $payment, $data ) {
-		$note = '<pre>' . $src . ' - ';
+	private function update_subscription_payment_note( $message, Pronamic_Pay_Subscription $subscription, Pronamic_Pay_Payment $payment, $data, $status_only = false ) {
+		$note = sprintf( '<p>%s</p>', $message );
 
 		if ( is_wp_error( $data ) ) {
-			$note .= print_r( $data, true );
-			$note .= '</pre>';
+			$note .= sprintf( '<p>%s</p>', $data->get_error_message() );
 
-			$payment->add_note( $note );
 			$subscription->add_note( $note );
+			$payment->add_note( $note );
 
 			return;
 		}
@@ -517,8 +537,13 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			'cancelledDatetime' => __( 'Cancelled date', 'pronamic_ideal' ),
 		);
 
-		$note .= __( 'Mollie subscription data in response message:', 'pronamic_ideal' );
-		$note .= '</p>';
+		if ( $status_only ) {
+			$labels = array(
+				'status' => __( 'Status', 'pronamic_ideal' ),
+			);
+		}
+
+		$note .= sprintf( '<p>%s</p>', __( 'Mollie subscription data in response message:', 'pronamic_ideal' ) );
 
 		$note .= '<dl>';
 
@@ -531,7 +556,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		$note .= '</dl>';
 
-		$payment->add_note( $note );
 		$subscription->add_note( $note );
+		$payment->add_note( $note );
 	}
 }
