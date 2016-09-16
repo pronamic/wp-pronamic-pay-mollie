@@ -432,14 +432,43 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	public function create_subscription( Pronamic_Pay_Payment $payment ) {
 		$subscription = $payment->get_subscription();
 
+		$interval = $subscription->get_interval();
+
+		switch ( $subscription->get_interval_period() ) {
+			case 'D':
+				$interval_period = 'days';
+
+				break;
+			case 'W':
+				$interval_period = 'weeks';
+
+				break;
+			case 'M':
+				$interval_period = 'months';
+
+				break;
+			case 'Y':
+				// Mollie doesn't allow 'years' interval period nor periods longer than 12 months.
+				// @see https://www.mollie.com/docs/reference/subscriptions/create
+
+				if ( 1 === intval( $interval ) ) {
+					$interval_period = 'months';
+					$interval        = 12;
+				}
+
+				break;
+			default:
+				$interval_period = '';
+		}
+
 		$data = $this->client->create_subscription(
 			$payment->meta['mollie_customer_id'], // customer_id
 			$subscription->get_amount(), // amount
 			$subscription->get_frequency(), // times
 			sprintf( // interval
 				'%s %s',
-				$subscription->get_interval(),
-				$subscription->get_interval_period()
+				$interval,
+				$interval_period
 			),
 			$subscription->get_description(), // description
 			$this->get_webhook_url()
