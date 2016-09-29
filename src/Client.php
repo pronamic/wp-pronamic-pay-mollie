@@ -126,6 +126,23 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		return $result;
 	}
 
+	public function get_payments() {
+		$result = null;
+
+		$response = $this->send_request( 'payments/', 'GET' );
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
+			$body = wp_remote_retrieve_body( $response );
+
+			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
+			$result = json_decode( $body );
+		}
+
+		return $result;
+	}
+
 	public function get_payment( $payment_id ) {
 		$result = null;
 
