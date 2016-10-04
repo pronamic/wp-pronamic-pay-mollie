@@ -80,7 +80,7 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
 			case self::EXPIRED :
 				return Pronamic_WP_Pay_Statuses::EXPIRED;
-			default:
+			default :
 				return null;
 		}
 	}
