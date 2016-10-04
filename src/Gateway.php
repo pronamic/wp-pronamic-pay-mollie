@@ -284,7 +284,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		}
 
 		$request->customer_id = $customer_id;
-		$result               = $this->client->create_payment( $request );
+
+		$result = $this->client->create_payment( $request );
 
 		if ( ! $result ) {
 			$this->error = $this->client->get_error();
