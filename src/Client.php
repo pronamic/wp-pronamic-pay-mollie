@@ -415,47 +415,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	}
 
 	/***
-	 * Cancel subscription.
-	 *
-	 * @param $customer_id
-	 * @param $subscription_id
-	 *
-	 * @return bool|array
-	 *
-	 * @see https://www.mollie.com/nl/docs/reference/subscriptions/delete
-	 *
-	 * @since unreleased
-	 */
-	public function cancel_subscription( $customer_id, $subscription_id ) {
-		if ( null === $subscription_id ) {
-			return false;
-		}
-
-		$response = $this->send_request( 'customers/' . $customer_id . '/subscriptions/' . $subscription_id, 'DELETE' );
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		$body = wp_remote_retrieve_body( $response );
-
-		if ( 200 != $response_code ) { // WPCS: loose comparison ok.
-			$mollie_result = json_decode( $body );
-
-			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
-
-			return false;
-		}
-
-		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-		$result = json_decode( $body );
-
-		if ( null !== $result ) {
-			return $result;
-		}
-
-		return false;
-	}
-
-	/***
 	 * Get subscriptions.
 	 *
 	 * @param $customer_id
