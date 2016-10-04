@@ -68,7 +68,7 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 	 */
 	public static function transform( $status ) {
 		switch ( $status ) {
-			case self::PENDING ;
+			case self::PENDING :
 			case self::OPEN :
 				return Pronamic_WP_Pay_Statuses::OPEN;
 			case self::CANCELLED :
