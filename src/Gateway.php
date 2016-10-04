@@ -373,45 +373,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	}
 
 	/**
-	 * Cancel subscription.
-	 *
-	 * @param Pronamic_Pay_Payment $payment
-	 */
-	public function cancel_subscription( Pronamic_Pay_Subscription $subscription ) {
-		$payment = $subscription->get_first_payment();
-
-		if ( '' === $subscription->get_transaction_id() ) {
-			$status = Pronamic_WP_Pay_Statuses::CANCELLED;
-		}
-
-		if ( '' !== $subscription->get_transaction_id() ) {
-			$response = $this->client->cancel_subscription(
-				$payment->get_meta( 'mollie_customer_id' ),
-				$subscription->get_transaction_id()
-			);
-
-			if ( ! $response ) {
-				$this->error = $this->client->get_error();
-
-				return;
-			}
-
-			$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $response->status );
-
-			$this->update_subscription_payment_note(
-				__('Cancelled Mollie subscription.', 'pronamic_ideal' ),
-				$subscription,
-				$payment,
-				(array) $response
-			);
-		}
-
-		$subscription->set_status( $status );
-
-		pronamic_wp_pay_update_subscription( $subscription );
-	}
-
-	/**
 	 * Update subscription payment note.
 	 *
 	 * @param Pronamic_Pay_Payment $payment
