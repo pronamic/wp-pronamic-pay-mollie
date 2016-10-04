@@ -414,62 +414,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		return null;
 	}
 
-	//////////////////////////////////////////////////
-
-	/***
-	 * Create subscription.
-	 *
-	 * @param $customer_id
-	 * @param $amount
-	 * @param $times
-	 * @param $interval
-	 * @param $description
-	 * @param $webhook_url
-	 *
-	 * @return bool|array
-	 *
-	 * @see https://www.mollie.com/nl/docs/reference/subscriptions/create
-	 *
-	 * @since unreleased
-	 */
-	public function create_subscription( $customer_id, $amount, $times, $interval, $description, $webhook_url ) {
-		if ( null === $customer_id ) {
-			return false;
-		}
-
-		$request = array(
-			'amount'      => $amount,
-			'times'       => $times,
-			'interval'    => $interval,
-			'description' => $description,
-			'method'      => null,
-			'webhookUrl'  => $webhook_url,
-		);
-
-		$response = $this->send_request( 'customers/' . $customer_id . '/subscriptions', 'POST', $request );
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		$body = wp_remote_retrieve_body( $response );
-
-		if ( 201 != $response_code ) { // WPCS: loose comparison ok.
-			$mollie_result = json_decode( $body );
-
-			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
-
-			return false;
-		}
-
-		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-		$result = json_decode( $body );
-
-		if ( null !== $result ) {
-			return $result;
-		}
-
-		return false;
-	}
-
 	/***
 	 * Cancel subscription.
 	 *
