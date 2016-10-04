@@ -314,14 +314,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	public function update_status( Pronamic_Pay_Payment $payment ) {
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
 
-		$customer_id = $payment->get_meta( 'mollie_customer_id' );
-
-		if ( $this->client->has_valid_mandate( $customer_id ) ) {
-			// @todo maybe remove? With a valid mandate, status is `pending` in test mode :/
-
-			$mollie_payment->status = Pronamic_WP_Pay_Mollie_Statuses::PAID;
-		}
-
 		if ( ! $mollie_payment ) {
 			$this->error = $this->client->get_error();
 
