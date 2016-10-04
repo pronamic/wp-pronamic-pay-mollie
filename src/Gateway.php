@@ -122,26 +122,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				}
 			}
 
-			/* Subscriptions */
-			if ( empty( $customer_id ) ) {
-				$customer_id = null;
-			}
-
-			$subscriptions = $this->client->get_subscriptions( $customer_id );
-
-			if ( $subscriptions ) {
-				echo '<h3>Subscriptions</h3>';
-
-				foreach ( $subscriptions->data as $subscription ) {
-					printf(
-						'<code>%s</code> %s (%s)<br>',
-						esc_html( $subscription->id ),
-						esc_html( $subscription->description ),
-						esc_html( $subscription->status )
-					);
-				}
-			}
-
 			echo '<hr>';
 		}
 
