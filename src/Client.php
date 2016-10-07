@@ -268,7 +268,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 					return $customer_id;
 
 					break;
-				case 404:
+				case 404 :
 					return false;
 
 					break;
