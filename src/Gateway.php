@@ -85,7 +85,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
 	 */
 	public function has_valid_mandate() {
-		$meta_key    = sprintf( '_pronamic_pay_mollie_customer_id_%s', $this->config->mode );
+		$meta_key = '_pronamic_pay_mollie_customer_id';
+
+		if ( 'test' === $this->config->mode ) {
+			$meta_key = '_pronamic_pay_mollie_customer_id_test';
+		}
+
 		$customer_id = get_user_meta( get_current_user_id(), $meta_key, true );
 
 		return $this->client->has_valid_mandate( $customer_id );
@@ -97,7 +102,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
 	 */
 	public function get_first_valid_mandate_datetime() {
-		$meta_key    = sprintf( '_pronamic_pay_mollie_customer_id_%s', $this->config->mode );
+		$meta_key = '_pronamic_pay_mollie_customer_id';
+
+		if ( 'test' === $this->config->mode ) {
+			$meta_key = '_pronamic_pay_mollie_customer_id_test';
+		}
+
 		$customer_id = get_user_meta( get_current_user_id(), $meta_key, true );
 
 		return $this->client->get_first_valid_mandate_datetime( $customer_id );
