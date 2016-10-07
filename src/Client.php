@@ -341,13 +341,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 			if ( null !== $result ) {
 				$mandates = $result;
-
-				// DELETE all mandates
-				if ( 0 ) {
-					foreach ( $mandates->data as $mandate ) {
-						$this->send_request( 'customers/' . $customer_id . '/mandates/' . $mandate->id, 'DELETE' );
-					}
-				}
 			}
 		} else {
 			$body = wp_remote_retrieve_body( $response );
