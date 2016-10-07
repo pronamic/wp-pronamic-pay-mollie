@@ -77,6 +77,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		}
 	}
 
+	/**
+	 * Get Mollie customer ID by the specified WordPress user ID.
+	 *
+	 * @param int $user_id
+	 * @return string
+	 */
 	private function get_customer_id_by_wp_user_id( $user_id ) {
 		$meta_key = '_pronamic_pay_mollie_customer_id';
 
