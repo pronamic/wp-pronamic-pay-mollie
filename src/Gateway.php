@@ -88,43 +88,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$meta_key    = sprintf( '_pronamic_pay_mollie_customer_id_%s', $this->config->mode );
 		$customer_id = get_user_meta( get_current_user_id(), $meta_key, true );
 
-		if ( 1 ) {
-			/* Payments */
-			$payments = $this->client->get_payments();
-
-			if ( $payments ) {
-				echo '<h3>Payments</h3>';
-
-				foreach ( $payments->data as $payment ) {
-					printf(
-						'%s <code>%s</code> %s (%s)<br>',
-						esc_html( $payment->createdDatetime ),
-						esc_html( $payment->id ),
-						esc_html( $payment->amount ),
-						esc_html( $payment->status )
-					);
-				}
-			}
-
-			/* Mandates */
-			$mandates = $this->client->get_mandates( $customer_id );
-
-			if ( $mandates ) {
-				echo '<h3>Mandates</h3>';
-
-				foreach ( $mandates->data as $mandate ) {
-					printf(
-						'<code>%s</code> %s (%s)<br>',
-						esc_html( $mandate->id ),
-						esc_html( $mandate->method ),
-						esc_html( $mandate->status )
-					);
-				}
-			}
-
-			echo '<hr>';
-		}
-
 		return $this->client->has_valid_mandate( $customer_id );
 	}
 
