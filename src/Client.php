@@ -241,49 +241,14 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * @param Pronamic_WP_Pay_PaymentData $data
 	 * @return array
 	 */
-	public function get_customer_id( $name = '' ) {
-		if ( ! is_user_logged_in() ) {
+	public function create_customer( $email, $name ) {
+		if ( empty( $email ) || empty( $name ) ) {
 			return false;
 		}
 
-		$user = wp_get_current_user();
-
-		// Get customer ID from user meta
-		$meta_key = '_pronamic_pay_mollie_customer_id';
-
-		if ( 'test' === $this->mode ) {
-			$meta_key = '_pronamic_pay_mollie_customer_id_test';
-		}
-
-		$customer_id = get_user_meta( $user->ID, $meta_key, true );
-
-		// Return customer ID if valid
-		if ( $customer_id ) {
-			$response = $this->send_request( 'customers/' . $customer_id, 'GET' );
-
-			$response_code = wp_remote_retrieve_response_code( $response );
-
-			switch ( $response_code ) {
-				case 200 :
-					return $customer_id;
-
-					break;
-				case 404 :
-					return false;
-
-					break;
-			}
-		}
-
-		// Create new customer
-		if ( '' === $name ) {
-			$name = trim( sprintf( '%s %s', $user->user_firstname, $user->user_lastname ) );
-		}
-
-		// Create new customer
 		$response = $this->send_request( 'customers/', 'POST', array(
 			'name'  => $name,
-			'email' => $user->user_email,
+			'email' => $email,
 		) );
 
 		$response_code = wp_remote_retrieve_response_code( $response );
@@ -308,11 +273,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			return false;
 		}
 
-		$customer_id = $result->id;
-
-		update_user_meta( $user->ID, $meta_key, $customer_id );
-
-		return $customer_id;
+		return $result->id;
 	}
 
 	/**

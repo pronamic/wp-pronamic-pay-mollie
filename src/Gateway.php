@@ -18,6 +18,13 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 */
 	const SLUG = 'mollie';
 
+	/**
+	 * Meta key for customer ID.
+	 *
+	 * @var string
+	 */
+	private $meta_key_customer_id = '_pronamic_pay_mollie_customer_id';
+
 	/////////////////////////////////////////////////
 
 	/**
@@ -35,6 +42,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		$this->client = new Pronamic_WP_Pay_Gateways_Mollie_Client( $config->api_key );
 		$this->client->set_mode( $config->mode );
+
+		if ( 'test' === $config->mode ) {
+			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
+		}
 	}
 
 	/////////////////////////////////////////////////
@@ -84,15 +95,11 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 * @return string
 	 */
 	private function get_customer_id_by_wp_user_id( $user_id ) {
-		$meta_key = '_pronamic_pay_mollie_customer_id';
+		return get_user_meta( $user_id, $this->meta_key_customer_id, true );
+	}
 
-		if ( 'test' === $this->config->mode ) {
-			$meta_key = '_pronamic_pay_mollie_customer_id_test';
-		}
-
-		$customer_id = get_user_meta( $user_id, $meta_key, true );
-
-		return $customer_id;
+	private function update_wp_user_customer_id( $user_id, $customer_id ) {
+		update_user_meta( $user_id, $this->meta_key_customer_id, $customer_id );
 	}
 
 	/**
@@ -206,7 +213,18 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		}
 
 		// Customer ID
-		$customer_id = $this->client->get_customer_id( $payment->get_customer_name() );
+		$user_id = $payment->post->post_author;
+
+		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
+
+		if ( empty( $customer_id ) ) {
+			$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
+
+			if ( $customer_id ) {
+				$this->update_wp_user_customer_id( $user_id, $customer_id );
+			}
+		}
+
 		$payment->set_meta( 'mollie_customer_id', $customer_id );
 
 		// Subscriptions
