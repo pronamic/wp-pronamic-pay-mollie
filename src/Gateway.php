@@ -235,7 +235,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
 		);
 
-		if ( $subscription && in_array( $payment_method, $subscription_methods ) ) {
+		if ( $subscription && in_array( $payment_method, $subscription_methods, true ) ) {
 			if ( is_object( $this->client->get_error() ) ) {
 				// Set error if customer could not be created
 				$this->error = $this->client->get_error();
