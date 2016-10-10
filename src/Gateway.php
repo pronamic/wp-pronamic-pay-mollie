@@ -230,7 +230,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		// Subscriptions
 		$subscription = $payment->get_subscription();
 
-		if ( $subscription && Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
+		$subscription_methods = array(
+			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_CREDIT_CARD,
+			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
+		);
+
+		if ( $subscription && in_array( $payment_method, $subscription_methods ) ) {
 			if ( is_object( $this->client->get_error() ) ) {
 				// Set error if customer could not be created
 				$this->error = $this->client->get_error();
@@ -255,7 +260,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			if ( ! $this->client->has_valid_mandate( $customer_id ) && ( ! $subscription->has_valid_payment() || $can_user_interact ) ) {
 				// First payment or if user interaction is possible and no valid mandates are found
 				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
-				$request->method         = Pronamic_WP_Pay_Mollie_Methods::IDEAL;
+				$request->method         = $payment_method;
 			}
 
 			if ( Pronamic_WP_Pay_Mollie_Recurring::RECURRING === $request->recurring_type ) {
