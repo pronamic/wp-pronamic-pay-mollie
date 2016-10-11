@@ -36,7 +36,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		parent::__construct( $config );
 
 		$this->supports = array(
-			'recurring_ideal',
+			'recurring_direct_debit',
 			'recurring_credit_card',
 		);
 
