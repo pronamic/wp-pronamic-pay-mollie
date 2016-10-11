@@ -35,6 +35,11 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	public function __construct( Pronamic_WP_Pay_Gateways_Mollie_Config $config ) {
 		parent::__construct( $config );
 
+		$this->supports = array(
+			'recurring_ideal',
+			'recurring_credit_card',
+		);
+
 		$this->set_method( Pronamic_WP_Pay_Gateway::METHOD_HTTP_REDIRECT );
 		$this->set_has_feedback( true );
 		$this->set_amount_minimum( 1.20 );
