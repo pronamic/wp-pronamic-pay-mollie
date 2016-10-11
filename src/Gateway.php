@@ -231,7 +231,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$subscription = $payment->get_subscription();
 
 		$subscription_methods = array(
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_CREDIT_CARD,
+			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
 			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
 		);
 
@@ -245,7 +245,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			}
 
 			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
-			$request->method         = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
+			$request->method         = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
+
+			if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
+				// Use direct debit for recurring payments with payment method `Direct Debit (mandate via iDEAL)`.
+				$request->method = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
+			}
 
 			if ( $subscription->has_valid_payment() && ! $customer_id ) {
 				// Get customer ID from first payment
@@ -255,12 +260,16 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				$payment->set_meta( 'mollie_customer_id', $customer_id );
 			}
 
-			$can_user_interact       = in_array( $payment->get_source(), array( 'gravityformsideal' ), true );
+			$can_user_interact = in_array( $payment->get_source(), array( 'gravityformsideal' ), true );
 
 			if ( ! $this->client->has_valid_mandate( $customer_id ) && ( ! $subscription->has_valid_payment() || $can_user_interact ) ) {
 				// First payment or if user interaction is possible and no valid mandates are found
 				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
-				$request->method         = $payment_method;
+
+				if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
+					// Use iDEAL for first payments with payment method `Direct Debit (mandate via iDEAL)`.
+					$request->method = Pronamic_WP_Pay_Mollie_Methods::IDEAL;
+				}
 			}
 
 			if ( Pronamic_WP_Pay_Mollie_Recurring::RECURRING === $request->recurring_type ) {
