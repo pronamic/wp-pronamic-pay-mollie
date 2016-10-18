@@ -144,6 +144,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	}
 
 	public function get_payment( $payment_id ) {
+		if ( '' === $payment_id ) {
+			return false;
+		}
+
 		$result = null;
 
 		$response = $this->send_request( 'payments/' . $payment_id, 'GET' );
