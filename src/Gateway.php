@@ -113,8 +113,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
 	 */
-	public function has_valid_mandate() {
-		return $this->client->has_valid_mandate( $this->get_customer_id_by_wp_user_id( get_current_user_id() ) );
+	public function has_valid_mandate( $payment_method = '' ) {
+		return $this->client->has_valid_mandate( $this->get_customer_id_by_wp_user_id( get_current_user_id() ), $payment_method );
 	}
 
 	/**
@@ -122,8 +122,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
 	 */
-	public function get_first_valid_mandate_datetime() {
-		return $this->client->get_first_valid_mandate_datetime( $this->get_customer_id_by_wp_user_id( get_current_user_id() ) );
+	public function get_first_valid_mandate_datetime( $payment_method = '' ) {
+		return $this->client->get_first_valid_mandate_datetime( $this->get_customer_id_by_wp_user_id( get_current_user_id() ), $payment_method );
 	}
 
 	/////////////////////////////////////////////////
@@ -268,7 +268,14 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 			$can_user_interact = in_array( $payment->get_source(), array( 'gravityformsideal' ), true );
 
-			if ( ! $this->client->has_valid_mandate( $customer_id ) && ( ! $subscription->has_valid_payment() || $can_user_interact ) ) {
+			// Mandate payment method to check for.
+			$mandate_method = $payment_method;
+
+			if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $mandate_method ) {
+				$mandate_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT;
+			}
+
+			if ( ! $this->client->has_valid_mandate( $customer_id, $mandate_method ) && ( ! $subscription->has_valid_payment() || $can_user_interact ) ) {
 				// First payment or if user interaction is possible and no valid mandates are found
 				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
 

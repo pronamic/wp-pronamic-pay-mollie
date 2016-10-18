@@ -321,11 +321,17 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 *
 	 * @return boolean
 	 */
-	public function has_valid_mandate( $customer_id ) {
+	public function has_valid_mandate( $customer_id, $payment_method = '' ) {
 		$mandates = $this->get_mandates( $customer_id );
 
 		if ( $mandates ) {
+			$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
+
 			foreach ( $mandates->data as $mandate ) {
+				if ( '' !== $payment_method && $mollie_method !== $mandate->method ) {
+					continue;
+				}
+
 				if ( 'valid' === $mandate->status ) {
 					return true;
 				}
@@ -342,13 +348,19 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 *
 	 * @return string
 	 */
-	public function get_first_valid_mandate_datetime( $customer_id ) {
+	public function get_first_valid_mandate_datetime( $customer_id, $payment_method = '' ) {
 		$mandates = $this->get_mandates( $customer_id );
 
 		if ( $mandates ) {
 			$valid_mandates = array();
 
+			$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
+
 			foreach ( $mandates->data as $mandate ) {
+				if ( '' !== $payment_method && $mollie_method !== $mandate->method ) {
+					continue;
+				}
+
 				if ( 'valid' === $mandate->status ) {
 					$valid_mandates[ $mandate->createdDatetime ] = $mandate;
 				}
