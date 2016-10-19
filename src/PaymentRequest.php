@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.6
+ * @version 1.1.9
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
@@ -105,6 +105,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest {
 	 * Recurring type for Mollie Recurring.
 	 *
 	 * @see https://www.mollie.com/nl/docs/recurring
+	 * @since 1.1.9
 	 * @var string
 	 */
 	public $recurring_type;

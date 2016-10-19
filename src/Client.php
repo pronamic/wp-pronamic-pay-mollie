@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.7
+ * @version 1.1.9
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_Client {
@@ -32,6 +32,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	/**
 	 * Mode
 	 *
+	 * @since 1.1.9
 	 * @var string
 	 */
 	private $mode;
@@ -61,6 +62,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	/**
 	 * Set mode
 	 *
+	 * @since 1.1.9
 	 * @param string $mode
 	 */
 	public function set_mode( $mode ) {

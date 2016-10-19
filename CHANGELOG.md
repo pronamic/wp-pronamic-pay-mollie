@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.9] - 2016-10-19
+- Fixed wrong char in switch statement.
+- Added support for new Bancontact constant.
+- Use seperate customer IDs for test and live mode.
+
 ## [1.1.8] - 2016-07-06
 - Excluded non-essential files in .gitattributes.
 
@@ -49,7 +54,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.8...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.9...HEAD
+[1.1.9]: https://github.com/wp-pay-gateways/mollie/compare/1.1.8...1.1.9
 [1.1.8]: https://github.com/wp-pay-gateways/mollie/compare/1.1.7...1.1.8
 [1.1.7]: https://github.com/wp-pay-gateways/mollie/compare/1.1.6...1.1.7
 [1.1.6]: https://github.com/wp-pay-gateways/mollie/compare/1.1.5...1.1.6

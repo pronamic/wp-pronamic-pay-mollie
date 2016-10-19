@@ -7,7 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.0.0
+ * @version 1.1.9
+ * @since 1.0.0
  */
 class Pronamic_WP_Pay_Mollie_Statuses {
 	/**
@@ -55,6 +56,7 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 	/**
 	 * Active
 	 *
+	 * @since 1.1.9
 	 * @var string
 	 */
 	const ACTIVE = 'active';
