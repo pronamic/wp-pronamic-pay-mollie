@@ -7,7 +7,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
-## [1.1.9] - 2016-10-19
+## [1.1.9] - 2016-10-20
 - Fixed wrong char in switch statement.
 - Added support for new Bancontact constant.
 - Use seperate customer IDs for test and live mode.
