@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.7
+ * @version 1.1.9
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Mollie_Methods {
@@ -87,10 +87,13 @@ class Pronamic_WP_Pay_Mollie_Methods {
 		switch ( $payment_method ) {
 			case Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER :
 				return Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER;
+			case Pronamic_WP_Pay_PaymentMethods::BITCOIN :
+				return Pronamic_WP_Pay_Mollie_Methods::BITCOIN;
 			case Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD :
 				return Pronamic_WP_Pay_Mollie_Methods::CREDITCARD;
 			case Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT :
 				return Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
+			case Pronamic_WP_Pay_PaymentMethods::BANCONTACT :
 			case Pronamic_WP_Pay_PaymentMethods::MISTER_CASH :
 				return Pronamic_WP_Pay_Mollie_Methods::MISTERCASH;
 			case Pronamic_WP_Pay_PaymentMethods::PAYPAL :

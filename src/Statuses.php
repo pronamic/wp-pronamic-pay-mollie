@@ -7,7 +7,8 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.0.0
+ * @version 1.1.9
+ * @since 1.0.0
  */
 class Pronamic_WP_Pay_Mollie_Statuses {
 	/**
@@ -45,6 +46,21 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 	 */
 	const EXPIRED = 'expired';
 
+	/**
+	 * Pending
+	 *
+	 * @var string
+	 */
+	const PENDING = 'pending';
+
+	/**
+	 * Active
+	 *
+	 * @since 1.1.9
+	 * @var string
+	 */
+	const ACTIVE = 'active';
+
 	/////////////////////////////////////////////////
 
 	/**
@@ -54,17 +70,19 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 	 */
 	public static function transform( $status ) {
 		switch ( $status ) {
+			case self::PENDING :
 			case self::OPEN :
 				return Pronamic_WP_Pay_Statuses::OPEN;
 			case self::CANCELLED :
 				return Pronamic_WP_Pay_Statuses::CANCELLED;
 			case self::PAID_OUT :
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
+			case self::ACTIVE :
 			case self::PAID :
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
 			case self::EXPIRED :
 				return Pronamic_WP_Pay_Statuses::EXPIRED;
-			default:
+			default :
 				return null;
 		}
 	}
