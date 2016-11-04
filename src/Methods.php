@@ -74,6 +74,30 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 */
 	const PAYSAFECARD = 'paysafecard';
 
+	/**
+	 * Constant for the Gift cards method.
+	 *
+	 * @see https://www.mollie.com/en/giftcards
+	 * @var string
+	 */
+	const PODIUMCADEAUKAART = 'podiumcadeaukaart';
+
+	/**
+	 * Constant for the KBC/CBC Payment Button method.
+	 *
+	 * @see https://www.mollie.com/en/kbccbc
+	 * @var string
+	 */
+	const KBC = 'kbc';
+
+	/**
+	 * Constant for the Belfius Direct Net method.
+	 *
+	 * @see https://www.mollie.com/en/belfiusdirectnet
+	 * @var string
+	 */
+	const BELFIUS = 'belfius';
+
 	/////////////////////////////////////////////////
 
 	/**
