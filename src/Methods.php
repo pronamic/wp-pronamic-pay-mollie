@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.9
+ * @version 1.1.10
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Mollie_Methods {
@@ -78,6 +78,7 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 * Constant for the Gift cards method.
 	 *
 	 * @see https://www.mollie.com/en/giftcards
+	 * @since 1.1.10
 	 * @var string
 	 */
 	const PODIUMCADEAUKAART = 'podiumcadeaukaart';
@@ -86,6 +87,7 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 * Constant for the KBC/CBC Payment Button method.
 	 *
 	 * @see https://www.mollie.com/en/kbccbc
+	 * @since 1.1.10
 	 * @var string
 	 */
 	const KBC = 'kbc';
@@ -94,6 +96,7 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 * Constant for the Belfius Direct Net method.
 	 *
 	 * @see https://www.mollie.com/en/belfiusdirectnet
+	 * @since 1.1.10
 	 * @var string
 	 */
 	const BELFIUS = 'belfius';
