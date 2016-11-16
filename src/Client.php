@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.9
+ * @version 1.1.10
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_Client {
@@ -88,61 +88,54 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * @param string $action
 	 * @param array $parameters
 	 */
-	private function send_request( $end_point, $method = 'POST', array $data = array() ) {
+	private function send_request( $end_point, $method = 'GET', array $data = array(), $expected_response_code = 200 ) {
+		// Request
 		$url = self::API_URL . $end_point;
 
-		return wp_remote_request( $url, array(
+		$response = wp_remote_request( $url, array(
 			'method'    => $method,
 			'headers'   => array(
 				'Authorization' => 'Bearer ' . $this->api_key,
 			),
 			'body'      => $data,
 		) );
+
+		// Response code
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		if ( $expected_response_code != $response_code ) { // WPCS: loose comparison ok.
+			$this->error = new WP_Error( 'mollie_error', 'Unexpected response code.' );
+		}
+
+		// Body
+		$body = wp_remote_retrieve_body( $response );
+
+		$data = json_decode( $body );
+
+		if ( ! is_object( $data ) ) {
+			$this->error = new WP_Error( 'mollie_error', 'Could not parse response.' );
+
+			return false;
+		}
+
+		// Mollie error
+		if ( isset( $data->error, $data->error->message ) ) {
+			$this->error = new WP_Error( 'mollie_error', $data->error->message, $data->error );
+
+			return false;
+		}
+
+		return $data;
 	}
 
 	/////////////////////////////////////////////////
 
 	public function create_payment( Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest $request ) {
-		$data = $request->get_array();
-
-		$response = $this->send_request( 'payments/', 'POST', $data );
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		if ( 201 != $response_code ) { // WPCS: loose comparison ok.
-			$body = wp_remote_retrieve_body( $response );
-
-			$mollie_result = json_decode( $body );
-
-			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
-
-			return null;
-		}
-
-		// OK
-		$body = wp_remote_retrieve_body( $response );
-
-		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-		$result = json_decode( $body );
-
-		return $result;
+		return $this->send_request( 'payments/', 'POST', $request->get_array(), 201 );
 	}
 
 	public function get_payments() {
-		$result = null;
-
-		$response = $this->send_request( 'payments/', 'GET' );
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
-			$body = wp_remote_retrieve_body( $response );
-
-			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-			$result = json_decode( $body );
-		}
-
-		return $result;
+		return $this->send_request( 'payments/', 'GET' );
 	}
 
 	public function get_payment( $payment_id ) {
@@ -150,20 +143,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			return false;
 		}
 
-		$result = null;
-
-		$response = $this->send_request( 'payments/' . $payment_id, 'GET' );
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
-			$body = wp_remote_retrieve_body( $response );
-
-			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-			$result = json_decode( $body );
-		}
-
-		return $result;
+		return $this->send_request( 'payments/' . $payment_id, 'GET' );
 	}
 
 	//////////////////////////////////////////////////
@@ -174,28 +154,21 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * @return array
 	 */
 	public function get_issuers() {
-		$issuers = false;
-
 		$response = $this->send_request( 'issuers/', 'GET' );
 
-		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( false === $response ) {
+			return false;
+		}
 
-		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
-			$body = wp_remote_retrieve_body( $response );
+		$issuers = array();
 
-			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-			$result = json_decode( $body );
+		if ( isset( $response->data ) ) {
+			foreach ( $response->data as $issuer ) {
+				if ( Pronamic_WP_Pay_Mollie_Methods::IDEAL === $issuer->method ) {
+					$id   = Pronamic_WP_Pay_XML_Security::filter( $issuer->id );
+					$name = Pronamic_WP_Pay_XML_Security::filter( $issuer->name );
 
-			if ( null !== $result ) {
-				$issuers = array();
-
-				foreach ( $result->data as $issuer ) {
-					if ( Pronamic_WP_Pay_Mollie_Methods::IDEAL === $issuer->method ) {
-						$id   = Pronamic_WP_Pay_XML_Security::filter( $issuer->id );
-						$name = Pronamic_WP_Pay_XML_Security::filter( $issuer->name );
-
-						$issuers[ $id ] = $name;
-					}
+					$issuers[ $id ] = $name;
 				}
 			}
 		}
@@ -211,27 +184,20 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * @return array
 	 */
 	public function get_payment_methods() {
-		$payment_methods = false;
-
 		$response = $this->send_request( 'methods/', 'GET' );
 
-		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( false === $response ) {
+			return false;
+		}
 
-		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
-			$body = wp_remote_retrieve_body( $response );
+		$payment_methods = array();
 
-			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-			$result = json_decode( $body );
+		if ( isset( $response->data ) ) {
+			foreach ( $response->data as $payment_method ) {
+				$id   = Pronamic_WP_Pay_XML_Security::filter( $payment_method->id );
+				$name = Pronamic_WP_Pay_XML_Security::filter( $payment_method->description );
 
-			if ( null !== $result ) {
-				$payment_methods = array();
-
-				foreach ( $result->data as $payment_method ) {
-					$id   = Pronamic_WP_Pay_XML_Security::filter( $payment_method->id );
-					$name = Pronamic_WP_Pay_XML_Security::filter( $payment_method->description );
-
-					$payment_methods[ $id ] = $name;
-				}
+				$payment_methods[ $id ] = $name;
 			}
 		}
 
@@ -255,31 +221,17 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		$response = $this->send_request( 'customers/', 'POST', array(
 			'name'  => $name,
 			'email' => $email,
-		) );
+		), 201 );
 
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		if ( 201 != $response_code ) { // WPCS: loose comparison ok.
-			$body = wp_remote_retrieve_body( $response );
-
-			$mollie_result = json_decode( $body );
-
-			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
-
+		if ( false === $response ) {
 			return false;
 		}
 
-		// OK
-		$body = wp_remote_retrieve_body( $response );
-
-		// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-		$result = json_decode( $body );
-
-		if ( ! is_object( $result ) ) {
+		if ( ! isset( $response->id ) ) {
 			return false;
 		}
 
-		return $result->id;
+		return $response->id;
 	}
 
 	/**
@@ -290,34 +242,11 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * @return array
 	 */
 	public function get_mandates( $customer_id ) {
-		$mandates = false;
-
 		if ( '' === $customer_id ) {
 			return false;
 		}
 
-		$response = $this->send_request( 'customers/' . $customer_id . '/mandates?count=250', 'GET' );
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		if ( 200 == $response_code ) { // WPCS: loose comparison ok.
-			$body = wp_remote_retrieve_body( $response );
-
-			// NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit.
-			$result = json_decode( $body );
-
-			if ( null !== $result ) {
-				$mandates = $result;
-			}
-		} else {
-			$body = wp_remote_retrieve_body( $response );
-
-			$mollie_result = json_decode( $body );
-
-			$this->error = new WP_Error( 'mollie_error', $mollie_result->error->message, $mollie_result->error );
-		}
-
-		return $mandates;
+		return $this->send_request( 'customers/' . $customer_id . '/mandates?count=250', 'GET' );
 	}
 
 	/**
