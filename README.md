@@ -35,6 +35,29 @@ development environment you could use a service like [ngrok](https://ngrok.com/)
 *	http://www.mollie.nl/
 
 
+## Errors
+
+### The customer id is invalid
+
+```sql
+DELETE
+	meta
+FROM
+	wp_usermeta AS meta
+		INNER JOIN
+	wp_users AS user
+			ON user.ID = user_id
+WHERE
+	(
+		meta_key = '_pronamic_pay_mollie_customer_id'
+			OR
+		meta_key = '_pronamic_pay_mollie_customer_id_test'
+	)
+		AND
+	user.user_login = 'username'
+;
+```
+
 ## Documentation
 
 *	[Mollie API](https://www.mollie.nl/files/documentatie/payments-api.html)
