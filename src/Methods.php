@@ -101,7 +101,25 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 */
 	const BELFIUS = 'belfius';
 
-	/////////////////////////////////////////////////
+	/**
+	 * Payments methods map.
+	 *
+	 * @var array
+	 */
+	private static $map = array(
+		Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER      => Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER,
+		Pronamic_WP_Pay_PaymentMethods::BITCOIN            => Pronamic_WP_Pay_Mollie_Methods::BITCOIN,
+		Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD        => Pronamic_WP_Pay_Mollie_Methods::CREDITCARD,
+		Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT       => Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT,
+		Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL => Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT,
+		Pronamic_WP_Pay_PaymentMethods::BANCONTACT         => Pronamic_WP_Pay_Mollie_Methods::MISTERCASH,
+		Pronamic_WP_Pay_PaymentMethods::MISTER_CASH        => Pronamic_WP_Pay_Mollie_Methods::MISTERCASH,
+		Pronamic_WP_Pay_PaymentMethods::PAYPAL             => Pronamic_WP_Pay_Mollie_Methods::PAYPAL,
+		Pronamic_WP_Pay_PaymentMethods::SOFORT             => Pronamic_WP_Pay_Mollie_Methods::SOFORT,
+		Pronamic_WP_Pay_PaymentMethods::IDEAL              => Pronamic_WP_Pay_Mollie_Methods::IDEAL,
+		Pronamic_WP_Pay_PaymentMethods::KBC                => Pronamic_WP_Pay_Mollie_Methods::KBC,
+		Pronamic_WP_Pay_PaymentMethods::BELFIUS            => Pronamic_WP_Pay_Mollie_Methods::BELFIUS,
+	);
 
 	/**
 	 * Transform WordPress payment method to Mollie method.
@@ -111,26 +129,10 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 * @return string
 	 */
 	public static function transform( $payment_method ) {
-		switch ( $payment_method ) {
-			case Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER :
-				return Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER;
-			case Pronamic_WP_Pay_PaymentMethods::BITCOIN :
-				return Pronamic_WP_Pay_Mollie_Methods::BITCOIN;
-			case Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD :
-				return Pronamic_WP_Pay_Mollie_Methods::CREDITCARD;
-			case Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT :
-				return Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
-			case Pronamic_WP_Pay_PaymentMethods::BANCONTACT :
-			case Pronamic_WP_Pay_PaymentMethods::MISTER_CASH :
-				return Pronamic_WP_Pay_Mollie_Methods::MISTERCASH;
-			case Pronamic_WP_Pay_PaymentMethods::PAYPAL :
-				return Pronamic_WP_Pay_Mollie_Methods::PAYPAL;
-			case Pronamic_WP_Pay_PaymentMethods::SOFORT :
-				return Pronamic_WP_Pay_Mollie_Methods::SOFORT;
-			case Pronamic_WP_Pay_PaymentMethods::IDEAL :
-				return Pronamic_WP_Pay_Mollie_Methods::IDEAL;
-			default :
-				return null;
+		if ( isset( self::$map[ $payment_method ] ) ) {
+			return self::$map[ $payment_method ];
 		}
+
+		return null;
 	}
 }
