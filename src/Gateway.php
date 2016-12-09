@@ -273,8 +273,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				$payment->set_meta( 'mollie_customer_id', $customer_id );
 			}
 
-			$can_user_interact = in_array( $payment->get_source(), array( 'gravityformsideal' ), true );
-
 			// Mandate payment method to check for.
 			$mandate_method = $payment_method;
 
@@ -282,12 +280,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				$mandate_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT;
 			}
 
-			if ( ! $this->client->has_valid_mandate( $customer_id, $mandate_method ) && ( ! $subscription->has_valid_payment() || $can_user_interact ) ) {
-				// First payment or if user interaction is possible and no valid mandates are found
+			if ( ! $payment->get_recurring() && ! $this->client->has_valid_mandate( $customer_id, $mandate_method ) ) {
+				// First payment without valid mandate
 				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
 
 				if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
-					// Use iDEAL for first payments with payment method `Direct Debit (mandate via iDEAL)`.
+					// Use IDEAL for first payments with DIRECT_DEBIT_IDEAL payment method
 					$request->method = Pronamic_WP_Pay_Mollie_Methods::IDEAL;
 				}
 			}
