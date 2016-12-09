@@ -39,6 +39,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			'payment_status_request',
 			'recurring_direct_debit',
 			'recurring_credit_card',
+			'recurring',
 		);
 
 		$this->set_method( Pronamic_WP_Pay_Gateway::METHOD_HTTP_REDIRECT );
