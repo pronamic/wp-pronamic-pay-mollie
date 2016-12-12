@@ -311,7 +311,9 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$result = $this->client->create_payment( $request );
 
 		if ( ! $result ) {
-			$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
+			if ( false !== $subscription ) {
+				$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
+			}
 
 			$this->error = $this->client->get_error();
 
