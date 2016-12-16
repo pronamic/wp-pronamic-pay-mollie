@@ -39,6 +39,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gatewa
 			add_action( 'show_user_profile', array( $this, 'user_profile' ) );
 			add_action( 'edit_user_profile', array( $this, 'user_profile' ) );
 		}
+
+		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
 	}
 
 	public function get_config_factory_class() {
@@ -72,5 +74,19 @@ class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gatewa
 	 */
 	public function user_profile( $user ) {
 		include dirname( __FILE__ ) . '/../views/html-admin-user-profile.php';
+	}
+
+	/**
+	 * Payment provider URL.
+	 *
+	 * @param string  $url
+	 * @param Payment $payment
+	 * @return string
+	 */
+	public function payment_provider_url( $url, $payment ) {
+		return sprintf(
+			'https://www.mollie.com/dashboard/payments/%s',
+			$payment->get_transaction_id()
+		);
 	}
 }
