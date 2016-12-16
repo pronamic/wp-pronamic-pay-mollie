@@ -167,7 +167,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT,
 			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
 			Pronamic_WP_Pay_PaymentMethods::BANCONTACT,
-			Pronamic_WP_Pay_PaymentMethods::MISTER_CASH,
 			Pronamic_WP_Pay_PaymentMethods::PAYPAL,
 			Pronamic_WP_Pay_PaymentMethods::SOFORT,
 			Pronamic_WP_Pay_PaymentMethods::IDEAL,
