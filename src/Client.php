@@ -207,7 +207,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	//////////////////////////////////////////////////
 
 	/**
-	 * Get customer.
+	 * Create customer.
 	 *
 	 * @since 1.1.6
 	 * @param Pronamic_WP_Pay_PaymentData $data
@@ -232,6 +232,33 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		}
 
 		return $response->id;
+	}
+
+	/**
+	 * Get customer.
+	 *
+	 * @param $customer_id
+	 *
+	 * @since unreleased
+	 *
+	 * @return array
+	 */
+	public function get_customer( $customer_id ) {
+		if ( empty( $customer_id ) ) {
+			return false;
+		}
+
+		$response = $this->send_request( 'customers/' . $customer_id, 'GET', array(), 200 );
+
+		if ( false === $response ) {
+			return false;
+		}
+
+		if ( is_wp_error( $this->error ) ) {
+			return false;
+		}
+
+		return $response;
 	}
 
 	/**
