@@ -300,7 +300,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			}
 		}
 
-		if ( Pronamic_WP_Pay_PaymentMethods::IDEAL === $payment_method ) {
+		if ( Pronamic_WP_Pay_Mollie_Methods::IDEAL === $request->method ) {
 			// If payment method is iDEAL we set the user chosen issuer ID.
 			$request->issuer = $payment->get_issuer();
 		}
