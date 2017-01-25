@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.9
+ * @version 1.1.11
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Mollie_ConfigTest extends PHPUnit_Framework_TestCase {
