@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.12] - 2017-01-25
+- Fixed Composer requirement.
+
 ## [1.1.11] - 2017-01-25
 - Enabled support for more Mollie payment methods.
 - Auto renew invalid customer IDs.
@@ -65,7 +68,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.11...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.12...HEAD
+[1.1.12]: https://github.com/wp-pay-gateways/mollie/compare/1.1.11...1.1.12
 [1.1.11]: https://github.com/wp-pay-gateways/mollie/compare/1.1.10...1.1.11
 [1.1.10]: https://github.com/wp-pay-gateways/mollie/compare/1.1.9...1.1.10
 [1.1.9]: https://github.com/wp-pay-gateways/mollie/compare/1.1.8...1.1.9
