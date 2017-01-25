@@ -7,6 +7,13 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.11] - 2017-01-25
+- Enabled support for more Mollie payment methods.
+- Auto renew invalid customer IDs.
+- Only update subscription status for subscriptions.
+- Added filter for payment provider URL.
+- Removed deprecated MISTER_CASH from the `get_supported_payment_methods` function.
+
 ## [1.1.10] - 2016-11-16
 - Improved Client class, DRY improvements.
 - Added constants for some extra methods.
@@ -58,7 +65,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.10...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.11...HEAD
+[1.1.11]: https://github.com/wp-pay-gateways/mollie/compare/1.1.10...1.1.11
 [1.1.10]: https://github.com/wp-pay-gateways/mollie/compare/1.1.9...1.1.10
 [1.1.9]: https://github.com/wp-pay-gateways/mollie/compare/1.1.8...1.1.9
 [1.1.8]: https://github.com/wp-pay-gateways/mollie/compare/1.1.7...1.1.8
