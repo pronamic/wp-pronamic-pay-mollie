@@ -283,7 +283,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 *
 	 * @return boolean
 	 */
-	public function has_valid_mandate( $customer_id, $payment_method = '' ) {
+	public function has_valid_mandate( $customer_id, $payment_method = null ) {
 		$mandates = $this->get_mandates( $customer_id );
 
 		if ( $mandates ) {
