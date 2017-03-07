@@ -257,7 +257,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			}
 
 			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
-			$request->method         = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
 
 			if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
 				// Use direct debit for recurring payments with payment method `Direct Debit (mandate via iDEAL)`.
