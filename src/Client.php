@@ -310,7 +310,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 *
 	 * @return string
 	 */
-	public function get_first_valid_mandate_datetime( $customer_id, $payment_method = '' ) {
+	public function get_first_valid_mandate_datetime( $customer_id, $payment_method = null ) {
 		$mandates = $this->get_mandates( $customer_id );
 
 		if ( $mandates ) {
@@ -319,7 +319,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
 
 			foreach ( $mandates->data as $mandate ) {
-				if ( '' !== $payment_method && $mollie_method !== $mandate->method ) {
+				if ( $mollie_method !== $mandate->method ) {
 					continue;
 				}
 
