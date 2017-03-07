@@ -290,7 +290,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
 
 			foreach ( $mandates->data as $mandate ) {
-				if ( '' !== $payment_method && $mollie_method !== $mandate->method ) {
+				if ( $mollie_method !== $mandate->method ) {
 					continue;
 				}
 
