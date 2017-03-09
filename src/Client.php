@@ -286,17 +286,19 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	public function has_valid_mandate( $customer_id, $payment_method = null ) {
 		$mandates = $this->get_mandates( $customer_id );
 
-		if ( $mandates ) {
-			$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
+		if ( ! $mandates ) {
+			return false;
+		}
 
-			foreach ( $mandates->data as $mandate ) {
-				if ( $mollie_method !== $mandate->method ) {
-					continue;
-				}
+		$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
 
-				if ( 'valid' === $mandate->status ) {
-					return true;
-				}
+		foreach ( $mandates->data as $mandate ) {
+			if ( $mollie_method !== $mandate->method ) {
+				continue;
+			}
+
+			if ( 'valid' === $mandate->status ) {
+				return true;
 			}
 		}
 
