@@ -313,29 +313,39 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	public function get_first_valid_mandate_datetime( $customer_id, $payment_method = null ) {
 		$mandates = $this->get_mandates( $customer_id );
 
-		if ( $mandates ) {
-			$valid_mandates = array();
+		if ( ! $mandates ) {
+			return null;
+		}
 
-			$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
+		$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
 
-			foreach ( $mandates->data as $mandate ) {
-				if ( $mollie_method !== $mandate->method ) {
-					continue;
-				}
-
-				if ( 'valid' === $mandate->status ) {
-					$valid_mandates[ $mandate->createdDatetime ] = $mandate;
-				}
+		foreach ( $mandates->data as $mandate ) {
+			if ( $mollie_method !== $mandate->method ) {
+				continue;
 			}
 
+			if ( 'valid' !== $mandate->status ) {
+				continue;
+			}
+
+			if ( ! isset( $valid_mandates ) ) {
+				$valid_mandates = array();
+			}
+
+			$valid_mandates[ $mandate->createdDatetime ] = $mandate;
+		}
+
+		if ( isset( $valid_mandates ) ) {
 			ksort( $valid_mandates );
 
 			$mandate = array_shift( $valid_mandates );
 
+			$created = new DateTime( $mandate->createdDatetime );
+
 			return sprintf(
 				__( '%1$s at %2$s', 'pronamic_ideal' ),
-				get_date_from_gmt( $mandate->createdDatetime, get_option( 'date_format' ) ),
-				get_date_from_gmt( $mandate->createdDatetime, get_option( 'time_format' ) )
+				date_i18n( get_option( 'date_format' ), $created->getTimestamp() ),
+				date_i18n( get_option( 'time_format' ), $created->getTimestamp() )
 			);
 		}
 
