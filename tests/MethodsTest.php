@@ -36,6 +36,10 @@ class Pronamic_WP_Pay_Mollie_MethodsTest extends PHPUnit_Framework_TestCase {
 			array( Pronamic_WP_Pay_PaymentMethods::KBC, Pronamic_WP_Pay_Mollie_Methods::KBC ),
 			array( Pronamic_WP_Pay_PaymentMethods::BELFIUS, Pronamic_WP_Pay_Mollie_Methods::BELFIUS ),
 			array( 'not existing payment method', null ),
+			array( null, null ),
+			array( 0, null ),
+			array( false, null ),
+			array( new stdClass(), null ),
 		);
 	}
 }

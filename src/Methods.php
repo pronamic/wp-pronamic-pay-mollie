@@ -129,6 +129,10 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 * @return string
 	 */
 	public static function transform( $payment_method ) {
+		if ( ! is_scalar( $payment_method ) ) {
+			return null;
+		}
+
 		if ( isset( self::$map[ $payment_method ] ) ) {
 			return self::$map[ $payment_method ];
 		}

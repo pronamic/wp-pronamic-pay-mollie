@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.11
+ * @version 1.1.13
  * @since 1.1.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
@@ -257,7 +257,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			}
 
 			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
-			$request->method         = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
 
 			if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
 				// Use direct debit for recurring payments with payment method `Direct Debit (mandate via iDEAL)`.
@@ -279,7 +278,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				$mandate_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT;
 			}
 
-			if ( ! $payment->get_recurring() && ! $this->client->has_valid_mandate( $customer_id, $mandate_method ) ) {
+			if ( ! $payment->get_recurring() ) {
 				// First payment without valid mandate
 				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
 
