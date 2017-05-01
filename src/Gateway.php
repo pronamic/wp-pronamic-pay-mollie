@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.13
+ * @version 1.1.14
  * @since 1.1.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
@@ -340,6 +340,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
 
 		if ( ! $mollie_payment ) {
+			$payment->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
 
 			if ( '' !== $payment->get_transaction_id() ) {
 				// Use payment status as subscription status only if there's a transaction ID

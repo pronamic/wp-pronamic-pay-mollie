@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.14] - 2017-05-01
+- Set payment status to `Failed` too if `mollie_error` occurs.
+
 ## [1.1.13] - 2017-03-15
 - Return null if the payment method variable is not a scalar type to fix “Warning: Illegal offset type in isset or empty” error.
 - No longer check if $payment_method is a empty string, the compare on the mandate method is enough.
@@ -75,7 +78,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.13...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.14...HEAD
+[1.1.14]: https://github.com/wp-pay-gateways/mollie/compare/1.1.13...1.1.14
 [1.1.13]: https://github.com/wp-pay-gateways/mollie/compare/1.1.12...1.1.13
 [1.1.12]: https://github.com/wp-pay-gateways/mollie/compare/1.1.11...1.1.12
 [1.1.11]: https://github.com/wp-pay-gateways/mollie/compare/1.1.10...1.1.11
