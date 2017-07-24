@@ -165,6 +165,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			Pronamic_WP_Pay_PaymentMethods::BITCOIN,
 			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
 			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT,
+			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
 			Pronamic_WP_Pay_PaymentMethods::BANCONTACT,
 			Pronamic_WP_Pay_PaymentMethods::PAYPAL,
@@ -242,12 +243,19 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		// Subscriptions
 		$subscription = $payment->get_subscription();
 
-		$subscription_methods = array(
-			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
+		$direct_debit_methods = array(
+			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT => Pronamic_WP_Pay_PaymentMethods::BANCONTACT,
+			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL      => Pronamic_WP_Pay_PaymentMethods::IDEAL,
 		);
 
-		if ( $subscription && in_array( $payment_method, $subscription_methods, true ) ) {
+		$subscription_methods = array_merge(
+			array(
+				Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD => Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
+			),
+			$direct_debit_methods
+		);
+
+		if ( $subscription && array_key_exists( $payment_method, $subscription_methods ) ) {
 			if ( is_object( $this->client->get_error() ) ) {
 				// Set error if customer could not be created
 				$this->error = $this->client->get_error();
@@ -258,8 +266,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
 
-			if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
-				// Use direct debit for recurring payments with payment method `Direct Debit (mandate via iDEAL)`.
+			if ( array_key_exists( $payment_method, $direct_debit_methods ) ) {
+				// Use direct debit payment method for recurring payments if not using credit card
 				$request->method = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
 			}
 
@@ -282,9 +290,9 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				// First payment without valid mandate
 				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
 
-				if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
-					// Use IDEAL for first payments with DIRECT_DEBIT_IDEAL payment method
-					$request->method = Pronamic_WP_Pay_Mollie_Methods::IDEAL;
+				if ( array_key_exists( $payment_method, $direct_debit_methods ) ) {
+					// Use corresponding first payment method for direct debit payment method
+					$request->method = Pronamic_WP_Pay_Mollie_Methods::transform( $subscription_methods[ $payment_method ] );
 				}
 			}
 
