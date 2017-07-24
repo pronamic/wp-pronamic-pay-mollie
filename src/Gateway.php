@@ -279,13 +279,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				$payment->set_meta( 'mollie_customer_id', $customer_id );
 			}
 
-			// Mandate payment method to check for.
-			$mandate_method = $payment_method;
-
-			if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $mandate_method ) {
-				$mandate_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT;
-			}
-
 			if ( ! $payment->get_recurring() ) {
 				// First payment without valid mandate
 				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
