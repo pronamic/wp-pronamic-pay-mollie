@@ -256,14 +256,6 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		);
 
 		if ( $subscription && array_key_exists( $payment_method, $subscription_methods ) ) {
-			if ( is_object( $this->client->get_error() ) ) {
-				// Set error if customer could not be created
-				$this->error = $this->client->get_error();
-
-				// Prevent subscription payment from being created without customer
-				return;
-			}
-
 			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
 
 			if ( array_key_exists( $payment_method, $direct_debit_methods ) ) {
