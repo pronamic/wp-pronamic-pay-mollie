@@ -78,6 +78,7 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 			case self::PAID_OUT :
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
 			case self::ACTIVE :
+				return Pronamic_WP_Pay_Statuses::ACTIVE;
 			case self::PAID :
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
 			case self::EXPIRED :
