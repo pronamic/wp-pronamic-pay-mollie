@@ -230,10 +230,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
 
-		if ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) {
+		if ( ! $payment->get_recurring() && ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) ) {
 			$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
 
-			if ( $customer_id ) {
+			if ( '0' !== $user_id && $customer_id ) {
 				$this->update_wp_user_customer_id( $user_id, $customer_id );
 			}
 		}
