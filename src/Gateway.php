@@ -364,6 +364,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 			if ( isset( $details->consumerName ) ) {
 				$payment->set_consumer_name( $details->consumerName );
+			} elseif ( isset( $details->cardHolder ) ) {
+				$payment->set_consumer_name( $details->cardHolder );
 			}
 
 			if ( isset( $details->consumerAccount ) ) {
