@@ -369,6 +369,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			if ( isset( $details->consumerAccount ) ) {
 				$payment->set_consumer_iban( $details->consumerAccount );
 			}
+
+			if ( isset( $details->consumerBic ) ) {
+				$payment->set_consumer_bic( $details->consumerBic );
+			}
 		}
 	}
 }
