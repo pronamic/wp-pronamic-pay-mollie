@@ -310,7 +310,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		}
 
 		if ( $subscription && Pronamic_WP_Pay_Mollie_Recurring::RECURRING === $request->recurring_type ) {
-			$subscription->set_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $result->status ) );
+			if ( ! ( $payment->get_recurring() && Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
+				// Update subscription status if this is not a recurring payment for a cancelled subscription.
+				$subscription->update_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $result->status ) );
+			}
 		}
 
 		$payment->set_transaction_id( $result->id );
