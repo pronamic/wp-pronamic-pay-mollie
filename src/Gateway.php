@@ -366,7 +366,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				Pronamic_WP_Pay_Statuses::FAILURE,
 			);
 
-			if ( ! $payment->get_recurring() && in_array( $new_status, $failed_statuses ) ) {
+			if ( ! $payment->get_recurring() && in_array( $new_status, $failed_statuses, true ) ) {
 				// Cancel subscription if this is the first payment and payment failed/expired,
 				// to prevent creating unwanted recurring payments in the future.
 
