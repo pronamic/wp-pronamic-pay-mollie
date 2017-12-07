@@ -369,7 +369,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 				$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED );
 			} elseif ( ! ( $payment->get_recurring() && Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
-				// Update subscription status if this is a recurring payment and the subscription has not been canceled.
+				// Update subscription status if this is not a recurring payment for a cancelled subscription.
 
 				$subscription->update_status( $new_status );
 			}
