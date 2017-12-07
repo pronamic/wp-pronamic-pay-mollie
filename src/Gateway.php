@@ -226,8 +226,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		}
 
 		// Customer ID
-		$user_id = $payment->post->post_author;
-
+		$user_id     = $payment->post->post_author;
 		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
 
 		if ( ! $payment->get_recurring() && ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) ) {
@@ -243,27 +242,15 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		// Subscriptions
 		$subscription = $payment->get_subscription();
 
-		$direct_debit_methods = array(
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT => Pronamic_WP_Pay_PaymentMethods::BANCONTACT,
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL      => Pronamic_WP_Pay_PaymentMethods::IDEAL,
-		);
-
-		$subscription_methods = array_merge(
-			array(
-				Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD => Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
-			),
-			$direct_debit_methods
-		);
-
-		if ( $subscription && array_key_exists( $payment_method, $subscription_methods ) ) {
+		if ( $subscription && Pronamic_WP_Pay_PaymentMethods::is_recurring_method( $payment_method ) ) {
 			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
 
-			if ( array_key_exists( $payment_method, $direct_debit_methods ) ) {
+			if ( Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
 				// Use direct debit payment method for recurring payments if not using credit card
 				$request->method = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
 			}
 
-			if ( $subscription->has_valid_payment() && ! $customer_id ) {
+			if ( ! $customer_id && $subscription->has_valid_payment() ) {
 				// Get customer ID from first payment
 				$first       = $subscription->get_first_payment();
 				$customer_id = $first->get_meta( 'mollie_customer_id' );
@@ -275,9 +262,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				// First payment without valid mandate
 				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
 
-				if ( array_key_exists( $payment_method, $direct_debit_methods ) ) {
+				if ( Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
 					// Use corresponding first payment method for direct debit payment method
-					$request->method = Pronamic_WP_Pay_Mollie_Methods::transform( $subscription_methods[ $payment_method ] );
+					$first_method    = Pronamic_WP_Pay_PaymentMethods::get_first_payment_method( $payment_method );
+					$request->method = Pronamic_WP_Pay_Mollie_Methods::transform( $first_method );
 				}
 			}
 
