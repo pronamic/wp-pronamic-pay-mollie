@@ -291,7 +291,17 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		if ( ! $result ) {
 			if ( false !== $subscription ) {
-				$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
+				// Payment for a subscription
+
+				if ( ! $payment->get_recurring() ) {
+					// First payment
+
+					// Cancel subscription to prevent unwanted recurring payments in the future,
+					// when a valid customer ID might be set for the user.
+					$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED );
+				} else {
+					$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
+				}
 			}
 
 			$this->error = $this->client->get_error();
@@ -344,7 +354,25 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		if ( $subscription && '' === $subscription->get_transaction_id() ) {
 			// First payment or non-subscription recurring payment,
 			// use payment status for subscription too.
-			$subscription->set_status( $status );
+
+			$new_status = $status;
+
+			$failed_statuses = array(
+				Pronamic_WP_Pay_Statuses::CANCELLED,
+				Pronamic_WP_Pay_Statuses::EXPIRED,
+				Pronamic_WP_Pay_Statuses::FAILURE,
+			);
+
+			if ( ! $payment->get_recurring() && in_array( $new_status, $failed_statuses ) ) {
+				// Cancel subscription if this is the first payment and payment failed/expired,
+				// to prevent creating unwanted recurring payments in the future.
+
+				$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED );
+			} elseif ( ! ( $payment->get_recurring() && Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
+				// Update subscription status if this is a recurring payment and the subscription has not been canceled.
+
+				$subscription->update_status( $new_status );
+			}
 		}
 
 		if ( isset( $mollie_payment->details ) ) {
