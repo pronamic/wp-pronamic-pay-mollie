@@ -7,6 +7,14 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [1.1.15] - 2017-12-12
+- Added support for payment method `Direct Debit (mandate via Bancontact)`.
+- No longer create new Mollie customer during recurring (not first) payments.
+- Update payment consumer BIC from Mollie payment details.
+- Update payment consumer name with Mollie payment card holder name.
+- Cancel subscriptions if first payment fails, to prevent future reactivation when a vailid customer ID becomes available.
+- Update subscription status on payment start only if it's not a recurring payment for a cancelled subscription.
+
 ## [1.1.14] - 2017-05-01
 - Set payment status to `Failed` too if `mollie_error` occurs.
 
@@ -78,7 +86,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.14...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.15...HEAD
+[1.1.15]: https://github.com/wp-pay-gateways/mollie/compare/1.1.14...1.1.15
 [1.1.14]: https://github.com/wp-pay-gateways/mollie/compare/1.1.13...1.1.14
 [1.1.13]: https://github.com/wp-pay-gateways/mollie/compare/1.1.12...1.1.13
 [1.1.12]: https://github.com/wp-pay-gateways/mollie/compare/1.1.11...1.1.12
