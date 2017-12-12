@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.11
+ * @version 1.1.15
  * @since 1.0.0
  */
 class Pronamic_WP_Pay_Mollie_ConfigTest extends PHPUnit_Framework_TestCase {
@@ -16,6 +16,7 @@ class Pronamic_WP_Pay_Mollie_ConfigTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function test_config() {
 		$config = new Pronamic_WP_Pay_Gateways_Mollie_Config();
+
 		$config->api_key = 'test';
 
 		$this->assertEquals( 'test', $config->api_key );

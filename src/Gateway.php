@@ -7,7 +7,7 @@
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.14
+ * @version 1.1.15
  * @since 1.1.0
  */
 class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
@@ -165,6 +165,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			Pronamic_WP_Pay_PaymentMethods::BITCOIN,
 			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
 			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT,
+			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
 			Pronamic_WP_Pay_PaymentMethods::BANCONTACT,
 			Pronamic_WP_Pay_PaymentMethods::PAYPAL,
@@ -225,14 +226,13 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		}
 
 		// Customer ID
-		$user_id = $payment->post->post_author;
-
+		$user_id     = $payment->post->post_author;
 		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
 
-		if ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) {
+		if ( ! $payment->get_recurring() && ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) ) {
 			$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
 
-			if ( $customer_id ) {
+			if ( '0' !== $user_id && $customer_id ) {
 				$this->update_wp_user_customer_id( $user_id, $customer_id );
 			}
 		}
@@ -242,28 +242,15 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		// Subscriptions
 		$subscription = $payment->get_subscription();
 
-		$subscription_methods = array(
-			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
-		);
-
-		if ( $subscription && in_array( $payment_method, $subscription_methods, true ) ) {
-			if ( is_object( $this->client->get_error() ) ) {
-				// Set error if customer could not be created
-				$this->error = $this->client->get_error();
-
-				// Prevent subscription payment from being created without customer
-				return;
-			}
-
+		if ( $subscription && Pronamic_WP_Pay_PaymentMethods::is_recurring_method( $payment_method ) ) {
 			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
 
-			if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
-				// Use direct debit for recurring payments with payment method `Direct Debit (mandate via iDEAL)`.
+			if ( Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
+				// Use direct debit payment method for recurring payments if not using credit card
 				$request->method = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
 			}
 
-			if ( $subscription->has_valid_payment() && ! $customer_id ) {
+			if ( ! $customer_id && $subscription->has_valid_payment() ) {
 				// Get customer ID from first payment
 				$first       = $subscription->get_first_payment();
 				$customer_id = $first->get_meta( 'mollie_customer_id' );
@@ -271,20 +258,14 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 				$payment->set_meta( 'mollie_customer_id', $customer_id );
 			}
 
-			// Mandate payment method to check for.
-			$mandate_method = $payment_method;
-
-			if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $mandate_method ) {
-				$mandate_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT;
-			}
-
 			if ( ! $payment->get_recurring() ) {
 				// First payment without valid mandate
 				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
 
-				if ( Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL === $payment_method ) {
-					// Use IDEAL for first payments with DIRECT_DEBIT_IDEAL payment method
-					$request->method = Pronamic_WP_Pay_Mollie_Methods::IDEAL;
+				if ( Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
+					// Use corresponding first payment method for direct debit payment method
+					$first_method    = Pronamic_WP_Pay_PaymentMethods::get_first_payment_method( $payment_method );
+					$request->method = Pronamic_WP_Pay_Mollie_Methods::transform( $first_method );
 				}
 			}
 
@@ -310,7 +291,17 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		if ( ! $result ) {
 			if ( false !== $subscription ) {
-				$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
+				// Payment for a subscription
+
+				if ( ! $payment->get_recurring() ) {
+					// First payment
+
+					// Cancel subscription to prevent unwanted recurring payments in the future,
+					// when a valid customer ID might be set for the user.
+					$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED );
+				} else {
+					$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
+				}
 			}
 
 			$this->error = $this->client->get_error();
@@ -319,7 +310,10 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		}
 
 		if ( $subscription && Pronamic_WP_Pay_Mollie_Recurring::RECURRING === $request->recurring_type ) {
-			$subscription->set_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $result->status ) );
+			if ( ! ( $payment->get_recurring() && Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
+				// Update subscription status if this is not a recurring payment for a cancelled subscription.
+				$subscription->update_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $result->status ) );
+			}
 		}
 
 		$payment->set_transaction_id( $result->id );
@@ -363,7 +357,25 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		if ( $subscription && '' === $subscription->get_transaction_id() ) {
 			// First payment or non-subscription recurring payment,
 			// use payment status for subscription too.
-			$subscription->set_status( $status );
+
+			$new_status = $status;
+
+			$failed_statuses = array(
+				Pronamic_WP_Pay_Statuses::CANCELLED,
+				Pronamic_WP_Pay_Statuses::EXPIRED,
+				Pronamic_WP_Pay_Statuses::FAILURE,
+			);
+
+			if ( ! $payment->get_recurring() && in_array( $new_status, $failed_statuses, true ) ) {
+				// Cancel subscription if this is the first payment and payment failed/expired,
+				// to prevent creating unwanted recurring payments in the future.
+
+				$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED );
+			} elseif ( ! ( $payment->get_recurring() && Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
+				// Update subscription status if this is not a recurring payment for a cancelled subscription.
+
+				$subscription->update_status( $new_status );
+			}
 		}
 
 		if ( isset( $mollie_payment->details ) ) {
@@ -371,10 +383,16 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 			if ( isset( $details->consumerName ) ) {
 				$payment->set_consumer_name( $details->consumerName );
+			} elseif ( isset( $details->cardHolder ) ) {
+				$payment->set_consumer_name( $details->cardHolder );
 			}
 
 			if ( isset( $details->consumerAccount ) ) {
 				$payment->set_consumer_iban( $details->consumerAccount );
+			}
+
+			if ( isset( $details->consumerBic ) ) {
+				$payment->set_consumer_bic( $details->consumerBic );
 			}
 		}
 	}
