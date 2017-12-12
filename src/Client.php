@@ -93,11 +93,11 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 		$url = self::API_URL . $end_point;
 
 		$response = wp_remote_request( $url, array(
-			'method'    => $method,
-			'headers'   => array(
+			'method'  => $method,
+			'headers' => array(
 				'Authorization' => 'Bearer ' . $this->api_key,
 			),
-			'body'      => $data,
+			'body'    => $data,
 		) );
 
 		// Response code
@@ -345,6 +345,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			$created = new DateTime( $mandate->createdDatetime );
 
 			return sprintf(
+				/* translators: 1: date, 2: time */
 				__( '%1$s at %2$s', 'pronamic_ideal' ),
 				date_i18n( get_option( 'date_format' ), $created->getTimestamp() ),
 				date_i18n( get_option( 'time_format' ), $created->getTimestamp() )

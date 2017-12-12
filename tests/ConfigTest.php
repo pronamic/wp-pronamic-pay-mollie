@@ -16,6 +16,7 @@ class Pronamic_WP_Pay_Mollie_ConfigTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function test_config() {
 		$config = new Pronamic_WP_Pay_Gateways_Mollie_Config();
+
 		$config->api_key = 'test';
 
 		$this->assertEquals( 'test', $config->api_key );

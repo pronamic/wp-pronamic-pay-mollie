@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<ruleset name="WordPress Pay Mollie rules">
+	<config name="installed_paths" value="vendor/wp-coding-standards/wpcs,vendor/wimg/php-compatibility" />
+
+	<config name="minimum_supported_wp_version" value="4.7" />
+
+	<config name="testVersion" value="5.3-99.0" />
+
+	<rule ref="PHPCompatibility" />
+
+	<rule ref="WordPress">	
+		<exclude name="Generic.Files.LowercasedFilename.NotFound" />
+
+		<exclude name="Squiz.Commenting" />
+
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+
+		<exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar" />
+
+		<exclude name="WordPress.WP.AlternativeFunctions.parse_url_parse_url" />
+		<exclude name="WordPress.VIP.RestrictedFunctions.user_meta_get_user_meta" />
+		<exclude name="WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta" />
+	</rule>
+
+	<rule ref="WordPress.VIP.SlowDBQuery.slow_db_query_meta_key">
+		<exclude-pattern>src/Settings.php</exclude-pattern>
+	</rule>
+
+	<rule ref="PEAR.Functions.FunctionCallSignature.Indent">
+		<exclude-pattern>src/Client.php</exclude-pattern>
+	</rule>
+</ruleset>

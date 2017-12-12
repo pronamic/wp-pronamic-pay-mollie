@@ -70,20 +70,20 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 	 */
 	public static function transform( $status ) {
 		switch ( $status ) {
-			case self::PENDING :
-			case self::OPEN :
+			case self::PENDING:
+			case self::OPEN:
 				return Pronamic_WP_Pay_Statuses::OPEN;
-			case self::CANCELLED :
+			case self::CANCELLED:
 				return Pronamic_WP_Pay_Statuses::CANCELLED;
-			case self::PAID_OUT :
+			case self::PAID_OUT:
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
-			case self::ACTIVE :
+			case self::ACTIVE:
 				return Pronamic_WP_Pay_Statuses::ACTIVE;
-			case self::PAID :
+			case self::PAID:
 				return Pronamic_WP_Pay_Statuses::SUCCESS;
-			case self::EXPIRED :
+			case self::EXPIRED:
 				return Pronamic_WP_Pay_Statuses::EXPIRED;
-			default :
+			default:
 				return null;
 		}
 	}
