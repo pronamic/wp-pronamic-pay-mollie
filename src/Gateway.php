@@ -187,7 +187,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	private function get_webhook_url() {
 		$url = home_url( '/' );
 
-		$host = parse_url( $url, PHP_URL_HOST );
+		$host = wp_parse_url( $url, PHP_URL_HOST );
 
 		if ( 'localhost' === $host ) {
 			// Mollie doesn't allow localhost
