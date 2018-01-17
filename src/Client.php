@@ -3,7 +3,7 @@
 /**
  * Title: Mollie
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
  * @author Remco Tolsma
@@ -210,8 +210,11 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * Create customer.
 	 *
 	 * @since 1.1.6
-	 * @param Pronamic_WP_Pay_PaymentData $data
-	 * @return array
+	 *
+	 * @param string $email
+	 * @param string $name
+	 *
+	 * @return array|bool
 	 */
 	public function create_customer( $email, $name ) {
 		if ( empty( $email ) || empty( $name ) ) {
