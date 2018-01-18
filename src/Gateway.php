@@ -319,7 +319,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 		$payment->set_transaction_id( $result->id );
 
-		if ( '' === $payment->get_action_url() ) {
+		if ( isset( $result->links, $result->links->paymentUrl ) ) {
 			$payment->set_action_url( $result->links->paymentUrl );
 		}
 	}
