@@ -3,7 +3,7 @@
 	"description": "Mollie driver for the WordPress payment processing library.",
 	"keywords": ["wordpress", "wp", "pay", "mollie", "gateway", "pronamic"],
 	"homepage": "http://www.wp-pay.org/gateways/mollie/",
-	"license": "GPL-3.0+",
+	"license": "GPL-3.0-or-later",
 	"authors": [
 		{
 			"name": "Pronamic",
