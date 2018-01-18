@@ -1,16 +1,18 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
 /**
  * Title: Mollie methods
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
  * @author Remco Tolsma
  * @version 1.1.11
  * @since 1.0.0
  */
-class Pronamic_WP_Pay_Mollie_Methods {
+class Methods {
 	/**
 	 * Constant for the iDEAL method.
 	 *
@@ -107,20 +109,20 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 * @var array
 	 */
 	private static $map = array(
-		Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER           => Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER,
-		Pronamic_WP_Pay_PaymentMethods::BITCOIN                 => Pronamic_WP_Pay_Mollie_Methods::BITCOIN,
-		Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD             => Pronamic_WP_Pay_Mollie_Methods::CREDITCARD,
-		Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT            => Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT,
-		Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT => Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT,
-		Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL      => Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT,
-		Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_SOFORT     => Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT,
-		Pronamic_WP_Pay_PaymentMethods::BANCONTACT              => Pronamic_WP_Pay_Mollie_Methods::MISTERCASH,
-		Pronamic_WP_Pay_PaymentMethods::MISTER_CASH             => Pronamic_WP_Pay_Mollie_Methods::MISTERCASH,
-		Pronamic_WP_Pay_PaymentMethods::PAYPAL                  => Pronamic_WP_Pay_Mollie_Methods::PAYPAL,
-		Pronamic_WP_Pay_PaymentMethods::SOFORT                  => Pronamic_WP_Pay_Mollie_Methods::SOFORT,
-		Pronamic_WP_Pay_PaymentMethods::IDEAL                   => Pronamic_WP_Pay_Mollie_Methods::IDEAL,
-		Pronamic_WP_Pay_PaymentMethods::KBC                     => Pronamic_WP_Pay_Mollie_Methods::KBC,
-		Pronamic_WP_Pay_PaymentMethods::BELFIUS                 => Pronamic_WP_Pay_Mollie_Methods::BELFIUS,
+		\Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER => Methods::BANKTRANSFER,
+		\Pronamic_WP_Pay_PaymentMethods::BITCOIN       => Methods::BITCOIN,
+		\Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD   => Methods::CREDITCARD,
+		\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT  => Methods::DIRECT_DEBIT,
+		\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT => Methods::DIRECT_DEBIT,
+		\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL => Methods::DIRECT_DEBIT,
+		\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_SOFORT => Methods::DIRECT_DEBIT,
+		\Pronamic_WP_Pay_PaymentMethods::BANCONTACT    => Methods::MISTERCASH,
+		\Pronamic_WP_Pay_PaymentMethods::MISTER_CASH   => Methods::MISTERCASH,
+		\Pronamic_WP_Pay_PaymentMethods::PAYPAL        => Methods::PAYPAL,
+		\Pronamic_WP_Pay_PaymentMethods::SOFORT        => Methods::SOFORT,
+		\Pronamic_WP_Pay_PaymentMethods::IDEAL         => Methods::IDEAL,
+		\Pronamic_WP_Pay_PaymentMethods::KBC           => Methods::KBC,
+		\Pronamic_WP_Pay_PaymentMethods::BELFIUS       => Methods::BELFIUS,
 	);
 
 	/**

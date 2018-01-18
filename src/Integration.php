@@ -1,16 +1,18 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
 /**
  * Title: Mollie integration
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
  * @author Remco Tolsma
  * @version 1.1.15
  * @since 1.0.0
  */
-class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gateways_AbstractIntegration {
+class Integration extends \Pronamic_WP_Pay_Gateways_AbstractIntegration {
 	/**
 	 * Dashboard URL.
 	 *
@@ -29,7 +31,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gatewa
 		$this->provider    = 'mollie';
 
 		// Actions
-		$function = array( 'Pronamic_WP_Pay_Gateways_Mollie_Listener', 'listen' );
+		$function = array( __NAMESPACE__ . '\Listener', 'listen' );
 
 		if ( ! has_action( 'wp_loaded', $function ) ) {
 			add_action( 'wp_loaded', $function );
@@ -44,11 +46,11 @@ class Pronamic_WP_Pay_Gateways_Mollie_Integration extends Pronamic_WP_Pay_Gatewa
 	}
 
 	public function get_config_factory_class() {
-		return 'Pronamic_WP_Pay_Gateways_Mollie_ConfigFactory';
+		return __NAMESPACE__ . '\ConfigFactory';
 	}
 
 	public function get_settings_class() {
-		return 'Pronamic_WP_Pay_Gateways_Mollie_Settings';
+		return __NAMESPACE__ . '\Settings';
 	}
 
 	/**

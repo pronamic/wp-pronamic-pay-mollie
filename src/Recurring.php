@@ -1,16 +1,18 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
 /**
  * Title: Mollie Recurring
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
  * @author Reüel van der Steege
  * @version 1.1.9
  * @since 1.1.9
  */
-class Pronamic_WP_Pay_Mollie_Recurring {
+class Recurring {
 	/**
 	 * Constant for the first payment.
 	 *

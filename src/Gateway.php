@@ -1,16 +1,18 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
 /**
  * Title: Mollie
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
  * @author Remco Tolsma
  * @version 1.1.15
  * @since 1.1.0
  */
-class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
+class Gateway extends \Pronamic_WP_Pay_Gateway {
 	/**
 	 * Slug of this gateway
 	 *
@@ -32,7 +34,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 *
 	 * @param Pronamic_WP_Pay_Gateways_Mollie_Config $config
 	 */
-	public function __construct( Pronamic_WP_Pay_Gateways_Mollie_Config $config ) {
+	public function __construct( Config $config ) {
 		parent::__construct( $config );
 
 		$this->supports = array(
@@ -42,12 +44,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			'recurring',
 		);
 
-		$this->set_method( Pronamic_WP_Pay_Gateway::METHOD_HTTP_REDIRECT );
+		$this->set_method( \Pronamic_WP_Pay_Gateway::METHOD_HTTP_REDIRECT );
 		$this->set_has_feedback( true );
 		$this->set_amount_minimum( 1.20 );
 		$this->set_slug( self::SLUG );
 
-		$this->client = new Pronamic_WP_Pay_Gateways_Mollie_Client( $config->api_key );
+		$this->client = new Client( $config->api_key );
 		$this->client->set_mode( $config->mode );
 
 		if ( 'test' === $config->mode ) {
@@ -83,7 +85,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	/////////////////////////////////////////////////
 
 	public function get_issuer_field() {
-		if ( Pronamic_WP_Pay_PaymentMethods::IDEAL === $this->get_payment_method() ) {
+		if ( \Pronamic_WP_Pay_PaymentMethods::IDEAL === $this->get_payment_method() ) {
 			return array(
 				'id'       => 'pronamic_ideal_issuer_id',
 				'name'     => 'pronamic_ideal_issuer_id',
@@ -161,18 +163,19 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 */
 	public function get_supported_payment_methods() {
 		return array(
-			Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER,
-			Pronamic_WP_Pay_PaymentMethods::BITCOIN,
-			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT,
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
-			Pronamic_WP_Pay_PaymentMethods::BANCONTACT,
-			Pronamic_WP_Pay_PaymentMethods::PAYPAL,
-			Pronamic_WP_Pay_PaymentMethods::SOFORT,
-			Pronamic_WP_Pay_PaymentMethods::IDEAL,
-			Pronamic_WP_Pay_PaymentMethods::KBC,
-			Pronamic_WP_Pay_PaymentMethods::BELFIUS,
+			\Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER,
+			\Pronamic_WP_Pay_PaymentMethods::BITCOIN,
+			\Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
+			\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT,
+			\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+			\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
+			\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_SOFORT,
+			\Pronamic_WP_Pay_PaymentMethods::BANCONTACT,
+			\Pronamic_WP_Pay_PaymentMethods::PAYPAL,
+			\Pronamic_WP_Pay_PaymentMethods::SOFORT,
+			\Pronamic_WP_Pay_PaymentMethods::IDEAL,
+			\Pronamic_WP_Pay_PaymentMethods::KBC,
+			\Pronamic_WP_Pay_PaymentMethods::BELFIUS,
 		);
 	}
 
@@ -186,7 +189,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	private function get_webhook_url() {
 		$url = home_url( '/' );
 
-		$host = parse_url( $url, PHP_URL_HOST );
+		$host = wp_parse_url( $url, PHP_URL_HOST );
 
 		if ( 'localhost' === $host ) {
 			// Mollie doesn't allow localhost
@@ -208,8 +211,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::start()
 	 */
-	public function start( Pronamic_Pay_Payment $payment ) {
-		$request = new Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest();
+	public function start( \Pronamic_Pay_Payment $payment ) {
+		$request = new PaymentRequest();
 
 		$payment_method = $payment->get_method();
 
@@ -217,8 +220,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
-		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $payment->get_language() );
-		$request->method       = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
+		$request->locale       = LocaleHelper::transform( $payment->get_language() );
+		$request->method       = Methods::transform( $payment_method );
 
 		if ( empty( $request->method ) && ! empty( $payment_method ) ) {
 			// Leap of faith if the WordPress payment method could not transform to a Mollie method?
@@ -242,12 +245,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		// Subscriptions
 		$subscription = $payment->get_subscription();
 
-		if ( $subscription && Pronamic_WP_Pay_PaymentMethods::is_recurring_method( $payment_method ) ) {
-			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
+		if ( $subscription && \Pronamic_WP_Pay_PaymentMethods::is_recurring_method( $payment_method ) ) {
+			$request->recurring_type = Recurring::RECURRING;
 
-			if ( Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
+			if ( \Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
 				// Use direct debit payment method for recurring payments if not using credit card
-				$request->method = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
+				$request->method = Methods::DIRECT_DEBIT;
 			}
 
 			if ( ! $customer_id && $subscription->has_valid_payment() ) {
@@ -260,16 +263,16 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 			if ( ! $payment->get_recurring() ) {
 				// First payment without valid mandate
-				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
+				$request->recurring_type = Recurring::FIRST;
 
-				if ( Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
+				if ( \Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
 					// Use corresponding first payment method for direct debit payment method
-					$first_method    = Pronamic_WP_Pay_PaymentMethods::get_first_payment_method( $payment_method );
-					$request->method = Pronamic_WP_Pay_Mollie_Methods::transform( $first_method );
+					$first_method    = \Pronamic_WP_Pay_PaymentMethods::get_first_payment_method( $payment_method );
+					$request->method = Methods::transform( $first_method );
 				}
 			}
 
-			if ( Pronamic_WP_Pay_Mollie_Recurring::RECURRING === $request->recurring_type ) {
+			if ( Recurring::RECURRING === $request->recurring_type ) {
 				// Recurring payment
 				$payment->set_action_url( $payment->get_return_url() );
 
@@ -280,7 +283,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			}
 		}
 
-		if ( Pronamic_WP_Pay_Mollie_Methods::IDEAL === $request->method ) {
+		if ( Methods::IDEAL === $request->method ) {
 			// If payment method is iDEAL we set the user chosen issuer ID.
 			$request->issuer = $payment->get_issuer();
 		}
@@ -298,9 +301,9 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 
 					// Cancel subscription to prevent unwanted recurring payments in the future,
 					// when a valid customer ID might be set for the user.
-					$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED );
+					$subscription->update_status( \Pronamic_WP_Pay_Statuses::CANCELLED );
 				} else {
-					$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
+					$subscription->set_status( \Pronamic_WP_Pay_Statuses::FAILURE );
 				}
 			}
 
@@ -309,15 +312,18 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			return;
 		}
 
-		if ( $subscription && Pronamic_WP_Pay_Mollie_Recurring::RECURRING === $request->recurring_type ) {
-			if ( ! ( $payment->get_recurring() && Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
+		if ( $subscription && Recurring::RECURRING === $request->recurring_type ) {
+			if ( ! ( $payment->get_recurring() && \Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
 				// Update subscription status if this is not a recurring payment for a cancelled subscription.
-				$subscription->update_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $result->status ) );
+				$subscription->update_status( Statuses::transform( $result->status ) );
 			}
 		}
 
 		$payment->set_transaction_id( $result->id );
-		$payment->set_action_url( $result->links->paymentUrl );
+
+		if ( isset( $result->links, $result->links->paymentUrl ) ) {
+			$payment->set_action_url( $result->links->paymentUrl );
+		}
 	}
 
 	/////////////////////////////////////////////////
@@ -327,17 +333,17 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 *
 	 * @param Pronamic_Pay_Payment $payment
 	 */
-	public function update_status( Pronamic_Pay_Payment $payment ) {
+	public function update_status( \Pronamic_Pay_Payment $payment ) {
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
 
 		if ( ! $mollie_payment ) {
-			$payment->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
+			$payment->set_status( \Pronamic_WP_Pay_Statuses::FAILURE );
 
 			if ( '' !== $payment->get_transaction_id() ) {
 				// Use payment status as subscription status only if there's a transaction ID
 
 				$subscription = $payment->get_subscription();
-				$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
+				$subscription->set_status( \Pronamic_WP_Pay_Statuses::FAILURE );
 			}
 
 			$this->error = $this->client->get_error();
@@ -345,7 +351,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			return;
 		}
 
-		$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_payment->status );
+		$status = Statuses::transform( $mollie_payment->status );
 
 		$payment->set_status( $status );
 
@@ -358,17 +364,17 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			$new_status = $status;
 
 			$failed_statuses = array(
-				Pronamic_WP_Pay_Statuses::CANCELLED,
-				Pronamic_WP_Pay_Statuses::EXPIRED,
-				Pronamic_WP_Pay_Statuses::FAILURE,
+				\Pronamic_WP_Pay_Statuses::CANCELLED,
+				\Pronamic_WP_Pay_Statuses::EXPIRED,
+				\Pronamic_WP_Pay_Statuses::FAILURE,
 			);
 
 			if ( ! $payment->get_recurring() && in_array( $new_status, $failed_statuses, true ) ) {
 				// Cancel subscription if this is the first payment and payment failed/expired,
 				// to prevent creating unwanted recurring payments in the future.
 
-				$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED );
-			} elseif ( ! ( $payment->get_recurring() && Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
+				$subscription->update_status( \Pronamic_WP_Pay_Statuses::CANCELLED );
+			} elseif ( ! ( $payment->get_recurring() && \Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
 				// Update subscription status if this is not a recurring payment for a cancelled subscription.
 
 				$subscription->update_status( $new_status );

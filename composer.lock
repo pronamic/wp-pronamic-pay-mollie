@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "372b0b43f4670b5c6b4e10b24d9d5e56",
+    "content-hash": "d3a37e942b39330bd4d30fe72f8a252b",
     "packages": [
         {
             "name": "wp-pay-gateways/common",
@@ -70,27 +70,28 @@
         },
         {
             "name": "wp-pay/core",
-            "version": "1.3.13",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-pay/core.git",
-                "reference": "da2142766d4635556280fc5e3ac89060e64adeb2"
+                "reference": "ef83256eab0c7ba8871ae71fead7ea0bc8f067a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-pay/core/zipball/da2142766d4635556280fc5e3ac89060e64adeb2",
-                "reference": "da2142766d4635556280fc5e3ac89060e64adeb2",
+                "url": "https://api.github.com/repos/wp-pay/core/zipball/ef83256eab0c7ba8871ae71fead7ea0bc8f067a3",
+                "reference": "ef83256eab0c7ba8871ae71fead7ea0bc8f067a3",
                 "shasum": ""
             },
             "require": {
                 "php": "^5.3"
             },
             "require-dev": {
+                "php-coveralls/php-coveralls": "^1.0",
                 "phpmd/phpmd": "^2.4",
                 "phpunit/phpunit": "^4.5",
-                "satooshi/php-coveralls": "^1.0",
                 "squizlabs/php_codesniffer": "^2.7",
-                "wp-coding-standards/wpcs": "0.10.0"
+                "wimg/php-compatibility": "^8.0",
+                "wp-coding-standards/wpcs": "^0.14.0"
             },
             "type": "library",
             "autoload": {
@@ -126,7 +127,7 @@
                 "wordpress",
                 "wp"
             ],
-            "time": "2017-09-14T09:00:42+00:00"
+            "time": "2018-01-17T08:40:58+00:00"
         },
         {
             "name": "xrstf/composer-php52",
@@ -1842,16 +1843,16 @@
         },
         {
             "name": "wimg/php-compatibility",
-            "version": "8.0.1",
+            "version": "8.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wimg/PHPCompatibility.git",
-                "reference": "4c4385fb891dff0501009670f988d4fe36785249"
+                "reference": "4ac01e4fe8faaa4f8d3b3cd06ea92e5418ce472e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wimg/PHPCompatibility/zipball/4c4385fb891dff0501009670f988d4fe36785249",
-                "reference": "4c4385fb891dff0501009670f988d4fe36785249",
+                "url": "https://api.github.com/repos/wimg/PHPCompatibility/zipball/4ac01e4fe8faaa4f8d3b3cd06ea92e5418ce472e",
+                "reference": "4ac01e4fe8faaa4f8d3b3cd06ea92e5418ce472e",
                 "shasum": ""
             },
             "require": {
@@ -1865,7 +1866,7 @@
                 "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0"
             },
             "suggest": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1"
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3"
             },
             "type": "phpcodesniffer-standard",
             "autoload": {
@@ -1890,7 +1891,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2017-08-07T19:39:05+00:00"
+            "time": "2017-12-27T21:58:38+00:00"
         },
         {
             "name": "wp-coding-standards/wpcs",
@@ -1933,9 +1934,18 @@
             "time": "2017-11-01T15:10:46+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "1.4",
+            "alias_normalized": "1.4.0.0",
+            "version": "dev-develop",
+            "package": "wp-pay/core"
+        }
+    ],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "wp-pay/core": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

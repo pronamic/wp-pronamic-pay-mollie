@@ -1,16 +1,18 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
 /**
  * Title: Mollie
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
  * @author Remco Tolsma
  * @version 1.1.15
  * @since 1.0.0
  */
-class Pronamic_WP_Pay_Gateways_Mollie_Client {
+class Client {
 	/**
 	 * Mollie API endpoint URL
 	 *
@@ -120,7 +122,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		// Mollie error
 		if ( isset( $data->error, $data->error->message ) ) {
-			$this->error = new WP_Error( 'mollie_error', $data->error->message, $data->error );
+			$this->error = new \WP_Error( 'mollie_error', $data->error->message, $data->error );
 
 			return false;
 		}
@@ -130,7 +132,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 	/////////////////////////////////////////////////
 
-	public function create_payment( Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest $request ) {
+	public function create_payment( PaymentRequest $request ) {
 		return $this->send_request( 'payments/', 'POST', $request->get_array(), 201 );
 	}
 
@@ -164,9 +166,9 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		if ( isset( $response->data ) ) {
 			foreach ( $response->data as $issuer ) {
-				if ( Pronamic_WP_Pay_Mollie_Methods::IDEAL === $issuer->method ) {
-					$id   = Pronamic_WP_Pay_XML_Security::filter( $issuer->id );
-					$name = Pronamic_WP_Pay_XML_Security::filter( $issuer->name );
+				if ( Methods::IDEAL === $issuer->method ) {
+					$id   = \Pronamic_WP_Pay_XML_Security::filter( $issuer->id );
+					$name = \Pronamic_WP_Pay_XML_Security::filter( $issuer->name );
 
 					$issuers[ $id ] = $name;
 				}
@@ -194,8 +196,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 		if ( isset( $response->data ) ) {
 			foreach ( $response->data as $payment_method ) {
-				$id   = Pronamic_WP_Pay_XML_Security::filter( $payment_method->id );
-				$name = Pronamic_WP_Pay_XML_Security::filter( $payment_method->description );
+				$id   = \Pronamic_WP_Pay_XML_Security::filter( $payment_method->id );
+				$name = \Pronamic_WP_Pay_XML_Security::filter( $payment_method->description );
 
 				$payment_methods[ $id ] = $name;
 			}
@@ -210,8 +212,11 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 	 * Create customer.
 	 *
 	 * @since 1.1.6
-	 * @param Pronamic_WP_Pay_PaymentData $data
-	 * @return array
+	 *
+	 * @param string $email
+	 * @param string $name
+	 *
+	 * @return array|bool
 	 */
 	public function create_customer( $email, $name ) {
 		if ( empty( $email ) || empty( $name ) ) {
@@ -290,7 +295,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			return false;
 		}
 
-		$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
+		$mollie_method = Methods::transform( $payment_method );
 
 		foreach ( $mandates->data as $mandate ) {
 			if ( $mollie_method !== $mandate->method ) {
@@ -319,7 +324,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 			return null;
 		}
 
-		$mollie_method = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
+		$mollie_method = Methods::transform( $payment_method );
 
 		foreach ( $mandates->data as $mandate ) {
 			if ( $mollie_method !== $mandate->method ) {
@@ -342,7 +347,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Client {
 
 			$mandate = array_shift( $valid_mandates );
 
-			$created = new DateTime( $mandate->createdDatetime );
+			$created = new \DateTime( $mandate->createdDatetime );
 
 			return sprintf(
 				/* translators: 1: date, 2: time */
