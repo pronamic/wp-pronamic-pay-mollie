@@ -2,6 +2,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Plugin;
+
 /**
  * Title: Mollie listener
  * Description:
@@ -22,7 +24,7 @@ class Listener implements \Pronamic_Pay_Gateways_ListenerInterface {
 
 			$payment = get_pronamic_payment_by_transaction_id( $transaction_id );
 
-			Pronamic_WP_Pay_Plugin::update_payment( $payment, false );
+			Plugin::update_payment( $payment, false );
 		}
 	}
 }
