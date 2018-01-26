@@ -2,6 +2,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Core\GatewaySettings;
+
 /**
  * Title: Mollie gateway settings
  * Description:
@@ -12,7 +14,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @version 1.1.15
  * @since 1.0.0
  */
-class Settings extends \Pronamic_WP_Pay_GatewaySettings {
+class Settings extends GatewaySettings {
 	public function __construct() {
 		add_filter( 'pronamic_pay_gateway_sections', array( $this, 'sections' ) );
 		add_filter( 'pronamic_pay_gateway_fields', array( $this, 'fields' ) );

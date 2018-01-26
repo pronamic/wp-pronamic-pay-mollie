@@ -2,6 +2,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
+
 /**
  * Title: Mollie methods
  * Description:
@@ -109,20 +111,20 @@ class Methods {
 	 * @var array
 	 */
 	private static $map = array(
-		\Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER => Methods::BANKTRANSFER,
-		\Pronamic_WP_Pay_PaymentMethods::BITCOIN       => Methods::BITCOIN,
-		\Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD   => Methods::CREDITCARD,
-		\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT  => Methods::DIRECT_DEBIT,
-		\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT => Methods::DIRECT_DEBIT,
-		\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL => Methods::DIRECT_DEBIT,
-		\Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_SOFORT => Methods::DIRECT_DEBIT,
-		\Pronamic_WP_Pay_PaymentMethods::BANCONTACT    => Methods::MISTERCASH,
-		\Pronamic_WP_Pay_PaymentMethods::MISTER_CASH   => Methods::MISTERCASH,
-		\Pronamic_WP_Pay_PaymentMethods::PAYPAL        => Methods::PAYPAL,
-		\Pronamic_WP_Pay_PaymentMethods::SOFORT        => Methods::SOFORT,
-		\Pronamic_WP_Pay_PaymentMethods::IDEAL         => Methods::IDEAL,
-		\Pronamic_WP_Pay_PaymentMethods::KBC           => Methods::KBC,
-		\Pronamic_WP_Pay_PaymentMethods::BELFIUS       => Methods::BELFIUS,
+		PaymentMethods::BANK_TRANSFER           => Methods::BANKTRANSFER,
+		PaymentMethods::BITCOIN                 => Methods::BITCOIN,
+		PaymentMethods::CREDIT_CARD             => Methods::CREDITCARD,
+		PaymentMethods::DIRECT_DEBIT            => Methods::DIRECT_DEBIT,
+		PaymentMethods::DIRECT_DEBIT_BANCONTACT => Methods::DIRECT_DEBIT,
+		PaymentMethods::DIRECT_DEBIT_IDEAL      => Methods::DIRECT_DEBIT,
+		PaymentMethods::DIRECT_DEBIT_SOFORT     => Methods::DIRECT_DEBIT,
+		PaymentMethods::BANCONTACT              => Methods::MISTERCASH,
+		PaymentMethods::MISTER_CASH             => Methods::MISTERCASH,
+		PaymentMethods::PAYPAL                  => Methods::PAYPAL,
+		PaymentMethods::SOFORT                  => Methods::SOFORT,
+		PaymentMethods::IDEAL                   => Methods::IDEAL,
+		PaymentMethods::KBC                     => Methods::KBC,
+		PaymentMethods::BELFIUS                 => Methods::BELFIUS,
 	);
 
 	/**

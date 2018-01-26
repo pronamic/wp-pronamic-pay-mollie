@@ -2,6 +2,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Core\GatewayConfigFactory;
+
 /**
  * Title: Mollie config factory
  * Description:
@@ -12,7 +14,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @version 1.1.15
  * @since 1.0.0
  */
-class ConfigFactory extends \Pronamic_WP_Pay_GatewayConfigFactory {
+class ConfigFactory extends GatewayConfigFactory {
 	public function get_config( $post_id ) {
 		$config = new Config();
 

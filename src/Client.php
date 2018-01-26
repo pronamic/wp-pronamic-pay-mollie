@@ -2,6 +2,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Core\XML\Security;
+
 /**
  * Title: Mollie
  * Description:
@@ -87,8 +89,12 @@ class Client {
 	/**
 	 * Send request with the specified action and parameters
 	 *
-	 * @param string $action
-	 * @param array $parameters
+	 * @param string $end_point
+	 * @param string $method
+	 * @param array $data
+	 * @param int $expected_response_code
+	 *
+	 * @return bool|object
 	 */
 	private function send_request( $end_point, $method = 'GET', array $data = array(), $expected_response_code = 200 ) {
 		// Request
@@ -167,8 +173,8 @@ class Client {
 		if ( isset( $response->data ) ) {
 			foreach ( $response->data as $issuer ) {
 				if ( Methods::IDEAL === $issuer->method ) {
-					$id   = \Pronamic_WP_Pay_XML_Security::filter( $issuer->id );
-					$name = \Pronamic_WP_Pay_XML_Security::filter( $issuer->name );
+					$id   = Security::filter( $issuer->id );
+					$name = Security::filter( $issuer->name );
 
 					$issuers[ $id ] = $name;
 				}
@@ -196,8 +202,8 @@ class Client {
 
 		if ( isset( $response->data ) ) {
 			foreach ( $response->data as $payment_method ) {
-				$id   = \Pronamic_WP_Pay_XML_Security::filter( $payment_method->id );
-				$name = \Pronamic_WP_Pay_XML_Security::filter( $payment_method->description );
+				$id   = Security::filter( $payment_method->id );
+				$name = Security::filter( $payment_method->description );
 
 				$payment_methods[ $id ] = $name;
 			}

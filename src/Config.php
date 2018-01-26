@@ -2,6 +2,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Core\GatewayConfig;
+
 /**
  * Title: Mollie config
  * Description:
@@ -11,7 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @author Remco Tolsma
  * @version 1.0.0
  */
-class Config extends \Pronamic_WP_Pay_GatewayConfig {
+class Config extends GatewayConfig {
 	public $api_key;
 
 	public function get_gateway_class() {

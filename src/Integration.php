@@ -2,6 +2,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Gateways\Common\AbstractIntegration;
+
 /**
  * Title: Mollie integration
  * Description:
@@ -12,7 +14,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @version 1.1.15
  * @since 1.0.0
  */
-class Integration extends \Pronamic_WP_Pay_Gateways_AbstractIntegration {
+class Integration extends AbstractIntegration {
 	/**
 	 * Dashboard URL.
 	 *
