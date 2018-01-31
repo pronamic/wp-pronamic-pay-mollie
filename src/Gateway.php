@@ -32,13 +32,6 @@ class Gateway extends Core_Gateway {
 	 */
 	private $meta_key_customer_id = '_pronamic_pay_mollie_customer_id';
 
-	/**
-	 * Mollie client
-	 *
-	 * @var Client
-	 */
-	private $client;
-
 	/////////////////////////////////////////////////
 
 	/**
