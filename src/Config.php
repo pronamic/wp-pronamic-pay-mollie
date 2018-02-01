@@ -15,8 +15,4 @@ use Pronamic\WordPress\Pay\Core\GatewayConfig;
  */
 class Config extends GatewayConfig {
 	public $api_key;
-
-	public function get_gateway_class() {
-		return __NAMESPACE__ . '\Gateway';
-	}
 }
