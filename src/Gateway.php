@@ -168,19 +168,19 @@ class Gateway extends Core_Gateway {
 	 */
 	public function get_supported_payment_methods() {
 		return array(
+			PaymentMethods::BANCONTACT,
 			PaymentMethods::BANK_TRANSFER,
+			PaymentMethods::BELFIUS,
 			PaymentMethods::BITCOIN,
 			PaymentMethods::CREDIT_CARD,
 			PaymentMethods::DIRECT_DEBIT,
 			PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 			PaymentMethods::DIRECT_DEBIT_IDEAL,
 			PaymentMethods::DIRECT_DEBIT_SOFORT,
-			PaymentMethods::BANCONTACT,
-			PaymentMethods::PAYPAL,
-			PaymentMethods::SOFORT,
 			PaymentMethods::IDEAL,
 			PaymentMethods::KBC,
-			PaymentMethods::BELFIUS,
+			PaymentMethods::PAYPAL,
+			PaymentMethods::SOFORT,
 		);
 	}
 
