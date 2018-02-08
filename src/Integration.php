@@ -40,8 +40,15 @@ class Integration extends AbstractIntegration {
 		}
 
 		if ( is_admin() ) {
-			add_action( 'show_user_profile', array( $this, 'user_profile' ) );
-			add_action( 'edit_user_profile', array( $this, 'user_profile' ) );
+			$function = array( __CLASS__, 'user_profile' );
+
+			if ( ! has_action( 'show_user_profile', $function ) ) {
+				add_action( 'show_user_profile', $function );
+			}
+
+			if ( ! has_action( 'edit_user_profile', $function ) ) {
+				add_action( 'edit_user_profile', $function );
+			}
 		}
 
 		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
@@ -76,7 +83,7 @@ class Integration extends AbstractIntegration {
 	 * @since 1.1.6
 	 * @see https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
 	 */
-	public function user_profile( $user ) {
+	public static function user_profile( $user ) {
 		include dirname( __FILE__ ) . '/../views/html-admin-user-profile.php';
 	}
 
