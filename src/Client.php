@@ -3,6 +3,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Core\XML\Security;
+use WP_Error;
 
 /**
  * Title: Mollie
