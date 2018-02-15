@@ -309,13 +309,6 @@ class Gateway extends Core_Gateway {
 		if ( ! $mollie_payment ) {
 			$payment->set_status( Core_Statuses::FAILURE );
 
-			if ( '' !== $payment->get_transaction_id() ) {
-				// Use payment status as subscription status only if there's a transaction ID
-
-				$subscription = $payment->get_subscription();
-				$subscription->set_status( Core_Statuses::FAILURE );
-			}
-
 			$this->error = $this->client->get_error();
 
 			return;
