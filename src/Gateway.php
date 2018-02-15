@@ -275,11 +275,6 @@ class Gateway extends Core_Gateway {
 			if ( Recurring::RECURRING === $request->recurring_type ) {
 				// Recurring payment
 				$payment->set_action_url( $payment->get_return_url() );
-
-				if ( $subscription->has_valid_payment() ) {
-					// Use subscription amount if this is not the initial payment.
-					$payment->amount = $subscription->get_amount();
-				}
 			}
 		}
 
