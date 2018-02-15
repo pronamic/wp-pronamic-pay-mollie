@@ -253,8 +253,6 @@ class Gateway extends Core_Gateway {
 			}
 
 			if ( ! empty( $customer_id ) ) {
-				$payment->set_meta( 'mollie_customer_id', $customer_id );
-
 				$request->customer_id = $customer_id;
 			}
 		}
