@@ -109,10 +109,18 @@ class Gateway extends Core_Gateway {
 	 * @return string
 	 */
 	private function get_customer_id_by_wp_user_id( $user_id ) {
+		if ( empty( $user_id ) ) {
+			return false;
+		}
+
 		return get_user_meta( $user_id, $this->meta_key_customer_id, true );
 	}
 
 	private function update_wp_user_customer_id( $user_id, $customer_id ) {
+		if ( empty( $user_id ) || empty( $customer_id ) ) {
+			return false;
+		}
+
 		update_user_meta( $user_id, $this->meta_key_customer_id, $customer_id );
 	}
 
@@ -219,51 +227,54 @@ class Gateway extends Core_Gateway {
 	public function start( Payment $payment ) {
 		$request = new PaymentRequest();
 
-		$payment_method = $payment->get_method();
-
 		$request->amount       = $payment->get_amount();
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
 		$request->locale       = LocaleHelper::transform( $payment->get_language() );
-		$request->method       = Methods::transform( $payment_method );
 
-		if ( empty( $request->method ) && ! empty( $payment_method ) ) {
-			// Leap of faith if the WordPress payment method could not transform to a Mollie method?
-			$request->method = $payment_method;
+		// Payment method.
+		$payment_method = $payment->get_method();
+
+		// Leap of faith if the WordPress payment method could not transform to a Mollie method?
+		$request->method = Methods::transform( $payment_method, $payment_method );
+
+		// Issuer.
+		if ( Methods::IDEAL === $request->method ) {
+			// If payment method is iDEAL we set the user chosen issuer ID.
+			$request->issuer = $payment->get_issuer();
 		}
 
-		// Customer ID
-		$user_id     = $payment->post->post_author;
-		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
+		// Subscription.
+		$subscription = $payment->get_subscription();
 
-		if ( ! $payment->get_recurring() && ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) ) {
-			$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
+		// Customer ID.
+		if ( ! empty( $payment->user_id ) ) {
+			$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
 
-			if ( '0' !== $user_id && $customer_id ) {
-				$this->update_wp_user_customer_id( $user_id, $customer_id );
+			// Create new customer if the customer does not exists at Mollie.
+			if ( ! $this->client->get_customer( $customer_id ) ) {
+				$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
+
+				if ( ! empty( $customer_id ) ) {
+					$this->update_wp_user_customer_id( $user_id, $customer_id );
+				}
+			}
+
+			if ( ! empty( $customer_id ) ) {
+				$payment->set_meta( 'mollie_customer_id', $customer_id );
+
+				$request->customer_id = $customer_id;
 			}
 		}
 
-		$payment->set_meta( 'mollie_customer_id', $customer_id );
-
-		// Subscriptions
-		$subscription = $payment->get_subscription();
-
+		// Subscription
 		if ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) ) {
 			$request->recurring_type = Recurring::RECURRING;
 
 			if ( PaymentMethods::is_direct_debit_method( $payment_method ) ) {
 				// Use direct debit payment method for recurring payments if not using credit card
 				$request->method = Methods::DIRECT_DEBIT;
-			}
-
-			if ( ! $customer_id && $subscription->has_valid_payment() ) {
-				// Get customer ID from first payment
-				$first       = $subscription->get_first_payment();
-				$customer_id = $first->get_meta( 'mollie_customer_id' );
-
-				$payment->set_meta( 'mollie_customer_id', $customer_id );
 			}
 
 			if ( ! $payment->get_recurring() ) {
@@ -288,33 +299,13 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		if ( Methods::IDEAL === $request->method ) {
-			// If payment method is iDEAL we set the user chosen issuer ID.
-			$request->issuer = $payment->get_issuer();
-		}
-
-		$request->customer_id = $customer_id;
-
+		// Create payment.
 		$result = $this->client->create_payment( $request );
 
 		if ( ! $result ) {
-			if ( false !== $subscription ) {
-				// Payment for a subscription
-
-				if ( ! $payment->get_recurring() ) {
-					// First payment
-
-					// Cancel subscription to prevent unwanted recurring payments in the future,
-					// when a valid customer ID might be set for the user.
-					$subscription->update_status( Core_Statuses::CANCELLED );
-				} else {
-					$subscription->set_status( Core_Statuses::FAILURE );
-				}
-			}
-
 			$this->error = $this->client->get_error();
 
-			return;
+			return false;
 		}
 
 		if ( $subscription && Recurring::RECURRING === $request->recurring_type ) {
@@ -324,8 +315,10 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
+		// Set transaction ID.
 		$payment->set_transaction_id( $result->id );
 
+		// Set action URL.
 		if ( isset( $result->links, $result->links->paymentUrl ) ) {
 			$payment->set_action_url( $result->links->paymentUrl );
 		}
@@ -391,7 +384,9 @@ class Gateway extends Core_Gateway {
 
 			if ( isset( $details->consumerName ) ) {
 				$payment->set_consumer_name( $details->consumerName );
-			} elseif ( isset( $details->cardHolder ) ) {
+			}
+
+			if ( isset( $details->cardHolder ) ) {
 				$payment->set_consumer_name( $details->cardHolder );
 			}
 
