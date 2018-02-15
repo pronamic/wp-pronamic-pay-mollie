@@ -18,8 +18,8 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @dataProvider method_matrix_provider
 	 */
-	public function test_transform( $payment_method, $expected ) {
-		$mollie_method = Methods::transform( $payment_method );
+	public function test_transform( $payment_method, $expected, $default = null ) {
+		$mollie_method = Methods::transform( $payment_method, $default );
 
 		$this->assertEquals( $expected, $mollie_method );
 	}
@@ -38,6 +38,7 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::KBC, Methods::KBC ),
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::BELFIUS, Methods::BELFIUS ),
 			array( 'not existing payment method', null ),
+			array( 'not existing payment method', 'test', 'test' ),
 			array( null, null ),
 			array( 0, null ),
 			array( false, null ),

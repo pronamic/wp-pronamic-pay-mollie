@@ -132,9 +132,10 @@ class Methods {
 	 *
 	 * @since 1.1.6
 	 * @param string $method
+	 * @param mixed $default
 	 * @return string
 	 */
-	public static function transform( $payment_method ) {
+	public static function transform( $payment_method, $default = null ) {
 		if ( ! is_scalar( $payment_method ) ) {
 			return null;
 		}
@@ -143,6 +144,6 @@ class Methods {
 			return self::$map[ $payment_method ];
 		}
 
-		return null;
+		return $default;
 	}
 }
