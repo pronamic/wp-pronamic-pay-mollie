@@ -248,7 +248,7 @@ class Gateway extends Core_Gateway {
 				$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
 
 				if ( ! empty( $customer_id ) ) {
-					$this->update_wp_user_customer_id( $user_id, $customer_id );
+					$this->update_wp_user_customer_id( $payment->user_id, $customer_id );
 				}
 			}
 
