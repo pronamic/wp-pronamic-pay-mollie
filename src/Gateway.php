@@ -233,20 +233,11 @@ class Gateway extends Core_Gateway {
 		$request->webhook_url  = $this->get_webhook_url();
 		$request->locale       = LocaleHelper::transform( $payment->get_language() );
 
-		// Payment method.
-		$payment_method = $payment->get_method();
-
-		// Leap of faith if the WordPress payment method could not transform to a Mollie method?
-		$request->method = Methods::transform( $payment_method, $payment_method );
-
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
 			// If payment method is iDEAL we set the user chosen issuer ID.
 			$request->issuer = $payment->get_issuer();
 		}
-
-		// Subscription.
-		$subscription = $payment->get_subscription();
 
 		// Customer ID.
 		if ( ! empty( $payment->user_id ) ) {
@@ -268,24 +259,17 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		// Subscription
+		// Payment method.
+		$payment_method = $payment->get_method();
+
+		// Subscription.
+		$subscription = $payment->get_subscription();
+
 		if ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) ) {
-			$request->recurring_type = Recurring::RECURRING;
+			$request->recurring_type = $payment->get_recurring() ? Recurring::RECURRING : Recurring::FIRST;
 
-			if ( PaymentMethods::is_direct_debit_method( $payment_method ) ) {
-				// Use direct debit payment method for recurring payments if not using credit card
-				$request->method = Methods::DIRECT_DEBIT;
-			}
-
-			if ( ! $payment->get_recurring() ) {
-				// First payment without valid mandate
-				$request->recurring_type = Recurring::FIRST;
-
-				if ( PaymentMethods::is_direct_debit_method( $payment_method ) ) {
-					// Use corresponding first payment method for direct debit payment method
-					$first_method    = PaymentMethods::get_first_payment_method( $payment_method );
-					$request->method = Methods::transform( $first_method );
-				}
+			if ( Recurring::FIRST === $request->recurring_type ) {
+				$payment_method = PaymentMethods::get_first_payment_method( $payment_method );
 			}
 
 			if ( Recurring::RECURRING === $request->recurring_type ) {
@@ -298,6 +282,9 @@ class Gateway extends Core_Gateway {
 				}
 			}
 		}
+
+		// Leap of faith if the WordPress payment method could not transform to a Mollie method?
+		$request->method = Methods::transform( $payment_method, $payment_method );
 
 		// Create payment.
 		$result = $this->client->create_payment( $request );
