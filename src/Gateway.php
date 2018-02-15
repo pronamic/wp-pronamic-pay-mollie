@@ -288,7 +288,14 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Set transaction ID.
-		$payment->set_transaction_id( $result->id );
+		if ( isset( $result->id ) ) {
+			$payment->set_transaction_id( $result->id );
+		}
+
+		// Set status
+		if ( isset( $result->status ) ) {
+			$payment->set_status( Statuses::transform( $result->status ) );
+		}
 
 		// Set action URL.
 		if ( isset( $result->links, $result->links->paymentUrl ) ) {
@@ -314,35 +321,7 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
-		$status = Statuses::transform( $mollie_payment->status );
-
-		$payment->set_status( $status );
-
-		$subscription = $payment->get_subscription();
-
-		if ( $subscription && '' === $subscription->get_transaction_id() ) {
-			// First payment or non-subscription recurring payment,
-			// use payment status for subscription too.
-
-			$new_status = $status;
-
-			$failed_statuses = array(
-				Core_Statuses::CANCELLED,
-				Core_Statuses::EXPIRED,
-				Core_Statuses::FAILURE,
-			);
-
-			if ( ! $payment->get_recurring() && in_array( $new_status, $failed_statuses, true ) ) {
-				// Cancel subscription if this is the first payment and payment failed/expired,
-				// to prevent creating unwanted recurring payments in the future.
-
-				$subscription->update_status( Core_Statuses::CANCELLED );
-			} elseif ( ! ( $payment->get_recurring() && Core_Statuses::CANCELLED === $subscription->get_status() ) ) {
-				// Update subscription status if this is not a recurring payment for a cancelled subscription.
-
-				$subscription->update_status( $new_status );
-			}
-		}
+		$payment->set_status( Statuses::transform( $mollie_payment->status ) );
 
 		if ( isset( $mollie_payment->details ) ) {
 			$details = $mollie_payment->details;
