@@ -148,7 +148,7 @@ class Client {
 	}
 
 	public function get_payment( $payment_id ) {
-		if ( '' === $payment_id ) {
+		if ( empty( $payment_id ) ) {
 			return false;
 		}
 
