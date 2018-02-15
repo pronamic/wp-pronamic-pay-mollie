@@ -289,13 +289,6 @@ class Gateway extends Core_Gateway {
 			return false;
 		}
 
-		if ( $subscription && Recurring::RECURRING === $request->recurring_type ) {
-			if ( ! ( $payment->get_recurring() && Core_Statuses::CANCELLED === $subscription->get_status() ) ) {
-				// Update subscription status if this is not a recurring payment for a cancelled subscription.
-				$subscription->update_status( Statuses::transform( $result->status ) );
-			}
-		}
-
 		// Set transaction ID.
 		$payment->set_transaction_id( $result->id );
 
