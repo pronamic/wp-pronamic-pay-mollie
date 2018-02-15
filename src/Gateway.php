@@ -273,7 +273,6 @@ class Gateway extends Core_Gateway {
 			}
 
 			if ( Recurring::RECURRING === $request->recurring_type ) {
-				// Recurring payment
 				$payment->set_action_url( $payment->get_return_url() );
 			}
 		}
