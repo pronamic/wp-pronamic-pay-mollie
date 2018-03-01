@@ -65,8 +65,6 @@ class Statuses {
 	 */
 	const ACTIVE = 'active';
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Transform an Mollie state to an more global status
 	 *

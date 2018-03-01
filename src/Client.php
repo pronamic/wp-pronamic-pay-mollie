@@ -23,16 +23,12 @@ class Client {
 	 */
 	const API_URL = 'https://api.mollie.nl/v1/';
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Mollie API Key ID
 	 *
 	 * @var string
 	 */
 	private $api_key;
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Mode
@@ -42,16 +38,12 @@ class Client {
 	 */
 	private $mode;
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Error
 	 *
 	 * @var WP_Error
 	 */
 	private $error;
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Constructs and initializes an Mollie client object
@@ -61,8 +53,6 @@ class Client {
 	public function __construct( $api_key ) {
 		$this->api_key = $api_key;
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Set mode
@@ -74,8 +64,6 @@ class Client {
 		$this->mode = $mode;
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Error
 	 *
@@ -84,8 +72,6 @@ class Client {
 	public function get_error() {
 		return $this->error;
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Send request with the specified action and parameters
@@ -137,8 +123,6 @@ class Client {
 		return $data;
 	}
 
-	/////////////////////////////////////////////////
-
 	public function create_payment( PaymentRequest $request ) {
 		return $this->send_request( 'payments/', 'POST', $request->get_array(), 201 );
 	}
@@ -154,8 +138,6 @@ class Client {
 
 		return $this->send_request( 'payments/' . $payment_id, 'GET' );
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get issuers
@@ -185,8 +167,6 @@ class Client {
 		return $issuers;
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get payment methods
 	 *
@@ -212,8 +192,6 @@ class Client {
 
 		return $payment_methods;
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Create customer.

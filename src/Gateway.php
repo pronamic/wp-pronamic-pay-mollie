@@ -32,8 +32,6 @@ class Gateway extends Core_Gateway {
 	 */
 	private $meta_key_customer_id = '_pronamic_pay_mollie_customer_id';
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initializes an Mollie gateway
 	 *
@@ -62,8 +60,6 @@ class Gateway extends Core_Gateway {
 		}
 	}
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Get issuers
 	 *
@@ -86,8 +82,6 @@ class Gateway extends Core_Gateway {
 
 		return $groups;
 	}
-
-	/////////////////////////////////////////////////
 
 	public function get_issuer_field() {
 		if ( PaymentMethods::IDEAL === $this->get_payment_method() ) {
@@ -142,8 +136,6 @@ class Gateway extends Core_Gateway {
 		return $this->client->get_first_valid_mandate_datetime( $this->get_customer_id_by_wp_user_id( get_current_user_id() ), $payment_method );
 	}
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Get payment methods
 	 *
@@ -166,8 +158,6 @@ class Gateway extends Core_Gateway {
 
 		return $groups;
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Get supported payment methods
@@ -192,8 +182,6 @@ class Gateway extends Core_Gateway {
 		);
 	}
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Get webhook URL for Mollie.
 	 *
@@ -216,8 +204,6 @@ class Gateway extends Core_Gateway {
 
 		return $url;
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Start
@@ -302,8 +288,6 @@ class Gateway extends Core_Gateway {
 			$payment->set_action_url( $result->links->paymentUrl );
 		}
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Update status of the specified payment
