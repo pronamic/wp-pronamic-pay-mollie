@@ -111,28 +111,30 @@ class Methods {
 	 * @var array
 	 */
 	private static $map = array(
-		PaymentMethods::BANK_TRANSFER           => Methods::BANKTRANSFER,
-		PaymentMethods::BITCOIN                 => Methods::BITCOIN,
-		PaymentMethods::CREDIT_CARD             => Methods::CREDITCARD,
-		PaymentMethods::DIRECT_DEBIT            => Methods::DIRECT_DEBIT,
-		PaymentMethods::DIRECT_DEBIT_BANCONTACT => Methods::DIRECT_DEBIT,
-		PaymentMethods::DIRECT_DEBIT_IDEAL      => Methods::DIRECT_DEBIT,
-		PaymentMethods::DIRECT_DEBIT_SOFORT     => Methods::DIRECT_DEBIT,
-		PaymentMethods::BANCONTACT              => Methods::MISTERCASH,
-		PaymentMethods::MISTER_CASH             => Methods::MISTERCASH,
-		PaymentMethods::PAYPAL                  => Methods::PAYPAL,
-		PaymentMethods::SOFORT                  => Methods::SOFORT,
-		PaymentMethods::IDEAL                   => Methods::IDEAL,
-		PaymentMethods::KBC                     => Methods::KBC,
-		PaymentMethods::BELFIUS                 => Methods::BELFIUS,
+		PaymentMethods::BANK_TRANSFER           => self::BANKTRANSFER,
+		PaymentMethods::BITCOIN                 => self::BITCOIN,
+		PaymentMethods::CREDIT_CARD             => self::CREDITCARD,
+		PaymentMethods::DIRECT_DEBIT            => self::DIRECT_DEBIT,
+		PaymentMethods::DIRECT_DEBIT_BANCONTACT => self::DIRECT_DEBIT,
+		PaymentMethods::DIRECT_DEBIT_IDEAL      => self::DIRECT_DEBIT,
+		PaymentMethods::DIRECT_DEBIT_SOFORT     => self::DIRECT_DEBIT,
+		PaymentMethods::BANCONTACT              => self::MISTERCASH,
+		PaymentMethods::MISTER_CASH             => self::MISTERCASH,
+		PaymentMethods::PAYPAL                  => self::PAYPAL,
+		PaymentMethods::SOFORT                  => self::SOFORT,
+		PaymentMethods::IDEAL                   => self::IDEAL,
+		PaymentMethods::KBC                     => self::KBC,
+		PaymentMethods::BELFIUS                 => self::BELFIUS,
 	);
 
 	/**
 	 * Transform WordPress payment method to Mollie method.
 	 *
 	 * @since 1.1.6
-	 * @param string $method
-	 * @param mixed $default
+	 *
+	 * @param string $payment_method Payment method.
+	 * @param mixed  $default        Default payment method.
+	 *
 	 * @return string
 	 */
 	public static function transform( $payment_method, $default = null ) {
@@ -145,5 +147,28 @@ class Methods {
 		}
 
 		return $default;
+	}
+
+	/**
+	 * Transform Mollie method to WordPress payment method.
+	 *
+	 * @since unreleased
+	 *
+	 * @param string $method Mollie method.
+	 *
+	 * @return string
+	 */
+	public static function transform_gateway_method( $method ) {
+		if ( ! is_scalar( $method ) ) {
+			return null;
+		}
+
+		$payment_method = array_search( $method, self::$map, true );
+
+		if ( ! $payment_method ) {
+			return null;
+		}
+
+		return $payment_method;
 	}
 }
