@@ -170,10 +170,18 @@ class Client {
 	/**
 	 * Get payment methods
 	 *
+	 * @param string $recurring_type Recurring type.
+	 *
 	 * @return array
 	 */
-	public function get_payment_methods() {
-		$response = $this->send_request( 'methods/', 'GET' );
+	public function get_payment_methods( $recurring_type = '' ) {
+		$data = array();
+
+		if ( '' !== $recurring_type ) {
+			$data['recurringType'] = $recurring_type;
+		}
+
+		$response = $this->send_request( 'methods/', 'GET', $data );
 
 		if ( false === $response ) {
 			return false;
