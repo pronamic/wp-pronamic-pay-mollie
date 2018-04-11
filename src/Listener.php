@@ -23,6 +23,20 @@ class Listener {
 
 		$payment = get_pronamic_payment_by_transaction_id( $transaction_id );
 
+		if ( null === $payment ) {
+			return;
+		}
+
+		// Add note.
+		$note = sprintf(
+			/* translators: %s: Mollie */
+			__( 'Webhook requested by %s.', 'pronamic_ideal' ),
+			__( 'Mollie', 'pronamic_ideal' )
+		);
+
+		$payment->add_note( $note );
+
+		// Update payment.
 		Plugin::update_payment( $payment, false );
 	}
 }
