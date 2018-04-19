@@ -248,7 +248,7 @@ class Gateway extends Core_Gateway {
 	public function start( Payment $payment ) {
 		$request = new PaymentRequest();
 
-		$request->amount       = $payment->get_amount();
+		$request->amount       = $payment->get_amount()->get_amount();
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
