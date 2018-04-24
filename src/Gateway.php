@@ -4,6 +4,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
 use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
@@ -145,7 +146,7 @@ class Gateway extends Core_Gateway {
 		$payment_methods = array();
 
 		// Set recurring types to get payment methods for.
-		$recurring_types = array( null, 'recurring', 'first' );
+		$recurring_types = array( null, Recurring::RECURRING, Recurring::FIRST );
 
 		$results = array();
 
@@ -159,7 +160,7 @@ class Gateway extends Core_Gateway {
 				break;
 			}
 
-			if ( 'first' === $recurring_type ) {
+			if ( Recurring::FIRST === $recurring_type ) {
 				foreach ( $result as $method => $title ) {
 					unset( $result[ $method ] );
 
