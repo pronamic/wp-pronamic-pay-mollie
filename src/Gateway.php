@@ -59,6 +59,9 @@ class Gateway extends Core_Gateway {
 		if ( 'test' === $config->mode ) {
 			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
 		}
+
+		// Actions.
+		add_action( 'pronamic_payment_status_update', array( $this, 'move_customer_id_to_wp_user' ), 99, 1 );
 	}
 
 	/**
@@ -95,28 +98,6 @@ class Gateway extends Core_Gateway {
 				'choices'  => $this->get_transient_issuers(),
 			);
 		}
-	}
-
-	/**
-	 * Get Mollie customer ID by the specified WordPress user ID.
-	 *
-	 * @param int $user_id
-	 * @return string
-	 */
-	private function get_customer_id_by_wp_user_id( $user_id ) {
-		if ( empty( $user_id ) ) {
-			return false;
-		}
-
-		return get_user_meta( $user_id, $this->meta_key_customer_id, true );
-	}
-
-	private function update_wp_user_customer_id( $user_id, $customer_id ) {
-		if ( empty( $user_id ) || empty( $customer_id ) ) {
-			return false;
-		}
-
-		update_user_meta( $user_id, $this->meta_key_customer_id, $customer_id );
 	}
 
 	/**
@@ -244,21 +225,10 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Customer ID.
-		if ( ! empty( $payment->user_id ) ) {
-			$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
+		$customer_id = $this->get_customer_id_for_payment( $payment );
 
-			// Create new customer if the customer does not exists at Mollie.
-			if ( ! $this->client->get_customer( $customer_id ) ) {
-				$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
-
-				if ( ! empty( $customer_id ) ) {
-					$this->update_wp_user_customer_id( $payment->user_id, $customer_id );
-				}
-			}
-
-			if ( ! empty( $customer_id ) ) {
-				$request->customer_id = $customer_id;
-			}
+		if ( ! empty( $customer_id ) ) {
+			$request->customer_id = $customer_id;
 		}
 
 		// Payment method.
@@ -343,6 +313,108 @@ class Gateway extends Core_Gateway {
 			if ( isset( $details->consumerBic ) ) {
 				$payment->set_consumer_bic( $details->consumerBic );
 			}
+		}
+	}
+
+	/**
+	 * Get Mollie customer ID for payment.
+	 *
+	 * @param Payment $payment Payment.
+	 *
+	 * @return bool|string
+	 */
+	private function get_customer_id_for_payment( Payment $payment ) {
+		// Get Mollie customer ID from user meta.
+		$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
+
+		if ( Core_Recurring::FIRST === $payment->recurring_type ) {
+			// Create new customer if the customer does not exist at Mollie.
+			if ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) {
+				$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
+
+				$this->update_wp_user_customer_id( $payment->user_id, $customer_id );
+			}
+
+			// Temporarily store customer ID in subscription meta for guest users.
+			if ( empty( $payment->user_id ) && ! empty( $customer_id ) ) {
+				$subscription = $payment->get_subscription();
+
+				if ( $subscription ) {
+					$subscription->set_meta( 'mollie_customer_id', $customer_id );
+				}
+			}
+		}
+
+		// Try to get customer ID from subscription meta.
+		if ( empty( $customer_id ) ) {
+			// Move customer ID from subscription meta to user meta.
+			$this->move_customer_id_to_wp_user( $payment );
+
+			// Get customer ID from user meta, again.
+			$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
+		}
+
+		return $customer_id;
+	}
+
+	/**
+	 * Get Mollie customer ID by the specified WordPress user ID.
+	 *
+	 * @param int $user_id WordPress user ID.
+	 *
+	 * @return string
+	 */
+	private function get_customer_id_by_wp_user_id( $user_id ) {
+		if ( empty( $user_id ) ) {
+			return false;
+		}
+
+		return get_user_meta( $user_id, $this->meta_key_customer_id, true );
+	}
+
+	/**
+	 * Update Mollie customer ID meta for WordPress user.
+	 *
+	 * @param int    $user_id     WordPress user ID.
+	 * @param string $customer_id Mollie Customer ID.
+	 *
+	 * @return bool
+	 */
+	private function update_wp_user_customer_id( $user_id, $customer_id ) {
+		if ( empty( $user_id ) || empty( $customer_id ) ) {
+			return false;
+		}
+
+		update_user_meta( $user_id, $this->meta_key_customer_id, $customer_id );
+	}
+
+	/**
+	 * Move Mollie customer ID from subscription meta to WordPress user meta.
+	 *
+	 * @param Payment $payment Payment.
+	 *
+	 * @return void
+	 */
+	public function move_customer_id_to_wp_user( Payment $payment ) {
+		if ( $this->config->id !== $payment->config_id ) {
+			return;
+		}
+
+		$subscription = $payment->get_subscription();
+
+		if ( ! $subscription || empty( $subscription->user_id ) ) {
+			return;
+		}
+
+		// Get customer ID from subscription meta.
+		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+		if ( ! empty( $customer_id ) && ! empty( $subscription->user_id ) ) {
+			// Set customer ID as user meta.
+			$this->update_wp_user_customer_id( $subscription->user_id, $customer_id );
+
+			// Delete customer ID from subscription meta.
+			$subscription->set_meta( 'mollie_customer_id', null );
 		}
 	}
 }
