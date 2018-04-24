@@ -2,6 +2,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\XML\Security;
 use WP_Error;
 
@@ -306,7 +307,8 @@ class Client {
 	/**
 	 * Get formatted date and time of first valid mandate.
 	 *
-	 * @param $customer_id
+	 * @param string $customer_id    Mollie customer ID.
+	 * @param string $payment_method Payment method.
 	 *
 	 * @return string
 	 */
@@ -340,14 +342,9 @@ class Client {
 
 			$mandate = array_shift( $valid_mandates );
 
-			$created = new \DateTime( $mandate->createdDatetime );
+			$create_date = new DateTime( $mandate->createdDatetime );
 
-			return sprintf(
-				/* translators: 1: date, 2: time */
-				__( '%1$s at %2$s', 'pronamic_ideal' ),
-				date_i18n( get_option( 'date_format' ), $created->getTimestamp() ),
-				date_i18n( get_option( 'time_format' ), $created->getTimestamp() )
-			);
+			return $create_date;
 		}
 
 		return null;
