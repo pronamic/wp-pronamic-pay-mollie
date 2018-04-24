@@ -120,24 +120,6 @@ class Gateway extends Core_Gateway {
 	}
 
 	/**
-	 * Is there a valid mandate for customer?
-	 *
-	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
-	 */
-	public function has_valid_mandate( $payment_method = '' ) {
-		return $this->client->has_valid_mandate( $this->get_customer_id_by_wp_user_id( get_current_user_id() ), $payment_method );
-	}
-
-	/**
-	 * Get formatted date and time of first valid mandate.
-	 *
-	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
-	 */
-	public function get_first_valid_mandate_datetime( $payment_method = '' ) {
-		return $this->client->get_first_valid_mandate_datetime( $this->get_customer_id_by_wp_user_id( get_current_user_id() ), $payment_method );
-	}
-
-	/**
 	 * Get available payment methods.
 	 *
 	 * @see Core_Gateway::get_available_payment_methods()
