@@ -9,7 +9,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.0
+ * @version 2.0.0
  */
 class LocaleHelper {
 	/**

@@ -9,7 +9,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author Reüel van der Steege
- * @version 1.1.9
+ * @version 2.0.0
  * @since 1.1.9
  */
 class Recurring {

@@ -15,7 +15,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author Remco Tolsma
- * @version 1.1.15
+ * @version 2.0.0
  * @since 1.1.0
  */
 class Gateway extends Core_Gateway {
