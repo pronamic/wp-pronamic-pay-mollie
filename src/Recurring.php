@@ -8,9 +8,9 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 2.0.0
- * @since 1.1.9
+ * @since   1.1.9
  */
 class Recurring {
 	/**

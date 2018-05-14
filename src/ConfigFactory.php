@@ -10,9 +10,9 @@ use Pronamic\WordPress\Pay\Core\GatewayConfigFactory;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
+ * @author  Remco Tolsma
  * @version 2.0.0
- * @since 1.0.0
+ * @since   1.0.0
  */
 class ConfigFactory extends GatewayConfigFactory {
 	public function get_config( $post_id ) {
