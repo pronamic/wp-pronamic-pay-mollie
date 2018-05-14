@@ -1,16 +1,20 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
+use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
+
 /**
  * Title: Mollie statuses constants
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
- * @version 1.1.15
- * @since 1.0.0
+ * @author  Remco Tolsma
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Mollie_Statuses {
+class Statuses {
 	/**
 	 * Open
 	 *
@@ -61,8 +65,6 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 	 */
 	const ACTIVE = 'active';
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Transform an Mollie state to an more global status
 	 *
@@ -72,17 +74,23 @@ class Pronamic_WP_Pay_Mollie_Statuses {
 		switch ( $status ) {
 			case self::PENDING:
 			case self::OPEN:
-				return Pronamic_WP_Pay_Statuses::OPEN;
+				return Core_Statuses::OPEN;
+
 			case self::CANCELLED:
-				return Pronamic_WP_Pay_Statuses::CANCELLED;
+				return Core_Statuses::CANCELLED;
+
 			case self::PAID_OUT:
-				return Pronamic_WP_Pay_Statuses::SUCCESS;
+				return Core_Statuses::SUCCESS;
+
 			case self::ACTIVE:
-				return Pronamic_WP_Pay_Statuses::ACTIVE;
+				return Core_Statuses::ACTIVE;
+
 			case self::PAID:
-				return Pronamic_WP_Pay_Statuses::SUCCESS;
+				return Core_Statuses::SUCCESS;
+
 			case self::EXPIRED:
-				return Pronamic_WP_Pay_Statuses::EXPIRED;
+				return Core_Statuses::EXPIRED;
+
 			default:
 				return null;
 		}

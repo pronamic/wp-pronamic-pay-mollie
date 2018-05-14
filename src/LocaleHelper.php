@@ -1,15 +1,18 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
 /**
  * Title: Mollie locale helper
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
- * @version 1.1.0
+ * @author  Remco Tolsma
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Mollie_LocaleHelper {
+class LocaleHelper {
 	/**
 	 * Get Mollie locale by the specified WordPress locale.
 	 *
@@ -18,11 +21,11 @@ class Pronamic_WP_Pay_Mollie_LocaleHelper {
 	public static function transform( $locale ) {
 		// Supported locales
 		$supported = array(
-			Pronamic_WP_Pay_Mollie_Locales::DE,
-			Pronamic_WP_Pay_Mollie_Locales::EN,
-			Pronamic_WP_Pay_Mollie_Locales::FR,
-			Pronamic_WP_Pay_Mollie_Locales::ES,
-			Pronamic_WP_Pay_Mollie_Locales::NL,
+			Locales::DE,
+			Locales::EN,
+			Locales::FR,
+			Locales::ES,
+			Locales::NL,
 		);
 
 		// Sub string

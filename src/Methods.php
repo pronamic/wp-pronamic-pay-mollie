@@ -1,16 +1,20 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
+
 /**
  * Title: Mollie methods
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
- * @version 1.1.11
- * @since 1.0.0
+ * @author  Remco Tolsma
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Mollie_Methods {
+class Methods {
 	/**
 	 * Constant for the iDEAL method.
 	 *
@@ -107,28 +111,33 @@ class Pronamic_WP_Pay_Mollie_Methods {
 	 * @var array
 	 */
 	private static $map = array(
-		Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER      => Pronamic_WP_Pay_Mollie_Methods::BANKTRANSFER,
-		Pronamic_WP_Pay_PaymentMethods::BITCOIN            => Pronamic_WP_Pay_Mollie_Methods::BITCOIN,
-		Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD        => Pronamic_WP_Pay_Mollie_Methods::CREDITCARD,
-		Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT       => Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT,
-		Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL => Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT,
-		Pronamic_WP_Pay_PaymentMethods::BANCONTACT         => Pronamic_WP_Pay_Mollie_Methods::MISTERCASH,
-		Pronamic_WP_Pay_PaymentMethods::MISTER_CASH        => Pronamic_WP_Pay_Mollie_Methods::MISTERCASH,
-		Pronamic_WP_Pay_PaymentMethods::PAYPAL             => Pronamic_WP_Pay_Mollie_Methods::PAYPAL,
-		Pronamic_WP_Pay_PaymentMethods::SOFORT             => Pronamic_WP_Pay_Mollie_Methods::SOFORT,
-		Pronamic_WP_Pay_PaymentMethods::IDEAL              => Pronamic_WP_Pay_Mollie_Methods::IDEAL,
-		Pronamic_WP_Pay_PaymentMethods::KBC                => Pronamic_WP_Pay_Mollie_Methods::KBC,
-		Pronamic_WP_Pay_PaymentMethods::BELFIUS            => Pronamic_WP_Pay_Mollie_Methods::BELFIUS,
+		PaymentMethods::BANK_TRANSFER           => self::BANKTRANSFER,
+		PaymentMethods::BITCOIN                 => self::BITCOIN,
+		PaymentMethods::CREDIT_CARD             => self::CREDITCARD,
+		PaymentMethods::DIRECT_DEBIT            => self::DIRECT_DEBIT,
+		PaymentMethods::DIRECT_DEBIT_BANCONTACT => self::DIRECT_DEBIT,
+		PaymentMethods::DIRECT_DEBIT_IDEAL      => self::DIRECT_DEBIT,
+		PaymentMethods::DIRECT_DEBIT_SOFORT     => self::DIRECT_DEBIT,
+		PaymentMethods::BANCONTACT              => self::MISTERCASH,
+		PaymentMethods::MISTER_CASH             => self::MISTERCASH,
+		PaymentMethods::PAYPAL                  => self::PAYPAL,
+		PaymentMethods::SOFORT                  => self::SOFORT,
+		PaymentMethods::IDEAL                   => self::IDEAL,
+		PaymentMethods::KBC                     => self::KBC,
+		PaymentMethods::BELFIUS                 => self::BELFIUS,
 	);
 
 	/**
 	 * Transform WordPress payment method to Mollie method.
 	 *
 	 * @since 1.1.6
-	 * @param string $method
+	 *
+	 * @param string $payment_method Payment method.
+	 * @param mixed  $default        Default payment method.
+	 *
 	 * @return string
 	 */
-	public static function transform( $payment_method ) {
+	public static function transform( $payment_method, $default = null ) {
 		if ( ! is_scalar( $payment_method ) ) {
 			return null;
 		}
@@ -137,6 +146,29 @@ class Pronamic_WP_Pay_Mollie_Methods {
 			return self::$map[ $payment_method ];
 		}
 
-		return null;
+		return $default;
+	}
+
+	/**
+	 * Transform Mollie method to WordPress payment method.
+	 *
+	 * @since unreleased
+	 *
+	 * @param string $method Mollie method.
+	 *
+	 * @return string
+	 */
+	public static function transform_gateway_method( $method ) {
+		if ( ! is_scalar( $method ) ) {
+			return null;
+		}
+
+		$payment_method = array_search( $method, self::$map, true );
+
+		if ( ! $payment_method ) {
+			return null;
+		}
+
+		return $payment_method;
 	}
 }

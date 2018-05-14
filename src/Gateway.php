@@ -1,16 +1,24 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
+use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
+use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
+use Pronamic\WordPress\Pay\Payments\Payment;
+
 /**
  * Title: Mollie
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Remco Tolsma
- * @version 1.1.15
- * @since 1.1.0
+ * @author  Remco Tolsma
+ * @version 2.0.0
+ * @since   1.1.0
  */
-class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
+class Gateway extends Core_Gateway {
 	/**
 	 * Slug of this gateway
 	 *
@@ -25,14 +33,12 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 */
 	private $meta_key_customer_id = '_pronamic_pay_mollie_customer_id';
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initializes an Mollie gateway
 	 *
-	 * @param Pronamic_WP_Pay_Gateways_Mollie_Config $config
+	 * @param Config $config
 	 */
-	public function __construct( Pronamic_WP_Pay_Gateways_Mollie_Config $config ) {
+	public function __construct( Config $config ) {
 		parent::__construct( $config );
 
 		$this->supports = array(
@@ -42,20 +48,21 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			'recurring',
 		);
 
-		$this->set_method( Pronamic_WP_Pay_Gateway::METHOD_HTTP_REDIRECT );
+		$this->set_method( Core_Gateway::METHOD_HTTP_REDIRECT );
 		$this->set_has_feedback( true );
 		$this->set_amount_minimum( 1.20 );
 		$this->set_slug( self::SLUG );
 
-		$this->client = new Pronamic_WP_Pay_Gateways_Mollie_Client( $config->api_key );
+		$this->client = new Client( $config->api_key );
 		$this->client->set_mode( $config->mode );
 
 		if ( 'test' === $config->mode ) {
 			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
 		}
-	}
 
-	/////////////////////////////////////////////////
+		// Actions.
+		add_action( 'pronamic_payment_status_update', array( $this, 'move_customer_id_to_wp_user' ), 99, 1 );
+	}
 
 	/**
 	 * Get issuers
@@ -80,10 +87,8 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		return $groups;
 	}
 
-	/////////////////////////////////////////////////
-
 	public function get_issuer_field() {
-		if ( Pronamic_WP_Pay_PaymentMethods::IDEAL === $this->get_payment_method() ) {
+		if ( PaymentMethods::IDEAL === $this->get_payment_method() ) {
 			return array(
 				'id'       => 'pronamic_ideal_issuer_id',
 				'name'     => 'pronamic_ideal_issuer_id',
@@ -96,63 +101,62 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	}
 
 	/**
-	 * Get Mollie customer ID by the specified WordPress user ID.
+	 * Get available payment methods.
 	 *
-	 * @param int $user_id
-	 * @return string
+	 * @see Core_Gateway::get_available_payment_methods()
 	 */
-	private function get_customer_id_by_wp_user_id( $user_id ) {
-		return get_user_meta( $user_id, $this->meta_key_customer_id, true );
-	}
+	public function get_available_payment_methods() {
+		$payment_methods = array();
 
-	private function update_wp_user_customer_id( $user_id, $customer_id ) {
-		update_user_meta( $user_id, $this->meta_key_customer_id, $customer_id );
-	}
+		// Set recurring types to get payment methods for.
+		$recurring_types = array( null, Recurring::RECURRING, Recurring::FIRST );
 
-	/**
-	 * Is there a valid mandate for customer?
-	 *
-	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
-	 */
-	public function has_valid_mandate( $payment_method = '' ) {
-		return $this->client->has_valid_mandate( $this->get_customer_id_by_wp_user_id( get_current_user_id() ), $payment_method );
-	}
+		$results = array();
 
-	/**
-	 * Get formatted date and time of first valid mandate.
-	 *
-	 * @see Pronamic_WP_Pay_Gateway::has_valid_mandate()
-	 */
-	public function get_first_valid_mandate_datetime( $payment_method = '' ) {
-		return $this->client->get_first_valid_mandate_datetime( $this->get_customer_id_by_wp_user_id( get_current_user_id() ), $payment_method );
-	}
+		foreach ( $recurring_types as $recurring_type ) {
+			// Get active payment methods for Mollie account.
+			$result = $this->client->get_payment_methods( $recurring_type );
 
-	/////////////////////////////////////////////////
+			if ( ! $result ) {
+				$this->error = $this->client->get_error();
 
-	/**
-	 * Get payment methods
-	 *
-	 * @see Pronamic_WP_Pay_Gateway::get_payment_methods()
-	 */
-	public function get_payment_methods() {
-		$groups = array();
+				break;
+			}
 
-		$result = $this->client->get_payment_methods();
+			if ( Recurring::FIRST === $recurring_type ) {
+				foreach ( $result as $method => $title ) {
+					unset( $result[ $method ] );
 
-		if ( ! $result ) {
-			$this->error = $this->client->get_error();
+					// Get WordPress payment method for direct debit method.
+					$method         = Methods::transform_gateway_method( $method );
+					$payment_method = array_search( $method, PaymentMethods::get_recurring_methods(), true );
 
-			return $groups;
+					if ( $payment_method ) {
+						$results[ $payment_method ] = $title;
+					}
+				}
+			}
+
+			$results = array_merge( $results, $result );
 		}
 
-		$groups[] = array(
-			'options' => $result,
-		);
+		// Transform to WordPress payment methods.
+		foreach ( $results as $method => $title ) {
+			if ( PaymentMethods::is_recurring_method( $method ) ) {
+				$payment_method = $method;
+			} else {
+				$payment_method = Methods::transform_gateway_method( $method );
+			}
 
-		return $groups;
+			if ( $payment_method ) {
+				$payment_methods[] = $payment_method;
+			}
+		}
+
+		$payment_methods = array_unique( $payment_methods );
+
+		return $payment_methods;
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Get supported payment methods
@@ -161,22 +165,21 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	 */
 	public function get_supported_payment_methods() {
 		return array(
-			Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER,
-			Pronamic_WP_Pay_PaymentMethods::BITCOIN,
-			Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD,
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT,
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-			Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL,
-			Pronamic_WP_Pay_PaymentMethods::BANCONTACT,
-			Pronamic_WP_Pay_PaymentMethods::PAYPAL,
-			Pronamic_WP_Pay_PaymentMethods::SOFORT,
-			Pronamic_WP_Pay_PaymentMethods::IDEAL,
-			Pronamic_WP_Pay_PaymentMethods::KBC,
-			Pronamic_WP_Pay_PaymentMethods::BELFIUS,
+			PaymentMethods::BANCONTACT,
+			PaymentMethods::BANK_TRANSFER,
+			PaymentMethods::BELFIUS,
+			PaymentMethods::BITCOIN,
+			PaymentMethods::CREDIT_CARD,
+			PaymentMethods::DIRECT_DEBIT,
+			PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+			PaymentMethods::DIRECT_DEBIT_IDEAL,
+			PaymentMethods::DIRECT_DEBIT_SOFORT,
+			PaymentMethods::IDEAL,
+			PaymentMethods::KBC,
+			PaymentMethods::PAYPAL,
+			PaymentMethods::SOFORT,
 		);
 	}
-
-	/////////////////////////////////////////////////
 
 	/**
 	 * Get webhook URL for Mollie.
@@ -186,7 +189,7 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 	private function get_webhook_url() {
 		$url = home_url( '/' );
 
-		$host = parse_url( $url, PHP_URL_HOST );
+		$host = wp_parse_url( $url, PHP_URL_HOST );
 
 		if ( 'localhost' === $host ) {
 			// Mollie doesn't allow localhost
@@ -201,189 +204,105 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 		return $url;
 	}
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Start
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::start()
 	 */
-	public function start( Pronamic_Pay_Payment $payment ) {
-		$request = new Pronamic_WP_Pay_Gateways_Mollie_PaymentRequest();
+	public function start( Payment $payment ) {
+		$request = new PaymentRequest();
 
-		$payment_method = $payment->get_method();
-
-		$request->amount       = $payment->get_amount();
+		$request->amount       = $payment->get_amount()->get_amount();
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
-		$request->locale       = Pronamic_WP_Pay_Mollie_LocaleHelper::transform( $payment->get_language() );
-		$request->method       = Pronamic_WP_Pay_Mollie_Methods::transform( $payment_method );
+		$request->locale       = LocaleHelper::transform( $payment->get_language() );
 
-		if ( empty( $request->method ) && ! empty( $payment_method ) ) {
-			// Leap of faith if the WordPress payment method could not transform to a Mollie method?
-			$request->method = $payment_method;
-		}
-
-		// Customer ID
-		$user_id     = $payment->post->post_author;
-		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
-
-		if ( ! $payment->get_recurring() && ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) ) {
-			$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
-
-			if ( '0' !== $user_id && $customer_id ) {
-				$this->update_wp_user_customer_id( $user_id, $customer_id );
-			}
-		}
-
-		$payment->set_meta( 'mollie_customer_id', $customer_id );
-
-		// Subscriptions
-		$subscription = $payment->get_subscription();
-
-		if ( $subscription && Pronamic_WP_Pay_PaymentMethods::is_recurring_method( $payment_method ) ) {
-			$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::RECURRING;
-
-			if ( Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
-				// Use direct debit payment method for recurring payments if not using credit card
-				$request->method = Pronamic_WP_Pay_Mollie_Methods::DIRECT_DEBIT;
-			}
-
-			if ( ! $customer_id && $subscription->has_valid_payment() ) {
-				// Get customer ID from first payment
-				$first       = $subscription->get_first_payment();
-				$customer_id = $first->get_meta( 'mollie_customer_id' );
-
-				$payment->set_meta( 'mollie_customer_id', $customer_id );
-			}
-
-			if ( ! $payment->get_recurring() ) {
-				// First payment without valid mandate
-				$request->recurring_type = Pronamic_WP_Pay_Mollie_Recurring::FIRST;
-
-				if ( Pronamic_WP_Pay_PaymentMethods::is_direct_debit_method( $payment_method ) ) {
-					// Use corresponding first payment method for direct debit payment method
-					$first_method    = Pronamic_WP_Pay_PaymentMethods::get_first_payment_method( $payment_method );
-					$request->method = Pronamic_WP_Pay_Mollie_Methods::transform( $first_method );
-				}
-			}
-
-			if ( Pronamic_WP_Pay_Mollie_Recurring::RECURRING === $request->recurring_type ) {
-				// Recurring payment
-				$payment->set_action_url( $payment->get_return_url() );
-
-				if ( $subscription->has_valid_payment() ) {
-					// Use subscription amount if this is not the initial payment.
-					$payment->amount = $subscription->get_amount();
-				}
-			}
-		}
-
-		if ( Pronamic_WP_Pay_Mollie_Methods::IDEAL === $request->method ) {
+		// Issuer.
+		if ( Methods::IDEAL === $request->method ) {
 			// If payment method is iDEAL we set the user chosen issuer ID.
 			$request->issuer = $payment->get_issuer();
 		}
 
-		$request->customer_id = $customer_id;
+		// Customer ID.
+		$customer_id = $this->get_customer_id_for_payment( $payment );
 
+		if ( ! empty( $customer_id ) ) {
+			$request->customer_id = $customer_id;
+		}
+
+		// Payment method.
+		$payment_method = $payment->get_method();
+
+		// Subscription.
+		$subscription = $payment->get_subscription();
+
+		if ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) ) {
+			$request->recurring_type = $payment->get_recurring() ? Recurring::RECURRING : Recurring::FIRST;
+
+			if ( Recurring::FIRST === $request->recurring_type ) {
+				$payment_method = PaymentMethods::get_first_payment_method( $payment_method );
+			}
+
+			if ( Recurring::RECURRING === $request->recurring_type ) {
+				$payment->set_action_url( $payment->get_return_url() );
+			}
+		}
+
+		// Leap of faith if the WordPress payment method could not transform to a Mollie method?
+		$request->method = Methods::transform( $payment_method, $payment_method );
+
+		// Create payment.
 		$result = $this->client->create_payment( $request );
 
 		if ( ! $result ) {
-			if ( false !== $subscription ) {
-				// Payment for a subscription
-
-				if ( ! $payment->get_recurring() ) {
-					// First payment
-
-					// Cancel subscription to prevent unwanted recurring payments in the future,
-					// when a valid customer ID might be set for the user.
-					$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED );
-				} else {
-					$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
-				}
-			}
-
 			$this->error = $this->client->get_error();
 
-			return;
+			return false;
 		}
 
-		if ( $subscription && Pronamic_WP_Pay_Mollie_Recurring::RECURRING === $request->recurring_type ) {
-			if ( ! ( $payment->get_recurring() && Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
-				// Update subscription status if this is not a recurring payment for a cancelled subscription.
-				$subscription->update_status( Pronamic_WP_Pay_Mollie_Statuses::transform( $result->status ) );
-			}
+		// Set transaction ID.
+		if ( isset( $result->id ) ) {
+			$payment->set_transaction_id( $result->id );
 		}
 
-		$payment->set_transaction_id( $result->id );
+		// Set status
+		if ( isset( $result->status ) ) {
+			$payment->set_status( Statuses::transform( $result->status ) );
+		}
 
-		if ( '' === $payment->get_action_url() ) {
+		// Set action URL.
+		if ( isset( $result->links, $result->links->paymentUrl ) ) {
 			$payment->set_action_url( $result->links->paymentUrl );
 		}
 	}
 
-	/////////////////////////////////////////////////
-
 	/**
 	 * Update status of the specified payment
 	 *
-	 * @param Pronamic_Pay_Payment $payment
+	 * @param Payment $payment
 	 */
-	public function update_status( Pronamic_Pay_Payment $payment ) {
+	public function update_status( Payment $payment ) {
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
 
 		if ( ! $mollie_payment ) {
-			$payment->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
-
-			if ( '' !== $payment->get_transaction_id() ) {
-				// Use payment status as subscription status only if there's a transaction ID
-
-				$subscription = $payment->get_subscription();
-				$subscription->set_status( Pronamic_WP_Pay_Statuses::FAILURE );
-			}
+			$payment->set_status( Core_Statuses::FAILURE );
 
 			$this->error = $this->client->get_error();
 
 			return;
 		}
 
-		$status = Pronamic_WP_Pay_Mollie_Statuses::transform( $mollie_payment->status );
-
-		$payment->set_status( $status );
-
-		$subscription = $payment->get_subscription();
-
-		if ( $subscription && '' === $subscription->get_transaction_id() ) {
-			// First payment or non-subscription recurring payment,
-			// use payment status for subscription too.
-
-			$new_status = $status;
-
-			$failed_statuses = array(
-				Pronamic_WP_Pay_Statuses::CANCELLED,
-				Pronamic_WP_Pay_Statuses::EXPIRED,
-				Pronamic_WP_Pay_Statuses::FAILURE,
-			);
-
-			if ( ! $payment->get_recurring() && in_array( $new_status, $failed_statuses, true ) ) {
-				// Cancel subscription if this is the first payment and payment failed/expired,
-				// to prevent creating unwanted recurring payments in the future.
-
-				$subscription->update_status( Pronamic_WP_Pay_Statuses::CANCELLED );
-			} elseif ( ! ( $payment->get_recurring() && Pronamic_WP_Pay_Statuses::CANCELLED === $subscription->get_status() ) ) {
-				// Update subscription status if this is not a recurring payment for a cancelled subscription.
-
-				$subscription->update_status( $new_status );
-			}
-		}
+		$payment->set_status( Statuses::transform( $mollie_payment->status ) );
 
 		if ( isset( $mollie_payment->details ) ) {
 			$details = $mollie_payment->details;
 
 			if ( isset( $details->consumerName ) ) {
 				$payment->set_consumer_name( $details->consumerName );
-			} elseif ( isset( $details->cardHolder ) ) {
+			}
+
+			if ( isset( $details->cardHolder ) ) {
 				$payment->set_consumer_name( $details->cardHolder );
 			}
 
@@ -394,6 +313,108 @@ class Pronamic_WP_Pay_Gateways_Mollie_Gateway extends Pronamic_WP_Pay_Gateway {
 			if ( isset( $details->consumerBic ) ) {
 				$payment->set_consumer_bic( $details->consumerBic );
 			}
+		}
+	}
+
+	/**
+	 * Get Mollie customer ID for payment.
+	 *
+	 * @param Payment $payment Payment.
+	 *
+	 * @return bool|string
+	 */
+	private function get_customer_id_for_payment( Payment $payment ) {
+		// Get Mollie customer ID from user meta.
+		$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
+
+		if ( Core_Recurring::FIRST === $payment->recurring_type ) {
+			// Create new customer if the customer does not exist at Mollie.
+			if ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) {
+				$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
+
+				$this->update_wp_user_customer_id( $payment->user_id, $customer_id );
+			}
+
+			// Temporarily store customer ID in subscription meta for guest users.
+			if ( empty( $payment->user_id ) && ! empty( $customer_id ) ) {
+				$subscription = $payment->get_subscription();
+
+				if ( $subscription ) {
+					$subscription->set_meta( 'mollie_customer_id', $customer_id );
+				}
+			}
+		}
+
+		// Try to get customer ID from subscription meta.
+		if ( empty( $customer_id ) ) {
+			// Move customer ID from subscription meta to user meta.
+			$this->move_customer_id_to_wp_user( $payment );
+
+			// Get customer ID from user meta, again.
+			$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
+		}
+
+		return $customer_id;
+	}
+
+	/**
+	 * Get Mollie customer ID by the specified WordPress user ID.
+	 *
+	 * @param int $user_id WordPress user ID.
+	 *
+	 * @return string
+	 */
+	private function get_customer_id_by_wp_user_id( $user_id ) {
+		if ( empty( $user_id ) ) {
+			return false;
+		}
+
+		return get_user_meta( $user_id, $this->meta_key_customer_id, true );
+	}
+
+	/**
+	 * Update Mollie customer ID meta for WordPress user.
+	 *
+	 * @param int    $user_id     WordPress user ID.
+	 * @param string $customer_id Mollie Customer ID.
+	 *
+	 * @return bool
+	 */
+	private function update_wp_user_customer_id( $user_id, $customer_id ) {
+		if ( empty( $user_id ) || empty( $customer_id ) ) {
+			return false;
+		}
+
+		update_user_meta( $user_id, $this->meta_key_customer_id, $customer_id );
+	}
+
+	/**
+	 * Move Mollie customer ID from subscription meta to WordPress user meta.
+	 *
+	 * @param Payment $payment Payment.
+	 *
+	 * @return void
+	 */
+	public function move_customer_id_to_wp_user( Payment $payment ) {
+		if ( $this->config->id !== $payment->config_id ) {
+			return;
+		}
+
+		$subscription = $payment->get_subscription();
+
+		if ( ! $subscription || empty( $subscription->user_id ) ) {
+			return;
+		}
+
+		// Get customer ID from subscription meta.
+		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+		if ( ! empty( $customer_id ) && ! empty( $subscription->user_id ) ) {
+			// Set customer ID as user meta.
+			$this->update_wp_user_customer_id( $subscription->user_id, $customer_id );
+
+			// Delete customer ID from subscription meta.
+			$subscription->set_meta( 'mollie_customer_id', null );
 		}
 	}
 }

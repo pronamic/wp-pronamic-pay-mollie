@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.0] - 2018-05-14
+- Switched to PHP namespaces.
+
 ## [1.1.15] - 2017-12-12
 - Added support for payment method `Direct Debit (mandate via Bancontact)`.
 - No longer create new Mollie customer during recurring (not first) payments.
@@ -86,7 +89,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/1.1.15...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/wp-pay-gateways/mollie/compare/1.1.15...2.0.0
 [1.1.15]: https://github.com/wp-pay-gateways/mollie/compare/1.1.14...1.1.15
 [1.1.14]: https://github.com/wp-pay-gateways/mollie/compare/1.1.13...1.1.14
 [1.1.13]: https://github.com/wp-pay-gateways/mollie/compare/1.1.12...1.1.13
