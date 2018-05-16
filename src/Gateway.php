@@ -15,7 +15,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.0.1
  * @since   1.1.0
  */
 class Gateway extends Core_Gateway {
@@ -345,13 +345,18 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		// Try to get customer ID from subscription meta.
+		// Try to move customer ID from subscription meta to user.
 		if ( empty( $customer_id ) ) {
 			// Move customer ID from subscription meta to user meta.
 			$this->move_customer_id_to_wp_user( $payment );
 
 			// Get customer ID from user meta, again.
 			$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
+		}
+
+		// Try to get customer ID from subscription meta.
+		if ( empty( $customer_id ) && $payment->get_subscription() ) {
+			$customer_id = $payment->get_subscription()->get_meta( 'mollie_customer_id' );
 		}
 
 		return $customer_id;
