@@ -205,12 +205,6 @@ class Gateway extends Core_Gateway {
 		$request->webhook_url  = $this->get_webhook_url();
 		$request->locale       = LocaleHelper::transform( $payment->get_language() );
 
-		// Issuer.
-		if ( Methods::IDEAL === $request->method ) {
-			// If payment method is iDEAL we set the user chosen issuer ID.
-			$request->issuer = $payment->get_issuer();
-		}
-
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
 
@@ -238,6 +232,12 @@ class Gateway extends Core_Gateway {
 
 		// Leap of faith if the WordPress payment method could not transform to a Mollie method?
 		$request->method = Methods::transform( $payment_method, $payment_method );
+
+		// Issuer.
+		if ( Methods::IDEAL === $request->method ) {
+			// If payment method is iDEAL we set the user chosen issuer ID.
+			$request->issuer = $payment->get_issuer();
+		}
 
 		// Create payment.
 		$result = $this->client->create_payment( $request );
