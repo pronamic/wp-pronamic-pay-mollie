@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.2] - 2018-06-01
+- Fixed setting issuer for iDEAL payment method.
+
 ## [2.0.1] - 2018-05-16
 - Fixed getting customer ID from subscription meta for guest users.
 
@@ -92,7 +95,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.1...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.2...HEAD
+[2.0.2]: https://github.com/wp-pay-gateways/mollie/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/wp-pay-gateways/mollie/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/wp-pay-gateways/mollie/compare/1.1.15...2.0.0
 [1.1.15]: https://github.com/wp-pay-gateways/mollie/compare/1.1.14...1.1.15

@@ -15,7 +15,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.1
+ * @version 2.0.2
  * @since   1.1.0
  */
 class Gateway extends Core_Gateway {
@@ -85,19 +85,6 @@ class Gateway extends Core_Gateway {
 		);
 
 		return $groups;
-	}
-
-	public function get_issuer_field() {
-		if ( PaymentMethods::IDEAL === $this->get_payment_method() ) {
-			return array(
-				'id'       => 'pronamic_ideal_issuer_id',
-				'name'     => 'pronamic_ideal_issuer_id',
-				'label'    => __( 'Choose your bank', 'pronamic_ideal' ),
-				'required' => true,
-				'type'     => 'select',
-				'choices'  => $this->get_transient_issuers(),
-			);
-		}
 	}
 
 	/**
@@ -218,12 +205,6 @@ class Gateway extends Core_Gateway {
 		$request->webhook_url  = $this->get_webhook_url();
 		$request->locale       = LocaleHelper::transform( $payment->get_language() );
 
-		// Issuer.
-		if ( Methods::IDEAL === $request->method ) {
-			// If payment method is iDEAL we set the user chosen issuer ID.
-			$request->issuer = $payment->get_issuer();
-		}
-
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
 
@@ -251,6 +232,12 @@ class Gateway extends Core_Gateway {
 
 		// Leap of faith if the WordPress payment method could not transform to a Mollie method?
 		$request->method = Methods::transform( $payment_method, $payment_method );
+
+		// Issuer.
+		if ( Methods::IDEAL === $request->method ) {
+			// If payment method is iDEAL we set the user chosen issuer ID.
+			$request->issuer = $payment->get_issuer();
+		}
 
 		// Create payment.
 		$result = $this->client->create_payment( $request );
