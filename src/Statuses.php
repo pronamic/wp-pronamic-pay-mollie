@@ -11,7 +11,7 @@ use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.0.3
  * @since   1.0.0
  */
 class Statuses {
@@ -53,6 +53,7 @@ class Statuses {
 	/**
 	 * Failed.
 	 *
+	 * @since 2.0.3
 	 * @var string
 	 */
 	const FAILED = 'failed';
