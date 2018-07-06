@@ -16,49 +16,56 @@ use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
  */
 class Statuses {
 	/**
-	 * Open
+	 * Open.
 	 *
 	 * @var string
 	 */
 	const OPEN = 'open';
 
 	/**
-	 * Cancelled
+	 * Cancelled.
 	 *
 	 * @var string
 	 */
 	const CANCELLED = 'cancelled';
 
 	/**
-	 * Paid out
+	 * Paid out.
 	 *
 	 * @var string
 	 */
 	const PAID_OUT = 'paidout';
 
 	/**
-	 * Paid
+	 * Paid.
 	 *
 	 * @var string
 	 */
 	const PAID = 'paid';
 
 	/**
-	 * Expired
+	 * Expired.
 	 *
 	 * @var string
 	 */
 	const EXPIRED = 'expired';
 
 	/**
-	 * Pending
+	 * Failed.
+	 *
+	 * @var string
+	 */
+	const FAILED = 'failed';
+
+	/**
+	 * Pending.
 	 *
 	 * @var string
 	 */
 	const PENDING = 'pending';
 
 	/**
-	 * Active
+	 * Active.
 	 *
 	 * @since 1.1.9
 	 * @var string
@@ -66,9 +73,11 @@ class Statuses {
 	const ACTIVE = 'active';
 
 	/**
-	 * Transform an Mollie state to an more global status
+	 * Transform an Mollie state to an more global status.
 	 *
-	 * @param string $status
+	 * @param string $status Mollie status.
+	 *
+	 * @return string|null Pay status.
 	 */
 	public static function transform( $status ) {
 		switch ( $status ) {
@@ -90,6 +99,9 @@ class Statuses {
 
 			case self::EXPIRED:
 				return Core_Statuses::EXPIRED;
+
+			case self::FAILED:
+				return Core_Statuses::FAILURE;
 
 			default:
 				return null;
