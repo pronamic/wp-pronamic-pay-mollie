@@ -323,6 +323,13 @@ class Gateway extends Core_Gateway {
 		if ( $subscription ) {
 			$subscription_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
+			// Try to get (legacy) customer ID from first payment.
+			if ( empty( $subscription_customer_id ) ) {
+				$first_payment = $subscription->get_first_payment();
+
+				$subscription_customer_id = $first_payment->get_meta( 'mollie_customer_id' );
+			}
+
 			if ( ! empty( $subscription_customer_id ) ) {
 				$customer_id = $subscription_customer_id;
 			}
