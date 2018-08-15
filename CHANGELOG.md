@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.4] - 2018-08-15
+- Improved the way we create and handle Mollie customers.
+
 ## [2.0.3] - 2018-07-06
 - Do not allow .local TLD in webhook URL.
 - Added missing `failed` status.
@@ -99,7 +102,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.3...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.4...HEAD
+[2.0.4]: https://github.com/wp-pay-gateways/mollie/compare/2.0.3...2.0.4
 [2.0.3]: https://github.com/wp-pay-gateways/mollie/compare/2.0.2...2.0.3
 [2.0.2]: https://github.com/wp-pay-gateways/mollie/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/wp-pay-gateways/mollie/compare/2.0.0...2.0.1
