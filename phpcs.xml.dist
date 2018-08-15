@@ -24,7 +24,7 @@
 		<exclude name="WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta" />
 	</rule>
 
-	<rule ref="WordPress.VIP.SlowDBQuery.slow_db_query_meta_key">
+	<rule ref="WordPress.DB.SlowDBQuery.slow_db_query_meta_key">
 		<exclude-pattern>src/Settings.php</exclude-pattern>
 	</rule>
 
