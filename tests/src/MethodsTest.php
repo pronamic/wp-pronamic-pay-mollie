@@ -45,4 +45,35 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 			array( new \stdClass(), null ),
 		);
 	}
+
+	/**
+	 * Test transform gateway method.
+	 *
+	 * @dataProvider transform_gateway_method_matrix_provider
+	 */
+	public function test_transform_gateway_method( $payment_method, $expected ) {
+		$wp_method = Methods::transform_gateway_method( $payment_method );
+
+		$this->assertEquals( $expected, $wp_method );
+	}
+
+	public function transform_gateway_method_matrix_provider() {
+		return array(
+			array( Methods::BANKTRANSFER, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANK_TRANSFER ),
+			array( Methods::MISTERCASH, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT ),
+			array( Methods::BITCOIN, \Pronamic\WordPress\Pay\Core\PaymentMethods::BITCOIN ),
+			array( Methods::CREDITCARD, \Pronamic\WordPress\Pay\Core\PaymentMethods::CREDIT_CARD ),
+			array( Methods::DIRECT_DEBIT, \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT ),
+			array( Methods::PAYPAL, \Pronamic\WordPress\Pay\Core\PaymentMethods::PAYPAL ),
+			array( Methods::SOFORT, \Pronamic\WordPress\Pay\Core\PaymentMethods::SOFORT ),
+			array( Methods::IDEAL, \Pronamic\WordPress\Pay\Core\PaymentMethods::IDEAL ),
+			array( Methods::KBC, \Pronamic\WordPress\Pay\Core\PaymentMethods::KBC ),
+			array( Methods::BELFIUS, \Pronamic\WordPress\Pay\Core\PaymentMethods::BELFIUS ),
+			array( 'not existing payment method', null ),
+			array( null, null ),
+			array( 0, null ),
+			array( false, null ),
+			array( new \stdClass(), null ),
+		);
+	}
 }
