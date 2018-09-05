@@ -42,6 +42,8 @@
 		"php-coveralls/php-coveralls": "^1.0",
 		"phpmd/phpmd": "^2.2.3",
 		"phpunit/phpunit": "^4.5",
+		"wp-phpunit/wp-phpunit": "^4.9",
+		"johnpbloch/wordpress": "^4.9",
 		"squizlabs/php_codesniffer": "^2.7",
 		"wimg/php-compatibility": "^8.0",
 		"wp-coding-standards/wpcs": "^1.0"
