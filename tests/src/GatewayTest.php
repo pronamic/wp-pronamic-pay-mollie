@@ -21,7 +21,7 @@ class GatewayTest extends \WP_UnitTestCase {
 	 *
 	 * @var Gateway
 	 */
-	var $gateway;
+	private $gateway;
 
 	public function setUp() {
 		$config = new Config();
