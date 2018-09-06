@@ -30,6 +30,7 @@ class StatusesTest extends \PHPUnit_Framework_TestCase {
 			array( Statuses::OPEN, \Pronamic\WordPress\Pay\Core\Statuses::OPEN ),
 			array( Statuses::CANCELLED, \Pronamic\WordPress\Pay\Core\Statuses::CANCELLED ),
 			array( Statuses::PAID_OUT, \Pronamic\WordPress\Pay\Core\Statuses::SUCCESS ),
+			array( Statuses::ACTIVE, \Pronamic\WordPress\Pay\Core\Statuses::ACTIVE ),
 			array( Statuses::PAID, \Pronamic\WordPress\Pay\Core\Statuses::SUCCESS ),
 			array( Statuses::EXPIRED, \Pronamic\WordPress\Pay\Core\Statuses::EXPIRED ),
 			array( Statuses::FAILED, \Pronamic\WordPress\Pay\Core\Statuses::FAILURE ),
