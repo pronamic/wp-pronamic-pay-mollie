@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "46d0a189fb32920389e5b61b35ac248f",
+    "content-hash": "4f3f2ec65cca7aa9634ad70f1fd86a79",
     "packages": [
         {
             "name": "pronamic/wp-datetime",
