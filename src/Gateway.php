@@ -173,7 +173,7 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @return string
 	 */
-	private function get_webhook_url() {
+	public function get_webhook_url() {
 		$url = home_url( '/' );
 
 		$host = wp_parse_url( $url, PHP_URL_HOST );
