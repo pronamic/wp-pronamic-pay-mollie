@@ -358,7 +358,7 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @return string
 	 */
-	private function get_customer_id_by_wp_user_id( $user_id ) {
+	public function get_customer_id_by_wp_user_id( $user_id ) {
 		if ( empty( $user_id ) ) {
 			return false;
 		}
@@ -375,7 +375,11 @@ class Gateway extends Core_Gateway {
 	 * @return bool
 	 */
 	private function update_wp_user_customer_id( $user_id, $customer_id ) {
-		if ( empty( $user_id ) || empty( $customer_id ) ) {
+		if ( empty( $user_id ) ) {
+			return false;
+		}
+
+		if ( ! is_string( $customer_id ) || empty( $customer_id ) ) {
 			return false;
 		}
 
