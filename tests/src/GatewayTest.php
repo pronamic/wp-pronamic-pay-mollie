@@ -8,12 +8,14 @@
  * @package   Pronamic\WordPress\Pay
  */
 
-namespace Pronamic\WordPress\Pay;
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Pay\Gateways\Mollie\Config;
-use Pronamic\WordPress\Pay\Gateways\Mollie\Gateway;
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Payments\PaymentsDataStoreCPT;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionsDataStoreCPT;
 use WP_UnitTestCase;
 
 class GatewayTest extends WP_UnitTestCase {
@@ -25,15 +27,39 @@ class GatewayTest extends WP_UnitTestCase {
 	private $gateway;
 
 	/**
+	 * Config ID.
+	 *
+	 * @var int
+	 */
+	private $config_id = 1;
+
+	/**
 	 * Setup gateway test.
 	 */
 	public function setUp() {
 		parent::setUp();
 
+		$this->set_gateway( array(
+			'id'   => $this->config_id,
+			'mode' => 'test',
+		) );
+	}
+
+	/**
+	 * Set gateway.
+	 *
+	 * @param array $args Config settings arguments.
+	 */
+	private function set_gateway( $args = array() ) {
 		$config = new Config();
 
-		$config->id   = 1;
-		$config->mode = 'test';
+		foreach ( $args as $key => $value ) {
+			$config->{$key} = $value;
+
+			if ( 'id' === $key ) {
+				$this->config_id = $value;
+			}
+		}
 
 		$this->gateway = new Gateway( $config );
 	}
@@ -92,8 +118,10 @@ class GatewayTest extends WP_UnitTestCase {
 	 * @depends test_get_supported_payment_methods_type
 	 */
 	public function test_get_supported_payment_methods_valid() {
+		$payment_methods = new PaymentMethods();
+
 		// Check if payment method is known.
-		$methods_reflection = new \ReflectionClass( __NAMESPACE__ . '\Core\PaymentMethods' );
+		$methods_reflection = new \ReflectionClass( get_class( $payment_methods ) );
 		$methods            = $methods_reflection->getConstants();
 
 		$supported = $this->gateway->get_supported_payment_methods();
@@ -118,8 +146,9 @@ class GatewayTest extends WP_UnitTestCase {
 	 * @depends test_get_available_payment_methods_type
 	 */
 	public function test_get_available_payment_methods_valid() {
-		// Check if available payment methods are known.
-		$methods_reflection = new \ReflectionClass( __NAMESPACE__ . '\Core\PaymentMethods' );
+		$payment_methods = new PaymentMethods();
+
+		$methods_reflection = new \ReflectionClass( get_class( $payment_methods ) );
 		$methods            = $methods_reflection->getConstants();
 
 		$available = $this->gateway->get_available_payment_methods();
@@ -169,15 +198,86 @@ class GatewayTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test get Mollie Customer ID for payment.
+	 *
+	 * @dataProvider get_customer_id_for_payment_provider
+	 *
+	 * @param int  $user_id  Payment WordPress user ID.
+	 * @param bool $expected Expected Mollie Customer ID.
+	 */
+	public function test_get_customer_id_for_payment( $user_id, $subscription_customer_id, $first_payment_customer_id, $expected ) {
+		// New payment.
+		$payment                         = new Payment();
+		$payment->config_id              = 1;
+		$payment->user_id                = $user_id;
+		$payment->recurring_type         = Core_Recurring::FIRST;
+		$payment->subscription_source_id = null;
+
+		$payment->subscription                  = new Subscription();
+		$payment->subscription->user_id         = $user_id;
+		$payment->subscription->interval        = 30;
+		$payment->subscription->interval_period = 'D';
+
+		$payments_data_store = new PaymentsDataStoreCPT();
+		$payments_data_store->create( $payment );
+
+		$payment->set_meta( 'mollie_customer_id', $first_payment_customer_id );
+
+		$payment->subscription->set_meta( 'mollie_customer_id', $subscription_customer_id );
+
+		$payment->set_meta( 'subscription_id', $payment->subscription->get_id() );
+
+		$payment->recurring_type = Core_Recurring::RECURRING;
+
+		// Get customer ID for payment.
+		$customer_id = $this->gateway->get_customer_id_for_payment( $payment );
+
+		$this->assertEquals( $expected, $customer_id );
+	}
+
+	/**
+	 * Data provider for getting Mollie Customer ID for payment.
+	 *
+	 * @return array
+	 */
+	public function get_customer_id_for_payment_provider() {
+		$customer_id              = 'cst_8wmqcHMN4U';
+		$customer_id_subscription = sprintf( '%s_subscription', $customer_id );
+		$customer_id_first        = sprintf( '%s_first', $customer_id );
+
+		return array(
+			array( null, null, null, false ),
+			array( true, null, null, false ),
+			array( false, null, null, false ),
+			array( 0, null, null, false ),
+			array( 10, null, null, false ),
+			array( 1, null, null, false ),
+			// @todo: array( 1, null, $customer_id_first, $customer_id_first ),
+			array( 1, $customer_id_subscription, null, $customer_id_subscription ),
+			array( 1, $customer_id_subscription, $customer_id_first, $customer_id_subscription ),
+			array( '1', $customer_id_subscription, $customer_id_first, $customer_id_subscription ),
+			array( '1', $customer_id_subscription, $customer_id_first, $customer_id_subscription ),
+		);
+	}
+
+	/**
 	 * Test copy customer id to wp user.
 	 *
-	 * @param $user_id
-	 * @param $customer_id
-	 * @param $expected
+	 * @param int    $config_id   Payment gateway ID.
+	 * @param int    $user_id     WordPress user ID.
+	 * @param string $customer_id Mollie Customer ID.
+	 * @param bool   $expected    Expected value.
 	 *
 	 * @dataProvider test_copy_customer_id_to_wp_user_provider
 	 */
-	public function test_copy_customer_id_to_wp_user( $user_id, $customer_id, $expected ) {
+	public function test_copy_customer_id_to_wp_user( $config_id, $user_id, $customer_id, $expected ) {
+		if ( $this->config_id !== $config_id ) {
+			$this->set_gateway( array(
+				'id'   => $config_id,
+				'mode' => 'test',
+			) );
+		}
+
 		// New payment.
 		$payment            = new Payment();
 		$payment->config_id = 1;
@@ -186,7 +286,7 @@ class GatewayTest extends WP_UnitTestCase {
 		$payment->subscription->user_id = $user_id;
 		$payment->subscription->set_id( 1 );
 
-		$subscriptions_data_store = new Subscriptions\SubscriptionsDataStoreCPT();
+		$subscriptions_data_store = new SubscriptionsDataStoreCPT();
 		$subscriptions_data_store->update( $payment->subscription );
 
 		$payment->subscription->set_meta( 'mollie_customer_id', $customer_id );
@@ -206,29 +306,32 @@ class GatewayTest extends WP_UnitTestCase {
 	 */
 	public function test_copy_customer_id_to_wp_user_provider() {
 		return array(
+			// Config ID not equal to payment config ID.
+			array( 0, 1, 'cst_8wmqcHMN4U', null ),
+
 			// Invalid WordPress user ID and valid Mollie customer ID.
-			array( 1, 'cst_8wmqcHMN4U', 'cst_8wmqcHMN4U' ),
+			array( 1, 1, 'cst_8wmqcHMN4U', 'cst_8wmqcHMN4U' ),
 
 			// Invalid WordPress user ID and Mollie customer ID.
-			array( 0, 0, false ),
-			array( null, null, false ),
-			array( true, true, false ),
-			array( false, false, false ),
-			array( '', '', false ),
+			array( 1, 0, 0, false ),
+			array( 1, null, null, false ),
+			array( 1, true, true, false ),
+			array( 1, false, false, false ),
+			array( 1, '', '', false ),
 
 			// Valid WordPress user ID and invalid Mollie customer ID.
-			array( 1, 0, false ),
-			array( 1, null, false ),
-			array( 1, true, false ),
-			array( 1, false, false ),
-			array( 1, '', false ),
+			array( 1, 1, 0, false ),
+			array( 1, 1, null, false ),
+			array( 1, 1, true, false ),
+			array( 1, 1, false, false ),
+			array( 1, 1, '', false ),
 
 			// Invalid WordPress user ID and valid Mollie customer ID.
-			array( 0, 'cst_8wmqcHMN4U', false ),
-			array( 0, 'cst_8wmqcHMN4U', false ),
-			array( 0, 'cst_8wmqcHMN4U', false ),
-			array( 0, 'cst_8wmqcHMN4U', false ),
-			array( 0, 'cst_8wmqcHMN4U', false ),
+			array( 1, 0, 'cst_8wmqcHMN4U', false ),
+			array( 1, null, 'cst_8wmqcHMN4U', false ),
+			array( 1, true, 'cst_8wmqcHMN4U', false ),
+			array( 1, false, 'cst_8wmqcHMN4U', false ),
+			array( 1, '', 'cst_8wmqcHMN4U', false ),
 		);
 	}
 }

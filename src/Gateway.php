@@ -311,7 +311,7 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @return bool|string
 	 */
-	private function get_customer_id_for_payment( Payment $payment ) {
+	public function get_customer_id_for_payment( Payment $payment ) {
 		// Get Mollie customer ID from user meta.
 		$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
 
@@ -375,11 +375,11 @@ class Gateway extends Core_Gateway {
 	 * @return bool
 	 */
 	private function update_wp_user_customer_id( $user_id, $customer_id ) {
-		if ( empty( $user_id ) ) {
+		if ( empty( $user_id ) || is_bool( $user_id ) ) {
 			return false;
 		}
 
-		if ( ! is_string( $customer_id ) || empty( $customer_id ) ) {
+		if ( ! is_string( $customer_id ) || empty( $customer_id ) || 1 === strlen( $customer_id ) ) {
 			return false;
 		}
 
