@@ -88,13 +88,16 @@ class Client {
 		// Request
 		$url = self::API_URL . $end_point;
 
-		$response = wp_remote_request( $url, array(
-			'method'  => $method,
-			'headers' => array(
-				'Authorization' => 'Bearer ' . $this->api_key,
-			),
-			'body'    => $data,
-		) );
+		$response = wp_remote_request(
+			$url,
+			array(
+				'method'  => $method,
+				'headers' => array(
+					'Authorization' => 'Bearer ' . $this->api_key,
+				),
+				'body'    => $data,
+			)
+		);
 
 		// Response code
 		$response_code = wp_remote_retrieve_response_code( $response );
@@ -217,10 +220,15 @@ class Client {
 			return false;
 		}
 
-		$response = $this->send_request( 'customers/', 'POST', array(
-			'name'  => $name,
-			'email' => $email,
-		), 201 );
+		$response = $this->send_request(
+			'customers/',
+			'POST',
+			array(
+				'name'  => $name,
+				'email' => $email,
+			),
+			201
+		);
 
 		if ( false === $response ) {
 			return false;

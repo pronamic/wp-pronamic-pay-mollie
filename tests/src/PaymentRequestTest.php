@@ -27,17 +27,20 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 		$request->customer_id    = 'cst_8wmqcHMN4U';
 		$request->recurring_type = Recurring::FIRST;
 
-		$this->assertEquals( array(
-			'amount'        => '100.00',
-			'description'   => 'Test',
-			'redirectUrl'   => 'https://example.com/mollie-redirect/',
-			'webhookUrl'    => 'https://example.com/mollie-webhook/',
-			'method'        => 'ideal',
-			'metadata'      => 'meta',
-			'locale'        => 'nl',
-			'issuer'        => 'ideal_INGBNL2A',
-			'customerId'    => 'cst_8wmqcHMN4U',
-			'recurringType' => 'first',
-		), $request->get_array() );
+		$this->assertEquals(
+			array(
+				'amount'        => '100.00',
+				'description'   => 'Test',
+				'redirectUrl'   => 'https://example.com/mollie-redirect/',
+				'webhookUrl'    => 'https://example.com/mollie-webhook/',
+				'method'        => 'ideal',
+				'metadata'      => 'meta',
+				'locale'        => 'nl',
+				'issuer'        => 'ideal_INGBNL2A',
+				'customerId'    => 'cst_8wmqcHMN4U',
+				'recurringType' => 'first',
+			),
+			$request->get_array()
+		);
 	}
 }

@@ -39,10 +39,12 @@ class GatewayTest extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		$this->set_gateway( array(
-			'id'   => $this->config_id,
-			'mode' => 'test',
-		) );
+		$this->set_gateway(
+			array(
+				'id'   => $this->config_id,
+				'mode' => 'test',
+			)
+		);
 	}
 
 	/**
@@ -271,10 +273,12 @@ class GatewayTest extends WP_UnitTestCase {
 	 */
 	public function test_copy_customer_id_to_wp_user( $config_id, $user_id, $customer_id, $expected ) {
 		if ( $this->config_id !== $config_id ) {
-			$this->set_gateway( array(
-				'id'   => $config_id,
-				'mode' => 'test',
-			) );
+			$this->set_gateway(
+				array(
+					'id'   => $config_id,
+					'mode' => 'test',
+				)
+			);
 		}
 
 		// New payment.
