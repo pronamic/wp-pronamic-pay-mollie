@@ -13,11 +13,16 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
 use Pronamic\WordPress\Pay\Payments\Payment;
-use Pronamic\WordPress\Pay\Payments\PaymentsDataStoreCPT;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionsDataStoreCPT;
 use WP_UnitTestCase;
 
+/**
+ * Gateway test.
+ *
+ * @author Reüel van der Steege
+ * @version 2.0.5
+ */
 class GatewayTest extends WP_UnitTestCase {
 	/**
 	 * Gateway

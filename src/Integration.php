@@ -32,7 +32,7 @@ class Integration extends AbstractIntegration {
 		$this->product_url = __( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' );
 		$this->provider    = 'mollie';
 
-		// Actions
+		// Actions.
 		$function = array( __NAMESPACE__ . '\Listener', 'listen' );
 
 		if ( ! has_action( 'wp_loaded', $function ) ) {
@@ -54,10 +54,20 @@ class Integration extends AbstractIntegration {
 		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
 	}
 
+	/**
+	 * Config factory class name.
+	 *
+	 * @return string
+	 */
 	public function get_config_factory_class() {
 		return __NAMESPACE__ . '\ConfigFactory';
 	}
 
+	/**
+	 * Settings class name.
+	 *
+	 * @return string
+	 */
 	public function get_settings_class() {
 		return __NAMESPACE__ . '\Settings';
 	}
