@@ -218,15 +218,14 @@ class GatewayTest extends WP_UnitTestCase {
 		$payment->subscription->interval        = 30;
 		$payment->subscription->interval_period = 'D';
 
-		$payments_data_store = new PaymentsDataStoreCPT();
-		$payments_data_store->create( $payment );
+		pronamic_pay_plugin()->payments_data_store->create( $payment );
 
+		// Set customer ID meta.
 		$payment->set_meta( 'mollie_customer_id', $first_payment_customer_id );
 
 		$payment->subscription->set_meta( 'mollie_customer_id', $subscription_customer_id );
 
-		$payment->set_meta( 'subscription_id', $payment->subscription->get_id() );
-
+		// Prevent Mollie API call for now.
 		$payment->recurring_type = Core_Recurring::RECURRING;
 
 		// Get customer ID for payment.
@@ -241,9 +240,9 @@ class GatewayTest extends WP_UnitTestCase {
 	 * @return array
 	 */
 	public function get_customer_id_for_payment_provider() {
-		$customer_id              = 'cst_8wmqcHMN4U';
-		$customer_id_subscription = sprintf( '%s_subscription', $customer_id );
-		$customer_id_first        = sprintf( '%s_first', $customer_id );
+		$customer_id      = 'cst_8wmqcHMN4U';
+		$cst_subscription = sprintf( '%s_subscription', $customer_id );
+		$cst_first        = sprintf( '%s_first', $customer_id );
 
 		return array(
 			array( null, null, null, false ),
@@ -252,11 +251,11 @@ class GatewayTest extends WP_UnitTestCase {
 			array( 0, null, null, false ),
 			array( 10, null, null, false ),
 			array( 1, null, null, false ),
-			// @todo: array( 1, null, $customer_id_first, $customer_id_first ),
-			array( 1, $customer_id_subscription, null, $customer_id_subscription ),
-			array( 1, $customer_id_subscription, $customer_id_first, $customer_id_subscription ),
-			array( '1', $customer_id_subscription, $customer_id_first, $customer_id_subscription ),
-			array( '1', $customer_id_subscription, $customer_id_first, $customer_id_subscription ),
+			array( 1, null, $cst_first, $cst_first ),
+			array( 1, $cst_subscription, null, $cst_subscription ),
+			array( 1, $cst_subscription, $cst_first, $cst_subscription ),
+			array( '1', $cst_subscription, $cst_first, $cst_subscription ),
+			array( '1', $cst_subscription, $cst_first, $cst_subscription ),
 		);
 	}
 

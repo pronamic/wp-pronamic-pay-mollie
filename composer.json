@@ -35,7 +35,7 @@
 	},
 	"require": {
 		"php": "^5.3",
-		"wp-pay/core": "^2.0",
+		"wp-pay/core": "dev-develop as 2.0",
 		"wp-pay-gateways/common": "^2.0"
 	},
 	"require-dev": {
