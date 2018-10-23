@@ -75,7 +75,7 @@ class Integration extends AbstractIntegration {
 	/**
 	 * Get required settings for this integration.
 	 *
-	 * @see https://github.com/wp-premium/gravityforms/blob/1.9.16/includes/fields/class-gf-field-multiselect.php#L21-L42
+	 * @link https://github.com/wp-premium/gravityforms/blob/1.9.16/includes/fields/class-gf-field-multiselect.php#L21-L42
 	 * @since 1.1.3
 	 * @return array
 	 */
@@ -91,7 +91,7 @@ class Integration extends AbstractIntegration {
 	 * User profile.
 	 *
 	 * @since 1.1.6
-	 * @see https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
+	 * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
 	 */
 	public static function user_profile( $user ) {
 		include dirname( __FILE__ ) . '/../views/html-admin-user-profile.php';

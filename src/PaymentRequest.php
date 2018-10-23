@@ -17,7 +17,7 @@ class PaymentRequest {
 	 * The amount in EURO that you want to charge, e.g. `100.00` if you would want to charge
 	 * € 100,00.
 	 *
-	 * @see https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var float
 	 */
 	public $amount;
@@ -26,7 +26,7 @@ class PaymentRequest {
 	 * The description of the payment you're creating. This will be shown to the consumer on their
 	 * card or bank statement when possible.
 	 *
-	 * @see https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var string
 	 */
 	public $description;
@@ -36,7 +36,7 @@ class PaymentRequest {
 	 * for the redirectURL to contain a unique identifier – like your order ID – so you can show
 	 * the right page referencing the order when the consumer returns.
 	 *
-	 * @see https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var string
 	 */
 	public $redirect_url;
@@ -45,7 +45,7 @@ class PaymentRequest {
 	 * Use this parameter to set a wehook URL for this payment only. Mollie will ignore any webhook
 	 * set in your website profile for this payment.
 	 *
-	 * @see https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var string
 	 */
 	public $webhook_url;
@@ -56,7 +56,7 @@ class PaymentRequest {
 	 * method. The parameter enables you to fully integrate the payment method selection into your
 	 * website, however note Mollie's country based conversion optimization is lost.
 	 *
-	 * @see https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var string
 	 */
 	public $method;
@@ -66,7 +66,7 @@ class PaymentRequest {
 	 * Whenever you fetch the payment with our API, we'll also include the metadata. You can use up
 	 * to 1kB of JSON.
 	 *
-	 * @see https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var mixed
 	 */
 	public $meta_data;
@@ -76,7 +76,7 @@ class PaymentRequest {
 	 * When this parameter is not provided, the browser language will be used instead (which is
 	 * usually more accurate).
 	 *
-	 * @see https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var string
 	 */
 	public $locale;
@@ -90,7 +90,7 @@ class PaymentRequest {
 	 * the specific banking website (ING Bank, in this example). For a list of issuers, refer to the
 	 * Issuers API.
 	 *
-	 * @see https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var string
 	 */
 	public $issuer;
@@ -98,7 +98,7 @@ class PaymentRequest {
 	/**
 	 * Customer ID for Mollie checkout.
 	 *
-	 * @see https://www.mollie.com/nl/docs/checkout
+	 * @link https://www.mollie.com/nl/docs/checkout
 	 * @var string
 	 */
 	public $customer_id;
@@ -106,7 +106,7 @@ class PaymentRequest {
 	/**
 	 * Recurring type for Mollie Recurring.
 	 *
-	 * @see https://www.mollie.com/nl/docs/recurring
+	 * @link https://www.mollie.com/nl/docs/recurring
 	 * @since 1.1.9
 	 * @var string
 	 */

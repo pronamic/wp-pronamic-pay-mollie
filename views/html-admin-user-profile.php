@@ -4,7 +4,7 @@
  * User profile.
  *
  * @since 1.1.6
- * @see https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
+ * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
  */
 
 $customer_id_live = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', true );

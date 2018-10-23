@@ -27,6 +27,13 @@ class Gateway extends Core_Gateway {
 	const SLUG = 'mollie';
 
 	/**
+	 * Client.
+	 *
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * Meta key for customer ID.
 	 *
 	 * @var string
