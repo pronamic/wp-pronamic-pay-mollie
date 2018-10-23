@@ -47,7 +47,7 @@ class GatewayTest extends WP_UnitTestCase {
 		$this->set_gateway(
 			array(
 				'id'   => $this->config_id,
-				'mode' => 'test',
+				'mode' => Gateway::MODE_TEST,
 			)
 		);
 	}
@@ -281,7 +281,7 @@ class GatewayTest extends WP_UnitTestCase {
 			$this->set_gateway(
 				array(
 					'id'   => $config_id,
-					'mode' => 'test',
+					'mode' => Gateway::MODE_TEST,
 				)
 			);
 		}

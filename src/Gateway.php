@@ -55,13 +55,13 @@ class Gateway extends Core_Gateway {
 			'recurring',
 		);
 
-		$this->set_method( Core_Gateway::METHOD_HTTP_REDIRECT );
+		$this->set_method( self::METHOD_HTTP_REDIRECT );
 		$this->set_slug( self::SLUG );
 
 		$this->client = new Client( $config->api_key );
 		$this->client->set_mode( $config->mode );
 
-		if ( 'test' === $config->mode ) {
+		if ( self::MODE_TEST === $config->mode ) {
 			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
 		}
 
