@@ -213,7 +213,7 @@ class Client {
 	 * @param string $email Customer email address.
 	 * @param string $name  Customer name.
 	 *
-	 * @return array|bool
+	 * @return string|bool
 	 */
 	public function create_customer( $email, $name ) {
 		if ( empty( $email ) || empty( $name ) ) {

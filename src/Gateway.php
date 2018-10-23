@@ -5,6 +5,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
+use Pronamic\WordPress\Pay\Core\Server;
 use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
@@ -183,6 +184,11 @@ class Gateway extends Core_Gateway {
 
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 
+		if ( is_array( $host ) ) {
+			// Parsing failure.
+			$host = '';
+		}
+
 		if ( 'localhost' === $host ) {
 			// Mollie doesn't allow localhost.
 			return null;
@@ -216,7 +222,7 @@ class Gateway extends Core_Gateway {
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
 
-		if ( ! empty( $customer_id ) ) {
+		if ( is_string( $customer_id ) && ! empty( $customer_id ) ) {
 			$request->customer_id = $customer_id;
 		}
 
