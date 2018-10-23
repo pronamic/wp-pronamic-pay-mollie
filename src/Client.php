@@ -146,7 +146,7 @@ class Client {
 	/**
 	 * Get issuers
 	 *
-	 * @return array
+	 * @return array|bool
 	 */
 	public function get_issuers() {
 		$response = $this->send_request( 'issuers/', 'GET' );
@@ -176,7 +176,7 @@ class Client {
 	 *
 	 * @param string $recurring_type Recurring type.
 	 *
-	 * @return array
+	 * @return array|bool
 	 */
 	public function get_payment_methods( $recurring_type = '' ) {
 		$data = array();
@@ -210,8 +210,8 @@ class Client {
 	 *
 	 * @since 1.1.6
 	 *
-	 * @param string $email
-	 * @param string $name
+	 * @param string $email Customer email address.
+	 * @param string $name  Customer name.
 	 *
 	 * @return array|bool
 	 */
@@ -244,11 +244,11 @@ class Client {
 	/**
 	 * Get customer.
 	 *
-	 * @param $customer_id
+	 * @param string $customer_id Mollie customer ID.
 	 *
 	 * @since unreleased
 	 *
-	 * @return array
+	 * @return object|bool
 	 */
 	public function get_customer( $customer_id ) {
 		if ( empty( $customer_id ) ) {
@@ -271,9 +271,9 @@ class Client {
 	/**
 	 * Get mandates for customer.
 	 *
-	 * @param $customer_id
+	 * @param string $customer_id Mollie customer ID.
 	 *
-	 * @return array
+	 * @return object|bool
 	 */
 	public function get_mandates( $customer_id ) {
 		if ( '' === $customer_id ) {
@@ -286,7 +286,8 @@ class Client {
 	/**
 	 * Is there a valid mandate for customer?
 	 *
-	 * @param $customer_id
+	 * @param string      $customer_id    Mollie customer ID.
+	 * @param string|null $payment_method Payment method to find mandates for.
 	 *
 	 * @return boolean
 	 */
@@ -318,7 +319,7 @@ class Client {
 	 * @param string $customer_id    Mollie customer ID.
 	 * @param string $payment_method Payment method.
 	 *
-	 * @return string
+	 * @return null|DateTime
 	 */
 	public function get_first_valid_mandate_datetime( $customer_id, $payment_method = null ) {
 		$mandates = $this->get_mandates( $customer_id );
@@ -342,7 +343,9 @@ class Client {
 				$valid_mandates = array();
 			}
 
+			// @codingStandardsIgnoreStart
 			$valid_mandates[ $mandate->createdDatetime ] = $mandate;
+			// @codingStandardsIgnoreEnd
 		}
 
 		if ( isset( $valid_mandates ) ) {
@@ -350,7 +353,9 @@ class Client {
 
 			$mandate = array_shift( $valid_mandates );
 
+			// @codingStandardsIgnoreStart
 			$create_date = new DateTime( $mandate->createdDatetime );
+			// @codingStandardsIgnoreEnd
 
 			return $create_date;
 		}

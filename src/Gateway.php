@@ -363,7 +363,7 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param int $user_id WordPress user ID.
 	 *
-	 * @return string
+	 * @return string|bool
 	 */
 	public function get_customer_id_by_wp_user_id( $user_id ) {
 		if ( empty( $user_id ) ) {
