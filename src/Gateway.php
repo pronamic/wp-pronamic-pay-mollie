@@ -214,11 +214,18 @@ class Gateway extends Core_Gateway {
 	public function start( Payment $payment ) {
 		$request = new PaymentRequest();
 
+		// Locale.
+		$locale = null;
+
+		if ( null !== $payment->get_customer() ) {
+			$locale = $payment->get_customer()->get_locale();
+		}
+
 		$request->amount       = $payment->get_total_amount()->get_amount();
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
-		$request->locale       = LocaleHelper::transform( $payment->get_language() );
+		$request->locale       = LocaleHelper::transform( $locale );
 
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
