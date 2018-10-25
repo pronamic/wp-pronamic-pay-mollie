@@ -16,10 +16,16 @@ class LocaleHelper {
 	/**
 	 * Get Mollie locale by the specified WordPress locale.
 	 *
+	 * @param string $locale Locale string (en_US) to transform to Mollie locale.
+	 *
 	 * @return string|null
 	 */
 	public static function transform( $locale ) {
-		// Supported locales
+		if ( ! is_string( $locale ) ) {
+			return null;
+		}
+
+		// Supported locales.
 		$supported = array(
 			Locales::DE,
 			Locales::EN,
@@ -28,10 +34,10 @@ class LocaleHelper {
 			Locales::NL,
 		);
 
-		// Sub string
+		// Sub string.
 		$locale = substr( $locale, 0, 2 );
 
-		// Lower case
+		// Lower case.
 		$locale = strtolower( $locale );
 
 		// Is supported?
