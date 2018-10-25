@@ -219,13 +219,15 @@ class Gateway extends Core_Gateway {
 
 		if ( null !== $payment->get_customer() ) {
 			$locale = $payment->get_customer()->get_locale();
+
+			$locale = LocaleHelper::transform( $locale );
 		}
 
 		$request->amount       = $payment->get_total_amount()->get_amount();
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
-		$request->locale       = LocaleHelper::transform( $locale );
+		$request->locale       = $locale;
 
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
