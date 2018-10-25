@@ -5,7 +5,6 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
-use Pronamic\WordPress\Pay\Core\Server;
 use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
@@ -44,7 +43,7 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Constructs and initializes an Mollie gateway
 	 *
-	 * @param Config $config
+	 * @param Config $config Config.
 	 */
 	public function __construct( Config $config ) {
 		parent::__construct( $config );
@@ -209,6 +208,8 @@ class Gateway extends Core_Gateway {
 	 * Start
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::start()
+	 *
+	 * @param Payment $payment Payment.
 	 */
 	public function start( Payment $payment ) {
 		$request = new PaymentRequest();
@@ -259,7 +260,7 @@ class Gateway extends Core_Gateway {
 		if ( ! $result ) {
 			$this->error = $this->client->get_error();
 
-			return false;
+			return;
 		}
 
 		// Set transaction ID.
@@ -267,7 +268,7 @@ class Gateway extends Core_Gateway {
 			$payment->set_transaction_id( $result->id );
 		}
 
-		// Set status
+		// Set status.
 		if ( isset( $result->status ) ) {
 			$payment->set_status( Statuses::transform( $result->status ) );
 		}
@@ -281,7 +282,9 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Update status of the specified payment
 	 *
-	 * @param Payment $payment
+	 * @param Payment $payment Payment.
+	 *
+	 * @return void
 	 */
 	public function update_status( Payment $payment ) {
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
@@ -299,6 +302,11 @@ class Gateway extends Core_Gateway {
 		if ( isset( $mollie_payment->details ) ) {
 			$details = $mollie_payment->details;
 
+			/*
+			 * @codingStandardsIgnoreStart
+			 *
+			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+			 */
 			if ( isset( $details->consumerName ) ) {
 				$payment->set_consumer_name( $details->consumerName );
 			}
@@ -314,6 +322,7 @@ class Gateway extends Core_Gateway {
 			if ( isset( $details->consumerBic ) ) {
 				$payment->set_consumer_bic( $details->consumerBic );
 			}
+			// @codingStandardsIgnoreEnd
 		}
 	}
 
