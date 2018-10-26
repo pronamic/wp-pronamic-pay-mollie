@@ -197,6 +197,9 @@ class Gateway extends Core_Gateway {
 		} elseif ( '.local' === substr( $host, -6 ) ) {
 			// Mollie doesn't allow the .local TLD.
 			return null;
+		} elseif ( '.test' === substr( $host, -5 ) ) {
+			// Mollie doesn't allow the .test TLD.
+			return null;
 		}
 
 		$url = add_query_arg( 'mollie_webhook', '', $url );
