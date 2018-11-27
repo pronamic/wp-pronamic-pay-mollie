@@ -346,8 +346,11 @@ class Gateway extends Core_Gateway {
 	 * @return bool|string
 	 */
 	public function get_customer_id_for_payment( Payment $payment ) {
+		// Get WordPress user ID from payment customer.
+		$user_id = ( null === $payment->get_customer() ? null : $payment->get_customer()->get_user_id() );
+
 		// Get Mollie customer ID from user meta.
-		$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
+		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
 
 		$subscription = $payment->get_subscription();
 
@@ -377,7 +380,7 @@ class Gateway extends Core_Gateway {
 
 			$customer_id = $this->client->create_customer( $payment->get_email(), $customer_name );
 
-			$this->update_wp_user_customer_id( $payment->user_id, $customer_id );
+			$this->update_wp_user_customer_id( $user_id, $customer_id );
 		}
 
 		// Store customer ID in subscription meta.
