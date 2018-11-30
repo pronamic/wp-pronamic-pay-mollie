@@ -35,7 +35,8 @@
 	},
 	"require": {
 		"php": "^5.3",
-		"wp-pay/core": "dev-develop as 2.0",
+		"pronamic/wp-money": "dev-develop as 1.1",
+		"wp-pay/core": "dev-develop as 2.0.20",
 		"wp-pay-gateways/common": "^2.0"
 	},
 	"require-dev": {
