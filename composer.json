@@ -35,15 +35,18 @@
 	},
 	"require": {
 		"php": "^5.3",
+		"pronamic/wp-money": "^1.1",
 		"wp-pay/core": "^2.0",
 		"wp-pay-gateways/common": "^2.0"
 	},
 	"require-dev": {
 		"php-coveralls/php-coveralls": "^1.0",
-		"phpmd/phpmd": "^2.2.3",
-		"phpunit/phpunit": "^4.5",
+		"phpmd/phpmd": "^2.4",
+		"phpunit/phpunit": "^4.8",
+		"wp-phpunit/wp-phpunit": "^5.0",
+		"johnpbloch/wordpress": "^5.0",
 		"squizlabs/php_codesniffer": "^2.7",
-		"wimg/php-compatibility": "^8.0",
-		"wp-coding-standards/wpcs": "^1.0"
+		"wimg/php-compatibility": "^9.0",
+		"wp-coding-standards/wpcs": "^1.2"
 	}
 }

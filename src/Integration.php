@@ -32,7 +32,7 @@ class Integration extends AbstractIntegration {
 		$this->product_url = __( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' );
 		$this->provider    = 'mollie';
 
-		// Actions
+		// Actions.
 		$function = array( __NAMESPACE__ . '\Listener', 'listen' );
 
 		if ( ! has_action( 'wp_loaded', $function ) ) {
@@ -54,10 +54,20 @@ class Integration extends AbstractIntegration {
 		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
 	}
 
+	/**
+	 * Config factory class name.
+	 *
+	 * @return string
+	 */
 	public function get_config_factory_class() {
 		return __NAMESPACE__ . '\ConfigFactory';
 	}
 
+	/**
+	 * Settings class name.
+	 *
+	 * @return string
+	 */
 	public function get_settings_class() {
 		return __NAMESPACE__ . '\Settings';
 	}
@@ -65,7 +75,7 @@ class Integration extends AbstractIntegration {
 	/**
 	 * Get required settings for this integration.
 	 *
-	 * @see https://github.com/wp-premium/gravityforms/blob/1.9.16/includes/fields/class-gf-field-multiselect.php#L21-L42
+	 * @link https://github.com/wp-premium/gravityforms/blob/1.9.16/includes/fields/class-gf-field-multiselect.php#L21-L42
 	 * @since 1.1.3
 	 * @return array
 	 */
@@ -81,7 +91,7 @@ class Integration extends AbstractIntegration {
 	 * User profile.
 	 *
 	 * @since 1.1.6
-	 * @see https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
+	 * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
 	 */
 	public static function user_profile( $user ) {
 		include dirname( __FILE__ ) . '/../views/html-admin-user-profile.php';

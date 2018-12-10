@@ -1,4 +1,12 @@
 <?php
+/**
+ * Mollie settings.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2018 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
@@ -11,10 +19,17 @@ use Pronamic\WordPress\Pay\Core\GatewaySettings;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.0.5
  * @since   1.0.0
  */
 class Settings extends GatewaySettings {
+	/**
+	 * API key meta key.
+	 *
+	 * @var string
+	 */
+	const API_KEY_META_KEY = '_pronamic_gateway_mollie_api_key';
+
 	/**
 	 * Settings constructor.
 	 */
@@ -60,7 +75,7 @@ class Settings extends GatewaySettings {
 		$fields[] = array(
 			'filter'   => FILTER_SANITIZE_STRING,
 			'section'  => 'mollie',
-			'meta_key' => '_pronamic_gateway_mollie_api_key',
+			'meta_key' => self::API_KEY_META_KEY,
 			'title'    => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
 			'type'     => 'text',
 			'classes'  => array( 'regular-text', 'code' ),
@@ -92,5 +107,31 @@ class Settings extends GatewaySettings {
 		);
 
 		return $fields;
+	}
+
+	/**
+	 * Save post.
+	 *
+	 * @param array $data Data to save.
+	 *
+	 * @return array
+	 */
+	public function save_post( $data ) {
+		// Set mode based on API key.
+		if ( isset( $data[ self::API_KEY_META_KEY ], $data['_pronamic_gateway_mode'] ) ) {
+			$api_key = trim( $data[ self::API_KEY_META_KEY ] );
+
+			if ( empty( $api_key ) ) {
+				$mode = $data['_pronamic_gateway_mode'];
+			} elseif ( 'live_' === substr( $api_key, 0, 5 ) ) {
+				$mode = Gateway::MODE_LIVE;
+			} else {
+				$mode = Gateway::MODE_TEST;
+			}
+
+			$data['_pronamic_gateway_mode'] = $mode;
+		}
+
+		return $data;
 	}
 }

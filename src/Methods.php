@@ -81,7 +81,7 @@ class Methods {
 	/**
 	 * Constant for the Gift cards method.
 	 *
-	 * @see https://www.mollie.com/en/giftcards
+	 * @link https://www.mollie.com/en/giftcards
 	 * @since 1.1.10
 	 * @var string
 	 */
@@ -90,7 +90,7 @@ class Methods {
 	/**
 	 * Constant for the KBC/CBC Payment Button method.
 	 *
-	 * @see https://www.mollie.com/en/kbccbc
+	 * @link https://www.mollie.com/en/kbccbc
 	 * @since 1.1.10
 	 * @var string
 	 */
@@ -99,7 +99,7 @@ class Methods {
 	/**
 	 * Constant for the Belfius Direct Net method.
 	 *
-	 * @see https://www.mollie.com/en/belfiusdirectnet
+	 * @link https://www.mollie.com/en/belfiusdirectnet
 	 * @since 1.1.10
 	 * @var string
 	 */

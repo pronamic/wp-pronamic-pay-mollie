@@ -17,8 +17,8 @@ class Locales {
 	 * German (Deutsch)
 	 *
 	 * @var string
-	 * @see https://www.mollie.com/nl/docs/payments
-	 * @see http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+	 * @link https://www.mollie.com/nl/docs/payments
+	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
 	const DE = 'de';
 
@@ -26,8 +26,8 @@ class Locales {
 	 * English
 	 *
 	 * @var string
-	 * @see https://www.mollie.com/nl/docs/payments
-	 * @see http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+	 * @link https://www.mollie.com/nl/docs/payments
+	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
 	const EN = 'en';
 
@@ -35,8 +35,8 @@ class Locales {
 	 * French
 	 *
 	 * @var string
-	 * @see https://www.mollie.com/nl/docs/payments
-	 * @see http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+	 * @link https://www.mollie.com/nl/docs/payments
+	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
 	const FR = 'fr';
 
@@ -44,8 +44,8 @@ class Locales {
 	 * Spanish (Español)
 	 *
 	 * @var string
-	 * @see https://www.mollie.com/nl/docs/payments
-	 * @see http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+	 * @link https://www.mollie.com/nl/docs/payments
+	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
 	const ES = 'es';
 
@@ -53,8 +53,8 @@ class Locales {
 	 * Dutch (Nederlands)
 	 *
 	 * @var string
-	 * @see https://www.mollie.com/nl/docs/payments
-	 * @see http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+	 * @link https://www.mollie.com/nl/docs/payments
+	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
 	const NL = 'nl';
 }

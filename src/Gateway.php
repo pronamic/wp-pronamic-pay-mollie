@@ -27,6 +27,13 @@ class Gateway extends Core_Gateway {
 	const SLUG = 'mollie';
 
 	/**
+	 * Client.
+	 *
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * Meta key for customer ID.
 	 *
 	 * @var string
@@ -36,7 +43,7 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Constructs and initializes an Mollie gateway
 	 *
-	 * @param Config $config
+	 * @param Config $config Config.
 	 */
 	public function __construct( Config $config ) {
 		parent::__construct( $config );
@@ -48,15 +55,13 @@ class Gateway extends Core_Gateway {
 			'recurring',
 		);
 
-		$this->set_method( Core_Gateway::METHOD_HTTP_REDIRECT );
-		$this->set_has_feedback( true );
-		$this->set_amount_minimum( 1.20 );
+		$this->set_method( self::METHOD_HTTP_REDIRECT );
 		$this->set_slug( self::SLUG );
 
 		$this->client = new Client( $config->api_key );
 		$this->client->set_mode( $config->mode );
 
-		if ( 'test' === $config->mode ) {
+		if ( self::MODE_TEST === $config->mode ) {
 			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
 		}
 
@@ -173,10 +178,15 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @return string
 	 */
-	private function get_webhook_url() {
+	public function get_webhook_url() {
 		$url = home_url( '/' );
 
 		$host = wp_parse_url( $url, PHP_URL_HOST );
+
+		if ( is_array( $host ) ) {
+			// Parsing failure.
+			$host = '';
+		}
 
 		if ( 'localhost' === $host ) {
 			// Mollie doesn't allow localhost.
@@ -186,6 +196,9 @@ class Gateway extends Core_Gateway {
 			return null;
 		} elseif ( '.local' === substr( $host, -6 ) ) {
 			// Mollie doesn't allow the .local TLD.
+			return null;
+		} elseif ( '.test' === substr( $host, -5 ) ) {
+			// Mollie doesn't allow the .test TLD.
 			return null;
 		}
 
@@ -198,20 +211,31 @@ class Gateway extends Core_Gateway {
 	 * Start
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::start()
+	 *
+	 * @param Payment $payment Payment.
 	 */
 	public function start( Payment $payment ) {
 		$request = new PaymentRequest();
 
-		$request->amount       = $payment->get_amount()->get_amount();
+		// Locale.
+		$locale = null;
+
+		if ( null !== $payment->get_customer() ) {
+			$locale = $payment->get_customer()->get_locale();
+
+			$locale = LocaleHelper::transform( $locale );
+		}
+
+		$request->amount       = $payment->get_total_amount()->get_value();
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
-		$request->locale       = LocaleHelper::transform( $payment->get_language() );
+		$request->locale       = $locale;
 
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
 
-		if ( ! empty( $customer_id ) ) {
+		if ( is_string( $customer_id ) && ! empty( $customer_id ) ) {
 			$request->customer_id = $customer_id;
 		}
 
@@ -248,7 +272,7 @@ class Gateway extends Core_Gateway {
 		if ( ! $result ) {
 			$this->error = $this->client->get_error();
 
-			return false;
+			return;
 		}
 
 		// Set transaction ID.
@@ -256,7 +280,7 @@ class Gateway extends Core_Gateway {
 			$payment->set_transaction_id( $result->id );
 		}
 
-		// Set status
+		// Set status.
 		if ( isset( $result->status ) ) {
 			$payment->set_status( Statuses::transform( $result->status ) );
 		}
@@ -270,7 +294,9 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Update status of the specified payment
 	 *
-	 * @param Payment $payment
+	 * @param Payment $payment Payment.
+	 *
+	 * @return void
 	 */
 	public function update_status( Payment $payment ) {
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
@@ -288,6 +314,11 @@ class Gateway extends Core_Gateway {
 		if ( isset( $mollie_payment->details ) ) {
 			$details = $mollie_payment->details;
 
+			/*
+			 * @codingStandardsIgnoreStart
+			 *
+			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+			 */
 			if ( isset( $details->consumerName ) ) {
 				$payment->set_consumer_name( $details->consumerName );
 			}
@@ -303,6 +334,7 @@ class Gateway extends Core_Gateway {
 			if ( isset( $details->consumerBic ) ) {
 				$payment->set_consumer_bic( $details->consumerBic );
 			}
+			// @codingStandardsIgnoreEnd
 		}
 	}
 
@@ -313,9 +345,12 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @return bool|string
 	 */
-	private function get_customer_id_for_payment( Payment $payment ) {
+	public function get_customer_id_for_payment( Payment $payment ) {
+		// Get WordPress user ID from payment customer.
+		$user_id = ( null === $payment->get_customer() ? null : $payment->get_customer()->get_user_id() );
+
 		// Get Mollie customer ID from user meta.
-		$customer_id = $this->get_customer_id_by_wp_user_id( $payment->user_id );
+		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
 
 		$subscription = $payment->get_subscription();
 
@@ -337,9 +372,15 @@ class Gateway extends Core_Gateway {
 
 		// Create new customer if the customer does not exist at Mollie.
 		if ( ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) && Core_Recurring::RECURRING !== $payment->recurring_type ) {
-			$customer_id = $this->client->create_customer( $payment->get_email(), $payment->get_customer_name() );
+			$customer_name = null;
 
-			$this->update_wp_user_customer_id( $payment->user_id, $customer_id );
+			if ( null !== $payment->get_customer() && null !== $payment->get_customer()->get_name() ) {
+				$customer_name = strval( $payment->get_customer()->get_name() );
+			}
+
+			$customer_id = $this->client->create_customer( $payment->get_email(), $customer_name );
+
+			$this->update_wp_user_customer_id( $user_id, $customer_id );
 		}
 
 		// Store customer ID in subscription meta.
@@ -358,9 +399,9 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param int $user_id WordPress user ID.
 	 *
-	 * @return string
+	 * @return string|bool
 	 */
-	private function get_customer_id_by_wp_user_id( $user_id ) {
+	public function get_customer_id_by_wp_user_id( $user_id ) {
 		if ( empty( $user_id ) ) {
 			return false;
 		}
@@ -377,7 +418,11 @@ class Gateway extends Core_Gateway {
 	 * @return bool
 	 */
 	private function update_wp_user_customer_id( $user_id, $customer_id ) {
-		if ( empty( $user_id ) || empty( $customer_id ) ) {
+		if ( empty( $user_id ) || is_bool( $user_id ) ) {
+			return false;
+		}
+
+		if ( ! is_string( $customer_id ) || empty( $customer_id ) || 1 === strlen( $customer_id ) ) {
 			return false;
 		}
 
