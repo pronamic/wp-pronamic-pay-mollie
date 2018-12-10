@@ -105,7 +105,7 @@ class IntegrationTest extends WP_UnitTestCase {
 		$url = $this->integration->payment_provider_url( '', $payment );
 
 		// Validate.
-		$is_valid = ( false !== filter_var( $url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED ) );
+		$is_valid = ( false !== filter_var( $url, FILTER_VALIDATE_URL ) );
 
 		$this->assertTrue( $is_valid );
 	}
