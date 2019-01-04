@@ -7,7 +7,7 @@ use Pronamic\WordPress\Pay\Gateways\Common\AbstractIntegration;
 /**
  * Title: Mollie integration
  * Description:
- * Copyright: Copyright (c) 2005 - 2018
+ * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
