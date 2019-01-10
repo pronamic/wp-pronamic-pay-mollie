@@ -216,7 +216,7 @@ class Client {
 	 * @return string|bool
 	 */
 	public function create_customer( $email, $name ) {
-		if ( empty( $email ) || empty( $name ) ) {
+		if ( empty( $email ) ) {
 			return false;
 		}
 
