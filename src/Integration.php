@@ -7,7 +7,7 @@ use Pronamic\WordPress\Pay\Gateways\Common\AbstractIntegration;
 /**
  * Title: Mollie integration
  * Description:
- * Copyright: Copyright (c) 2005 - 2018
+ * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -16,21 +16,15 @@ use Pronamic\WordPress\Pay\Gateways\Common\AbstractIntegration;
  */
 class Integration extends AbstractIntegration {
 	/**
-	 * Dashboard URL.
-	 *
-	 * @var string
-	 */
-	public $dashboard_url = 'http://www.mollie.nl/beheer/';
-
-	/**
 	 * Construct and intialize Mollie integration.
 	 */
 	public function __construct() {
-		$this->id          = 'mollie';
-		$this->name        = 'Mollie';
-		$this->url         = 'http://www.mollie.com/en/';
-		$this->product_url = __( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' );
-		$this->provider    = 'mollie';
+		$this->id            = 'mollie';
+		$this->name          = 'Mollie';
+		$this->url           = 'http://www.mollie.com/en/';
+		$this->product_url   = __( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' );
+		$this->dashboard_url = 'http://www.mollie.nl/beheer/';
+		$this->provider      = 'mollie';
 
 		// Actions.
 		$function = array( __NAMESPACE__ . '\Listener', 'listen' );

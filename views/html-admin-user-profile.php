@@ -7,31 +7,59 @@
  * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
  */
 
-$customer_id_live = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id', true );
-$customer_id_test = get_user_meta( $user->ID, '_pronamic_pay_mollie_customer_id_test', true );
+$data = array(
+	'_pronamic_pay_mollie_customer_id'      => __( 'Customer live ID', 'pronamic_ideal' ),
+	'_pronamic_pay_mollie_customer_id_test' => __( 'Customer test ID', 'pronamic_ideal' ),
+);
+
+$customers = array();
+
+foreach ( $data as $meta_key => $label ) {
+	$customer_id = get_user_meta( $user->ID, $meta_key, true );
+
+	if ( empty( $customer_id ) ) {
+		continue;
+	}
+
+	$customers[] = (object) array(
+		'id'    => $customer_id,
+		'label' => $label,
+	);
+}
+
+if ( empty( $customers ) ) {
+	return;
+}
 
 ?>
 <h2><?php esc_html_e( 'Mollie', 'pronamic_ideal' ); ?></h2>
 
 <table class="form-table">
-	<tr>
-		<th>
-			<label for="pronamic_pay_mollie_customer_id_live">
-				<?php esc_html_e( 'Customer live ID', 'pronamic_ideal' ); ?>
-			</label>
-		</th>
-		<td>
-			<input id="pronamic_pay_mollie_customer_id_live" name="pronamic_pay_mollie_customer_id_live" type="text" value="<?php echo esc_attr( $customer_id_live ); ?>" class="regular-text" readonly="readonly" />
-		</td>
-	</tr>
-	<tr>
-		<th>
-			<label for="pronamic_pay_mollie_customer_id_test">
-				<?php esc_html_e( 'Customer test ID', 'pronamic_ideal' ); ?>
-			</label>
-		</th>
-		<td>
-			<input id="pronamic_pay_mollie_customer_id_test" name="pronamic_pay_mollie_customer_id_test" type="text" value="<?php echo esc_attr( $customer_id_test ); ?>" class="regular-text" readonly="readonly" />
-		</td>
-	</tr>
+
+	<?php foreach ( $customers as $customer ) : ?>
+
+		<tr>
+			<th>
+				<?php echo esc_html( $customer->label ); ?>
+			</th>
+			<td>
+				<?php
+
+				$link = sprintf(
+					'https://www.mollie.com/dashboard/customers/%s',
+					$customer->id
+				);
+
+				printf(
+					'<a href="%s">%s</a>',
+					esc_url( $link ),
+					esc_html( $customer->id )
+				);
+
+				?>
+			</td>
+		</tr>
+
+	<?php endforeach; ?>
+
 </table>

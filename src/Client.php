@@ -9,7 +9,7 @@ use WP_Error;
 /**
  * Title: Mollie
  * Description:
- * Copyright: Copyright (c) 2005 - 2018
+ * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -216,7 +216,7 @@ class Client {
 	 * @return string|bool
 	 */
 	public function create_customer( $email, $name ) {
-		if ( empty( $email ) || empty( $name ) ) {
+		if ( empty( $email ) ) {
 			return false;
 		}
 
