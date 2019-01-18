@@ -45,14 +45,14 @@ if ( empty( $customers ) ) {
 			<td>
 				<?php
 
-				$link = sprintf(
+				$mollie_link = sprintf(
 					'https://www.mollie.com/dashboard/customers/%s',
 					$customer->id
 				);
 
 				printf(
 					'<a href="%s">%s</a>',
-					esc_url( $link ),
+					esc_url( $mollie_link ),
 					esc_html( $customer->id )
 				);
 
