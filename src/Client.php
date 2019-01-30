@@ -49,7 +49,7 @@ class Client {
 	/**
 	 * Constructs and initializes an Mollie client object
 	 *
-	 * @param string $api_key
+	 * @param string $api_key Mollie API key.
 	 */
 	public function __construct( $api_key ) {
 		$this->api_key = $api_key;
@@ -59,7 +59,7 @@ class Client {
 	 * Set mode
 	 *
 	 * @since 1.1.9
-	 * @param string $mode
+	 * @param string $mode Mode (test or live).
 	 */
 	public function set_mode( $mode ) {
 		$this->mode = $mode;
@@ -77,15 +77,15 @@ class Client {
 	/**
 	 * Send request with the specified action and parameters
 	 *
-	 * @param string $end_point
-	 * @param string $method
-	 * @param array $data
-	 * @param int $expected_response_code
+	 * @param string $end_point              Requested endpoint.
+	 * @param string $method                 HTTP method to use.
+	 * @param array  $data                   Request data.
+	 * @param int    $expected_response_code Expected response code.
 	 *
 	 * @return bool|object
 	 */
 	private function send_request( $end_point, $method = 'GET', array $data = array(), $expected_response_code = 200 ) {
-		// Request
+		// Request.
 		$url = self::API_URL . $end_point;
 
 		$response = wp_remote_request(
@@ -99,14 +99,14 @@ class Client {
 			)
 		);
 
-		// Response code
+		// Response code.
 		$response_code = wp_remote_retrieve_response_code( $response );
 
 		if ( $expected_response_code != $response_code ) { // WPCS: loose comparison ok.
 			$this->error = new WP_Error( 'mollie_error', 'Unexpected response code.' );
 		}
 
-		// Body
+		// Body.
 		$body = wp_remote_retrieve_body( $response );
 
 		$data = json_decode( $body );
@@ -117,7 +117,7 @@ class Client {
 			return false;
 		}
 
-		// Mollie error
+		// Mollie error.
 		if ( isset( $data->error, $data->error->message ) ) {
 			$this->error = new \WP_Error( 'mollie_error', $data->error->message, $data->error );
 
@@ -127,14 +127,33 @@ class Client {
 		return $data;
 	}
 
+	/**
+	 * Create payment.
+	 *
+	 * @param PaymentRequest $request Payment request.
+	 *
+	 * @return bool|object
+	 */
 	public function create_payment( PaymentRequest $request ) {
 		return $this->send_request( 'payments/', 'POST', $request->get_array(), 201 );
 	}
 
+	/**
+	 * Get payments.
+	 *
+	 * @return bool|object
+	 */
 	public function get_payments() {
 		return $this->send_request( 'payments/', 'GET' );
 	}
 
+	/**
+	 * Get payment.
+	 *
+	 * @param string $payment_id Payment ID.
+	 *
+	 * @return bool|object
+	 */
 	public function get_payment( $payment_id ) {
 		if ( empty( $payment_id ) ) {
 			return false;
