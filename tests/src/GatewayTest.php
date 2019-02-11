@@ -318,7 +318,7 @@ class GatewayTest extends WP_UnitTestCase {
 			array( 0, 1, 'cst_8wmqcHMN4U', null ),
 
 			// Invalid WordPress user ID and valid Mollie customer ID.
-			array( 1, 1, 'cst_8wmqcHMN4U', 'cst_8wmqcHMN4U' ),
+			array( 1, 1, 'cst_8wmqcHMN4U', '' ),
 
 			// Invalid WordPress user ID and Mollie customer ID.
 			array( 1, 0, 0, false ),
