@@ -215,22 +215,16 @@ class Gateway extends Core_Gateway {
 	 * @param Payment $payment Payment.
 	 */
 	public function start( Payment $payment ) {
-		$request = new PaymentRequest();
-
-		// Locale.
-		$locale = null;
-
-		if ( null !== $payment->get_customer() ) {
-			$locale = $payment->get_customer()->get_locale();
-
-			$locale = LocaleHelper::transform( $locale );
-		}
-
+		$request               = new PaymentRequest();
 		$request->amount       = $payment->get_total_amount()->get_value();
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
-		$request->locale       = $locale;
+
+		// Locale.
+		if ( null !== $payment->get_customer() ) {
+			$request->locale = LocaleHelper::transform( $payment->get_customer()->get_locale() );
+		}
 
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
@@ -262,7 +256,6 @@ class Gateway extends Core_Gateway {
 
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
-			// If payment method is iDEAL we set the user chosen issuer ID.
 			$request->issuer = $payment->get_issuer();
 		}
 
