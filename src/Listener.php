@@ -11,7 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Plugin;
-use Pronamic\WordPress\Pay\Webhook;
+use Pronamic\WordPress\Pay\WebhookManager;
 
 /**
  * Title: Mollie listener
@@ -51,7 +51,7 @@ class Listener {
 
 		$payment->add_note( $note );
 
-		Webhook::log_payment( $payment );
+		WebhookManager::log_payment( $payment );
 
 		// Update payment.
 		Plugin::update_payment( $payment, false );

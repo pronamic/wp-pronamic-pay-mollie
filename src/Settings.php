@@ -109,7 +109,7 @@ class Settings extends GatewaySettings {
 			'methods'  => array( 'mollie' ),
 			'title'    => __( 'Status', 'pronamic_ideal' ),
 			'type'     => 'description',
-			'callback' => array( 'Pronamic\WordPress\Pay\Webhook', 'settings_status' ),
+			'callback' => array( 'Pronamic\WordPress\Pay\WebhookManager', 'settings_status' ),
 		);
 
 		return $fields;
