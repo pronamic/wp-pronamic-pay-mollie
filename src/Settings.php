@@ -58,6 +58,7 @@ class Settings extends GatewaySettings {
 			'title'       => __( 'Transaction feedback', 'pronamic_ideal' ),
 			'methods'     => array( 'mollie' ),
 			'description' => __( 'Payment status updates will be processed without any additional configuration. The <em>Webhook URL</em> is being used to receive the status updates.', 'pronamic_ideal' ),
+			'features'    => Gateway::get_supported_features(),
 		);
 
 		return $sections;
@@ -86,6 +87,7 @@ class Settings extends GatewaySettings {
 		// Transaction feedback.
 		$fields[] = array(
 			'section' => 'mollie',
+			'methods' => array( 'mollie' ),
 			'title'   => __( 'Transaction feedback', 'pronamic_ideal' ),
 			'type'    => 'description',
 			'html'    => __( 'Payment status updates will be processed without any additional configuration.', 'pronamic_ideal' ),
