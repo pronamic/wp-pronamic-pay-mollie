@@ -51,6 +51,7 @@ class Listener {
 
 		$payment->add_note( $note );
 
+		// Log webhook request.
 		WebhookManager::log_payment( $payment );
 
 		// Update payment.
