@@ -78,7 +78,6 @@ class Gateway extends Core_Gateway {
 			'recurring_direct_debit',
 			'recurring_credit_card',
 			'recurring',
-			'webhook_auto_config',
 		);
 	}
 
