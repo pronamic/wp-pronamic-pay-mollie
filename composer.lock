@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ef837f39d8a5db5bde4bbdcf4ffdd82a",
+    "content-hash": "131b98a24c54b9474742493306872ac4",
     "packages": [
         {
             "name": "composer/installers",
@@ -236,16 +236,16 @@
         },
         {
             "name": "pronamic/wp-money",
-            "version": "1.2.1",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pronamic/wp-money.git",
-                "reference": "0746ad2d03447d22ee46bde2702a0a05b6e9ad05"
+                "reference": "4e31de38d8ba5ad5939ae1c36f634fa63af429a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pronamic/wp-money/zipball/0746ad2d03447d22ee46bde2702a0a05b6e9ad05",
-                "reference": "0746ad2d03447d22ee46bde2702a0a05b6e9ad05",
+                "url": "https://api.github.com/repos/pronamic/wp-money/zipball/4e31de38d8ba5ad5939ae1c36f634fa63af429a9",
+                "reference": "4e31de38d8ba5ad5939ae1c36f634fa63af429a9",
                 "shasum": ""
             },
             "require": {
@@ -278,7 +278,7 @@
                 "GPL-3.0-or-later"
             ],
             "description": "WordPress Money library.",
-            "time": "2019-03-27T15:36:48+00:00"
+            "time": "2019-05-23T10:14:17+00:00"
         },
         {
             "name": "viison/address-splitter",
@@ -325,19 +325,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-pay/core.git",
-                "reference": "bfe1fa13761362ba66931789c32a13baab0a0b22"
+                "reference": "da9a2ad8f7a510a447e791dfd5e40f0a4073291c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-pay/core/zipball/bfe1fa13761362ba66931789c32a13baab0a0b22",
-                "reference": "bfe1fa13761362ba66931789c32a13baab0a0b22",
+                "url": "https://api.github.com/repos/wp-pay/core/zipball/da9a2ad8f7a510a447e791dfd5e40f0a4073291c",
+                "reference": "da9a2ad8f7a510a447e791dfd5e40f0a4073291c",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "^1.6",
                 "php": ">=5.6.0",
                 "pronamic/wp-datetime": "^1.0",
-                "pronamic/wp-money": "^1.2",
+                "pronamic/wp-money": "dev-develop as 1.2",
                 "viison/address-splitter": "^0.3.2"
             },
             "require-dev": {
@@ -392,7 +392,7 @@
                 "wordpress",
                 "wp"
             ],
-            "time": "2019-05-22T13:12:31+00:00"
+            "time": "2019-05-23T13:22:22+00:00"
         }
     ],
     "packages-dev": [
@@ -1528,6 +1528,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2015-10-02T06:51:40+00:00"
         },
         {
@@ -1636,7 +1637,8 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress/WordPress/zipball/5.2.1"
+                "url": "https://api.github.com/repos/WordPress/WordPress/zipball/5.2.1",
+                "reference": "5.2.1"
             },
             "require": {
                 "php": ">=5.3.2",
@@ -2929,7 +2931,7 @@
             "package": "wp-pay/core"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
         "wp-pay/core": 20
     },
