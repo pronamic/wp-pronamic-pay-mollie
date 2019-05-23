@@ -153,7 +153,11 @@ class Methods {
 			return self::$map[ $payment_method ];
 		}
 
-		return $default;
+		if ( ! empty( $default ) ) {
+			return $default;
+		}
+
+		return null;
 	}
 
 	/**
