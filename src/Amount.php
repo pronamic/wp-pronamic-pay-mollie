@@ -107,6 +107,8 @@ class Amount {
 	 * @param object $json JSON object.
 	 *
 	 * @return Amount
+	 *
+	 * @throws InvalidArgumentException Throws invalid argument exception when input JSON is not an object.
 	 * @throws \JsonSchema\Exception\ValidationException Throws JSON schema validation exception when JSON is invalid.
 	 */
 	public static function from_json( $json ) {
@@ -127,6 +129,11 @@ class Amount {
 		return self::from_object( $json );
 	}
 
+	/**
+	 * Create string representation of amount.
+	 *
+	 * @return string
+	 */
 	public function __toString() {
 		return sprintf( '%1$s %2$s', $this->get_currency(), $this->get_value() );
 	}

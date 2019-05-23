@@ -1,4 +1,12 @@
 <?php
+/**
+ * Mollie statuses test.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
@@ -17,6 +25,9 @@ class StatusesTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test transform.
 	 *
+	 * @param string $mollie_status Mollie status.
+	 * @param string $expected      Expected value.
+	 *
 	 * @dataProvider status_matrix_provider
 	 */
 	public function test_transform( $mollie_status, $expected ) {
@@ -25,6 +36,11 @@ class StatusesTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( $expected, $status );
 	}
 
+	/**
+	 * Status data provider.
+	 *
+	 * @return array
+	 */
 	public function status_matrix_provider() {
 		return array(
 			array( Statuses::AUTHORIZED, null ),

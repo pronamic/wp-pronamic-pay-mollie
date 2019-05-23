@@ -1,6 +1,6 @@
 <?php
 /**
- * Mollie amount transformer test
+ * Mollie amount transformer test.
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2019 Pronamic
@@ -37,6 +37,11 @@ class AmountTransformerTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( $expected, strval( $amount ) );
 	}
 
+	/**
+	 * Amount data provider.
+	 *
+	 * @return array
+	 */
 	public function amount_provider() {
 		return array(
 			array( new Money( 100, 'EUR' ), 'EUR 100.00' ),

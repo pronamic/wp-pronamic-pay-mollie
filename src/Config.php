@@ -1,4 +1,12 @@
 <?php
+/**
+ * Mollie config.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
@@ -15,5 +23,10 @@ use Pronamic\WordPress\Pay\Core\GatewayConfig;
  * @since   1.0.0
  */
 class Config extends GatewayConfig {
+	/**
+	 * API key.
+	 *
+	 * @var string|null
+	 */
 	public $api_key;
 }

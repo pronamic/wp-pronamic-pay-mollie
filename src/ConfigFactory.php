@@ -23,11 +23,19 @@ use Pronamic\WordPress\Pay\Core\GatewayConfigFactory;
  * @since   1.0.0
  */
 class ConfigFactory extends GatewayConfigFactory {
+	/**
+	 * Get configuration by post ID.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return Config
+	 */
 	public function get_config( $post_id ) {
 		$config = new Config();
 
-		$config->api_key = get_post_meta( $post_id, '_pronamic_gateway_mollie_api_key', true );
-		$config->mode    = get_post_meta( $post_id, '_pronamic_gateway_mode', true );
+		$config->post_id = intval( $post_id );
+		$config->api_key = $this->get_meta( $post_id, '_pronamic_gateway_mollie_api_key' );
+		$config->mode    = $this->get_meta( $post_id, '_pronamic_gateway_mode' );
 
 		return $config;
 	}

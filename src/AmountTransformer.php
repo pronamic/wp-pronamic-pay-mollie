@@ -23,8 +23,9 @@ class AmountTransformer {
 	/**
 	 * Transform Pronamic money to Mollie amount.
 	 *
-	 * @param PronamicMoney $pronamic_money Pronamic money to convert.
-	 * @return Money
+	 * @param Money $money Pronamic money to convert.
+	 *
+	 * @return Amount
 	 */
 	public static function transform( Money $money ) {
 		$amount = new Amount(

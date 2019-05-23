@@ -23,8 +23,6 @@
 	<rule ref="WordPress">	
 		<exclude name="Generic.Files.LowercasedFilename.NotFound" />
 
-		<exclude name="Squiz.Commenting" />
-
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
 
@@ -42,4 +40,8 @@
 	<rule ref="PEAR.Functions.FunctionCallSignature.Indent">
 		<exclude-pattern>src/Client.php</exclude-pattern>
 	</rule>
+
+    <rule ref="Squiz.Commenting.FunctionCommentThrowTag.WrongNumber">
+        <exclude-pattern>src/Amount.php</exclude-pattern>
+    </rule>
 </ruleset>

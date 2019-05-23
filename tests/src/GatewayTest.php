@@ -209,8 +209,10 @@ class GatewayTest extends WP_UnitTestCase {
 	 *
 	 * @dataProvider get_customer_id_for_payment_provider
 	 *
-	 * @param int  $user_id  Payment WordPress user ID.
-	 * @param bool $expected Expected Mollie Customer ID.
+	 * @param int    $user_id                   Payment WordPress user ID.
+	 * @param string $subscription_customer_id  Subscription Mollie customer ID.
+	 * @param string $first_payment_customer_id First payment Mollie customer ID.
+	 * @param bool   $expected                  Expected Mollie Customer ID.
 	 */
 	public function test_get_customer_id_for_payment( $user_id, $subscription_customer_id, $first_payment_customer_id, $expected ) {
 		// New payment.

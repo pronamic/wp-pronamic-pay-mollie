@@ -1,6 +1,6 @@
 <?php
 /**
- * Mollie amount test
+ * Mollie amount test.
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2019 Pronamic

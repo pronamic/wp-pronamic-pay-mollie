@@ -1,9 +1,18 @@
 <?php
+/**
+ * Mollie integration.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Gateways\Common\AbstractIntegration;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use WP_User;
 
 /**
  * Title: Mollie integration
@@ -85,6 +94,8 @@ class Integration extends AbstractIntegration {
 	/**
 	 * User profile.
 	 *
+	 * @param WP_User $user WordPress user.
+	 *
 	 * @since 1.1.6
 	 * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
 	 */
@@ -95,8 +106,9 @@ class Integration extends AbstractIntegration {
 	/**
 	 * Payment provider URL.
 	 *
-	 * @param string  $url
-	 * @param Payment $payment
+	 * @param string  $url     Payment provider URL.
+	 * @param Payment $payment Payment.
+	 *
 	 * @return string
 	 */
 	public function payment_provider_url( $url, Payment $payment ) {
