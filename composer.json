@@ -28,13 +28,9 @@
 			"Pronamic\\WordPress\\Pay\\Gateways\\Mollie\\": "src/"
 		}
 	},
-	"config": {
-		"platform": {
-			"php": "5.3.3"
-		}
-	},
 	"require": {
-		"php": "^5.3",
+		"php": ">=5.6.0",
+		"justinrainbow/json-schema": "^5.2",
 		"wp-pay/core": "^2.1"
 	},
 	"require-dev": {

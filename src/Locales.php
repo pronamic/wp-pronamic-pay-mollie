@@ -9,52 +9,154 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.0.0
  */
 class Locales {
 	/**
-	 * German (Deutsch)
+	 * English (US).
 	 *
 	 * @var string
-	 * @link https://www.mollie.com/nl/docs/payments
-	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
-	const DE = 'de';
+	const EN_US = 'en_US';
 
 	/**
-	 * English
+	 * Dutch (Netherlands).
 	 *
 	 * @var string
-	 * @link https://www.mollie.com/nl/docs/payments
-	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
-	const EN = 'en';
+	const NL_NL = 'nl_NL';
 
 	/**
-	 * French
+	 * Dutch (Belgium).
 	 *
 	 * @var string
-	 * @link https://www.mollie.com/nl/docs/payments
-	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
-	const FR = 'fr';
+	const NL_BE = 'nl_BE';
 
 	/**
-	 * Spanish (Español)
+	 * French (France).
 	 *
 	 * @var string
-	 * @link https://www.mollie.com/nl/docs/payments
-	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
-	const ES = 'es';
+	const FR_FR = 'fr_FR';
 
 	/**
-	 * Dutch (Nederlands)
+	 * French (Belgium).
 	 *
 	 * @var string
-	 * @link https://www.mollie.com/nl/docs/payments
-	 * @link https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 	 */
-	const NL = 'nl';
+	const FR_BE = 'fr_BE';
+
+	/**
+	 * German (Germany).
+	 *
+	 * @var string
+	 */
+	const DE_DE = 'de_DE';
+
+	/**
+	 * German (Austria).
+	 *
+	 * @var string
+	 */
+	const DE_AT = 'de_AT';
+
+	/**
+	 * German (Switzerland).
+	 *
+	 * @var string
+	 */
+	const DE_CH = 'de_CH';
+
+	/**
+	 * Spanish (Spain).
+	 *
+	 * @var string
+	 */
+	const ES_ES = 'es_ES';
+
+	/**
+	 * Catalan (Spain).
+	 *
+	 * @var string
+	 */
+	const CA_ES = 'ca_ES';
+
+	/**
+	 * Portuguese (Portugal).
+	 *
+	 * @var string
+	 */
+	const PT_PT = 'pt_PT';
+
+	/**
+	 * Italian (Italy).
+	 *
+	 * @var string
+	 */
+	const IT_IT = 'it_IT';
+
+	/**
+	 * Norwegian (Norway).
+	 *
+	 * @var string
+	 */
+	const NB_NO = 'nb_NO';
+
+	/**
+	 * Swedish (Sweden).
+	 *
+	 * @var string
+	 */
+	const SV_SE = 'sv_SE';
+
+	/**
+	 * Finish (Finland).
+	 *
+	 * @var string
+	 */
+	const FI_FI = 'fi_FI';
+
+	/**
+	 * Danish (Denmark).
+	 *
+	 * @var string
+	 */
+	const DA_DK = 'da_DK';
+
+	/**
+	 * Icelandic (Iceland).
+	 *
+	 * @var string
+	 */
+	const IS_IS = 'is_IS';
+
+	/**
+	 * Hungarian (Hungary).
+	 *
+	 * @var string
+	 */
+	const HU_HU = 'hu_HU';
+
+	/**
+	 * Polish (Poland).
+	 *
+	 * @var string
+	 */
+	const PL_PL = 'pl_PL';
+
+	/**
+	 * Latvian (Latvia).
+	 *
+	 * @var string
+	 */
+	const LV_LV = 'lv_LV';
+
+	/**
+	 * Lithuanian (Lithuania).
+	 *
+	 * @var string
+	 */
+	const LT_LT = 'lt_LT';
 }

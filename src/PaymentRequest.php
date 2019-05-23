@@ -9,16 +9,16 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.0.0
  */
 class PaymentRequest {
 	/**
-	 * The amount in EURO that you want to charge, e.g. `100.00` if you would want to charge
-	 * € 100,00.
+	 * The amount in EURO that you want to charge, e.g. `{"currency":"EUR", "value":"100.00"}`
+	 * if you would want to charge € 100,00.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var float
+	 * @var Amount
 	 */
 	public $amount;
 
@@ -104,13 +104,13 @@ class PaymentRequest {
 	public $customer_id;
 
 	/**
-	 * Recurring type for Mollie Recurring.
+	 * Sequence type for Mollie Recurring.
 	 *
 	 * @link https://www.mollie.com/nl/docs/recurring
 	 * @since 1.1.9
 	 * @var string
 	 */
-	public $recurring_type;
+	public $sequence_type;
 
 	/**
 	 * Get array of this Mollie payment request object.
@@ -119,16 +119,16 @@ class PaymentRequest {
 	 */
 	public function get_array() {
 		$array = array(
-			'amount'        => number_format( $this->amount, 2, '.', '' ),
-			'description'   => $this->description,
-			'method'        => $this->method,
-			'redirectUrl'   => $this->redirect_url,
-			'metadata'      => $this->meta_data,
-			'locale'        => $this->locale,
-			'webhookUrl'    => $this->webhook_url,
-			'issuer'        => $this->issuer,
-			'recurringType' => $this->recurring_type,
-			'customerId'    => $this->customer_id,
+			'amount'       => $this->amount->get_json(),
+			'description'  => $this->description,
+			'method'       => $this->method,
+			'redirectUrl'  => $this->redirect_url,
+			'metadata'     => $this->meta_data,
+			'locale'       => $this->locale,
+			'webhookUrl'   => $this->webhook_url,
+			'issuer'       => $this->issuer,
+			'sequenceType' => $this->sequence_type,
+			'customerId'   => $this->customer_id,
 		);
 
 		/*

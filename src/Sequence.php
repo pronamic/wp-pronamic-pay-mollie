@@ -3,16 +3,23 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Title: Mollie Recurring
+ * Title: Mollie sequence
  * Description:
  * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.1.9
  */
-class Recurring {
+class Sequence {
+	/**
+	 * Constant for one-off payment.
+	 *
+	 * @var string
+	 */
+	const ONE_OFF = 'oneoff';
+
 	/**
 	 * Constant for the first payment.
 	 *

@@ -9,7 +9,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.0.0
  */
 class MethodsTest extends \PHPUnit_Framework_TestCase {
@@ -26,13 +26,12 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 
 	public function method_matrix_provider() {
 		return array(
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT, Methods::MISTERCASH ),
+			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT, Methods::BANCONTACT ),
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::BANK_TRANSFER, Methods::BANKTRANSFER ),
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::BITCOIN, Methods::BITCOIN ),
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::CREDIT_CARD, Methods::CREDITCARD ),
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT, Methods::DIRECT_DEBIT ),
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT_IDEAL, Methods::DIRECT_DEBIT ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::MISTER_CASH, Methods::MISTERCASH ),
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::SOFORT, Methods::SOFORT ),
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::IDEAL, Methods::IDEAL ),
 			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::KBC, Methods::KBC ),
@@ -59,8 +58,8 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 
 	public function transform_gateway_method_matrix_provider() {
 		return array(
+			array( Methods::BANCONTACT, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT ),
 			array( Methods::BANKTRANSFER, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANK_TRANSFER ),
-			array( Methods::MISTERCASH, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT ),
 			array( Methods::BITCOIN, \Pronamic\WordPress\Pay\Core\PaymentMethods::BITCOIN ),
 			array( Methods::CREDITCARD, \Pronamic\WordPress\Pay\Core\PaymentMethods::CREDIT_CARD ),
 			array( Methods::DIRECT_DEBIT, \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT ),

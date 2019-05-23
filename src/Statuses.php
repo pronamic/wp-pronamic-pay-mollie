@@ -11,10 +11,17 @@ use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.3
+ * @version 2.1.0
  * @since   1.0.0
  */
 class Statuses {
+	/**
+	 * Authorized.
+	 *
+	 * @var string
+	 */
+	const AUTHORIZED = 'authorized';
+
 	/**
 	 * Open.
 	 *
@@ -23,18 +30,11 @@ class Statuses {
 	const OPEN = 'open';
 
 	/**
-	 * Cancelled.
+	 * Canceled.
 	 *
 	 * @var string
 	 */
-	const CANCELLED = 'cancelled';
-
-	/**
-	 * Paid out.
-	 *
-	 * @var string
-	 */
-	const PAID_OUT = 'paidout';
+	const CANCELED = 'canceled';
 
 	/**
 	 * Paid.
@@ -86,11 +86,8 @@ class Statuses {
 			case self::OPEN:
 				return Core_Statuses::OPEN;
 
-			case self::CANCELLED:
+			case self::CANCELED:
 				return Core_Statuses::CANCELLED;
-
-			case self::PAID_OUT:
-				return Core_Statuses::SUCCESS;
 
 			case self::ACTIVE:
 				return Core_Statuses::ACTIVE;

@@ -9,7 +9,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.3
+ * @version 2.1.0
  * @since   1.0.0
  * @see     https://www.mollie.nl/support/documentatie/betaaldiensten/ideal/en/
  */
@@ -27,9 +27,9 @@ class StatusesTest extends \PHPUnit_Framework_TestCase {
 
 	public function status_matrix_provider() {
 		return array(
+			array( Statuses::AUTHORIZED, null ),
 			array( Statuses::OPEN, \Pronamic\WordPress\Pay\Core\Statuses::OPEN ),
-			array( Statuses::CANCELLED, \Pronamic\WordPress\Pay\Core\Statuses::CANCELLED ),
-			array( Statuses::PAID_OUT, \Pronamic\WordPress\Pay\Core\Statuses::SUCCESS ),
+			array( Statuses::CANCELED, \Pronamic\WordPress\Pay\Core\Statuses::CANCELLED ),
 			array( Statuses::ACTIVE, \Pronamic\WordPress\Pay\Core\Statuses::ACTIVE ),
 			array( Statuses::PAID, \Pronamic\WordPress\Pay\Core\Statuses::SUCCESS ),
 			array( Statuses::EXPIRED, \Pronamic\WordPress\Pay\Core\Statuses::EXPIRED ),

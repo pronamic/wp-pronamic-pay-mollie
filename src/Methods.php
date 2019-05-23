@@ -11,10 +11,17 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.0.0
  */
 class Methods {
+	/**
+	 * Constant for the Bancontact method.
+	 *
+	 * @var string
+	 */
+	const BANCONTACT = 'bancontact';
+
 	/**
 	 * Constant for the iDEAL method.
 	 *
@@ -35,13 +42,6 @@ class Methods {
 	 * @var string
 	 */
 	const DIRECT_DEBIT = 'directdebit';
-
-	/**
-	 * Constant for the Mister Cash method.
-	 *
-	 * @var string
-	 */
-	const MISTERCASH = 'mistercash';
 
 	/**
 	 * Constant for the Sofort method.
@@ -111,6 +111,7 @@ class Methods {
 	 * @var array
 	 */
 	private static $map = array(
+		PaymentMethods::BANCONTACT              => self::BANCONTACT,
 		PaymentMethods::BANK_TRANSFER           => self::BANKTRANSFER,
 		PaymentMethods::BITCOIN                 => self::BITCOIN,
 		PaymentMethods::CREDIT_CARD             => self::CREDITCARD,
@@ -118,8 +119,6 @@ class Methods {
 		PaymentMethods::DIRECT_DEBIT_BANCONTACT => self::DIRECT_DEBIT,
 		PaymentMethods::DIRECT_DEBIT_IDEAL      => self::DIRECT_DEBIT,
 		PaymentMethods::DIRECT_DEBIT_SOFORT     => self::DIRECT_DEBIT,
-		PaymentMethods::BANCONTACT              => self::MISTERCASH,
-		PaymentMethods::MISTER_CASH             => self::MISTERCASH,
 		PaymentMethods::PAYPAL                  => self::PAYPAL,
 		PaymentMethods::SOFORT                  => self::SOFORT,
 		PaymentMethods::IDEAL                   => self::IDEAL,

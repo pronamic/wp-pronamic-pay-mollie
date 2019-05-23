@@ -15,7 +15,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.4
+ * @version 2.1.0
  * @since   1.1.0
  */
 class Gateway extends Core_Gateway {
@@ -100,14 +100,14 @@ class Gateway extends Core_Gateway {
 	public function get_available_payment_methods() {
 		$payment_methods = array();
 
-		// Set recurring types to get payment methods for.
-		$recurring_types = array( null, Recurring::RECURRING, Recurring::FIRST );
+		// Set sequence types to get payment methods for.
+		$sequence_types = array( Sequence::ONE_OFF, Sequence::RECURRING, Sequence::FIRST );
 
 		$results = array();
 
-		foreach ( $recurring_types as $recurring_type ) {
+		foreach ( $sequence_types as $sequence_type ) {
 			// Get active payment methods for Mollie account.
-			$result = $this->client->get_payment_methods( $recurring_type );
+			$result = $this->client->get_payment_methods( $sequence_type );
 
 			if ( ! $result ) {
 				$this->error = $this->client->get_error();
@@ -115,7 +115,7 @@ class Gateway extends Core_Gateway {
 				break;
 			}
 
-			if ( Recurring::FIRST === $recurring_type ) {
+			if ( Sequence::FIRST === $sequence_type ) {
 				foreach ( $result as $method => $title ) {
 					unset( $result[ $method ] );
 
@@ -216,7 +216,7 @@ class Gateway extends Core_Gateway {
 	 */
 	public function start( Payment $payment ) {
 		$request               = new PaymentRequest();
-		$request->amount       = $payment->get_total_amount()->get_value();
+		$request->amount       = AmountTransformer::transform( $payment->get_total_amount() );
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
@@ -240,13 +240,13 @@ class Gateway extends Core_Gateway {
 		$subscription = $payment->get_subscription();
 
 		if ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) ) {
-			$request->recurring_type = $payment->get_recurring() ? Recurring::RECURRING : Recurring::FIRST;
+			$request->sequence_type = $payment->get_recurring() ? Sequence::RECURRING : Sequence::FIRST;
 
-			if ( Recurring::FIRST === $request->recurring_type ) {
+			if ( Sequence::FIRST === $request->sequence_type ) {
 				$payment_method = PaymentMethods::get_first_payment_method( $payment_method );
 			}
 
-			if ( Recurring::RECURRING === $request->recurring_type ) {
+			if ( Sequence::RECURRING === $request->sequence_type ) {
 				$payment->set_action_url( $payment->get_return_url() );
 			}
 		}
@@ -279,8 +279,8 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Set action URL.
-		if ( isset( $result->links, $result->links->paymentUrl ) ) {
-			$payment->set_action_url( $result->links->paymentUrl );
+		if ( isset( $result->_links->checkout->href ) ) {
+			$payment->set_action_url( $result->_links->checkout->href );
 		}
 	}
 
