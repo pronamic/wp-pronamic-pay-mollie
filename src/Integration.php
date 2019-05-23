@@ -3,6 +3,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Gateways\Common\AbstractIntegration;
+use Pronamic\WordPress\Pay\Payments\Payment;
 
 /**
  * Title: Mollie integration
@@ -98,7 +99,7 @@ class Integration extends AbstractIntegration {
 	 * @param Payment $payment
 	 * @return string
 	 */
-	public function payment_provider_url( $url, $payment ) {
+	public function payment_provider_url( $url, Payment $payment ) {
 		return sprintf(
 			'https://www.mollie.com/dashboard/payments/%s',
 			$payment->get_transaction_id()
