@@ -34,8 +34,8 @@ class ConfigFactory extends GatewayConfigFactory {
 		$config = new Config();
 
 		$config->post_id = intval( $post_id );
-		$config->api_key = $this->get_meta( $post_id, '_pronamic_gateway_mollie_api_key' );
-		$config->mode    = $this->get_meta( $post_id, '_pronamic_gateway_mode' );
+		$config->api_key = $this->get_meta( $post_id, 'mollie_api_key' );
+		$config->mode    = $this->get_meta( $post_id, 'mode' );
 
 		return $config;
 	}
