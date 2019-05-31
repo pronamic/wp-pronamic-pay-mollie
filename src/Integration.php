@@ -72,30 +72,6 @@ class Integration extends AbstractIntegration {
 	}
 
 	/**
-	 * Settings class name.
-	 *
-	 * @return string
-	 */
-	public function get_settings_class() {
-		return __NAMESPACE__ . '\Settings';
-	}
-
-	/**
-	 * Get required settings for this integration.
-	 *
-	 * @link https://github.com/wp-premium/gravityforms/blob/1.9.16/includes/fields/class-gf-field-multiselect.php#L21-L42
-	 * @since 1.1.3
-	 * @return array
-	 */
-	public function get_settings() {
-		$settings = parent::get_settings();
-
-		$settings[] = 'mollie';
-
-		return $settings;
-	}
-
-	/**
 	 * Get settings fields.
 	 *
 	 * @return array
@@ -111,7 +87,6 @@ class Integration extends AbstractIntegration {
 			'title'    => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
 			'type'     => 'text',
 			'classes'  => array( 'regular-text', 'code' ),
-			'methods'  => array( 'mollie' ),
 			'tooltip'  => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
 		);
 
@@ -123,7 +98,6 @@ class Integration extends AbstractIntegration {
 			'classes'  => array( 'large-text', 'code' ),
 			'value'    => add_query_arg( 'mollie_webhook', '', home_url( '/' ) ),
 			'readonly' => true,
-			'methods'  => array( 'mollie' ),
 			'tooltip'  => __( 'The Webhook URL as sent with each transaction to receive automatic payment status updates on.', 'pronamic_ideal' ),
 		);
 
