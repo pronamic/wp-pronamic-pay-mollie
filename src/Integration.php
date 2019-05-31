@@ -107,7 +107,7 @@ class Integration extends AbstractIntegration {
 		$fields[] = array(
 			'section'  => 'general',
 			'filter'   => FILTER_SANITIZE_STRING,
-			'meta_key' => self::API_KEY_META_KEY,
+			'meta_key' => '_pronamic_gateway_mollie_api_key',
 			'title'    => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
 			'type'     => 'text',
 			'classes'  => array( 'regular-text', 'code' ),
@@ -139,8 +139,8 @@ class Integration extends AbstractIntegration {
 	 */
 	public function save_post( $data ) {
 		// Set mode based on API key.
-		if ( isset( $data[ self::API_KEY_META_KEY ], $data['_pronamic_gateway_mode'] ) ) {
-			$api_key = trim( $data[ self::API_KEY_META_KEY ] );
+		if ( isset( $data['_pronamic_gateway_mollie_api_key'], $data['_pronamic_gateway_mode'] ) ) {
+			$api_key = trim( $data['_pronamic_gateway_mollie_api_key'] );
 
 			if ( empty( $api_key ) ) {
 				$mode = $data['_pronamic_gateway_mode'];
@@ -165,7 +165,7 @@ class Integration extends AbstractIntegration {
 	 * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
 	 */
 	public static function user_profile( $user ) {
-		include dirname( __FILE__ ) . '/../views/html-admin-user-profile.php';
+		include __DIR__ . '/../views/html-admin-user-profile.php';
 	}
 
 	/**
