@@ -36,6 +36,7 @@ class Integration extends AbstractIntegration {
 		$this->dashboard_url = 'http://www.mollie.nl/beheer/';
 		$this->provider      = 'mollie';
 		$this->supports = array(
+			'payment_status_request',
 			'webhook',
 			'webhook_no_config',
 		);
