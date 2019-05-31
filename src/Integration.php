@@ -35,6 +35,10 @@ class Integration extends AbstractIntegration {
 		$this->product_url   = __( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' );
 		$this->dashboard_url = 'http://www.mollie.nl/beheer/';
 		$this->provider      = 'mollie';
+		$this->supports = array(
+			'webhook',
+			'webhook_no_config',
+		);
 
 		// Actions.
 		$function = array( __NAMESPACE__ . '\Listener', 'listen' );
