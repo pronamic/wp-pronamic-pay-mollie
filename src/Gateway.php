@@ -60,7 +60,12 @@ class Gateway extends Core_Gateway {
 		$this->set_slug( self::SLUG );
 
 		// Supported features.
-		$this->supports = self::get_supported_features();
+		$this->supports = array(
+			'payment_status_request',
+			'recurring_direct_debit',
+			'recurring_credit_card',
+			'recurring',
+		);
 
 		// Client.
 		$this->client = new Client( $config->api_key );
@@ -73,20 +78,6 @@ class Gateway extends Core_Gateway {
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
-	}
-
-	/**
-	 * Get supported features.
-	 *
-	 * @return array
-	 */
-	public static function get_supported_features() {
-		return array(
-			'payment_status_request',
-			'recurring_direct_debit',
-			'recurring_credit_card',
-			'recurring',
-		);
 	}
 
 	/**

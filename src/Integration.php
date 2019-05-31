@@ -92,6 +92,67 @@ class Integration extends AbstractIntegration {
 	}
 
 	/**
+	 * Get settings fields.
+	 *
+	 * @return array
+	 */
+	public function get_settings_fields() {
+		$fields = array();
+
+		// API Key.
+		$fields[] = array(
+			'section'  => 'general',
+			'filter'   => FILTER_SANITIZE_STRING,
+			'meta_key' => self::API_KEY_META_KEY,
+			'title'    => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
+			'type'     => 'text',
+			'classes'  => array( 'regular-text', 'code' ),
+			'methods'  => array( 'mollie' ),
+			'tooltip'  => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
+		);
+
+		// Webhook.
+		$fields[] = array(
+			'section'  => 'feedback',
+			'title'    => __( 'Webhook URL', 'pronamic_ideal' ),
+			'type'     => 'text',
+			'classes'  => array( 'large-text', 'code' ),
+			'value'    => add_query_arg( 'mollie_webhook', '', home_url( '/' ) ),
+			'readonly' => true,
+			'methods'  => array( 'mollie' ),
+			'tooltip'  => __( 'The Webhook URL as sent with each transaction to receive automatic payment status updates on.', 'pronamic_ideal' ),
+		);
+
+		return $fields;
+	}
+
+	/**
+	 * Save post.
+	 *
+	 * @param array $data Data to save.
+	 *
+	 * @return array
+	 */
+	public function save_post( $data ) {
+		// Set mode based on API key.
+		if ( isset( $data[ self::API_KEY_META_KEY ], $data['_pronamic_gateway_mode'] ) ) {
+			$api_key = trim( $data[ self::API_KEY_META_KEY ] );
+
+			if ( empty( $api_key ) ) {
+				$mode = $data['_pronamic_gateway_mode'];
+			} elseif ( 'live_' === substr( $api_key, 0, 5 ) ) {
+				$mode = Gateway::MODE_LIVE;
+			} else {
+				$mode = Gateway::MODE_TEST;
+			}
+
+			$data['_pronamic_gateway_mode'] = $mode;
+		}
+
+		return $data;
+	}
+
+	/**
 	 * User profile.
 	 *
 	 * @param WP_User $user WordPress user.
