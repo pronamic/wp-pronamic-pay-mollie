@@ -58,6 +58,7 @@ class Settings extends GatewaySettings {
 			'title'       => __( 'Transaction feedback', 'pronamic_ideal' ),
 			'methods'     => array( 'mollie' ),
 			'description' => __( 'Payment status updates will be processed without any additional configuration. The <em>Webhook URL</em> is being used to receive the status updates.', 'pronamic_ideal' ),
+			'features'    => Gateway::get_supported_features(),
 		);
 
 		return $sections;
@@ -86,12 +87,10 @@ class Settings extends GatewaySettings {
 		// Transaction feedback.
 		$fields[] = array(
 			'section' => 'mollie',
+			'methods' => array( 'mollie' ),
 			'title'   => __( 'Transaction feedback', 'pronamic_ideal' ),
 			'type'    => 'description',
-			'html'    => sprintf(
-				'<span class="dashicons dashicons-yes"></span> %s',
-				__( 'Payment status updates will be processed without any additional configuration.', 'pronamic_ideal' )
-			),
+			'html'    => __( 'Payment status updates will be processed without any additional configuration.', 'pronamic_ideal' ),
 		);
 
 		// Webhook.
@@ -104,6 +103,15 @@ class Settings extends GatewaySettings {
 			'readonly' => true,
 			'methods'  => array( 'mollie' ),
 			'tooltip'  => __( 'The Webhook URL as sent with each transaction to receive automatic payment status updates on.', 'pronamic_ideal' ),
+		);
+
+		// Webhook status.
+		$fields[] = array(
+			'section'  => 'mollie_feedback',
+			'methods'  => array( 'mollie' ),
+			'title'    => __( 'Status', 'pronamic_ideal' ),
+			'type'     => 'description',
+			'callback' => array( 'Pronamic\WordPress\Pay\WebhookManager', 'settings_status' ),
 		);
 
 		return $fields;

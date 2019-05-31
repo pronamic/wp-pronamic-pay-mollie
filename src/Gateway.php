@@ -56,25 +56,37 @@ class Gateway extends Core_Gateway {
 	public function __construct( Config $config ) {
 		parent::__construct( $config );
 
-		$this->supports = array(
-			'payment_status_request',
-			'recurring_direct_debit',
-			'recurring_credit_card',
-			'recurring',
-		);
-
 		$this->set_method( self::METHOD_HTTP_REDIRECT );
 		$this->set_slug( self::SLUG );
 
+		// Supported features.
+		$this->supports = self::get_supported_features();
+
+		// Client.
 		$this->client = new Client( $config->api_key );
 		$this->client->set_mode( $config->mode );
 
+		// Mollie customer ID meta key.
 		if ( self::MODE_TEST === $config->mode ) {
 			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
 		}
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
+	}
+
+	/**
+	 * Get supported features.
+	 *
+	 * @return array
+	 */
+	public static function get_supported_features() {
+		return array(
+			'payment_status_request',
+			'recurring_direct_debit',
+			'recurring_credit_card',
+			'recurring',
+		);
 	}
 
 	/**
