@@ -52,7 +52,7 @@ class Listener {
 		$payment->add_note( $note );
 
 		// Log webhook request.
-		WebhookManager::log_payment( $payment );
+		do_action( 'pronamic_pay_webhook_log_payment', $payment );
 
 		// Update payment.
 		Plugin::update_payment( $payment, false );
