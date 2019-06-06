@@ -53,28 +53,6 @@ class IntegrationTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test config factory class name.
-	 */
-	public function test_get_config_factory_class() {
-		$class = $this->integration->get_config_factory_class();
-
-		$this->assertNotEmpty( $class );
-
-		$this->assertInternalType( 'string', $class );
-	}
-
-	/**
-	 * Test settings class name.
-	 */
-	public function test_get_settings_class() {
-		$class = $this->integration->get_settings_class();
-
-		$this->assertNotEmpty( $class );
-
-		$this->assertInternalType( 'string', $class );
-	}
-
-	/**
 	 * Test settings.
 	 */
 	public function test_get_settings() {
