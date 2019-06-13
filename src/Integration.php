@@ -36,7 +36,7 @@ class Integration extends AbstractIntegration {
 		$this->dashboard_url = 'https://www.mollie.com/dashboard/';
 		$this->register_url  = 'https://www.mollie.com/nl/signup/665327';
 		$this->provider      = 'mollie';
-		$this->supports = array(
+		$this->supports      = array(
 			'payment_status_request',
 			'webhook',
 			'webhook_log',
