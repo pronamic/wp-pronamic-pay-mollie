@@ -160,7 +160,7 @@ class Integration extends AbstractIntegration {
 	public function get_config( $post_id ) {
 		$config = new Config();
 
-		$config->post_id = intval( $post_id );
+		$config->id      = intval( $post_id );
 		$config->api_key = $this->get_meta( $post_id, 'mollie_api_key' );
 		$config->mode    = $this->get_meta( $post_id, 'mode' );
 

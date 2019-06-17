@@ -24,6 +24,13 @@ use Pronamic\WordPress\Pay\Core\GatewayConfig;
  */
 class Config extends GatewayConfig {
 	/**
+	 * ID.
+	 *
+	 * @var int
+	 */
+	public $id;
+
+	/**
 	 * API key.
 	 *
 	 * @var string|null
