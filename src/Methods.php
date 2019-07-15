@@ -73,6 +73,13 @@ class Methods {
 	const BITCOIN = 'bitcoin';
 
 	/**
+	 * Constant for the Giropay method.
+	 *
+	 * @var string
+	 */
+	const GIROPAY = 'giropay';
+
+	/**
 	 * Constant for the PayPal method.
 	 *
 	 * @var string
@@ -127,6 +134,7 @@ class Methods {
 		PaymentMethods::DIRECT_DEBIT_BANCONTACT => self::DIRECT_DEBIT,
 		PaymentMethods::DIRECT_DEBIT_IDEAL      => self::DIRECT_DEBIT,
 		PaymentMethods::DIRECT_DEBIT_SOFORT     => self::DIRECT_DEBIT,
+		PaymentMethods::GIROPAY                 => self::GIROPAY,
 		PaymentMethods::PAYPAL                  => self::PAYPAL,
 		PaymentMethods::SOFORT                  => self::SOFORT,
 		PaymentMethods::IDEAL                   => self::IDEAL,
