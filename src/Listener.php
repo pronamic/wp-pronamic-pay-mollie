@@ -11,7 +11,6 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Plugin;
-use Pronamic\WordPress\Pay\WebhookManager;
 
 /**
  * Title: Mollie listener
