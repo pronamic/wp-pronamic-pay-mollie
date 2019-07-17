@@ -513,7 +513,7 @@ class Gateway extends Core_Gateway {
 				break;
 		}
 
-		$next_payment_delivery_date->setTime( 10, 0, 0 );
+		$next_payment_delivery_date->setTime( 0, 0, 0 );
 
 		return $next_payment_delivery_date;
 	}
