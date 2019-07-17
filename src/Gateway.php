@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use DateInterval;
+use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
@@ -78,6 +80,8 @@ class Gateway extends Core_Gateway {
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
+
+		add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', array( $this, 'next_payment_delivery_date' ), 10, 2 );
 	}
 
 	/**
@@ -461,5 +465,56 @@ class Gateway extends Core_Gateway {
 			// Set customer ID as user meta.
 			$this->update_wp_user_customer_id( $subscription->user_id, $customer_id );
 		}
+	}
+
+	/**
+	 * Next payment delivery date.
+	 *
+	 * @param \DateTime $next_payment_delivery_date Next payment delivery date.
+	 * @param Payment   $payment                    Payment.
+	 *
+	 * @return \DateTime
+	 *
+	 * @throws \Exception
+	 */
+	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
+		// Check gateway.
+		$config_id = $payment->get_config_id();
+
+		$gateway_id = get_post_meta( $config_id, '_pronamic_gateway_id', true );
+
+		if ( self::SLUG !== $gateway_id ) {
+			return $next_payment_delivery_date;
+		}
+
+		// Check direct debit payment method.
+		if ( ! PaymentMethods::is_direct_debit_method( $payment->get_method() ) ) {
+			return $next_payment_delivery_date;
+		}
+
+		// Textual representation of the day of the week, Sunday through Saturday.
+		$day_of_week = $next_payment_delivery_date->format( 'l' );
+
+		switch ( $day_of_week ) {
+			case 'Monday':
+				$next_payment_delivery_date->sub( new DateInterval( 'P3D' ) );
+				break;
+
+			case 'Saturday':
+				$next_payment_delivery_date->sub( new DateInterval( 'P2D' ) );
+				break;
+
+			case 'Sunday':
+				$next_payment_delivery_date->sub( new DateInterval( 'P3D' ) );
+				break;
+
+			default:
+				$next_payment_delivery_date->sub( new DateInterval( 'P1D' ) );
+				break;
+		}
+
+		$next_payment_delivery_date->setTime( 10, 0, 0 );
+
+		return $next_payment_delivery_date;
 	}
 }
