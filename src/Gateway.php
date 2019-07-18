@@ -472,11 +472,9 @@ class Gateway extends Core_Gateway {
 	 */
 	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
 		// Check gateway.
-		$config_id = $payment->get_config_id();
+		$gateway_id = get_post_meta( $payment->get_config_id(), '_pronamic_gateway_id', true );
 
-		$gateway_id = get_post_meta( $config_id, '_pronamic_gateway_id', true );
-
-		if ( self::SLUG !== $gateway_id ) {
+		if ( 'mollie' !== $gateway_id ) {
 			return $next_payment_delivery_date;
 		}
 
