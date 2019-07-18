@@ -101,27 +101,29 @@ class Integration extends AbstractIntegration {
 	/**
 	 * Save post.
 	 *
-	 * @param array $data Data to save.
+	 * @link https://developer.wordpress.org/reference/functions/get_post_meta/
 	 *
-	 * @return array
+	 * @param int $post_id Post ID.
 	 */
-	public function save_post( $data ) {
-		// Set mode based on API key.
-		if ( isset( $data['_pronamic_gateway_mollie_api_key'], $data['_pronamic_gateway_mode'] ) ) {
-			$api_key = trim( $data['_pronamic_gateway_mollie_api_key'] );
+	public function save_post( $post_id ) {
+		$api_key = get_post_meta( $post_id, '_pronamic_gateway_mollie_api_key', true );
 
-			if ( empty( $api_key ) ) {
-				$mode = $data['_pronamic_gateway_mode'];
-			} elseif ( 'live_' === substr( $api_key, 0, 5 ) ) {
-				$mode = Gateway::MODE_LIVE;
-			} else {
-				$mode = Gateway::MODE_TEST;
-			}
-
-			$data['_pronamic_gateway_mode'] = $mode;
+		if ( ! is_string( $api_key ) ) {
+			return;
 		}
 
-		return $data;
+		$api_key_prefix = substr( $api_key, 0, 4 );
+
+		switch ( $api_key_prefix ) {
+			case 'live':
+				update_post_meta( $post_id, '_pronamic_gateway_mode', Gateway::MODE_LIVE );
+
+				return;
+			case 'test':
+				update_post_meta( $post_id, '_pronamic_gateway_mode', Gateway::MODE_TEST );
+
+				return;
+		}
 	}
 
 	/**
