@@ -181,6 +181,7 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 			PaymentMethods::DIRECT_DEBIT_IDEAL,
 			PaymentMethods::DIRECT_DEBIT_SOFORT,
+			PaymentMethods::EPS,
 			PaymentMethods::GIROPAY,
 			PaymentMethods::IDEAL,
 			PaymentMethods::KBC,
