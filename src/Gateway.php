@@ -467,8 +467,6 @@ class Gateway extends Core_Gateway {
 	 * @param Payment   $payment                    Payment.
 	 *
 	 * @return \DateTime
-	 *
-	 * @throws \Exception
 	 */
 	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
 		// Check gateway.
