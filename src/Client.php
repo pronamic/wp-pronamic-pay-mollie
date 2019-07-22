@@ -110,7 +110,8 @@ class Client {
 		// Response code.
 		$response_code = wp_remote_retrieve_response_code( $response );
 
-		if ( $expected_response_code != $response_code ) { // WPCS: loose comparison ok.
+		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+		if ( $expected_response_code != $response_code ) {
 			$this->error = new WP_Error( 'mollie_error', 'Unexpected response code.' );
 		}
 
