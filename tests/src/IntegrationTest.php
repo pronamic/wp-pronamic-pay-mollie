@@ -87,4 +87,30 @@ class IntegrationTest extends WP_UnitTestCase {
 
 		$this->assertTrue( $is_valid );
 	}
+
+	/**
+	 * Test config.
+	 */
+	public function test_config() {
+		$config = $this->integration->get_config( 99 );
+
+		$this->assertInstanceOf( __NAMESPACE__ . '\Config', $config );
+		$this->assertEquals( 99, $config->id );
+	}
+
+	/**
+	 * Test gateway.
+	 */
+	public function test_gateway() {
+		$gateway = $this->integration->get_gateway( 99 );
+
+		$this->assertInstanceOf( __NAMESPACE__ . '\Gateway', $gateway );
+	}
+
+	/**
+	 * Test settings.
+	 */
+	public function test_settings() {
+		$this->assertInternalType( 'array', $this->integration->get_settings_fields() );
+	}
 }

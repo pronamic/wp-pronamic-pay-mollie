@@ -61,6 +61,7 @@ class LocaleHelperTest extends \PHPUnit_Framework_TestCase {
 
 			// Other.
 			array( 'not existing locale', null ),
+			array( null, null ),
 		);
 	}
 }

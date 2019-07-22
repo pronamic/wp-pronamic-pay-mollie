@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use InvalidArgumentException;
+
 /**
  * Title: Mollie amount tests
  * Description:
@@ -50,5 +52,27 @@ class AmountTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( wp_json_encode( $json_data, JSON_PRETTY_PRINT ), $json_string );
 
 		$this->assertJsonStringEqualsJsonFile( $json_file, $json_string );
+	}
+
+	/**
+	 * Test from invalid object without currency.
+	 */
+	public function test_invalid_object_missing_currency() {
+		$object = (object) array( 'value' => '100.00' );
+
+		$this->expectException( InvalidArgumentException::class );
+
+		Amount::from_object( $object );
+	}
+
+	/**
+	 * Test from invalid object without value.
+	 */
+	public function test_from_object_missing_value() {
+		$object = (object) array( 'currency' => 'EUR' );
+
+		$this->expectException( InvalidArgumentException::class );
+
+		Amount::from_object( $object );
 	}
 }
