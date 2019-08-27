@@ -7,6 +7,12 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.7] - 2019-08-28
+- Updated packages.
+- Updated to Mollie API v2, with multicurrency support.
+- Added EPS payment method.
+- Added filter for subscription 'Next Payment Delivery Date'.
+
 ## [2.0.6] - 2019-01-18
 - Name is not required anymore when creating a new Mollie customer.
 
@@ -99,7 +105,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 - Add support for direct iDEAL payment method.
 
 ## [1.1.1] - 2015-03-03
-- Changed WordPress pay core library requirment from ~1.0.1 to >=1.0.1.
+- Changed WordPress pay core library requirment from `~1.0.1` to `>=1.0.1`.
 
 ## [1.1.0] - 2015-02-16
 - Improved support for unsupported Mollie locales.
@@ -108,7 +114,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.6...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.7...HEAD
+[2.0.7]: https://github.com/wp-pay-gateways/mollie/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/wp-pay-gateways/mollie/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/wp-pay-gateways/mollie/compare/2.0.4...2.0.5
 [2.0.4]: https://github.com/wp-pay-gateways/mollie/compare/2.0.3...2.0.4
