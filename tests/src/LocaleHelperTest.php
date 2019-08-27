@@ -1,4 +1,12 @@
 <?php
+/**
+ * Mollie locale test.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
@@ -9,13 +17,16 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.0.0
  * @see     https://www.mollie.nl/support/documentatie/betaaldiensten/ideal/en/
  */
 class LocaleHelperTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test transform.
+	 *
+	 * @param string $locale   Locale.
+	 * @param string $expected Expected locale.
 	 *
 	 * @dataProvider locale_matrix_provider
 	 */
@@ -25,22 +36,32 @@ class LocaleHelperTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( $expected, $mollie_locale );
 	}
 
+	/**
+	 * Locale data provider.
+	 *
+	 * @return array
+	 */
 	public function locale_matrix_provider() {
 		return array(
-			// English
-			array( 'en_US', Locales::EN ),
-			array( 'en_GB', Locales::EN ),
-			array( 'EN', Locales::EN ),
-			array( 'en', Locales::EN ),
-			// Dutch
-			array( 'nl_NL', Locales::NL ),
-			array( 'NL', Locales::NL ),
-			array( 'nl', Locales::NL ),
-			// Frisian
+			// English.
+			array( 'en_US', Locales::EN_US ),
+			array( 'en_us', Locales::EN_US ),
+			array( 'en_GB', null ),
+			array( 'EN', null ),
+			array( 'en', null ),
+
+			// Dutch.
+			array( 'nl_NL', Locales::NL_NL ),
+			array( 'NL', null ),
+			array( 'nl', null ),
+
+			// Frisian.
 			array( 'FY', null ),
 			array( 'fy', null ),
-			// Other
+
+			// Other.
 			array( 'not existing locale', null ),
+			array( null, null ),
 		);
 	}
 }

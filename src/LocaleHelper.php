@@ -1,4 +1,12 @@
 <?php
+/**
+ * Mollie locale helper.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
@@ -9,7 +17,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.0.0
  */
 class LocaleHelper {
@@ -27,22 +35,39 @@ class LocaleHelper {
 
 		// Supported locales.
 		$supported = array(
-			Locales::DE,
-			Locales::EN,
-			Locales::FR,
-			Locales::ES,
-			Locales::NL,
+			Locales::EN_US,
+			Locales::NL_NL,
+			Locales::NL_BE,
+			Locales::FR_FR,
+			Locales::FR_BE,
+			Locales::DE_DE,
+			Locales::DE_AT,
+			Locales::DE_CH,
+			Locales::ES_ES,
+			Locales::CA_ES,
+			Locales::PT_PT,
+			Locales::IT_IT,
+			Locales::NB_NO,
+			Locales::SV_SE,
+			Locales::FI_FI,
+			Locales::DA_DK,
+			Locales::IS_IS,
+			Locales::HU_HU,
+			Locales::PL_PL,
+			Locales::LV_LV,
+			Locales::LT_LT,
 		);
-
-		// Sub string.
-		$locale = substr( $locale, 0, 2 );
 
 		// Lower case.
 		$locale = strtolower( $locale );
 
 		// Is supported?
-		if ( in_array( $locale, $supported, true ) ) {
-			return $locale;
+		$supported_lowercase = array_map( 'strtolower', $supported );
+
+		$search = array_search( $locale, $supported_lowercase, true );
+
+		if ( false !== $search ) {
+			return $supported[ $search ];
 		}
 
 		return null;

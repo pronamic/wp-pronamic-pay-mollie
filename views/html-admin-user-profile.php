@@ -1,10 +1,14 @@
 <?php
-
 /**
  * User profile.
  *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ *
  * @since 1.1.6
- * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
+ * @link  https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
  */
 
 $data = array(
@@ -45,14 +49,14 @@ if ( empty( $customers ) ) {
 			<td>
 				<?php
 
-				$link = sprintf(
+				$mollie_link = sprintf(
 					'https://www.mollie.com/dashboard/customers/%s',
 					$customer->id
 				);
 
 				printf(
 					'<a href="%s">%s</a>',
-					esc_url( $link ),
+					esc_url( $mollie_link ),
 					esc_html( $customer->id )
 				);
 

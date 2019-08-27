@@ -1,4 +1,12 @@
 <?php
+/**
+ * Mollie methods.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
@@ -11,10 +19,17 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.0.0
  */
 class Methods {
+	/**
+	 * Constant for the Bancontact method.
+	 *
+	 * @var string
+	 */
+	const BANCONTACT = 'bancontact';
+
 	/**
 	 * Constant for the iDEAL method.
 	 *
@@ -37,13 +52,6 @@ class Methods {
 	const DIRECT_DEBIT = 'directdebit';
 
 	/**
-	 * Constant for the Mister Cash method.
-	 *
-	 * @var string
-	 */
-	const MISTERCASH = 'mistercash';
-
-	/**
 	 * Constant for the Sofort method.
 	 *
 	 * @var string
@@ -63,6 +71,20 @@ class Methods {
 	 * @var string
 	 */
 	const BITCOIN = 'bitcoin';
+
+	/**
+	 * Constant for the EPS method.
+	 *
+	 * @var string
+	 */
+	const EPS = 'eps';
+
+	/**
+	 * Constant for the Giropay method.
+	 *
+	 * @var string
+	 */
+	const GIROPAY = 'giropay';
 
 	/**
 	 * Constant for the PayPal method.
@@ -111,6 +133,7 @@ class Methods {
 	 * @var array
 	 */
 	private static $map = array(
+		PaymentMethods::BANCONTACT              => self::BANCONTACT,
 		PaymentMethods::BANK_TRANSFER           => self::BANKTRANSFER,
 		PaymentMethods::BITCOIN                 => self::BITCOIN,
 		PaymentMethods::CREDIT_CARD             => self::CREDITCARD,
@@ -118,8 +141,8 @@ class Methods {
 		PaymentMethods::DIRECT_DEBIT_BANCONTACT => self::DIRECT_DEBIT,
 		PaymentMethods::DIRECT_DEBIT_IDEAL      => self::DIRECT_DEBIT,
 		PaymentMethods::DIRECT_DEBIT_SOFORT     => self::DIRECT_DEBIT,
-		PaymentMethods::BANCONTACT              => self::MISTERCASH,
-		PaymentMethods::MISTER_CASH             => self::MISTERCASH,
+		PaymentMethods::EPS                     => self::EPS,
+		PaymentMethods::GIROPAY                 => self::GIROPAY,
 		PaymentMethods::PAYPAL                  => self::PAYPAL,
 		PaymentMethods::SOFORT                  => self::SOFORT,
 		PaymentMethods::IDEAL                   => self::IDEAL,
@@ -146,7 +169,11 @@ class Methods {
 			return self::$map[ $payment_method ];
 		}
 
-		return $default;
+		if ( ! empty( $default ) ) {
+			return $default;
+		}
+
+		return null;
 	}
 
 	/**

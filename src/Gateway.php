@@ -1,7 +1,17 @@
 <?php
+/**
+ * Mollie gateway.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use DateInterval;
+use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
@@ -15,17 +25,10 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.4
+ * @version 2.1.0
  * @since   1.1.0
  */
 class Gateway extends Core_Gateway {
-	/**
-	 * Slug of this gateway
-	 *
-	 * @var string
-	 */
-	const SLUG = 'mollie';
-
 	/**
 	 * Client.
 	 *
@@ -48,6 +51,9 @@ class Gateway extends Core_Gateway {
 	public function __construct( Config $config ) {
 		parent::__construct( $config );
 
+		$this->set_method( self::METHOD_HTTP_REDIRECT );
+
+		// Supported features.
 		$this->supports = array(
 			'payment_status_request',
 			'recurring_direct_debit',
@@ -55,18 +61,19 @@ class Gateway extends Core_Gateway {
 			'recurring',
 		);
 
-		$this->set_method( self::METHOD_HTTP_REDIRECT );
-		$this->set_slug( self::SLUG );
-
+		// Client.
 		$this->client = new Client( $config->api_key );
 		$this->client->set_mode( $config->mode );
 
+		// Mollie customer ID meta key.
 		if ( self::MODE_TEST === $config->mode ) {
 			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
 		}
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
+
+		add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', array( $this, 'next_payment_delivery_date' ), 10, 2 );
 	}
 
 	/**
@@ -100,14 +107,14 @@ class Gateway extends Core_Gateway {
 	public function get_available_payment_methods() {
 		$payment_methods = array();
 
-		// Set recurring types to get payment methods for.
-		$recurring_types = array( null, Recurring::RECURRING, Recurring::FIRST );
+		// Set sequence types to get payment methods for.
+		$sequence_types = array( Sequence::ONE_OFF, Sequence::RECURRING, Sequence::FIRST );
 
 		$results = array();
 
-		foreach ( $recurring_types as $recurring_type ) {
+		foreach ( $sequence_types as $sequence_type ) {
 			// Get active payment methods for Mollie account.
-			$result = $this->client->get_payment_methods( $recurring_type );
+			$result = $this->client->get_payment_methods( $sequence_type );
 
 			if ( ! $result ) {
 				$this->error = $this->client->get_error();
@@ -115,7 +122,7 @@ class Gateway extends Core_Gateway {
 				break;
 			}
 
-			if ( Recurring::FIRST === $recurring_type ) {
+			if ( Sequence::FIRST === $sequence_type ) {
 				foreach ( $result as $method => $title ) {
 					unset( $result[ $method ] );
 
@@ -166,6 +173,8 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 			PaymentMethods::DIRECT_DEBIT_IDEAL,
 			PaymentMethods::DIRECT_DEBIT_SOFORT,
+			PaymentMethods::EPS,
+			PaymentMethods::GIROPAY,
 			PaymentMethods::IDEAL,
 			PaymentMethods::KBC,
 			PaymentMethods::PAYPAL,
@@ -215,22 +224,16 @@ class Gateway extends Core_Gateway {
 	 * @param Payment $payment Payment.
 	 */
 	public function start( Payment $payment ) {
-		$request = new PaymentRequest();
-
-		// Locale.
-		$locale = null;
-
-		if ( null !== $payment->get_customer() ) {
-			$locale = $payment->get_customer()->get_locale();
-
-			$locale = LocaleHelper::transform( $locale );
-		}
-
-		$request->amount       = $payment->get_total_amount()->get_value();
+		$request               = new PaymentRequest();
+		$request->amount       = AmountTransformer::transform( $payment->get_total_amount() );
 		$request->description  = $payment->get_description();
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
-		$request->locale       = $locale;
+
+		// Locale.
+		if ( null !== $payment->get_customer() ) {
+			$request->locale = LocaleHelper::transform( $payment->get_customer()->get_locale() );
+		}
 
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
@@ -246,13 +249,13 @@ class Gateway extends Core_Gateway {
 		$subscription = $payment->get_subscription();
 
 		if ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) ) {
-			$request->recurring_type = $payment->get_recurring() ? Recurring::RECURRING : Recurring::FIRST;
+			$request->sequence_type = $payment->get_recurring() ? Sequence::RECURRING : Sequence::FIRST;
 
-			if ( Recurring::FIRST === $request->recurring_type ) {
+			if ( Sequence::FIRST === $request->sequence_type ) {
 				$payment_method = PaymentMethods::get_first_payment_method( $payment_method );
 			}
 
-			if ( Recurring::RECURRING === $request->recurring_type ) {
+			if ( Sequence::RECURRING === $request->sequence_type ) {
 				$payment->set_action_url( $payment->get_return_url() );
 			}
 		}
@@ -262,7 +265,6 @@ class Gateway extends Core_Gateway {
 
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
-			// If payment method is iDEAL we set the user chosen issuer ID.
 			$request->issuer = $payment->get_issuer();
 		}
 
@@ -286,8 +288,8 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Set action URL.
-		if ( isset( $result->links, $result->links->paymentUrl ) ) {
-			$payment->set_action_url( $result->links->paymentUrl );
+		if ( isset( $result->_links->checkout->href ) ) {
+			$payment->set_action_url( $result->_links->checkout->href );
 		}
 	}
 
@@ -456,5 +458,52 @@ class Gateway extends Core_Gateway {
 			// Set customer ID as user meta.
 			$this->update_wp_user_customer_id( $subscription->user_id, $customer_id );
 		}
+	}
+
+	/**
+	 * Next payment delivery date.
+	 *
+	 * @param \DateTime $next_payment_delivery_date Next payment delivery date.
+	 * @param Payment   $payment                    Payment.
+	 *
+	 * @return \DateTime
+	 */
+	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
+		// Check gateway.
+		$gateway_id = get_post_meta( $payment->get_config_id(), '_pronamic_gateway_id', true );
+
+		if ( 'mollie' !== $gateway_id ) {
+			return $next_payment_delivery_date;
+		}
+
+		// Check direct debit payment method.
+		if ( ! PaymentMethods::is_direct_debit_method( $payment->get_method() ) ) {
+			return $next_payment_delivery_date;
+		}
+
+		// Textual representation of the day of the week, Sunday through Saturday.
+		$day_of_week = $next_payment_delivery_date->format( 'l' );
+
+		switch ( $day_of_week ) {
+			case 'Monday':
+				$next_payment_delivery_date->sub( new DateInterval( 'P3D' ) );
+				break;
+
+			case 'Saturday':
+				$next_payment_delivery_date->sub( new DateInterval( 'P2D' ) );
+				break;
+
+			case 'Sunday':
+				$next_payment_delivery_date->sub( new DateInterval( 'P3D' ) );
+				break;
+
+			default:
+				$next_payment_delivery_date->sub( new DateInterval( 'P1D' ) );
+				break;
+		}
+
+		$next_payment_delivery_date->setTime( 0, 0, 0 );
+
+		return $next_payment_delivery_date;
 	}
 }

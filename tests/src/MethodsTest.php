@@ -1,6 +1,16 @@
 <?php
+/**
+ * Mollie methods test.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Mollie methods test
@@ -9,12 +19,16 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.0.0
  */
 class MethodsTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test transform.
+	 *
+	 * @param string      $payment_method WordPress Pay payment method.
+	 * @param string      $expected       Expected Mollie method.
+	 * @param string|null $default        Default payment method.
 	 *
 	 * @dataProvider method_matrix_provider
 	 */
@@ -24,19 +38,23 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( $expected, $mollie_method );
 	}
 
+	/**
+	 * Method data provider.
+	 *
+	 * @return array
+	 */
 	public function method_matrix_provider() {
 		return array(
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT, Methods::MISTERCASH ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::BANK_TRANSFER, Methods::BANKTRANSFER ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::BITCOIN, Methods::BITCOIN ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::CREDIT_CARD, Methods::CREDITCARD ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT, Methods::DIRECT_DEBIT ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT_IDEAL, Methods::DIRECT_DEBIT ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::MISTER_CASH, Methods::MISTERCASH ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::SOFORT, Methods::SOFORT ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::IDEAL, Methods::IDEAL ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::KBC, Methods::KBC ),
-			array( \Pronamic\WordPress\Pay\Core\PaymentMethods::BELFIUS, Methods::BELFIUS ),
+			array( PaymentMethods::BANCONTACT, Methods::BANCONTACT ),
+			array( PaymentMethods::BANK_TRANSFER, Methods::BANKTRANSFER ),
+			array( PaymentMethods::BITCOIN, Methods::BITCOIN ),
+			array( PaymentMethods::CREDIT_CARD, Methods::CREDITCARD ),
+			array( PaymentMethods::DIRECT_DEBIT, Methods::DIRECT_DEBIT ),
+			array( PaymentMethods::DIRECT_DEBIT_IDEAL, Methods::DIRECT_DEBIT ),
+			array( PaymentMethods::SOFORT, Methods::SOFORT ),
+			array( PaymentMethods::IDEAL, Methods::IDEAL ),
+			array( PaymentMethods::KBC, Methods::KBC ),
+			array( PaymentMethods::BELFIUS, Methods::BELFIUS ),
 			array( 'not existing payment method', null ),
 			array( 'not existing payment method', 'test', 'test' ),
 			array( null, null ),
@@ -49,6 +67,9 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test transform gateway method.
 	 *
+	 * @param string $payment_method Mollie payment method.
+	 * @param string $expected       Expected value.
+	 *
 	 * @dataProvider transform_gateway_method_matrix_provider
 	 */
 	public function test_transform_gateway_method( $payment_method, $expected ) {
@@ -57,10 +78,15 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( $expected, $wp_method );
 	}
 
+	/**
+	 * Transform gateway method data provider.
+	 *
+	 * @return array
+	 */
 	public function transform_gateway_method_matrix_provider() {
 		return array(
+			array( Methods::BANCONTACT, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT ),
 			array( Methods::BANKTRANSFER, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANK_TRANSFER ),
-			array( Methods::MISTERCASH, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT ),
 			array( Methods::BITCOIN, \Pronamic\WordPress\Pay\Core\PaymentMethods::BITCOIN ),
 			array( Methods::CREDITCARD, \Pronamic\WordPress\Pay\Core\PaymentMethods::CREDIT_CARD ),
 			array( Methods::DIRECT_DEBIT, \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT ),

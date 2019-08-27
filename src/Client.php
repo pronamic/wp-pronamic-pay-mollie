@@ -1,4 +1,12 @@
 <?php
+/**
+ * Mollie client.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay
+ */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
@@ -13,7 +21,7 @@ use WP_Error;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.1.0
  * @since   1.0.0
  */
 class Client {
@@ -22,7 +30,7 @@ class Client {
 	 *
 	 * @var string
 	 */
-	const API_URL = 'https://api.mollie.nl/v1/';
+	const API_URL = 'https://api.mollie.com/v2/';
 
 	/**
 	 * Mollie API Key ID
@@ -49,7 +57,7 @@ class Client {
 	/**
 	 * Constructs and initializes an Mollie client object
 	 *
-	 * @param string $api_key
+	 * @param string $api_key Mollie API key.
 	 */
 	public function __construct( $api_key ) {
 		$this->api_key = $api_key;
@@ -59,7 +67,7 @@ class Client {
 	 * Set mode
 	 *
 	 * @since 1.1.9
-	 * @param string $mode
+	 * @param string $mode Mode (test or live).
 	 */
 	public function set_mode( $mode ) {
 		$this->mode = $mode;
@@ -77,15 +85,15 @@ class Client {
 	/**
 	 * Send request with the specified action and parameters
 	 *
-	 * @param string $end_point
-	 * @param string $method
-	 * @param array $data
-	 * @param int $expected_response_code
+	 * @param string $end_point              Requested endpoint.
+	 * @param string $method                 HTTP method to use.
+	 * @param array  $data                   Request data.
+	 * @param int    $expected_response_code Expected response code.
 	 *
 	 * @return bool|object
 	 */
 	private function send_request( $end_point, $method = 'GET', array $data = array(), $expected_response_code = 200 ) {
-		// Request
+		// Request.
 		$url = self::API_URL . $end_point;
 
 		$response = wp_remote_request(
@@ -99,14 +107,15 @@ class Client {
 			)
 		);
 
-		// Response code
+		// Response code.
 		$response_code = wp_remote_retrieve_response_code( $response );
 
-		if ( $expected_response_code != $response_code ) { // WPCS: loose comparison ok.
+		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+		if ( $expected_response_code != $response_code ) {
 			$this->error = new WP_Error( 'mollie_error', 'Unexpected response code.' );
 		}
 
-		// Body
+		// Body.
 		$body = wp_remote_retrieve_body( $response );
 
 		$data = json_decode( $body );
@@ -117,9 +126,9 @@ class Client {
 			return false;
 		}
 
-		// Mollie error
-		if ( isset( $data->error, $data->error->message ) ) {
-			$this->error = new \WP_Error( 'mollie_error', $data->error->message, $data->error );
+		// Mollie error.
+		if ( isset( $data->status, $data->title, $data->detail ) ) {
+			$this->error = new \WP_Error( 'mollie_error', $data->detail, $data );
 
 			return false;
 		}
@@ -127,14 +136,33 @@ class Client {
 		return $data;
 	}
 
+	/**
+	 * Create payment.
+	 *
+	 * @param PaymentRequest $request Payment request.
+	 *
+	 * @return bool|object
+	 */
 	public function create_payment( PaymentRequest $request ) {
-		return $this->send_request( 'payments/', 'POST', $request->get_array(), 201 );
+		return $this->send_request( 'payments', 'POST', $request->get_array(), 201 );
 	}
 
+	/**
+	 * Get payments.
+	 *
+	 * @return bool|object
+	 */
 	public function get_payments() {
-		return $this->send_request( 'payments/', 'GET' );
+		return $this->send_request( 'payments', 'GET' );
 	}
 
+	/**
+	 * Get payment.
+	 *
+	 * @param string $payment_id Payment ID.
+	 *
+	 * @return bool|object
+	 */
 	public function get_payment( $payment_id ) {
 		if ( empty( $payment_id ) ) {
 			return false;
@@ -149,7 +177,7 @@ class Client {
 	 * @return array|bool
 	 */
 	public function get_issuers() {
-		$response = $this->send_request( 'issuers/', 'GET' );
+		$response = $this->send_request( 'methods/ideal?include=issuers', 'GET' );
 
 		if ( false === $response ) {
 			return false;
@@ -157,14 +185,12 @@ class Client {
 
 		$issuers = array();
 
-		if ( isset( $response->data ) ) {
-			foreach ( $response->data as $issuer ) {
-				if ( Methods::IDEAL === $issuer->method ) {
-					$id   = Security::filter( $issuer->id );
-					$name = Security::filter( $issuer->name );
+		if ( isset( $response->issuers ) ) {
+			foreach ( $response->issuers as $issuer ) {
+				$id   = Security::filter( $issuer->id );
+				$name = Security::filter( $issuer->name );
 
-					$issuers[ $id ] = $name;
-				}
+				$issuers[ $id ] = $name;
 			}
 		}
 
@@ -174,18 +200,18 @@ class Client {
 	/**
 	 * Get payment methods
 	 *
-	 * @param string $recurring_type Recurring type.
+	 * @param string $sequence_type Sequence type.
 	 *
 	 * @return array|bool
 	 */
-	public function get_payment_methods( $recurring_type = '' ) {
+	public function get_payment_methods( $sequence_type = '' ) {
 		$data = array();
 
-		if ( '' !== $recurring_type ) {
-			$data['recurringType'] = $recurring_type;
+		if ( '' !== $sequence_type ) {
+			$data['sequenceType'] = $sequence_type;
 		}
 
-		$response = $this->send_request( 'methods/', 'GET', $data );
+		$response = $this->send_request( 'methods', 'GET', $data );
 
 		if ( false === $response ) {
 			return false;
@@ -193,8 +219,8 @@ class Client {
 
 		$payment_methods = array();
 
-		if ( isset( $response->data ) ) {
-			foreach ( $response->data as $payment_method ) {
+		if ( isset( $response->_embedded->methods ) ) {
+			foreach ( $response->_embedded->methods as $payment_method ) {
 				$id   = Security::filter( $payment_method->id );
 				$name = Security::filter( $payment_method->description );
 
@@ -221,7 +247,7 @@ class Client {
 		}
 
 		$response = $this->send_request(
-			'customers/',
+			'customers',
 			'POST',
 			array(
 				'name'  => $name,
@@ -280,7 +306,7 @@ class Client {
 			return false;
 		}
 
-		return $this->send_request( 'customers/' . $customer_id . '/mandates?count=250', 'GET' );
+		return $this->send_request( 'customers/' . $customer_id . '/mandates?limit=250', 'GET' );
 	}
 
 	/**
@@ -300,7 +326,7 @@ class Client {
 
 		$mollie_method = Methods::transform( $payment_method );
 
-		foreach ( $mandates->data as $mandate ) {
+		foreach ( $mandates->_embedded as $mandate ) {
 			if ( $mollie_method !== $mandate->method ) {
 				continue;
 			}
@@ -330,7 +356,7 @@ class Client {
 
 		$mollie_method = Methods::transform( $payment_method );
 
-		foreach ( $mandates->data as $mandate ) {
+		foreach ( $mandates->_embedded as $mandate ) {
 			if ( $mollie_method !== $mandate->method ) {
 				continue;
 			}
@@ -344,7 +370,7 @@ class Client {
 			}
 
 			// @codingStandardsIgnoreStart
-			$valid_mandates[ $mandate->createdDatetime ] = $mandate;
+			$valid_mandates[ $mandate->createdAt ] = $mandate;
 			// @codingStandardsIgnoreEnd
 		}
 
@@ -354,7 +380,7 @@ class Client {
 			$mandate = array_shift( $valid_mandates );
 
 			// @codingStandardsIgnoreStart
-			$create_date = new DateTime( $mandate->createdDatetime );
+			$create_date = new DateTime( $mandate->createdAt );
 			// @codingStandardsIgnoreEnd
 
 			return $create_date;

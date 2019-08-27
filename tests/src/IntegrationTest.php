@@ -53,28 +53,6 @@ class IntegrationTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test config factory class name.
-	 */
-	public function test_get_config_factory_class() {
-		$class = $this->integration->get_config_factory_class();
-
-		$this->assertNotEmpty( $class );
-
-		$this->assertInternalType( 'string', $class );
-	}
-
-	/**
-	 * Test settings class name.
-	 */
-	public function test_get_settings_class() {
-		$class = $this->integration->get_settings_class();
-
-		$this->assertNotEmpty( $class );
-
-		$this->assertInternalType( 'string', $class );
-	}
-
-	/**
 	 * Test settings.
 	 */
 	public function test_get_settings() {
@@ -108,5 +86,31 @@ class IntegrationTest extends WP_UnitTestCase {
 		$is_valid = ( false !== filter_var( $url, FILTER_VALIDATE_URL ) );
 
 		$this->assertTrue( $is_valid );
+	}
+
+	/**
+	 * Test config.
+	 */
+	public function test_config() {
+		$config = $this->integration->get_config( 99 );
+
+		$this->assertInstanceOf( __NAMESPACE__ . '\Config', $config );
+		$this->assertEquals( 99, $config->id );
+	}
+
+	/**
+	 * Test gateway.
+	 */
+	public function test_gateway() {
+		$gateway = $this->integration->get_gateway( 99 );
+
+		$this->assertInstanceOf( __NAMESPACE__ . '\Gateway', $gateway );
+	}
+
+	/**
+	 * Test settings.
+	 */
+	public function test_settings() {
+		$this->assertInternalType( 'array', $this->integration->get_settings_fields() );
 	}
 }
