@@ -89,8 +89,8 @@ class Client {
 	 * @param string $method                 HTTP method to use.
 	 * @param array  $data                   Request data.
 	 * @param int    $expected_response_code Expected response code.
-	 *
 	 * @return bool|object
+	 * @throws \Exception Throws exception when error occurs.
 	 */
 	private function send_request( $end_point, $method = 'GET', array $data = array(), $expected_response_code = 200 ) {
 		// Request.
@@ -107,6 +107,10 @@ class Client {
 			)
 		);
 
+		if ( $response instanceof \WP_Error ) {
+			throw new \Exception( $response->get_error_message() );
+		}
+
 		// Response code.
 		$response_code = wp_remote_retrieve_response_code( $response );
 
@@ -120,10 +124,24 @@ class Client {
 
 		$data = json_decode( $body );
 
-		if ( ! is_object( $data ) ) {
-			$this->error = new WP_Error( 'mollie_error', 'Could not parse response.' );
+		// JSON error.
+		$json_error = \json_last_error();
 
-			return false;
+		if ( \JSON_ERROR_NONE !== $json_error ) {
+			throw new \Exception(
+				\sprintf( 'JSON: %s', \json_last_error_msg() ),
+				$json_error
+			);
+		}
+
+		// Object.
+		if ( ! \is_object( $data ) ) {
+			$code = \wp_remote_retrieve_response_code( $response );
+
+			throw new \Exception(
+				\sprintf( 'Could not JSON decode Mollie response to an object (HTTP Status Code: %s).', $code ),
+				\intval( $code )
+			);
 		}
 
 		// Mollie error.
