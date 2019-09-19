@@ -122,7 +122,7 @@ class Gateway extends Core_Gateway {
 				}
 			}
 
-			if ( false !== $result ) {
+			if ( is_array( $result ) ) {
 				$results = array_merge( $results, $result );
 			}
 		}
