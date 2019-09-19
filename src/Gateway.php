@@ -82,18 +82,10 @@ class Gateway extends Core_Gateway {
 	 * @see Pronamic_WP_Pay_Gateway::get_issuers()
 	 */
 	public function get_issuers() {
-		$groups = array();
-
-		$result = $this->client->get_issuers();
-
-		if ( ! $result ) {
-			$this->error = $this->client->get_error();
-
-			return $groups;
-		}
-
-		$groups[] = array(
-			'options' => $result,
+		$groups = array(
+			array(
+				'options' => $this->client->get_issuers(),
+			),
 		);
 
 		return $groups;
@@ -115,12 +107,6 @@ class Gateway extends Core_Gateway {
 		foreach ( $sequence_types as $sequence_type ) {
 			// Get active payment methods for Mollie account.
 			$result = $this->client->get_payment_methods( $sequence_type );
-
-			if ( ! $result ) {
-				$this->error = $this->client->get_error();
-
-				break;
-			}
 
 			if ( Sequence::FIRST === $sequence_type ) {
 				foreach ( $result as $method => $title ) {
@@ -271,12 +257,6 @@ class Gateway extends Core_Gateway {
 		// Create payment.
 		$result = $this->client->create_payment( $request );
 
-		if ( ! $result ) {
-			$this->error = $this->client->get_error();
-
-			return;
-		}
-
 		// Set transaction ID.
 		if ( isset( $result->id ) ) {
 			$payment->set_transaction_id( $result->id );
@@ -305,8 +285,6 @@ class Gateway extends Core_Gateway {
 
 		if ( ! $mollie_payment ) {
 			$payment->set_status( Core_Statuses::FAILURE );
-
-			$this->error = $this->client->get_error();
 
 			return;
 		}

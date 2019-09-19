@@ -96,17 +96,12 @@ class GatewayTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test if gateway error is set when there are no issuers.
+	 * Test if gateway exception is thrown when there are no issuers.
 	 */
-	public function test_get_issuers_error() {
+	public function test_get_issuers_exception() {
+		$this->expectException( \Pronamic\WordPress\Pay\GatewayException::class );
+
 		$issuers = $this->gateway->get_issuers();
-
-		// Assert instance of WP_Error.
-		if ( empty( $issuers ) ) {
-			$error = $this->gateway->get_error();
-
-			$this->assertInstanceOf( 'WP_Error', $error );
-		}
 	}
 
 	/**
