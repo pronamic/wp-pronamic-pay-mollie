@@ -210,10 +210,6 @@ class Client {
 
 		$response = $this->send_request( 'methods', 'GET', $data );
 
-		if ( false === $response ) {
-			return false;
-		}
-
 		$payment_methods = array();
 
 		if ( isset( $response->_embedded->methods ) ) {
@@ -252,10 +248,6 @@ class Client {
 			),
 			201
 		);
-
-		if ( false === $response ) {
-			return false;
-		}
 
 		if ( ! isset( $response->id ) ) {
 			return false;

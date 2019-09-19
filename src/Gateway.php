@@ -122,7 +122,9 @@ class Gateway extends Core_Gateway {
 				}
 			}
 
-			$results = array_merge( $results, $result );
+			if ( fall !== $result ) {
+				$results = array_merge( $results, $result );
+			}
 		}
 
 		// Transform to WordPress payment methods.
