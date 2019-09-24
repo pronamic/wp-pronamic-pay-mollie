@@ -230,8 +230,8 @@ class Integration extends AbstractIntegration {
 		/*
 		 * Subtract days from next payment date for earlier delivery.
 		 *
-		 * @link https://help.mollie.com/hc/nl/articles/115000785649-Wanneer-worden-incassobetalingen-verwerkt-en-uitbetaald-
-		 * @link https://help.mollie.com/hc/nl/articles/115002540294-Wat-zijn-de-doorlooptijden-van-de-verschillende-betaalmethodes-
+		 * @link https://help.mollie.com/hc/en-us/articles/115000785649-When-are-direct-debit-payments-processed-and-paid-out-
+		 * @link https://help.mollie.com/hc/en-us/articles/115002540294-What-are-the-payment-methods-processing-times-
 		 */
 		switch ( $day_of_week ) {
 			case 'Monday':
