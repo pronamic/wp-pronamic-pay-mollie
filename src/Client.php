@@ -99,7 +99,7 @@ class Client {
 
 		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 		if ( $expected_response_code != $response_code ) {
-			throw new \Pronamic\WordPress\Pay\GatewayException( 'mollie', 'Unexpected response code (' . $response_code . ').' );
+			throw new \Pronamic\WordPress\Pay\GatewayException( 'mollie', 'Unexpected response code (' . $response_code . ').', $response );
 		}
 
 		// Body.
