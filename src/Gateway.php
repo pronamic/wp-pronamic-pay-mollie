@@ -231,10 +231,15 @@ class Gateway extends Core_Gateway {
 		// Payment method.
 		$payment_method = $payment->get_method();
 
-		// Subscription.
-		$subscription = $payment->get_subscription();
+		// Recurring payment method.
+		$is_recurring_method = ( $payment->get_subscription() && PaymentMethods::is_recurring_method( $payment_method ) );
 
-		if ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) ) {
+		if ( false === $is_recurring_method ) {
+			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
+			$is_recurring_method = PaymentMethods::is_direct_debit_method( $payment_method );
+		}
+
+		if ( $is_recurring_method ) {
 			$request->sequence_type = $payment->get_recurring() ? Sequence::RECURRING : Sequence::FIRST;
 
 			if ( Sequence::FIRST === $request->sequence_type ) {
