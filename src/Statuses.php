@@ -18,6 +18,8 @@ use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_Statuses;
  * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
  *
+ * @link https://docs.mollie.com/payments/status-changes
+ *
  * @author  Remco Tolsma
  * @version 2.1.0
  * @since   1.0.0
@@ -74,14 +76,6 @@ class Statuses {
 	const PENDING = 'pending';
 
 	/**
-	 * Active.
-	 *
-	 * @since 1.1.9
-	 * @var string
-	 */
-	const ACTIVE = 'active';
-
-	/**
 	 * Transform an Mollie state to an more global status.
 	 *
 	 * @param string $status Mollie status.
@@ -96,9 +90,6 @@ class Statuses {
 
 			case self::CANCELED:
 				return Core_Statuses::CANCELLED;
-
-			case self::ACTIVE:
-				return Core_Statuses::ACTIVE;
 
 			case self::PAID:
 				return Core_Statuses::SUCCESS;
