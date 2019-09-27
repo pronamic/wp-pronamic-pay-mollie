@@ -44,12 +44,12 @@ class StatusesTest extends \PHPUnit_Framework_TestCase {
 	public function status_matrix_provider() {
 		return array(
 			array( Statuses::AUTHORIZED, null ),
-			array( Statuses::OPEN, \Pronamic\WordPress\Pay\Core\Statuses::OPEN ),
-			array( Statuses::CANCELED, \Pronamic\WordPress\Pay\Core\Statuses::CANCELLED ),
-			array( Statuses::ACTIVE, \Pronamic\WordPress\Pay\Core\Statuses::ACTIVE ),
-			array( Statuses::PAID, \Pronamic\WordPress\Pay\Core\Statuses::SUCCESS ),
-			array( Statuses::EXPIRED, \Pronamic\WordPress\Pay\Core\Statuses::EXPIRED ),
-			array( Statuses::FAILED, \Pronamic\WordPress\Pay\Core\Statuses::FAILURE ),
+			array( Statuses::OPEN, \Pronamic\WordPress\Pay\Payments\PaymentStatus::OPEN ),
+			array( Statuses::CANCELED, \Pronamic\WordPress\Pay\Payments\PaymentStatus::CANCELLED ),
+			array( Statuses::ACTIVE, \Pronamic\WordPress\Pay\Payments\PaymentStatus::ACTIVE ),
+			array( Statuses::PAID, \Pronamic\WordPress\Pay\Payments\PaymentStatus::SUCCESS ),
+			array( Statuses::EXPIRED, \Pronamic\WordPress\Pay\Payments\PaymentStatus::EXPIRED ),
+			array( Statuses::FAILED, \Pronamic\WordPress\Pay\Payments\PaymentStatus::FAILURE ),
 			array( 'not existing status', null ),
 		);
 	}
