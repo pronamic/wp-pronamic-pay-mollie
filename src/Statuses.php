@@ -10,13 +10,15 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 
 /**
  * Title: Mollie statuses constants
  * Description:
  * Copyright: 2005-2019 Pronamic
  * Company: Pronamic
+ *
+ * @link https://docs.mollie.com/payments/status-changes
  *
  * @author  Remco Tolsma
  * @version 2.1.0
@@ -74,14 +76,6 @@ class Statuses {
 	const PENDING = 'pending';
 
 	/**
-	 * Active.
-	 *
-	 * @since 1.1.9
-	 * @var string
-	 */
-	const ACTIVE = 'active';
-
-	/**
 	 * Transform an Mollie state to an more global status.
 	 *
 	 * @param string $status Mollie status.
@@ -92,23 +86,15 @@ class Statuses {
 		switch ( $status ) {
 			case self::PENDING:
 			case self::OPEN:
-				return Core_Statuses::OPEN;
-
+				return PaymentStatus::OPEN;
 			case self::CANCELED:
-				return Core_Statuses::CANCELLED;
-
-			case self::ACTIVE:
-				return Core_Statuses::ACTIVE;
-
+				return PaymentStatus::CANCELLED;
 			case self::PAID:
-				return Core_Statuses::SUCCESS;
-
+				return PaymentStatus::SUCCESS;
 			case self::EXPIRED:
-				return Core_Statuses::EXPIRED;
-
+				return PaymentStatus::EXPIRED;
 			case self::FAILED:
-				return Core_Statuses::FAILURE;
-
+				return PaymentStatus::FAILURE;
 			default:
 				return null;
 		}

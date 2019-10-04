@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Gateways\Common\AbstractIntegration;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use WP_User;
@@ -21,7 +22,7 @@ use WP_User;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.0
+ * @version 2.0.8
  * @since   1.0.0
  */
 class Integration extends AbstractIntegration {
@@ -60,6 +61,13 @@ class Integration extends AbstractIntegration {
 			if ( ! has_action( 'edit_user_profile', $function ) ) {
 				add_action( 'edit_user_profile', $function );
 			}
+		}
+
+		// Filters.
+		$function = array( $this, 'next_payment_delivery_date' );
+
+		if ( ! \has_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function ) ) {
+			\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function, 10, 2 );
 		}
 
 		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
@@ -177,5 +185,74 @@ class Integration extends AbstractIntegration {
 	 */
 	public function get_gateway( $post_id ) {
 		return new Gateway( $this->get_config( $post_id ) );
+	}
+
+	/**
+	 * Next payment delivery date.
+	 *
+	 * @param \DateTime $next_payment_delivery_date Next payment delivery date.
+	 * @param Payment   $payment                    Payment.
+	 *
+	 * @return \DateTime
+	 */
+	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
+		// Check gateway.
+		$gateway_id = \get_post_meta( $payment->get_config_id(), '_pronamic_gateway_id', true );
+
+		if ( 'mollie' !== $gateway_id ) {
+			return $next_payment_delivery_date;
+		}
+
+		// Check direct debit payment method.
+		if ( ! PaymentMethods::is_direct_debit_method( $payment->get_method() ) ) {
+			return $next_payment_delivery_date;
+		}
+
+		// Check subscription.
+		$subscription = $payment->get_subscription();
+
+		if ( null === $subscription ) {
+			return $next_payment_delivery_date;
+		}
+
+		// Base delivery date on next payment date.
+		$next_payment_date = $subscription->get_next_payment_date();
+
+		if ( null === $next_payment_date ) {
+			return $next_payment_delivery_date;
+		}
+
+		$next_payment_delivery_date = clone $next_payment_date;
+
+		// Textual representation of the day of the week, Sunday through Saturday.
+		$day_of_week = $next_payment_delivery_date->format( 'l' );
+
+		/*
+		 * Subtract days from next payment date for earlier delivery.
+		 *
+		 * @link https://help.mollie.com/hc/en-us/articles/115000785649-When-are-direct-debit-payments-processed-and-paid-out-
+		 * @link https://help.mollie.com/hc/en-us/articles/115002540294-What-are-the-payment-methods-processing-times-
+		 */
+		switch ( $day_of_week ) {
+			case 'Monday':
+				$next_payment_delivery_date->sub( new \DateInterval( 'P3D' ) );
+				break;
+
+			case 'Saturday':
+				$next_payment_delivery_date->sub( new \DateInterval( 'P2D' ) );
+				break;
+
+			case 'Sunday':
+				$next_payment_delivery_date->sub( new \DateInterval( 'P3D' ) );
+				break;
+
+			default:
+				$next_payment_delivery_date->sub( new \DateInterval( 'P1D' ) );
+				break;
+		}
+
+		$next_payment_delivery_date->setTime( 0, 0, 0 );
+
+		return $next_payment_delivery_date;
 	}
 }

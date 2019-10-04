@@ -15,7 +15,7 @@ use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
-use Pronamic\WordPress\Pay\Core\Statuses as Core_Statuses;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
 /**
@@ -25,7 +25,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.0
+ * @version 2.0.8
  * @since   1.1.0
  */
 class Gateway extends Core_Gateway {
@@ -72,8 +72,6 @@ class Gateway extends Core_Gateway {
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
-
-		add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', array( $this, 'next_payment_delivery_date' ), 10, 2 );
 	}
 
 	/**
@@ -136,7 +134,9 @@ class Gateway extends Core_Gateway {
 				}
 			}
 
-			$results = array_merge( $results, $result );
+			if ( is_array( $result ) ) {
+				$results = array_merge( $results, $result );
+			}
 		}
 
 		// Transform to WordPress payment methods.
@@ -245,10 +245,15 @@ class Gateway extends Core_Gateway {
 		// Payment method.
 		$payment_method = $payment->get_method();
 
-		// Subscription.
-		$subscription = $payment->get_subscription();
+		// Recurring payment method.
+		$is_recurring_method = ( $payment->get_subscription() && PaymentMethods::is_recurring_method( $payment_method ) );
 
-		if ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) ) {
+		if ( false === $is_recurring_method ) {
+			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
+			$is_recurring_method = PaymentMethods::is_direct_debit_method( $payment_method );
+		}
+
+		if ( $is_recurring_method ) {
 			$request->sequence_type = $payment->get_recurring() ? Sequence::RECURRING : Sequence::FIRST;
 
 			if ( Sequence::FIRST === $request->sequence_type ) {
@@ -304,7 +309,7 @@ class Gateway extends Core_Gateway {
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
 
 		if ( ! $mollie_payment ) {
-			$payment->set_status( Core_Statuses::FAILURE );
+			$payment->set_status( PaymentStatus::FAILURE );
 
 			$this->error = $this->client->get_error();
 
@@ -458,52 +463,5 @@ class Gateway extends Core_Gateway {
 			// Set customer ID as user meta.
 			$this->update_wp_user_customer_id( $subscription->user_id, $customer_id );
 		}
-	}
-
-	/**
-	 * Next payment delivery date.
-	 *
-	 * @param \DateTime $next_payment_delivery_date Next payment delivery date.
-	 * @param Payment   $payment                    Payment.
-	 *
-	 * @return \DateTime
-	 */
-	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
-		// Check gateway.
-		$gateway_id = get_post_meta( $payment->get_config_id(), '_pronamic_gateway_id', true );
-
-		if ( 'mollie' !== $gateway_id ) {
-			return $next_payment_delivery_date;
-		}
-
-		// Check direct debit payment method.
-		if ( ! PaymentMethods::is_direct_debit_method( $payment->get_method() ) ) {
-			return $next_payment_delivery_date;
-		}
-
-		// Textual representation of the day of the week, Sunday through Saturday.
-		$day_of_week = $next_payment_delivery_date->format( 'l' );
-
-		switch ( $day_of_week ) {
-			case 'Monday':
-				$next_payment_delivery_date->sub( new DateInterval( 'P3D' ) );
-				break;
-
-			case 'Saturday':
-				$next_payment_delivery_date->sub( new DateInterval( 'P2D' ) );
-				break;
-
-			case 'Sunday':
-				$next_payment_delivery_date->sub( new DateInterval( 'P3D' ) );
-				break;
-
-			default:
-				$next_payment_delivery_date->sub( new DateInterval( 'P1D' ) );
-				break;
-		}
-
-		$next_payment_delivery_date->setTime( 0, 0, 0 );
-
-		return $next_payment_delivery_date;
 	}
 }

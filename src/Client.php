@@ -21,7 +21,7 @@ use WP_Error;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.0
+ * @version 2.0.8
  * @since   1.0.0
  */
 class Client {
@@ -89,8 +89,8 @@ class Client {
 	 * @param string $method                 HTTP method to use.
 	 * @param array  $data                   Request data.
 	 * @param int    $expected_response_code Expected response code.
-	 *
 	 * @return bool|object
+	 * @throws \Exception Throws exception when error occurs.
 	 */
 	private function send_request( $end_point, $method = 'GET', array $data = array(), $expected_response_code = 200 ) {
 		// Request.
@@ -107,12 +107,23 @@ class Client {
 			)
 		);
 
+		if ( $response instanceof \WP_Error ) {
+			throw new \Exception( $response->get_error_message() );
+		}
+
 		// Response code.
 		$response_code = wp_remote_retrieve_response_code( $response );
 
 		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 		if ( $expected_response_code != $response_code ) {
-			$this->error = new WP_Error( 'mollie_error', 'Unexpected response code.' );
+			$this->error = new WP_Error(
+				'mollie_error',
+				sprintf(
+					'Unexpected response code, expcted: %s, actually: %s.',
+					$expected_response_code,
+					$response_code
+				)
+			);
 		}
 
 		// Body.
@@ -120,13 +131,27 @@ class Client {
 
 		$data = json_decode( $body );
 
-		if ( ! is_object( $data ) ) {
-			$this->error = new WP_Error( 'mollie_error', 'Could not parse response.' );
+		// JSON error.
+		$json_error = \json_last_error();
 
-			return false;
+		if ( \JSON_ERROR_NONE !== $json_error ) {
+			throw new \Exception(
+				\sprintf( 'JSON: %s', \json_last_error_msg() ),
+				$json_error
+			);
 		}
 
-		// Mollie error.
+		// Object.
+		if ( ! \is_object( $data ) ) {
+			$code = \wp_remote_retrieve_response_code( $response );
+
+			throw new \Exception(
+				\sprintf( 'Could not JSON decode Mollie response to an object (HTTP Status Code: %s).', $code ),
+				\intval( $code )
+			);
+		}
+
+		// Mollie error from JSON response.
 		if ( isset( $data->status, $data->title, $data->detail ) ) {
 			$this->error = new \WP_Error( 'mollie_error', $data->detail, $data );
 
@@ -213,10 +238,6 @@ class Client {
 
 		$response = $this->send_request( 'methods', 'GET', $data );
 
-		if ( false === $response ) {
-			return false;
-		}
-
 		$payment_methods = array();
 
 		if ( isset( $response->_embedded->methods ) ) {
@@ -255,10 +276,6 @@ class Client {
 			),
 			201
 		);
-
-		if ( false === $response ) {
-			return false;
-		}
 
 		if ( ! isset( $response->id ) ) {
 			return false;
