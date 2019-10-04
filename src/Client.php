@@ -12,6 +12,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\XML\Security;
+use WP_Error;
 
 /**
  * Title: Mollie
@@ -47,6 +48,13 @@ class Client {
 	private $mode;
 
 	/**
+	 * Error
+	 *
+	 * @var WP_Error
+	 */
+	private $error;
+
+	/**
 	 * Constructs and initializes an Mollie client object
 	 *
 	 * @param string $api_key Mollie API key.
@@ -66,6 +74,15 @@ class Client {
 	}
 
 	/**
+	 * Error
+	 *
+	 * @return WP_Error
+	 */
+	public function get_error() {
+		return $this->error;
+	}
+
+	/**
 	 * Send request with the specified action and parameters
 	 *
 	 * @param string $end_point              Requested endpoint.
@@ -73,7 +90,7 @@ class Client {
 	 * @param array  $data                   Request data.
 	 * @param int    $expected_response_code Expected response code.
 	 * @return bool|object
-	 * @throws \Pronamic\WordPress\Pay\GatewayException Throws exception when error occurs.
+	 * @throws \Exception Throws exception when error occurs.
 	 */
 	private function send_request( $end_point, $method = 'GET', array $data = array(), $expected_response_code = 200 ) {
 		// Request.
@@ -91,7 +108,15 @@ class Client {
 		);
 
 		if ( $response instanceof \WP_Error ) {
-			throw new \Pronamic\WordPress\Pay\GatewayException( 'mollie', $response->get_error_message() );
+			throw new \Exception( $response->get_error_message() );
+		}
+
+		// Response code.
+		$response_code = wp_remote_retrieve_response_code( $response );
+
+		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+		if ( $expected_response_code != $response_code ) {
+			$this->error = new WP_Error( 'mollie_error', 'Unexpected response code.' );
 		}
 
 		// Body.
@@ -103,8 +128,7 @@ class Client {
 		$json_error = \json_last_error();
 
 		if ( \JSON_ERROR_NONE !== $json_error ) {
-			throw new \Pronamic\WordPress\Pay\GatewayException(
-				'mollie',
+			throw new \Exception(
 				\sprintf( 'JSON: %s', \json_last_error_msg() ),
 				$json_error
 			);
@@ -114,8 +138,7 @@ class Client {
 		if ( ! \is_object( $data ) ) {
 			$code = \wp_remote_retrieve_response_code( $response );
 
-			throw new \Pronamic\WordPress\Pay\GatewayException(
-				'mollie',
+			throw new \Exception(
 				\sprintf( 'Could not JSON decode Mollie response to an object (HTTP Status Code: %s).', $code ),
 				\intval( $code )
 			);
@@ -123,15 +146,9 @@ class Client {
 
 		// Mollie error from JSON response.
 		if ( isset( $data->status, $data->title, $data->detail ) ) {
-			throw new \Pronamic\WordPress\Pay\GatewayException( 'mollie', sprintf( '%1$s - %2$s', $data->title, $data->detail ), $data );
-		}
+			$this->error = new \WP_Error( 'mollie_error', $data->detail, $data );
 
-		// Response code.
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
-		if ( $expected_response_code != $response_code ) {
-			throw new \Pronamic\WordPress\Pay\GatewayException( 'mollie', 'Unexpected response code (' . $response_code . ').', $response );
+			return false;
 		}
 
 		return $data;
@@ -179,6 +196,10 @@ class Client {
 	 */
 	public function get_issuers() {
 		$response = $this->send_request( 'methods/ideal?include=issuers', 'GET' );
+
+		if ( false === $response ) {
+			return false;
+		}
 
 		$issuers = array();
 
@@ -270,9 +291,13 @@ class Client {
 			return false;
 		}
 
-		try {
-			$response = $this->send_request( 'customers/' . $customer_id, 'GET', array(), 200 );
-		} catch ( \Pronamic\WordPress\Pay\GatewayException $e ) {
+		$response = $this->send_request( 'customers/' . $customer_id, 'GET', array(), 200 );
+
+		if ( false === $response ) {
+			return false;
+		}
+
+		if ( is_wp_error( $this->error ) ) {
 			return false;
 		}
 
