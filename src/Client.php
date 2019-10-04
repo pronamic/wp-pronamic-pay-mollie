@@ -21,7 +21,7 @@ use WP_Error;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.0
+ * @version 2.0.8
  * @since   1.0.0
  */
 class Client {
@@ -116,7 +116,14 @@ class Client {
 
 		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 		if ( $expected_response_code != $response_code ) {
-			$this->error = new WP_Error( 'mollie_error', 'Unexpected response code.' );
+			$this->error = new WP_Error(
+				'mollie_error',
+				sprintf(
+					'Unexpected response code, expcted: %s, actually: %s.',
+					$expected_response_code,
+					$response_code
+				)
+			);
 		}
 
 		// Body.

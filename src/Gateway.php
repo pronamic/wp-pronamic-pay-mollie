@@ -15,7 +15,7 @@ use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
-use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_Statuses;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
 /**
@@ -25,7 +25,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.0
+ * @version 2.0.8
  * @since   1.1.0
  */
 class Gateway extends Core_Gateway {
@@ -309,7 +309,7 @@ class Gateway extends Core_Gateway {
 		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
 
 		if ( ! $mollie_payment ) {
-			$payment->set_status( Core_Statuses::FAILURE );
+			$payment->set_status( PaymentStatus::FAILURE );
 
 			$this->error = $this->client->get_error();
 

@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
+
 /**
  * Title: Mollie statuses constants tests
  * Description:
@@ -44,11 +46,11 @@ class StatusesTest extends \PHPUnit_Framework_TestCase {
 	public function status_matrix_provider() {
 		return array(
 			array( Statuses::AUTHORIZED, null ),
-			array( Statuses::OPEN, \Pronamic\WordPress\Pay\Payments\PaymentStatus::OPEN ),
-			array( Statuses::CANCELED, \Pronamic\WordPress\Pay\Payments\PaymentStatus::CANCELLED ),
-			array( Statuses::PAID, \Pronamic\WordPress\Pay\Payments\PaymentStatus::SUCCESS ),
-			array( Statuses::EXPIRED, \Pronamic\WordPress\Pay\Payments\PaymentStatus::EXPIRED ),
-			array( Statuses::FAILED, \Pronamic\WordPress\Pay\Payments\PaymentStatus::FAILURE ),
+			array( Statuses::OPEN, PaymentStatus::OPEN ),
+			array( Statuses::CANCELED, PaymentStatus::CANCELLED ),
+			array( Statuses::PAID, PaymentStatus::SUCCESS ),
+			array( Statuses::EXPIRED, PaymentStatus::EXPIRED ),
+			array( Statuses::FAILED, PaymentStatus::FAILURE ),
 			array( 'not existing status', null ),
 		);
 	}

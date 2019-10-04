@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.0.8] - 2019-10-04
+- Added response data to error for unexpected response code.
+- Moved next payment delivery date filter from gateway to integration class.
+- Throw exception when Mollie response is not what we expect.
+
 ## [2.0.7] - 2019-08-28
 - Updated packages.
 - Updated to Mollie API v2, with multicurrency support.
@@ -114,7 +119,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.7...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.8...HEAD
+[2.0.8]: https://github.com/wp-pay-gateways/mollie/compare/2.0.7...2.0.8
 [2.0.7]: https://github.com/wp-pay-gateways/mollie/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/wp-pay-gateways/mollie/compare/2.0.5...2.0.6
 [2.0.5]: https://github.com/wp-pay-gateways/mollie/compare/2.0.4...2.0.5

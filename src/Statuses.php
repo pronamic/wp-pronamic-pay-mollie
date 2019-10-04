@@ -10,7 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_Statuses;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 
 /**
  * Title: Mollie statuses constants
@@ -86,20 +86,15 @@ class Statuses {
 		switch ( $status ) {
 			case self::PENDING:
 			case self::OPEN:
-				return Core_Statuses::OPEN;
-
+				return PaymentStatus::OPEN;
 			case self::CANCELED:
-				return Core_Statuses::CANCELLED;
-
+				return PaymentStatus::CANCELLED;
 			case self::PAID:
-				return Core_Statuses::SUCCESS;
-
+				return PaymentStatus::SUCCESS;
 			case self::EXPIRED:
-				return Core_Statuses::EXPIRED;
-
+				return PaymentStatus::EXPIRED;
 			case self::FAILED:
-				return Core_Statuses::FAILURE;
-
+				return PaymentStatus::FAILURE;
 			default:
 				return null;
 		}
