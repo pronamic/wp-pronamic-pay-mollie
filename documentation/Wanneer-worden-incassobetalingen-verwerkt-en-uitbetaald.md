@@ -24,7 +24,7 @@ Betalingen die voor 16:00 uur zijn aangeleverd, worden de eerst volgende werkdag
 > 
 > Met vriendelijke groet,
 > 
-> Remco Tolsma
+> Remco Tolsma  
 > Pronamic
 
 **Martin** from **Mollie** to **Pronamic** on **4 okt. 13:00 CEST**:
@@ -39,7 +39,7 @@ Betalingen die voor 16:00 uur zijn aangeleverd, worden de eerst volgende werkdag
 > 
 > Mocht u nog vragen hebben, neem dan gerust contact met ons op of raadpleeg ons helpcenter voor meer informatie.
 > 
-> Met vriendelijke groet,
+> Met vriendelijke groet,  
 > Martin
 
 **Remco** from **Pronamic** to **Mollie** on **7 okt. 13:43 CEST**:
@@ -74,7 +74,7 @@ Betalingen die voor 16:00 uur zijn aangeleverd, worden de eerst volgende werkdag
 > 
 > Mocht u nog vragen hebben, neem dan gerust contact met ons op of raadpleeg ons helpcenter voor meer informatie.
 > 
-> Met vriendelijke groet,
+> Met vriendelijke groet,  
 > Martin
 
 ![Mollie - Payment status flow](payment-status-flow@2x.png)
