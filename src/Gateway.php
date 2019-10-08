@@ -273,6 +273,19 @@ class Gateway extends Core_Gateway {
 			$request->issuer = $payment->get_issuer();
 		}
 
+		// Due date.
+		$due_date_days = \filter_var( $this->config->due_date_days, \FILTER_SANITIZE_NUMBER_INT );
+
+		if ( Methods::BANKTRANSFER === $request->method && ! empty( $due_date_days ) ) {
+			$date = new DateTime();
+
+			$interval_spec = sprintf( 'P%dD', $due_date_days );
+
+			$date->add( new \DateInterval( $interval_spec ) );
+
+			$request->set_due_date( $date->format( 'Y-m-d' ) );
+		}
+
 		// Create payment.
 		$result = $this->client->create_payment( $request );
 
@@ -290,6 +303,11 @@ class Gateway extends Core_Gateway {
 		// Set status.
 		if ( isset( $result->status ) ) {
 			$payment->set_status( Statuses::transform( $result->status ) );
+		}
+
+		// Set transfer reference.
+		if ( isset( $result->details->transferReference ) ) {
+			$payment->set_meta( 'mollie_transfer_reference', $result->details->transferReference );
 		}
 
 		// Set action URL.

@@ -92,6 +92,24 @@ class Integration extends AbstractIntegration {
 			'tooltip'  => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
 		);
 
+		// Bank transfer due date days.
+		$fields[] = array(
+			'section'  => 'advanced',
+			'filter'   => \FILTER_SANITIZE_NUMBER_INT,
+			'meta_key' => '_pronamic_gateway_mollie_due_date_days',
+			'title'    => _x( 'Bank transfer due date days', 'mollie', 'pronamic_ideal' ),
+			'type'     => 'text',
+			'classes'  => array( 'regular-text' ),
+			'tooltip'  => __( 'Number of days after which a bank transfer payment expires.', 'pronamic_ideal' ),
+			'description' => sprintf(
+				/* translators: 1: <code>1</code>, 2: <code>100</code>, 3: <code>12</code> */
+				__( 'Minimum %1$s and maximum %2$s days. Default: %3$s days.', 'pronamic_ideal' ),
+				sprintf( '<code>%s</code>', '1' ),
+				sprintf( '<code>%s</code>', '100' ),
+				sprintf( '<code>%s</code>', '12' )
+			),
+		);
+
 		// Webhook.
 		$fields[] = array(
 			'section'  => 'feedback',
@@ -170,9 +188,10 @@ class Integration extends AbstractIntegration {
 	public function get_config( $post_id ) {
 		$config = new Config();
 
-		$config->id      = intval( $post_id );
-		$config->api_key = $this->get_meta( $post_id, 'mollie_api_key' );
-		$config->mode    = $this->get_meta( $post_id, 'mode' );
+		$config->id            = intval( $post_id );
+		$config->api_key       = $this->get_meta( $post_id, 'mollie_api_key' );
+		$config->mode          = $this->get_meta( $post_id, 'mode' );
+		$config->due_date_days = $this->get_meta( $post_id, 'mollie_due_date_days' );
 
 		return $config;
 	}

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Added advanced gateway setting for bank transfer due date days.
 
 ## [2.0.8] - 2019-10-04
 - Added response data to error for unexpected response code.

@@ -104,6 +104,15 @@ class PaymentRequest {
 	public $issuer;
 
 	/**
+	 * The date the payment should expire, in YYYY-MM-DD format. Please note: the minimum date
+	 * is tomorrow and the maximum date is 100 days after tomorrow.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @var string
+	 */
+	private $due_date;
+
+	/**
 	 * Customer ID for Mollie checkout.
 	 *
 	 * @link https://www.mollie.com/nl/docs/checkout
@@ -121,6 +130,24 @@ class PaymentRequest {
 	public $sequence_type;
 
 	/**
+	 * Get due date.
+	 *
+	 * @return string
+	 */
+	public function get_due_date() {
+		return $this->due_date;
+	}
+
+	/**
+	 * Set due date.
+	 *
+	 * @param string $due_date
+	 */
+	public function set_due_date( $due_date ) {
+		$this->due_date = $due_date;
+	}
+
+	/**
 	 * Get array of this Mollie payment request object.
 	 *
 	 * @return array
@@ -135,6 +162,7 @@ class PaymentRequest {
 			'locale'       => $this->locale,
 			'webhookUrl'   => $this->webhook_url,
 			'issuer'       => $this->issuer,
+			'dueDate'      => $this->get_due_date(),
 			'sequenceType' => $this->sequence_type,
 			'customerId'   => $this->customer_id,
 		);

@@ -36,4 +36,11 @@ class Config extends GatewayConfig {
 	 * @var string|null
 	 */
 	public $api_key;
+
+	/**
+	 * Bank transfer due date days.
+	 *
+	 * @var string|null
+	 */
+	public $due_date_days;
 }
