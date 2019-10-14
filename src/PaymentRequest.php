@@ -108,7 +108,7 @@ class PaymentRequest {
 	 * is tomorrow and the maximum date is 100 days after tomorrow.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
-	 * @var string
+	 * @var null|\DateTimeInterface
 	 */
 	private $due_date;
 
@@ -132,7 +132,7 @@ class PaymentRequest {
 	/**
 	 * Get due date.
 	 *
-	 * @return string
+	 * @return null|\DateTimeInterface
 	 */
 	public function get_due_date() {
 		return $this->due_date;
@@ -141,7 +141,7 @@ class PaymentRequest {
 	/**
 	 * Set due date.
 	 *
-	 * @param string $due_date
+	 * @param null|\DateTimeInterface $due_date Due date.
 	 */
 	public function set_due_date( $due_date ) {
 		$this->due_date = $due_date;
@@ -153,6 +153,13 @@ class PaymentRequest {
 	 * @return array
 	 */
 	public function get_array() {
+		// Due date.
+		$due_date = $this->get_due_date();
+
+		if ( null !== $due_date ) {
+			$due_date = $due_date->format( 'Y-m-d' );
+		}
+
 		$array = array(
 			'amount'       => $this->amount->get_json(),
 			'description'  => $this->description,
@@ -162,7 +169,7 @@ class PaymentRequest {
 			'locale'       => $this->locale,
 			'webhookUrl'   => $this->webhook_url,
 			'issuer'       => $this->issuer,
-			'dueDate'      => $this->get_due_date(),
+			'dueDate'      => $due_date,
 			'sequenceType' => $this->sequence_type,
 			'customerId'   => $this->customer_id,
 		);

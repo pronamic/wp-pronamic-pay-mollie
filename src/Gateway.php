@@ -274,17 +274,13 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Due date.
-		$due_date_days = \filter_var( $this->config->due_date_days, \FILTER_SANITIZE_NUMBER_INT );
-
-		if ( Methods::BANKTRANSFER === $request->method && ! empty( $due_date_days ) ) {
-			$date = new DateTime();
-
-			$interval_spec = sprintf( 'P%dD', $due_date_days );
-
-			$date->add( new \DateInterval( $interval_spec ) );
-
-			$request->set_due_date( $date->format( 'Y-m-d' ) );
+		try {
+			$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
+		} catch ( \Exception $e ) {
+			$due_date = null;
 		}
+
+		$request->set_due_date( $due_date );
 
 		// Create payment.
 		$result = $this->client->create_payment( $request );
