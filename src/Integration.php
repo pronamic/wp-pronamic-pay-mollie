@@ -101,7 +101,6 @@ class Integration extends AbstractIntegration {
 			'type'        => 'number',
 			'min'         => 1,
 			'max'         => 100,
-			'default'     => 12,
 			'classes'     => array( 'regular-text' ),
 			'tooltip'     => __( 'Number of days after which a bank transfer payment expires.', 'pronamic_ideal' ),
 			'description' => sprintf(
