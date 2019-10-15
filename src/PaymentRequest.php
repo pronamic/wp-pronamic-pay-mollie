@@ -54,7 +54,7 @@ class PaymentRequest {
 	 * set in your website profile for this payment.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $webhook_url;
 
@@ -65,7 +65,7 @@ class PaymentRequest {
 	 * website, however note Mollie's country based conversion optimization is lost.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $method;
 
@@ -75,7 +75,7 @@ class PaymentRequest {
 	 * to 1kB of JSON.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var mixed
+	 * @var mixed|null
 	 */
 	public $meta_data;
 
@@ -85,7 +85,7 @@ class PaymentRequest {
 	 * usually more accurate).
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $locale;
 
@@ -99,7 +99,7 @@ class PaymentRequest {
 	 * Issuers API.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $issuer;
 

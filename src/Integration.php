@@ -27,6 +27,13 @@ use WP_User;
  */
 class Integration extends AbstractIntegration {
 	/**
+	 * Register URL.
+	 *
+	 * @var string
+	 */
+	public $register_url;
+
+	/**
 	 * Construct and intialize Mollie integration.
 	 */
 	public function __construct() {
@@ -217,15 +224,27 @@ class Integration extends AbstractIntegration {
 	 * @return \DateTime
 	 */
 	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
+		$config_id = $payment->get_config_id();
+
+		if ( null === $config_id ) {
+			return $next_payment_delivery_date;
+		}
+
 		// Check gateway.
-		$gateway_id = \get_post_meta( $payment->get_config_id(), '_pronamic_gateway_id', true );
+		$gateway_id = \get_post_meta( $config_id, '_pronamic_gateway_id', true );
 
 		if ( 'mollie' !== $gateway_id ) {
 			return $next_payment_delivery_date;
 		}
 
 		// Check direct debit payment method.
-		if ( ! PaymentMethods::is_direct_debit_method( $payment->get_method() ) ) {
+		$method = $payment->get_method();
+
+		if ( null === $method ) {
+			return $next_payment_delivery_date;
+		}
+
+		if ( ! PaymentMethods::is_direct_debit_method( $method ) ) {
 			return $next_payment_delivery_date;
 		}
 
@@ -256,19 +275,20 @@ class Integration extends AbstractIntegration {
 		 */
 		switch ( $day_of_week ) {
 			case 'Monday':
-				$next_payment_delivery_date->sub( new \DateInterval( 'P3D' ) );
-				break;
+				$next_payment_delivery_date->modify( '-3 days' );
 
+				break;
 			case 'Saturday':
-				$next_payment_delivery_date->sub( new \DateInterval( 'P2D' ) );
-				break;
+				$next_payment_delivery_date->modify( '-2 days' );
 
+				break;
 			case 'Sunday':
-				$next_payment_delivery_date->sub( new \DateInterval( 'P3D' ) );
-				break;
+				$next_payment_delivery_date->modify( '-3 days' );
 
+				break;
 			default:
-				$next_payment_delivery_date->sub( new \DateInterval( 'P1D' ) );
+				$next_payment_delivery_date->modify( '-1 day' );
+
 				break;
 		}
 

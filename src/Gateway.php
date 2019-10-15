@@ -62,7 +62,7 @@ class Gateway extends Core_Gateway {
 		);
 
 		// Client.
-		$this->client = new Client( $config->api_key );
+		$this->client = new Client( \strval( $config->api_key ) );
 		$this->client->set_mode( $config->mode );
 
 		// Mollie customer ID meta key.
@@ -184,7 +184,7 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Get webhook URL for Mollie.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function get_webhook_url() {
 		$url = home_url( '/' );
@@ -225,7 +225,7 @@ class Gateway extends Core_Gateway {
 	public function start( Payment $payment ) {
 		$request               = new PaymentRequest();
 		$request->amount       = AmountTransformer::transform( $payment->get_total_amount() );
-		$request->description  = $payment->get_description();
+		$request->description  = \strval( $payment->get_description() );
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
 
@@ -284,12 +284,6 @@ class Gateway extends Core_Gateway {
 		// Create payment.
 		$result = $this->client->create_payment( $request );
 
-		if ( ! $result ) {
-			$this->error = $this->client->get_error();
-
-			return;
-		}
-
 		// Set transaction ID.
 		if ( isset( $result->id ) ) {
 			$payment->set_transaction_id( $result->id );
@@ -301,13 +295,17 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Set transfer reference.
-		if ( isset( $result->details->transferReference ) ) {
-			$payment->set_meta( 'mollie_transfer_reference', $result->details->transferReference );
+		if ( isset( $result->details ) ) {
+			if ( isset( $result->details->transferReference ) ) {
+				$payment->set_meta( 'mollie_transfer_reference', $result->details->transferReference );
+			}
 		}
 
 		// Set action URL.
-		if ( isset( $result->_links->checkout->href ) ) {
-			$payment->set_action_url( $result->_links->checkout->href );
+		if ( isset( $result->_links ) ) {
+			if ( isset( $result->_links->checkout->href ) ) {
+				$payment->set_action_url( $result->_links->checkout->href );
+			}
 		}
 	}
 
@@ -319,17 +317,17 @@ class Gateway extends Core_Gateway {
 	 * @return void
 	 */
 	public function update_status( Payment $payment ) {
-		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
+		$transaction_id = $payment->get_transaction_id();
 
-		if ( ! $mollie_payment ) {
-			$payment->set_status( PaymentStatus::FAILURE );
-
-			$this->error = $this->client->get_error();
-
+		if ( null === $transaction_id ) {
 			return;
 		}
 
-		$payment->set_status( Statuses::transform( $mollie_payment->status ) );
+		$mollie_payment = $this->client->get_payment( $transaction_id );
+
+		if ( isset( $mollie_payment->status ) ) {
+			$payment->set_status( Statuses::transform( $mollie_payment->status ) );
+		}
 
 		if ( isset( $mollie_payment->details ) ) {
 			$details = $mollie_payment->details;

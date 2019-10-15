@@ -12,7 +12,6 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\XML\Security;
-use WP_Error;
 
 /**
  * Title: Mollie
@@ -50,7 +49,7 @@ class Client {
 	/**
 	 * Error
 	 *
-	 * @var WP_Error
+	 * @var \WP_Error
 	 */
 	private $error;
 
@@ -76,7 +75,7 @@ class Client {
 	/**
 	 * Error
 	 *
-	 * @return WP_Error
+	 * @return \WP_Error
 	 */
 	public function get_error() {
 		return $this->error;
@@ -88,11 +87,10 @@ class Client {
 	 * @param string $end_point              Requested endpoint.
 	 * @param string $method                 HTTP method to use.
 	 * @param array  $data                   Request data.
-	 * @param int    $expected_response_code Expected response code.
-	 * @return bool|object
+	 * @return object
 	 * @throws \Exception Throws exception when error occurs.
 	 */
-	private function send_request( $end_point, $method = 'GET', array $data = array(), $expected_response_code = 200 ) {
+	private function send_request( $end_point, $method = 'GET', array $data = array() ) {
 		// Request.
 		$url = self::API_URL . $end_point;
 
@@ -109,21 +107,6 @@ class Client {
 
 		if ( $response instanceof \WP_Error ) {
 			throw new \Exception( $response->get_error_message() );
-		}
-
-		// Response code.
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
-		if ( $expected_response_code != $response_code ) {
-			$this->error = new WP_Error(
-				'mollie_error',
-				sprintf(
-					'Unexpected response code, expcted: %s, actually: %s.',
-					$expected_response_code,
-					$response_code
-				)
-			);
 		}
 
 		// Body.
@@ -153,9 +136,11 @@ class Client {
 
 		// Mollie error from JSON response.
 		if ( isset( $data->status, $data->title, $data->detail ) ) {
-			$this->error = new \WP_Error( 'mollie_error', $data->detail, $data );
-
-			return false;
+			throw new Error(
+				$data->status,
+				$data->title,
+				$data->detail
+			);
 		}
 
 		return $data;
@@ -165,11 +150,10 @@ class Client {
 	 * Create payment.
 	 *
 	 * @param PaymentRequest $request Payment request.
-	 *
-	 * @return bool|object
+	 * @return object
 	 */
 	public function create_payment( PaymentRequest $request ) {
-		return $this->send_request( 'payments', 'POST', $request->get_array(), 201 );
+		return $this->send_request( 'payments', 'POST', $request->get_array() );
 	}
 
 	/**
@@ -185,12 +169,11 @@ class Client {
 	 * Get payment.
 	 *
 	 * @param string $payment_id Payment ID.
-	 *
-	 * @return bool|object
+	 * @return object
 	 */
 	public function get_payment( $payment_id ) {
 		if ( empty( $payment_id ) ) {
-			return false;
+			throw new \Exception( 'Mollie payment ID can not be empty string.' );
 		}
 
 		return $this->send_request( 'payments/' . $payment_id, 'GET' );
@@ -199,14 +182,10 @@ class Client {
 	/**
 	 * Get issuers
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
 	public function get_issuers() {
 		$response = $this->send_request( 'methods/ideal?include=issuers', 'GET' );
-
-		if ( false === $response ) {
-			return false;
-		}
 
 		$issuers = array();
 
@@ -226,8 +205,7 @@ class Client {
 	 * Get payment methods
 	 *
 	 * @param string $sequence_type Sequence type.
-	 *
-	 * @return array|bool
+	 * @return array
 	 */
 	public function get_payment_methods( $sequence_type = '' ) {
 		$data = array();
@@ -239,6 +217,10 @@ class Client {
 		$response = $this->send_request( 'methods', 'GET', $data );
 
 		$payment_methods = array();
+
+		if ( ! isset( $response->_embedded ) ) {
+			throw new \Exception( 'No embbedded data in Mollie response.' );
+		}
 
 		if ( isset( $response->_embedded->methods ) ) {
 			foreach ( $response->_embedded->methods as $payment_method ) {
@@ -257,9 +239,8 @@ class Client {
 	 *
 	 * @since 1.1.6
 	 *
-	 * @param string $email Customer email address.
-	 * @param string $name  Customer name.
-	 *
+	 * @param string|null $email Customer email address.
+	 * @param string|null $name  Customer name.
 	 * @return string|bool
 	 */
 	public function create_customer( $email, $name ) {
@@ -273,8 +254,7 @@ class Client {
 			array(
 				'name'  => $name,
 				'email' => $email,
-			),
-			201
+			)
 		);
 
 		if ( ! isset( $response->id ) ) {
@@ -288,39 +268,25 @@ class Client {
 	 * Get customer.
 	 *
 	 * @param string $customer_id Mollie customer ID.
-	 *
-	 * @since unreleased
-	 *
-	 * @return object|bool
+	 * @return object
 	 */
 	public function get_customer( $customer_id ) {
 		if ( empty( $customer_id ) ) {
-			return false;
+			throw new \Exception( 'Mollie customer ID can not be empty string.' );
 		}
 
-		$response = $this->send_request( 'customers/' . $customer_id, 'GET', array(), 200 );
-
-		if ( false === $response ) {
-			return false;
-		}
-
-		if ( is_wp_error( $this->error ) ) {
-			return false;
-		}
-
-		return $response;
+		return $this->send_request( 'customers/' . $customer_id, 'GET' );
 	}
 
 	/**
 	 * Get mandates for customer.
 	 *
 	 * @param string $customer_id Mollie customer ID.
-	 *
-	 * @return object|bool
+	 * @return object
 	 */
 	public function get_mandates( $customer_id ) {
 		if ( '' === $customer_id ) {
-			return false;
+			throw new \Exception( 'Mollie customer ID can not be empty string.' );
 		}
 
 		return $this->send_request( 'customers/' . $customer_id . '/mandates?limit=250', 'GET' );
@@ -331,17 +297,16 @@ class Client {
 	 *
 	 * @param string      $customer_id    Mollie customer ID.
 	 * @param string|null $payment_method Payment method to find mandates for.
-	 *
 	 * @return boolean
 	 */
 	public function has_valid_mandate( $customer_id, $payment_method = null ) {
 		$mandates = $this->get_mandates( $customer_id );
 
-		if ( ! $mandates ) {
-			return false;
-		}
-
 		$mollie_method = Methods::transform( $payment_method );
+
+		if ( ! isset( $mandates->_embedded ) ) {
+			throw new \Exception( 'No embbedded data in Mollie response.' );
+		}
 
 		foreach ( $mandates->_embedded as $mandate ) {
 			if ( $mollie_method !== $mandate->method ) {
@@ -361,17 +326,16 @@ class Client {
 	 *
 	 * @param string $customer_id    Mollie customer ID.
 	 * @param string $payment_method Payment method.
-	 *
 	 * @return null|DateTime
 	 */
 	public function get_first_valid_mandate_datetime( $customer_id, $payment_method = null ) {
 		$mandates = $this->get_mandates( $customer_id );
 
-		if ( ! $mandates ) {
-			return null;
-		}
-
 		$mollie_method = Methods::transform( $payment_method );
+
+		if ( ! isset( $mandates->_embedded ) ) {
+			throw new \Exception( 'No embbedded data in Mollie response.' );
+		}
 
 		foreach ( $mandates->_embedded as $mandate ) {
 			if ( $mollie_method !== $mandate->method ) {

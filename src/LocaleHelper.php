@@ -24,8 +24,7 @@ class LocaleHelper {
 	/**
 	 * Get Mollie locale by the specified WordPress locale.
 	 *
-	 * @param string $locale Locale string (en_US) to transform to Mollie locale.
-	 *
+	 * @param string|null $locale Locale string (en_US) to transform to Mollie locale.
 	 * @return string|null
 	 */
 	public static function transform( $locale ) {
