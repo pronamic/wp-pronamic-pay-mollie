@@ -66,13 +66,6 @@ class Methods {
 	const BANKTRANSFER = 'banktransfer';
 
 	/**
-	 * Constant for the Bitcoin method.
-	 *
-	 * @var string
-	 */
-	const BITCOIN = 'bitcoin';
-
-	/**
 	 * Constant for the EPS method.
 	 *
 	 * @var string
@@ -135,7 +128,6 @@ class Methods {
 	private static $map = array(
 		PaymentMethods::BANCONTACT              => self::BANCONTACT,
 		PaymentMethods::BANK_TRANSFER           => self::BANKTRANSFER,
-		PaymentMethods::BITCOIN                 => self::BITCOIN,
 		PaymentMethods::CREDIT_CARD             => self::CREDITCARD,
 		PaymentMethods::DIRECT_DEBIT            => self::DIRECT_DEBIT,
 		PaymentMethods::DIRECT_DEBIT_BANCONTACT => self::DIRECT_DEBIT,

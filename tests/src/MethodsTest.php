@@ -47,7 +47,6 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 		return array(
 			array( PaymentMethods::BANCONTACT, Methods::BANCONTACT ),
 			array( PaymentMethods::BANK_TRANSFER, Methods::BANKTRANSFER ),
-			array( PaymentMethods::BITCOIN, Methods::BITCOIN ),
 			array( PaymentMethods::CREDIT_CARD, Methods::CREDITCARD ),
 			array( PaymentMethods::DIRECT_DEBIT, Methods::DIRECT_DEBIT ),
 			array( PaymentMethods::DIRECT_DEBIT_IDEAL, Methods::DIRECT_DEBIT ),
@@ -87,7 +86,6 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 		return array(
 			array( Methods::BANCONTACT, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT ),
 			array( Methods::BANKTRANSFER, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANK_TRANSFER ),
-			array( Methods::BITCOIN, \Pronamic\WordPress\Pay\Core\PaymentMethods::BITCOIN ),
 			array( Methods::CREDITCARD, \Pronamic\WordPress\Pay\Core\PaymentMethods::CREDIT_CARD ),
 			array( Methods::DIRECT_DEBIT, \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT ),
 			array( Methods::PAYPAL, \Pronamic\WordPress\Pay\Core\PaymentMethods::PAYPAL ),

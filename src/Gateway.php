@@ -167,7 +167,6 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::BANCONTACT,
 			PaymentMethods::BANK_TRANSFER,
 			PaymentMethods::BELFIUS,
-			PaymentMethods::BITCOIN,
 			PaymentMethods::CREDIT_CARD,
 			PaymentMethods::DIRECT_DEBIT,
 			PaymentMethods::DIRECT_DEBIT_BANCONTACT,
