@@ -47,13 +47,6 @@ class Client {
 	private $mode;
 
 	/**
-	 * Error
-	 *
-	 * @var \WP_Error
-	 */
-	private $error;
-
-	/**
 	 * Constructs and initializes an Mollie client object
 	 *
 	 * @param string $api_key Mollie API key.
@@ -73,21 +66,13 @@ class Client {
 	}
 
 	/**
-	 * Error
-	 *
-	 * @return \WP_Error
-	 */
-	public function get_error() {
-		return $this->error;
-	}
-
-	/**
 	 * Send request with the specified action and parameters
 	 *
 	 * @param string $end_point              Requested endpoint.
 	 * @param string $method                 HTTP method to use.
 	 * @param array  $data                   Request data.
 	 * @return object
+	 * @throws Error Throws Error when Mollie error occurs.
 	 * @throws \Exception Throws exception when error occurs.
 	 */
 	private function send_request( $end_point, $method = 'GET', array $data = array() ) {

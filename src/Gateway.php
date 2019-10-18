@@ -77,22 +77,31 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Get issuers
 	 *
-	 * @see Pronamic_WP_Pay_Gateway::get_issuers()
+	 * @see Core_Gateway::get_issuers()
 	 */
 	public function get_issuers() {
 		$groups = array();
 
-		$result = $this->client->get_issuers();
+		try {
+			$result = $this->client->get_issuers();
 
-		if ( ! $result ) {
-			$this->error = $this->client->get_error();
+			$groups[] = array(
+				'options' => $result,
+			);
+		} catch ( Error $e ) {
+			// Catch Mollie error.
+			$error = new \WP_Error(
+				'mollie_error',
+				sprintf( '%1$s (%2$s) - %3$s', $e->get_title(), $e->getCode(), $e->get_detail() )
+			);
 
-			return $groups;
+			$this->set_error( $error );
+		} catch ( \Exception $e ) {
+			// Catch exceptions.
+			$error = new \WP_Error( $e->getCode(), $e->getMessage() );
+
+			$this->set_error( $error );
 		}
-
-		$groups[] = array(
-			'options' => $result,
-		);
 
 		return $groups;
 	}
@@ -112,10 +121,23 @@ class Gateway extends Core_Gateway {
 
 		foreach ( $sequence_types as $sequence_type ) {
 			// Get active payment methods for Mollie account.
-			$result = $this->client->get_payment_methods( $sequence_type );
+			try {
+				$result = $this->client->get_payment_methods( $sequence_type );
+			} catch ( Error $e ) {
+				// Catch Mollie error.
+				$error = new \WP_Error(
+					'mollie_error',
+					sprintf( '%1$s (%2$s) - %3$s', $e->get_title(), $e->getCode(), $e->get_detail() )
+				);
 
-			if ( ! $result ) {
-				$this->error = $this->client->get_error();
+				$this->set_error( $error );
+
+				break;
+			} catch ( \Exception $e ) {
+				// Catch exceptions.
+				$error = new \WP_Error( $e->getCode(), $e->getMessage() );
+
+				$this->set_error( $error );
 
 				break;
 			}
