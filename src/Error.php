@@ -48,7 +48,13 @@ class Error extends \Exception {
 	 * @param string $detail Detail.
 	 */
 	public function __construct( $status, $title, $detail ) {
-		parent::__construct( $title, $status );
+		$message = sprintf(
+			'%s - %s',
+			$title,
+			$detail
+		);
+
+		parent::__construct( $message, $status );
 
 		$this->status = $status;
 		$this->title  = $title;
