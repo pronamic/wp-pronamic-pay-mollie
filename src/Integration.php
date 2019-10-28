@@ -41,7 +41,6 @@ class Integration extends AbstractIntegration {
 		$this->name          = 'Mollie';
 		$this->url           = 'http://www.mollie.com/en/';
 		$this->product_url   = __( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' );
-		$this->manual_url    = __( 'https://www.pronamic.eu/support/how-to-connect-mollie-with-wordpress-via-pronamic-pay/', 'pronamic_ideal' );
 		$this->dashboard_url = 'https://www.mollie.com/dashboard/';
 		$this->register_url  = 'https://www.mollie.com/nl/signup/665327';
 		$this->provider      = 'mollie';
@@ -51,6 +50,8 @@ class Integration extends AbstractIntegration {
 			'webhook_log',
 			'webhook_no_config',
 		);
+
+		$this->set_manual_url( __( 'https://www.pronamic.eu/support/how-to-connect-mollie-with-wordpress-via-pronamic-pay/', 'pronamic_ideal' ) );
 
 		// Actions.
 		$function = array( __NAMESPACE__ . '\Listener', 'listen' );
