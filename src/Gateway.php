@@ -15,6 +15,8 @@ use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
+use Pronamic\WordPress\Pay\Payments\BankAccountDetails;
+use Pronamic\WordPress\Pay\Payments\BankTransferDetails;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
@@ -311,16 +313,69 @@ class Gateway extends Core_Gateway {
 			$payment->set_transaction_id( $result->id );
 		}
 
+		// Set expiry date.
+		/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
+		if ( isset( $result->expiresAt ) ) {
+			try {
+				$expires_at = new DateTime( $result->expiresAt );
+			} catch ( \Exception $e ) {
+				$expires_at = null;
+			}
+
+			$payment->set_expiry_date( $expires_at );
+		}
+		/* phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
+
 		// Set status.
 		if ( isset( $result->status ) ) {
 			$payment->set_status( Statuses::transform( $result->status ) );
 		}
 
-		// Set transfer reference.
+		// Set bank transfer recipient details.
 		if ( isset( $result->details ) ) {
-			if ( isset( $result->details->transferReference ) ) {
-				$payment->set_meta( 'mollie_transfer_reference', $result->details->transferReference );
+			$bank_transfer_recipient_details = $payment->get_bank_transfer_recipient_details();
+
+			if ( null === $bank_transfer_recipient_details ) {
+				$bank_transfer_recipient_details = new BankTransferDetails();
+
+				$payment->set_bank_transfer_recipient_details( $bank_transfer_recipient_details );
 			}
+
+			$bank_details = $bank_transfer_recipient_details->get_bank_account();
+
+			if ( null === $bank_details ) {
+				$bank_details = new BankAccountDetails();
+
+				$bank_transfer_recipient_details->set_bank_account( $bank_details );
+			}
+
+			$details = $result->details;
+
+			/*
+			 * @codingStandardsIgnoreStart
+			 *
+			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+			 */
+			if ( isset( $details->bankName ) ) {
+				/**
+				 * Set `bankName` as bank details name, as result "Stichting Mollie Payments"
+				 * is not the name of a bank, but the account holder name.
+				 */
+				$bank_details->set_name( $details->bankName );
+			}
+
+			if ( isset( $details->bankAccount ) ) {
+				$bank_details->set_iban( $details->bankAccount );
+			}
+
+			if ( isset( $details->bankBic ) ) {
+				$bank_details->set_bic( $details->bankBic );
+			}
+
+			if ( isset( $details->transferReference ) ) {
+				$bank_transfer_recipient_details->set_reference( $details->transferReference );
+			}
+			// @codingStandardsIgnoreEnd
 		}
 
 		// Set action URL.
@@ -352,6 +407,14 @@ class Gateway extends Core_Gateway {
 		}
 
 		if ( isset( $mollie_payment->details ) ) {
+			$consumer_bank_details = $payment->get_consumer_bank_details();
+
+			if ( null === $consumer_bank_details ) {
+				$consumer_bank_details = new BankAccountDetails();
+
+				$payment->set_consumer_bank_details( $consumer_bank_details );
+			}
+
 			$details = $mollie_payment->details;
 
 			/*
@@ -360,19 +423,45 @@ class Gateway extends Core_Gateway {
 			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 			 */
 			if ( isset( $details->consumerName ) ) {
-				$payment->set_consumer_name( $details->consumerName );
+				$consumer_bank_details->set_name( $details->consumerName );
 			}
 
 			if ( isset( $details->cardHolder ) ) {
-				$payment->set_consumer_name( $details->cardHolder );
+				$consumer_bank_details->set_name( $details->cardHolder );
+			}
+
+			if ( isset( $details->cardNumber ) ) {
+				// The last four digits of the card number.
+				$consumer_bank_details->set_account_number( $details->cardNumber );
+			}
+
+			if ( isset( $details->cardCountryCode ) ) {
+				// The ISO 3166-1 alpha-2 country code of the country the card was issued in.
+				$consumer_bank_details->set_country( $details->cardCountryCode );
 			}
 
 			if ( isset( $details->consumerAccount ) ) {
-				$payment->set_consumer_iban( $details->consumerAccount );
+				switch ( $mollie_payment->method ) {
+					case Methods::BELFIUS:
+					case Methods::DIRECT_DEBIT:
+					case Methods::IDEAL:
+					case Methods::KBC:
+					case Methods::SOFORT:
+						$consumer_bank_details->set_iban( $details->consumerAccount );
+
+						break;
+					case Methods::BANCONTACT:
+					case Methods::BANKTRANSFER:
+					case Methods::PAYPAL:
+					default:
+						$consumer_bank_details->set_account_number( $details->consumerAccount );
+
+						break;
+				}
 			}
 
 			if ( isset( $details->consumerBic ) ) {
-				$payment->set_consumer_bic( $details->consumerBic );
+				$consumer_bank_details->set_bic( $details->consumerBic );
 			}
 			// @codingStandardsIgnoreEnd
 		}
