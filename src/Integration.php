@@ -46,6 +46,9 @@ class Integration extends AbstractIntegration {
 		$this->provider      = 'mollie';
 		$this->supports      = array(
 			'payment_status_request',
+			'recurring_direct_debit',
+			'recurring_credit_card',
+			'recurring',
 			'webhook',
 			'webhook_log',
 			'webhook_no_config',
