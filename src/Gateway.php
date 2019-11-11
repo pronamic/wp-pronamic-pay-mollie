@@ -103,7 +103,7 @@ class Gateway extends Core_Gateway {
 			$this->set_error( $error );
 		} catch ( \Exception $e ) {
 			// Catch exceptions.
-			$error = new \WP_Error( $e->getCode(), $e->getMessage() );
+			$error = new \WP_Error( 'mollie_error', $e->getMessage() );
 
 			$this->set_error( $error );
 		}
@@ -140,7 +140,7 @@ class Gateway extends Core_Gateway {
 				break;
 			} catch ( \Exception $e ) {
 				// Catch exceptions.
-				$error = new \WP_Error( $e->getCode(), $e->getMessage() );
+				$error = new \WP_Error( 'mollie_error', $e->getMessage() );
 
 				$this->set_error( $error );
 
