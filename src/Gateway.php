@@ -575,18 +575,20 @@ class Gateway extends Core_Gateway {
 
 		$subscription = $payment->get_subscription();
 
-		if ( ! $subscription || empty( $subscription->user_id ) ) {
+		if ( ! $subscription || null === $subscription->get_customer() || empty( $subscription->get_customer()->get_user_id() ) ) {
 			return;
 		}
+
+		$user_id = $subscription->get_customer()->get_user_id();
 
 		// Get customer ID from subscription meta.
 		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
-		$user_customer_id = $this->get_customer_id_by_wp_user_id( $subscription->user_id );
+		$user_customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
 
 		if ( empty( $user_customer_id ) ) {
 			// Set customer ID as user meta.
-			$this->update_wp_user_customer_id( $subscription->user_id, $customer_id );
+			$this->update_wp_user_customer_id( $user_id, $customer_id );
 		}
 	}
 }
