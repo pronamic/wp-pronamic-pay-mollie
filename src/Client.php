@@ -154,11 +154,13 @@ class Client {
 	 * Get payment.
 	 *
 	 * @param string $payment_id Payment ID.
+	 *
 	 * @return object
+	 * @throws \InvalidArgumentException Throws exception on empty payment ID argument.
 	 */
 	public function get_payment( $payment_id ) {
 		if ( empty( $payment_id ) ) {
-			throw new \Exception( 'Mollie payment ID can not be empty string.' );
+			throw new \InvalidArgumentException( 'Mollie payment ID can not be empty string.' );
 		}
 
 		return $this->send_request( 'payments/' . $payment_id, 'GET' );
@@ -190,7 +192,9 @@ class Client {
 	 * Get payment methods
 	 *
 	 * @param string $sequence_type Sequence type.
+	 *
 	 * @return array
+	 * @throws \Exception Throws exception for methods on failed request or invalid response.
 	 */
 	public function get_payment_methods( $sequence_type = '' ) {
 		$data = array();
@@ -253,11 +257,13 @@ class Client {
 	 * Get customer.
 	 *
 	 * @param string $customer_id Mollie customer ID.
+	 *
 	 * @return object
+	 * @throws \InvalidArgumentException Throws exception on empty customer ID argument.
 	 */
 	public function get_customer( $customer_id ) {
 		if ( empty( $customer_id ) ) {
-			throw new \Exception( 'Mollie customer ID can not be empty string.' );
+			throw new \InvalidArgumentException( 'Mollie customer ID can not be empty string.' );
 		}
 
 		return $this->send_request( 'customers/' . $customer_id, 'GET' );
@@ -267,11 +273,13 @@ class Client {
 	 * Get mandates for customer.
 	 *
 	 * @param string $customer_id Mollie customer ID.
+	 *
 	 * @return object
+	 * @throws \InvalidArgumentException Throws exception on empty customer ID argument.
 	 */
 	public function get_mandates( $customer_id ) {
 		if ( '' === $customer_id ) {
-			throw new \Exception( 'Mollie customer ID can not be empty string.' );
+			throw new \InvalidArgumentException( 'Mollie customer ID can not be empty string.' );
 		}
 
 		return $this->send_request( 'customers/' . $customer_id . '/mandates?limit=250', 'GET' );
@@ -282,7 +290,9 @@ class Client {
 	 *
 	 * @param string      $customer_id    Mollie customer ID.
 	 * @param string|null $payment_method Payment method to find mandates for.
+	 *
 	 * @return boolean
+	 * @throws \Exception Throws exception for mandates on failed request or invalid response.
 	 */
 	public function has_valid_mandate( $customer_id, $payment_method = null ) {
 		$mandates = $this->get_mandates( $customer_id );
@@ -311,7 +321,9 @@ class Client {
 	 *
 	 * @param string $customer_id    Mollie customer ID.
 	 * @param string $payment_method Payment method.
+	 *
 	 * @return null|DateTime
+	 * @throws \Exception Throws exception for mandates on failed request or invalid response.
 	 */
 	public function get_first_valid_mandate_datetime( $customer_id, $payment_method = null ) {
 		$mandates = $this->get_mandates( $customer_id );
