@@ -305,6 +305,10 @@ class GatewayTest extends WP_UnitTestCase {
 		$payment->recurring_type = Core_Recurring::RECURRING;
 
 		// Get customer ID for payment.
+		$this->mock_http_response( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U.http' );
+		$this->mock_http_response( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U_first', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U_first.http' );
+		$this->mock_http_response( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U_subscription', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U_subscription.http' );
+
 		$customer_id = $this->gateway->get_customer_id_for_payment( $payment );
 
 		$this->assertEquals( $expected, $customer_id );
@@ -330,7 +334,6 @@ class GatewayTest extends WP_UnitTestCase {
 			array( 1, null, $cst_first, $cst_first ),
 			array( 1, $cst_subscription, null, $cst_subscription ),
 			array( 1, $cst_subscription, $cst_first, $cst_subscription ),
-			array( '1', $cst_subscription, $cst_first, $cst_subscription ),
 			array( '1', $cst_subscription, $cst_first, $cst_subscription ),
 		);
 	}
