@@ -588,7 +588,7 @@ class Gateway extends Core_Gateway {
 
 		if ( empty( $user_customer_id ) ) {
 			// Set customer ID as user meta.
-			$this->update_wp_user_customer_id( $user_id, $customer_id );
+			$this->update_wp_user_customer_id( $user_id, (string) $customer_id );
 		}
 	}
 }
