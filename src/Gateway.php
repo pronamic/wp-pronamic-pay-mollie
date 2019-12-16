@@ -12,11 +12,11 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use DateInterval;
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
+use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
-use Pronamic\WordPress\Pay\Payments\BankAccountDetails;
-use Pronamic\WordPress\Pay\Payments\BankTransferDetails;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 
