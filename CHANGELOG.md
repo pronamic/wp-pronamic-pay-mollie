@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
-- Added advanced gateway setting for bank transfer due date days.
+-
+
+## [2.0.9] - 2019-12-22
+- Added advanced setting for bank transfer due date days.
+- Added bank transfer recipient details to payment.
+- Added URL to manual in gateway settings.
+- Improved error handling with exceptions.
+- Removed Bitcoin payment method (not supported by Mollie anymore).
 
 ## [2.0.8] - 2019-10-04
 - Added response data to error for unexpected response code.
@@ -119,7 +126,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.8...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.9...HEAD
+[2.0.9]: https://github.com/wp-pay-gateways/mollie/compare/2.0.8...2.0.9
 [2.0.8]: https://github.com/wp-pay-gateways/mollie/compare/2.0.7...2.0.8
 [2.0.7]: https://github.com/wp-pay-gateways/mollie/compare/2.0.6...2.0.7
 [2.0.6]: https://github.com/wp-pay-gateways/mollie/compare/2.0.5...2.0.6
