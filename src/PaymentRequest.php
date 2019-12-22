@@ -17,7 +17,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.0
+ * @version 2.0.9
  * @since   1.0.0
  */
 class PaymentRequest {
@@ -54,7 +54,7 @@ class PaymentRequest {
 	 * set in your website profile for this payment.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $webhook_url;
 
@@ -65,7 +65,7 @@ class PaymentRequest {
 	 * website, however note Mollie's country based conversion optimization is lost.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $method;
 
@@ -75,7 +75,7 @@ class PaymentRequest {
 	 * to 1kB of JSON.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var mixed
+	 * @var mixed|null
 	 */
 	public $meta_data;
 
@@ -85,7 +85,7 @@ class PaymentRequest {
 	 * usually more accurate).
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $locale;
 
@@ -99,9 +99,18 @@ class PaymentRequest {
 	 * Issuers API.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $issuer;
+
+	/**
+	 * The date the payment should expire, in YYYY-MM-DD format. Please note: the minimum date
+	 * is tomorrow and the maximum date is 100 days after tomorrow.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @var null|\DateTimeInterface
+	 */
+	private $due_date;
 
 	/**
 	 * Customer ID for Mollie checkout.
@@ -121,11 +130,36 @@ class PaymentRequest {
 	public $sequence_type;
 
 	/**
+	 * Get due date.
+	 *
+	 * @return null|\DateTimeInterface
+	 */
+	public function get_due_date() {
+		return $this->due_date;
+	}
+
+	/**
+	 * Set due date.
+	 *
+	 * @param null|\DateTimeInterface $due_date Due date.
+	 */
+	public function set_due_date( $due_date ) {
+		$this->due_date = $due_date;
+	}
+
+	/**
 	 * Get array of this Mollie payment request object.
 	 *
 	 * @return array
 	 */
 	public function get_array() {
+		// Due date.
+		$due_date = $this->get_due_date();
+
+		if ( null !== $due_date ) {
+			$due_date = $due_date->format( 'Y-m-d' );
+		}
+
 		$array = array(
 			'amount'       => $this->amount->get_json(),
 			'description'  => $this->description,
@@ -135,6 +169,7 @@ class PaymentRequest {
 			'locale'       => $this->locale,
 			'webhookUrl'   => $this->webhook_url,
 			'issuer'       => $this->issuer,
+			'dueDate'      => $due_date,
 			'sequenceType' => $this->sequence_type,
 			'customerId'   => $this->customer_id,
 		);

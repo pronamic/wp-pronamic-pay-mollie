@@ -12,6 +12,8 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use DateInterval;
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
+use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
@@ -25,7 +27,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.8
+ * @version 2.0.9
  * @since   1.1.0
  */
 class Gateway extends Core_Gateway {
@@ -59,10 +61,13 @@ class Gateway extends Core_Gateway {
 			'recurring_direct_debit',
 			'recurring_credit_card',
 			'recurring',
+			'webhook',
+			'webhook_log',
+			'webhook_no_config',
 		);
 
 		// Client.
-		$this->client = new Client( $config->api_key );
+		$this->client = new Client( \strval( $config->api_key ) );
 		$this->client->set_mode( $config->mode );
 
 		// Mollie customer ID meta key.
@@ -77,22 +82,31 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Get issuers
 	 *
-	 * @see Pronamic_WP_Pay_Gateway::get_issuers()
+	 * @see Core_Gateway::get_issuers()
 	 */
 	public function get_issuers() {
 		$groups = array();
 
-		$result = $this->client->get_issuers();
+		try {
+			$result = $this->client->get_issuers();
 
-		if ( ! $result ) {
-			$this->error = $this->client->get_error();
+			$groups[] = array(
+				'options' => $result,
+			);
+		} catch ( Error $e ) {
+			// Catch Mollie error.
+			$error = new \WP_Error(
+				'mollie_error',
+				sprintf( '%1$s (%2$s) - %3$s', $e->get_title(), $e->getCode(), $e->get_detail() )
+			);
 
-			return $groups;
+			$this->set_error( $error );
+		} catch ( \Exception $e ) {
+			// Catch exceptions.
+			$error = new \WP_Error( 'mollie_error', $e->getMessage() );
+
+			$this->set_error( $error );
 		}
-
-		$groups[] = array(
-			'options' => $result,
-		);
 
 		return $groups;
 	}
@@ -112,10 +126,23 @@ class Gateway extends Core_Gateway {
 
 		foreach ( $sequence_types as $sequence_type ) {
 			// Get active payment methods for Mollie account.
-			$result = $this->client->get_payment_methods( $sequence_type );
+			try {
+				$result = $this->client->get_payment_methods( $sequence_type );
+			} catch ( Error $e ) {
+				// Catch Mollie error.
+				$error = new \WP_Error(
+					'mollie_error',
+					sprintf( '%1$s (%2$s) - %3$s', $e->get_title(), $e->getCode(), $e->get_detail() )
+				);
 
-			if ( ! $result ) {
-				$this->error = $this->client->get_error();
+				$this->set_error( $error );
+
+				break;
+			} catch ( \Exception $e ) {
+				// Catch exceptions.
+				$error = new \WP_Error( 'mollie_error', $e->getMessage() );
+
+				$this->set_error( $error );
 
 				break;
 			}
@@ -167,7 +194,6 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::BANCONTACT,
 			PaymentMethods::BANK_TRANSFER,
 			PaymentMethods::BELFIUS,
-			PaymentMethods::BITCOIN,
 			PaymentMethods::CREDIT_CARD,
 			PaymentMethods::DIRECT_DEBIT,
 			PaymentMethods::DIRECT_DEBIT_BANCONTACT,
@@ -185,7 +211,7 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Get webhook URL for Mollie.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function get_webhook_url() {
 		$url = home_url( '/' );
@@ -226,7 +252,7 @@ class Gateway extends Core_Gateway {
 	public function start( Payment $payment ) {
 		$request               = new PaymentRequest();
 		$request->amount       = AmountTransformer::transform( $payment->get_total_amount() );
-		$request->description  = $payment->get_description();
+		$request->description  = \strval( $payment->get_description() );
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
 
@@ -273,28 +299,93 @@ class Gateway extends Core_Gateway {
 			$request->issuer = $payment->get_issuer();
 		}
 
+		// Due date.
+		try {
+			$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
+		} catch ( \Exception $e ) {
+			$due_date = null;
+		}
+
+		$request->set_due_date( $due_date );
+
 		// Create payment.
 		$result = $this->client->create_payment( $request );
-
-		if ( ! $result ) {
-			$this->error = $this->client->get_error();
-
-			return;
-		}
 
 		// Set transaction ID.
 		if ( isset( $result->id ) ) {
 			$payment->set_transaction_id( $result->id );
 		}
 
+		// Set expiry date.
+		/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
+		if ( isset( $result->expiresAt ) ) {
+			try {
+				$expires_at = new DateTime( $result->expiresAt );
+			} catch ( \Exception $e ) {
+				$expires_at = null;
+			}
+
+			$payment->set_expiry_date( $expires_at );
+		}
+		/* phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
+
 		// Set status.
 		if ( isset( $result->status ) ) {
 			$payment->set_status( Statuses::transform( $result->status ) );
 		}
 
+		// Set bank transfer recipient details.
+		if ( isset( $result->details ) ) {
+			$bank_transfer_recipient_details = $payment->get_bank_transfer_recipient_details();
+
+			if ( null === $bank_transfer_recipient_details ) {
+				$bank_transfer_recipient_details = new BankTransferDetails();
+
+				$payment->set_bank_transfer_recipient_details( $bank_transfer_recipient_details );
+			}
+
+			$bank_details = $bank_transfer_recipient_details->get_bank_account();
+
+			if ( null === $bank_details ) {
+				$bank_details = new BankAccountDetails();
+
+				$bank_transfer_recipient_details->set_bank_account( $bank_details );
+			}
+
+			$details = $result->details;
+
+			/*
+			 * @codingStandardsIgnoreStart
+			 *
+			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
+			 */
+			if ( isset( $details->bankName ) ) {
+				/**
+				 * Set `bankName` as bank details name, as result "Stichting Mollie Payments"
+				 * is not the name of a bank, but the account holder name.
+				 */
+				$bank_details->set_name( $details->bankName );
+			}
+
+			if ( isset( $details->bankAccount ) ) {
+				$bank_details->set_iban( $details->bankAccount );
+			}
+
+			if ( isset( $details->bankBic ) ) {
+				$bank_details->set_bic( $details->bankBic );
+			}
+
+			if ( isset( $details->transferReference ) ) {
+				$bank_transfer_recipient_details->set_reference( $details->transferReference );
+			}
+			// @codingStandardsIgnoreEnd
+		}
+
 		// Set action URL.
-		if ( isset( $result->_links->checkout->href ) ) {
-			$payment->set_action_url( $result->_links->checkout->href );
+		if ( isset( $result->_links ) ) {
+			if ( isset( $result->_links->checkout->href ) ) {
+				$payment->set_action_url( $result->_links->checkout->href );
+			}
 		}
 	}
 
@@ -306,19 +397,27 @@ class Gateway extends Core_Gateway {
 	 * @return void
 	 */
 	public function update_status( Payment $payment ) {
-		$mollie_payment = $this->client->get_payment( $payment->get_transaction_id() );
+		$transaction_id = $payment->get_transaction_id();
 
-		if ( ! $mollie_payment ) {
-			$payment->set_status( PaymentStatus::FAILURE );
-
-			$this->error = $this->client->get_error();
-
+		if ( null === $transaction_id ) {
 			return;
 		}
 
-		$payment->set_status( Statuses::transform( $mollie_payment->status ) );
+		$mollie_payment = $this->client->get_payment( $transaction_id );
+
+		if ( isset( $mollie_payment->status ) ) {
+			$payment->set_status( Statuses::transform( $mollie_payment->status ) );
+		}
 
 		if ( isset( $mollie_payment->details ) ) {
+			$consumer_bank_details = $payment->get_consumer_bank_details();
+
+			if ( null === $consumer_bank_details ) {
+				$consumer_bank_details = new BankAccountDetails();
+
+				$payment->set_consumer_bank_details( $consumer_bank_details );
+			}
+
 			$details = $mollie_payment->details;
 
 			/*
@@ -327,19 +426,45 @@ class Gateway extends Core_Gateway {
 			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 			 */
 			if ( isset( $details->consumerName ) ) {
-				$payment->set_consumer_name( $details->consumerName );
+				$consumer_bank_details->set_name( $details->consumerName );
 			}
 
 			if ( isset( $details->cardHolder ) ) {
-				$payment->set_consumer_name( $details->cardHolder );
+				$consumer_bank_details->set_name( $details->cardHolder );
+			}
+
+			if ( isset( $details->cardNumber ) ) {
+				// The last four digits of the card number.
+				$consumer_bank_details->set_account_number( $details->cardNumber );
+			}
+
+			if ( isset( $details->cardCountryCode ) ) {
+				// The ISO 3166-1 alpha-2 country code of the country the card was issued in.
+				$consumer_bank_details->set_country( $details->cardCountryCode );
 			}
 
 			if ( isset( $details->consumerAccount ) ) {
-				$payment->set_consumer_iban( $details->consumerAccount );
+				switch ( $mollie_payment->method ) {
+					case Methods::BELFIUS:
+					case Methods::DIRECT_DEBIT:
+					case Methods::IDEAL:
+					case Methods::KBC:
+					case Methods::SOFORT:
+						$consumer_bank_details->set_iban( $details->consumerAccount );
+
+						break;
+					case Methods::BANCONTACT:
+					case Methods::BANKTRANSFER:
+					case Methods::PAYPAL:
+					default:
+						$consumer_bank_details->set_account_number( $details->consumerAccount );
+
+						break;
+				}
 			}
 
 			if ( isset( $details->consumerBic ) ) {
-				$payment->set_consumer_bic( $details->consumerBic );
+				$consumer_bank_details->set_bic( $details->consumerBic );
 			}
 			// @codingStandardsIgnoreEnd
 		}
@@ -450,18 +575,20 @@ class Gateway extends Core_Gateway {
 
 		$subscription = $payment->get_subscription();
 
-		if ( ! $subscription || empty( $subscription->user_id ) ) {
+		if ( ! $subscription || null === $subscription->get_customer() || empty( $subscription->get_customer()->get_user_id() ) ) {
 			return;
 		}
+
+		$user_id = $subscription->get_customer()->get_user_id();
 
 		// Get customer ID from subscription meta.
 		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
-		$user_customer_id = $this->get_customer_id_by_wp_user_id( $subscription->user_id );
+		$user_customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
 
 		if ( empty( $user_customer_id ) ) {
 			// Set customer ID as user meta.
-			$this->update_wp_user_customer_id( $subscription->user_id, $customer_id );
+			$this->update_wp_user_customer_id( $user_id, (string) $customer_id );
 		}
 	}
 }

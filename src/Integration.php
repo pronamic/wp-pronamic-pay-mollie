@@ -22,10 +22,17 @@ use WP_User;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.8
+ * @version 2.0.9
  * @since   1.0.0
  */
 class Integration extends AbstractIntegration {
+	/**
+	 * Register URL.
+	 *
+	 * @var string
+	 */
+	public $register_url;
+
 	/**
 	 * Construct and intialize Mollie integration.
 	 */
@@ -39,10 +46,15 @@ class Integration extends AbstractIntegration {
 		$this->provider      = 'mollie';
 		$this->supports      = array(
 			'payment_status_request',
+			'recurring_direct_debit',
+			'recurring_credit_card',
+			'recurring',
 			'webhook',
 			'webhook_log',
 			'webhook_no_config',
 		);
+
+		$this->set_manual_url( __( 'https://www.pronamic.eu/support/how-to-connect-mollie-with-wordpress-via-pronamic-pay/', 'pronamic_ideal' ) );
 
 		// Actions.
 		$function = array( __NAMESPACE__ . '\Listener', 'listen' );
@@ -90,6 +102,26 @@ class Integration extends AbstractIntegration {
 			'type'     => 'text',
 			'classes'  => array( 'regular-text', 'code' ),
 			'tooltip'  => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
+		);
+
+		// Due date days.
+		$fields[] = array(
+			'section'     => 'advanced',
+			'filter'      => \FILTER_SANITIZE_NUMBER_INT,
+			'meta_key'    => '_pronamic_gateway_mollie_due_date_days',
+			'title'       => _x( 'Due date days', 'mollie', 'pronamic_ideal' ),
+			'type'        => 'number',
+			'min'         => 1,
+			'max'         => 100,
+			'classes'     => array( 'regular-text' ),
+			'tooltip'     => __( 'Number of days after which a bank transfer payment expires.', 'pronamic_ideal' ),
+			'description' => sprintf(
+				/* translators: 1: <code>1</code>, 2: <code>100</code>, 3: <code>12</code> */
+				__( 'Minimum %1$s and maximum %2$s days. Default: %3$s days.', 'pronamic_ideal' ),
+				sprintf( '<code>%s</code>', '1' ),
+				sprintf( '<code>%s</code>', '100' ),
+				sprintf( '<code>%s</code>', '12' )
+			),
 		);
 
 		// Webhook.
@@ -170,9 +202,10 @@ class Integration extends AbstractIntegration {
 	public function get_config( $post_id ) {
 		$config = new Config();
 
-		$config->id      = intval( $post_id );
-		$config->api_key = $this->get_meta( $post_id, 'mollie_api_key' );
-		$config->mode    = $this->get_meta( $post_id, 'mode' );
+		$config->id            = intval( $post_id );
+		$config->api_key       = $this->get_meta( $post_id, 'mollie_api_key' );
+		$config->mode          = $this->get_meta( $post_id, 'mode' );
+		$config->due_date_days = $this->get_meta( $post_id, 'mollie_due_date_days' );
 
 		return $config;
 	}
@@ -196,15 +229,27 @@ class Integration extends AbstractIntegration {
 	 * @return \DateTime
 	 */
 	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
+		$config_id = $payment->get_config_id();
+
+		if ( null === $config_id ) {
+			return $next_payment_delivery_date;
+		}
+
 		// Check gateway.
-		$gateway_id = \get_post_meta( $payment->get_config_id(), '_pronamic_gateway_id', true );
+		$gateway_id = \get_post_meta( $config_id, '_pronamic_gateway_id', true );
 
 		if ( 'mollie' !== $gateway_id ) {
 			return $next_payment_delivery_date;
 		}
 
 		// Check direct debit payment method.
-		if ( ! PaymentMethods::is_direct_debit_method( $payment->get_method() ) ) {
+		$method = $payment->get_method();
+
+		if ( null === $method ) {
+			return $next_payment_delivery_date;
+		}
+
+		if ( ! PaymentMethods::is_direct_debit_method( $method ) ) {
 			return $next_payment_delivery_date;
 		}
 
@@ -235,19 +280,20 @@ class Integration extends AbstractIntegration {
 		 */
 		switch ( $day_of_week ) {
 			case 'Monday':
-				$next_payment_delivery_date->sub( new \DateInterval( 'P3D' ) );
-				break;
+				$next_payment_delivery_date->modify( '-3 days' );
 
+				break;
 			case 'Saturday':
-				$next_payment_delivery_date->sub( new \DateInterval( 'P2D' ) );
-				break;
+				$next_payment_delivery_date->modify( '-2 days' );
 
+				break;
 			case 'Sunday':
-				$next_payment_delivery_date->sub( new \DateInterval( 'P3D' ) );
-				break;
+				$next_payment_delivery_date->modify( '-3 days' );
 
+				break;
 			default:
-				$next_payment_delivery_date->sub( new \DateInterval( 'P1D' ) );
+				$next_payment_delivery_date->modify( '-1 day' );
+
 				break;
 		}
 

@@ -12,16 +12,18 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
+use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionsDataStoreCPT;
+use WP_Http;
 use WP_UnitTestCase;
 
 /**
  * Gateway test.
  *
  * @author Reüel van der Steege
- * @version 2.0.5
+ * @version 2.0.9
  */
 class GatewayTest extends WP_UnitTestCase {
 	/**
@@ -39,10 +41,24 @@ class GatewayTest extends WP_UnitTestCase {
 	private $config_id = 1;
 
 	/**
+	 * Mock HTTP responses.
+	 *
+	 * @var array
+	 */
+	private $mock_http_responses;
+
+	/**
 	 * Setup gateway test.
 	 */
 	public function setUp() {
 		parent::setUp();
+
+		$this->mock_http_responses = array();
+
+		// Mock HTTP response.
+		add_filter( 'pre_http_request', array( $this, 'pre_http_request' ), 10, 3 );
+
+		$this->mock_http_response( 'https://api.mollie.com/v2/methods', __DIR__ . '/../http/api-mollie-com-v2-methods.http' );
 
 		$this->set_gateway(
 			array(
@@ -50,6 +66,50 @@ class GatewayTest extends WP_UnitTestCase {
 				'mode' => Gateway::MODE_TEST,
 			)
 		);
+	}
+
+	/**
+	 * Mock HTTP response.
+	 *
+	 * @param string $url  URL.
+	 * @param string $file File with HTTP response.
+	 */
+	public function mock_http_response( $url, $file ) {
+		$this->mock_http_responses[ $url ] = $file;
+	}
+
+	/**
+	 * Pre HTTP request
+	 *
+	 * @link https://github.com/WordPress/WordPress/blob/3.9.1/wp-includes/class-http.php#L150-L164
+	 *
+	 * @param false|array|WP_Error $preempt Whether to preempt an HTTP request's return value. Default false.
+	 * @param array                $r       HTTP request arguments.
+	 * @param string               $url     The request URL.
+	 *
+	 * @return array
+	 */
+	public function pre_http_request( $preempt, $r, $url ) {
+		if ( ! isset( $this->mock_http_responses[ $url ] ) ) {
+			return $preempt;
+		}
+
+		$file = $this->mock_http_responses[ $url ];
+
+		// Vary methods result based on requested sequence type.
+		if ( 'https://api.mollie.com/v2/methods' === $url && is_array( $r['body'] ) && isset( $r['body']['sequenceType'] ) ) {
+			$file = \str_replace( '.http', sprintf( '-%s.http', $r['body']['sequenceType'] ), $file );
+		}
+
+		$response = file_get_contents( $file, true );
+
+		$processed_response = WP_Http::processResponse( $response );
+
+		$processed_headers = WP_Http::processHeaders( $processed_response['headers'], $url );
+
+		$processed_headers['body'] = $processed_response['body'];
+
+		return $processed_headers;
 	}
 
 	/**
@@ -88,10 +148,17 @@ class GatewayTest extends WP_UnitTestCase {
 	public function test_get_issuers_structure() {
 		$issuers = $this->gateway->get_issuers();
 
+		$this->assertInternalType( 'array', $issuers );
+
 		// Check issuers array structure.
 		if ( ! empty( $issuers ) ) {
 			$this->assertInternalType( 'array', $issuers[0] );
 			$this->assertArrayHasKey( 'options', $issuers[0] );
+		}
+
+		// Check gateway error if issuers is empty.
+		if ( empty( $issuers ) ) {
+			$this->assertInstanceOf( 'WP_Error', $this->gateway->error );
 		}
 	}
 
@@ -238,6 +305,10 @@ class GatewayTest extends WP_UnitTestCase {
 		$payment->recurring_type = Core_Recurring::RECURRING;
 
 		// Get customer ID for payment.
+		$this->mock_http_response( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U.http' );
+		$this->mock_http_response( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U_first', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U_first.http' );
+		$this->mock_http_response( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U_subscription', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U_subscription.http' );
+
 		$customer_id = $this->gateway->get_customer_id_for_payment( $payment );
 
 		$this->assertEquals( $expected, $customer_id );
@@ -264,7 +335,6 @@ class GatewayTest extends WP_UnitTestCase {
 			array( 1, $cst_subscription, null, $cst_subscription ),
 			array( 1, $cst_subscription, $cst_first, $cst_subscription ),
 			array( '1', $cst_subscription, $cst_first, $cst_subscription ),
-			array( '1', $cst_subscription, $cst_first, $cst_subscription ),
 		);
 	}
 
@@ -276,7 +346,7 @@ class GatewayTest extends WP_UnitTestCase {
 	 * @param string $customer_id Mollie Customer ID.
 	 * @param bool   $expected    Expected value.
 	 *
-	 * @dataProvider test_copy_customer_id_to_wp_user_provider
+	 * @dataProvider provider_copy_customer_id_to_wp_user
 	 */
 	public function test_copy_customer_id_to_wp_user( $config_id, $user_id, $customer_id, $expected ) {
 		if ( $this->config_id !== $config_id ) {
@@ -292,9 +362,12 @@ class GatewayTest extends WP_UnitTestCase {
 		$payment            = new Payment();
 		$payment->config_id = 1;
 
-		$payment->subscription          = new Subscription();
-		$payment->subscription->user_id = $user_id;
+		$customer = new Customer();
+		$customer->set_user_id( $user_id );
+
+		$payment->subscription = new Subscription();
 		$payment->subscription->set_id( 1 );
+		$payment->subscription->set_customer( $customer );
 
 		$subscriptions_data_store = new SubscriptionsDataStoreCPT();
 		$subscriptions_data_store->update( $payment->subscription );
@@ -314,13 +387,13 @@ class GatewayTest extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function test_copy_customer_id_to_wp_user_provider() {
+	public function provider_copy_customer_id_to_wp_user() {
 		return array(
 			// Config ID not equal to payment config ID.
 			array( 0, 1, 'cst_8wmqcHMN4U', null ),
 
-			// Invalid WordPress user ID and valid Mollie customer ID.
-			array( 1, 1, 'cst_8wmqcHMN4U', '' ),
+			// Valid WordPress user ID and Mollie customer ID.
+			array( 1, 1, 'cst_8wmqcHMN4U', 'cst_8wmqcHMN4U' ),
 
 			// Invalid WordPress user ID and Mollie customer ID.
 			array( 1, 0, 0, false ),

@@ -16,14 +16,21 @@ use Pronamic\WordPress\Money\Money;
  * Payment request test
  *
  * @author  Remco Tolsma
- * @version 2.1.0
+ * @version 2.0.9
  * @since   1.0.0
  */
 class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	/**
-	 * Test payment request.
+	 * Payment request.
+	 *
+	 * @var PaymentRequest
 	 */
-	public function test_payment_request() {
+	private $request;
+
+	/**
+	 * Setup.
+	 */
+	public function setUp() {
 		$request = new PaymentRequest();
 
 		$amount = new Amount( 'EUR', '100.00' );
@@ -39,9 +46,15 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 		$request->customer_id   = 'cst_8wmqcHMN4U';
 		$request->sequence_type = Sequence::FIRST;
 
+		$this->request = $request;
+	}
+	/**
+	 * Test payment request.
+	 */
+	public function test_payment_request() {
 		$this->assertEquals(
 			array(
-				'amount'       => $amount->get_json(),
+				'amount'       => $this->request->amount->get_json(),
 				'description'  => 'Test',
 				'redirectUrl'  => 'https://example.com/mollie-redirect/',
 				'webhookUrl'   => 'https://example.com/mollie-webhook/',
@@ -52,7 +65,35 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 				'customerId'   => 'cst_8wmqcHMN4U',
 				'sequenceType' => 'first',
 			),
-			$request->get_array()
+			$this->request->get_array()
+		);
+	}
+
+	/**
+	 * Test due date.
+	 *
+	 * @throws \Exception Throws exception on date error.
+	 */
+	public function test_due_date() {
+		$due_date = new \DateTime( '+12 days' );
+
+		$this->request->set_due_date( $due_date );
+
+		$this->assertEquals(
+			array(
+				'amount'       => $this->request->amount->get_json(),
+				'description'  => 'Test',
+				'redirectUrl'  => 'https://example.com/mollie-redirect/',
+				'webhookUrl'   => 'https://example.com/mollie-webhook/',
+				'method'       => 'ideal',
+				'metadata'     => 'meta',
+				'locale'       => 'nl_NL',
+				'issuer'       => 'ideal_INGBNL2A',
+				'dueDate'      => $due_date->format( 'Y-m-d' ),
+				'customerId'   => 'cst_8wmqcHMN4U',
+				'sequenceType' => 'first',
+			),
+			$this->request->get_array()
 		);
 	}
 }

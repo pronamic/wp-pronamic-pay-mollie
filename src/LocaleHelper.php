@@ -17,15 +17,14 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.0
+ * @version 2.0.9
  * @since   1.0.0
  */
 class LocaleHelper {
 	/**
 	 * Get Mollie locale by the specified WordPress locale.
 	 *
-	 * @param string $locale Locale string (en_US) to transform to Mollie locale.
-	 *
+	 * @param string|null $locale Locale string (en_US) to transform to Mollie locale.
 	 * @return string|null
 	 */
 	public static function transform( $locale ) {

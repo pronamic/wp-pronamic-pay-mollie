@@ -19,7 +19,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.0
+ * @version 2.0.9
  * @since   1.0.0
  */
 class Methods {
@@ -64,13 +64,6 @@ class Methods {
 	 * @var string
 	 */
 	const BANKTRANSFER = 'banktransfer';
-
-	/**
-	 * Constant for the Bitcoin method.
-	 *
-	 * @var string
-	 */
-	const BITCOIN = 'bitcoin';
 
 	/**
 	 * Constant for the EPS method.
@@ -135,7 +128,6 @@ class Methods {
 	private static $map = array(
 		PaymentMethods::BANCONTACT              => self::BANCONTACT,
 		PaymentMethods::BANK_TRANSFER           => self::BANKTRANSFER,
-		PaymentMethods::BITCOIN                 => self::BITCOIN,
 		PaymentMethods::CREDIT_CARD             => self::CREDITCARD,
 		PaymentMethods::DIRECT_DEBIT            => self::DIRECT_DEBIT,
 		PaymentMethods::DIRECT_DEBIT_BANCONTACT => self::DIRECT_DEBIT,
@@ -155,10 +147,9 @@ class Methods {
 	 *
 	 * @since 1.1.6
 	 *
-	 * @param string $payment_method Payment method.
-	 * @param mixed  $default        Default payment method.
-	 *
-	 * @return string
+	 * @param string|null $payment_method Payment method.
+	 * @param mixed       $default        Default payment method.
+	 * @return string|null
 	 */
 	public static function transform( $payment_method, $default = null ) {
 		if ( ! is_scalar( $payment_method ) ) {
@@ -179,11 +170,8 @@ class Methods {
 	/**
 	 * Transform Mollie method to WordPress payment method.
 	 *
-	 * @since unreleased
-	 *
-	 * @param string $method Mollie method.
-	 *
-	 * @return string
+	 * @param string|null $method Mollie method.
+	 * @return string|null
 	 */
 	public static function transform_gateway_method( $method ) {
 		if ( ! is_scalar( $method ) ) {
