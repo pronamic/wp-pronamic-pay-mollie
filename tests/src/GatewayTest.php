@@ -23,7 +23,7 @@ use WP_UnitTestCase;
  * Gateway test.
  *
  * @author Reüel van der Steege
- * @version 2.0.5
+ * @version 2.0.9
  */
 class GatewayTest extends WP_UnitTestCase {
 	/**
