@@ -208,7 +208,7 @@ class Client {
 		$payment_methods = array();
 
 		if ( ! isset( $response->_embedded ) ) {
-			throw new \Exception( 'No embbedded data in Mollie response.' );
+			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
 		if ( isset( $response->_embedded->methods ) ) {
@@ -300,7 +300,7 @@ class Client {
 		$mollie_method = Methods::transform( $payment_method );
 
 		if ( ! isset( $mandates->_embedded ) ) {
-			throw new \Exception( 'No embbedded data in Mollie response.' );
+			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
 		foreach ( $mandates->_embedded as $mandate ) {
@@ -331,7 +331,7 @@ class Client {
 		$mollie_method = Methods::transform( $payment_method );
 
 		if ( ! isset( $mandates->_embedded ) ) {
-			throw new \Exception( 'No embbedded data in Mollie response.' );
+			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
 		foreach ( $mandates->_embedded as $mandate ) {
