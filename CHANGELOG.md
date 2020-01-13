@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+- Fixed notice "Not Found - No customer exists with token cst_XXXXXXXXXX".
 
 ## [2.0.9] - 2019-12-22
 - Added advanced setting for bank transfer due date days.

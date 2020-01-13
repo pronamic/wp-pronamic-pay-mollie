@@ -503,7 +503,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Create new customer if the customer does not exist at Mollie.
-		if ( ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) && Core_Recurring::RECURRING !== $payment->recurring_type ) {
+		if ( ( empty( $customer_id ) || null === $this->client->get_customer( $customer_id ) ) && Core_Recurring::RECURRING !== $payment->recurring_type ) {
 			$customer_name = null;
 
 			if ( null !== $payment->get_customer() && null !== $payment->get_customer()->get_name() ) {

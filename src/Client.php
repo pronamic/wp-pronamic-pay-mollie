@@ -258,7 +258,7 @@ class Client {
 	 *
 	 * @param string $customer_id Mollie customer ID.
 	 *
-	 * @return object
+	 * @return null|object
 	 * @throws \InvalidArgumentException Throws exception on empty customer ID argument.
 	 */
 	public function get_customer( $customer_id ) {
@@ -266,7 +266,15 @@ class Client {
 			throw new \InvalidArgumentException( 'Mollie customer ID can not be empty string.' );
 		}
 
-		return $this->send_request( 'customers/' . $customer_id, 'GET' );
+		try {
+			return $this->send_request( 'customers/' . $customer_id, 'GET' );
+		} catch ( Error $error ) {
+			if ( 404 === $error->get_status() ) {
+				return null;
+			}
+
+			throw $error;
+		}
 	}
 
 	/**
