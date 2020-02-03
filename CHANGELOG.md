@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
-- Fixed notice "Not Found - No customer exists with token cst_XXXXXXXXXX".
+-
+
+## [2.0.10] - 2020-02-03
+- Fixed notice "Not Found - No customer exists with token cst_XXXXXXXXXX" in some cases.
 
 ## [2.0.9] - 2019-12-22
 - Added advanced setting for bank transfer due date days.
@@ -126,7 +129,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.9...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.0.10...HEAD
+[2.0.10]: https://github.com/wp-pay-gateways/mollie/compare/2.0.9...2.0.10
 [2.0.9]: https://github.com/wp-pay-gateways/mollie/compare/2.0.8...2.0.9
 [2.0.8]: https://github.com/wp-pay-gateways/mollie/compare/2.0.7...2.0.8
 [2.0.7]: https://github.com/wp-pay-gateways/mollie/compare/2.0.6...2.0.7
