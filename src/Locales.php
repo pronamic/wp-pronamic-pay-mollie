@@ -3,7 +3,7 @@
  * Mollie locales.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2019 Pronamic
+ * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -13,7 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 /**
  * Title: Mollie locales
  * Description:
- * Copyright: 2005-2019 Pronamic
+ * Copyright: 2005-2020 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma

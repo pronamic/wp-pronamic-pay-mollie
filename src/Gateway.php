@@ -3,7 +3,7 @@
  * Mollie gateway.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2019 Pronamic
+ * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -23,7 +23,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 /**
  * Title: Mollie
  * Description:
- * Copyright: 2005-2019 Pronamic
+ * Copyright: 2005-2020 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -503,7 +503,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Create new customer if the customer does not exist at Mollie.
-		if ( ( empty( $customer_id ) || ! $this->client->get_customer( $customer_id ) ) && Core_Recurring::RECURRING !== $payment->recurring_type ) {
+		if ( ( empty( $customer_id ) || null === $this->client->get_customer( $customer_id ) ) && Core_Recurring::RECURRING !== $payment->recurring_type ) {
 			$customer_name = null;
 
 			if ( null !== $payment->get_customer() && null !== $payment->get_customer()->get_name() ) {

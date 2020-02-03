@@ -3,7 +3,7 @@
  * Mollie client.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2019 Pronamic
+ * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -16,7 +16,7 @@ use Pronamic\WordPress\Pay\Core\XML\Security;
 /**
  * Title: Mollie
  * Description:
- * Copyright: 2005-2019 Pronamic
+ * Copyright: 2005-2020 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -208,7 +208,7 @@ class Client {
 		$payment_methods = array();
 
 		if ( ! isset( $response->_embedded ) ) {
-			throw new \Exception( 'No embbedded data in Mollie response.' );
+			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
 		if ( isset( $response->_embedded->methods ) ) {
@@ -258,15 +258,24 @@ class Client {
 	 *
 	 * @param string $customer_id Mollie customer ID.
 	 *
-	 * @return object
+	 * @return null|object
 	 * @throws \InvalidArgumentException Throws exception on empty customer ID argument.
+	 * @throws Error Throws Error when Mollie error occurs.
 	 */
 	public function get_customer( $customer_id ) {
 		if ( empty( $customer_id ) ) {
 			throw new \InvalidArgumentException( 'Mollie customer ID can not be empty string.' );
 		}
 
-		return $this->send_request( 'customers/' . $customer_id, 'GET' );
+		try {
+			return $this->send_request( 'customers/' . $customer_id, 'GET' );
+		} catch ( Error $error ) {
+			if ( 404 === $error->get_status() ) {
+				return null;
+			}
+
+			throw $error;
+		}
 	}
 
 	/**
@@ -300,7 +309,7 @@ class Client {
 		$mollie_method = Methods::transform( $payment_method );
 
 		if ( ! isset( $mandates->_embedded ) ) {
-			throw new \Exception( 'No embbedded data in Mollie response.' );
+			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
 		foreach ( $mandates->_embedded as $mandate ) {
@@ -331,7 +340,7 @@ class Client {
 		$mollie_method = Methods::transform( $payment_method );
 
 		if ( ! isset( $mandates->_embedded ) ) {
-			throw new \Exception( 'No embbedded data in Mollie response.' );
+			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
 		foreach ( $mandates->_embedded as $mandate ) {
