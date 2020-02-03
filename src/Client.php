@@ -260,6 +260,7 @@ class Client {
 	 *
 	 * @return null|object
 	 * @throws \InvalidArgumentException Throws exception on empty customer ID argument.
+	 * @throws \Exception Throws exception when request fails.
 	 */
 	public function get_customer( $customer_id ) {
 		if ( empty( $customer_id ) ) {
