@@ -188,6 +188,7 @@ class Gateway extends Core_Gateway {
 	 * Get supported payment methods
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::get_supported_payment_methods()
+	 * @return array<string>
 	 */
 	public function get_supported_payment_methods() {
 		return array(
@@ -246,19 +247,23 @@ class Gateway extends Core_Gateway {
 	 * Start
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::start()
-	 *
 	 * @param Payment $payment Payment.
+	 * @return void
 	 */
 	public function start( Payment $payment ) {
-		$request               = new PaymentRequest();
-		$request->amount       = AmountTransformer::transform( $payment->get_total_amount() );
-		$request->description  = \strval( $payment->get_description() );
+		$request = new PaymentRequest(
+			AmountTransformer::transform( $payment->get_total_amount() ),
+			\strval( $payment->get_description() )
+		);
+
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
 
 		// Locale.
-		if ( null !== $payment->get_customer() ) {
-			$request->locale = LocaleHelper::transform( $payment->get_customer()->get_locale() );
+		$customer = $payment->get_customer();
+
+		if ( null !== $customer ) {
+			$request->locale = LocaleHelper::transform( $customer->get_locale() );
 		}
 
 		// Customer ID.
@@ -393,7 +398,6 @@ class Gateway extends Core_Gateway {
 	 * Update status of the specified payment
 	 *
 	 * @param Payment $payment Payment.
-	 *
 	 * @return void
 	 */
 	public function update_status( Payment $payment ) {
@@ -474,12 +478,13 @@ class Gateway extends Core_Gateway {
 	 * Get Mollie customer ID for payment.
 	 *
 	 * @param Payment $payment Payment.
-	 *
 	 * @return bool|string
 	 */
 	public function get_customer_id_for_payment( Payment $payment ) {
+		$customer = $payment->get_customer();
+
 		// Get WordPress user ID from payment customer.
-		$user_id = ( null === $payment->get_customer() ? null : $payment->get_customer()->get_user_id() );
+		$user_id = ( null === $customer ? null : $customer->get_user_id() );
 
 		// Get Mollie customer ID from user meta.
 		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
@@ -506,8 +511,8 @@ class Gateway extends Core_Gateway {
 		if ( ( empty( $customer_id ) || null === $this->client->get_customer( $customer_id ) ) && Core_Recurring::RECURRING !== $payment->recurring_type ) {
 			$customer_name = null;
 
-			if ( null !== $payment->get_customer() && null !== $payment->get_customer()->get_name() ) {
-				$customer_name = strval( $payment->get_customer()->get_name() );
+			if ( null !== $customer && null !== $customer->get_name() ) {
+				$customer_name = strval( $customer->get_name() );
 			}
 
 			$customer_id = $this->client->create_customer( $payment->get_email(), $customer_name );
@@ -530,7 +535,6 @@ class Gateway extends Core_Gateway {
 	 * Get Mollie customer ID by the specified WordPress user ID.
 	 *
 	 * @param int $user_id WordPress user ID.
-	 *
 	 * @return string|bool
 	 */
 	public function get_customer_id_by_wp_user_id( $user_id ) {
@@ -546,7 +550,6 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param int    $user_id     WordPress user ID.
 	 * @param string $customer_id Mollie Customer ID.
-	 *
 	 * @return bool
 	 */
 	private function update_wp_user_customer_id( $user_id, $customer_id ) {
@@ -565,7 +568,6 @@ class Gateway extends Core_Gateway {
 	 * Copy Mollie customer ID from subscription meta to WordPress user meta.
 	 *
 	 * @param Payment $payment Payment.
-	 *
 	 * @return void
 	 */
 	public function copy_customer_id_to_wp_user( Payment $payment ) {
@@ -575,11 +577,21 @@ class Gateway extends Core_Gateway {
 
 		$subscription = $payment->get_subscription();
 
-		if ( ! $subscription || null === $subscription->get_customer() || empty( $subscription->get_customer()->get_user_id() ) ) {
+		if ( ! $subscription ) {
 			return;
 		}
 
-		$user_id = $subscription->get_customer()->get_user_id();
+		$customer = $subscription->get_customer();
+
+		if ( null === $customer ) {
+			return;
+		}
+
+		$user_id = $customer->get_user_id();
+
+		if ( empty( $user_id ) ) {
+			return;
+		}
 
 		// Get customer ID from subscription meta.
 		$customer_id = $subscription->get_meta( 'mollie_customer_id' );

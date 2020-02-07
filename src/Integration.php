@@ -142,8 +142,8 @@ class Integration extends AbstractIntegration {
 	 * Save post.
 	 *
 	 * @link https://developer.wordpress.org/reference/functions/get_post_meta/
-	 *
 	 * @param int $post_id Post ID.
+	 * @return void
 	 */
 	public function save_post( $post_id ) {
 		$api_key = get_post_meta( $post_id, '_pronamic_gateway_mollie_api_key', true );
@@ -169,10 +169,10 @@ class Integration extends AbstractIntegration {
 	/**
 	 * User profile.
 	 *
-	 * @param WP_User $user WordPress user.
-	 *
 	 * @since 1.1.6
 	 * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
+	 * @param WP_User $user WordPress user.
+	 * @return void
 	 */
 	public static function user_profile( $user ) {
 		include __DIR__ . '/../views/html-admin-user-profile.php';
@@ -181,22 +181,26 @@ class Integration extends AbstractIntegration {
 	/**
 	 * Payment provider URL.
 	 *
-	 * @param string  $url     Payment provider URL.
-	 * @param Payment $payment Payment.
-	 *
-	 * @return string
+	 * @param string|null $url     Payment provider URL.
+	 * @param Payment     $payment Payment.
+	 * @return string|null
 	 */
 	public function payment_provider_url( $url, Payment $payment ) {
+		$transaction_id = $payment->get_transaction_id();
+
+		if ( null === $transaction_id ) {
+			return $url;
+		}
+
 		return sprintf(
 			'https://www.mollie.com/dashboard/payments/%s',
-			$payment->get_transaction_id()
+			$transaction_id
 		);
 	}
 	/**
 	 * Get configuration by post ID.
 	 *
 	 * @param int $post_id Post ID.
-	 *
 	 * @return Config
 	 */
 	public function get_config( $post_id ) {
@@ -225,7 +229,6 @@ class Integration extends AbstractIntegration {
 	 *
 	 * @param \DateTime $next_payment_delivery_date Next payment delivery date.
 	 * @param Payment   $payment                    Payment.
-	 *
 	 * @return \DateTime
 	 */
 	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {

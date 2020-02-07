@@ -45,7 +45,7 @@ class PaymentRequest {
 	 * the right page referencing the order when the consumer returns.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $redirect_url;
 
@@ -108,7 +108,7 @@ class PaymentRequest {
 	 * is tomorrow and the maximum date is 100 days after tomorrow.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
-	 * @var null|\DateTimeInterface
+	 * @var \DateTimeInterface|null
 	 */
 	private $due_date;
 
@@ -116,7 +116,7 @@ class PaymentRequest {
 	 * Customer ID for Mollie checkout.
 	 *
 	 * @link https://www.mollie.com/nl/docs/checkout
-	 * @var string
+	 * @var string|null
 	 */
 	public $customer_id;
 
@@ -125,9 +125,20 @@ class PaymentRequest {
 	 *
 	 * @link https://www.mollie.com/nl/docs/recurring
 	 * @since 1.1.9
-	 * @var string
+	 * @var string|null
 	 */
 	public $sequence_type;
+
+	/**
+	 * Create Mollie payment request object.
+	 *
+	 * @param Amount $amount      The amount that you want to charge.
+	 * @param string $description The description of the payment you’re creating.
+	 */
+	public function __construct( $amount, $description ) {
+		$this->amount      = $amount;
+		$this->description = $description;
+	}
 
 	/**
 	 * Get due date.
@@ -142,6 +153,7 @@ class PaymentRequest {
 	 * Set due date.
 	 *
 	 * @param null|\DateTimeInterface $due_date Due date.
+	 * @return void
 	 */
 	public function set_due_date( $due_date ) {
 		$this->due_date = $due_date;

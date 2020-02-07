@@ -42,7 +42,7 @@ class Client {
 	 * Mode
 	 *
 	 * @since 1.1.9
-	 * @var string
+	 * @var string|null
 	 */
 	private $mode;
 
@@ -60,6 +60,7 @@ class Client {
 	 *
 	 * @since 1.1.9
 	 * @param string $mode Mode (test or live).
+	 * @return void
 	 */
 	public function set_mode( $mode ) {
 		$this->mode = $mode;
