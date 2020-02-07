@@ -552,15 +552,15 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param int    $user_id     WordPress user ID.
 	 * @param string $customer_id Mollie Customer ID.
-	 * @return bool
+	 * @return void
 	 */
 	private function update_wp_user_customer_id( $user_id, $customer_id ) {
 		if ( empty( $user_id ) || is_bool( $user_id ) ) {
-			return false;
+			return;
 		}
 
 		if ( ! is_string( $customer_id ) || empty( $customer_id ) || 1 === strlen( $customer_id ) ) {
-			return false;
+			return;
 		}
 
 		update_user_meta( $user_id, $this->meta_key_customer_id, $customer_id );
