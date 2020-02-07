@@ -69,9 +69,9 @@ class Client {
 	/**
 	 * Send request with the specified action and parameters
 	 *
-	 * @param string $end_point              Requested endpoint.
-	 * @param string $method                 HTTP method to use.
-	 * @param array  $data                   Request data.
+	 * @param string                             $end_point Requested endpoint.
+	 * @param string                             $method    HTTP method to use.
+	 * @param array<string, string|object|null> $data      Request data.
 	 * @return object
 	 * @throws Error Throws Error when Mollie error occurs.
 	 * @throws \Exception Throws exception when error occurs.
@@ -170,7 +170,7 @@ class Client {
 	/**
 	 * Get issuers
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_issuers() {
 		$response = $this->send_request( 'methods/ideal?include=issuers', 'GET' );
@@ -194,7 +194,7 @@ class Client {
 	 *
 	 * @param string $sequence_type Sequence type.
 	 *
-	 * @return array
+	 * @return array<string>
 	 * @throws \Exception Throws exception for methods on failed request or invalid response.
 	 */
 	public function get_payment_methods( $sequence_type = '' ) {

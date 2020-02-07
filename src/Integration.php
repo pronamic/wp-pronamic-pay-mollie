@@ -88,7 +88,7 @@ class Integration extends AbstractIntegration {
 	/**
 	 * Get settings fields.
 	 *
-	 * @return array
+	 * @return array<int, array<string, array<int, string>|int|string|true>>
 	 */
 	public function get_settings_fields() {
 		$fields = array();

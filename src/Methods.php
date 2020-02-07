@@ -123,7 +123,7 @@ class Methods {
 	/**
 	 * Payments methods map.
 	 *
-	 * @var array
+	 * @var array<string>
 	 */
 	private static $map = array(
 		PaymentMethods::BANCONTACT              => self::BANCONTACT,

@@ -162,7 +162,7 @@ class PaymentRequest {
 	/**
 	 * Get array of this Mollie payment request object.
 	 *
-	 * @return array
+	 * @return array<string,object>
 	 */
 	public function get_array() {
 		// Due date.

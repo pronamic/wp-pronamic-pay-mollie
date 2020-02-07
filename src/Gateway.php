@@ -83,6 +83,7 @@ class Gateway extends Core_Gateway {
 	 * Get issuers
 	 *
 	 * @see Core_Gateway::get_issuers()
+	 * @return array<int, array<string, array<string>>>
 	 */
 	public function get_issuers() {
 		$groups = array();
@@ -115,6 +116,7 @@ class Gateway extends Core_Gateway {
 	 * Get available payment methods.
 	 *
 	 * @see Core_Gateway::get_available_payment_methods()
+	 * @return array<string>
 	 */
 	public function get_available_payment_methods() {
 		$payment_methods = array();

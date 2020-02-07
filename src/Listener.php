@@ -26,11 +26,11 @@ class Listener {
 	/**
 	 * Listen.
 	 *
-	 * @return bool|null
+	 * @return void
 	 */
 	public static function listen() {
 		if ( ! filter_has_var( INPUT_GET, 'mollie_webhook' ) || ! filter_has_var( INPUT_POST, 'id' ) ) {
-			return null;
+			return;
 		}
 
 		$transaction_id = filter_input( INPUT_POST, 'id', FILTER_SANITIZE_STRING );
@@ -38,7 +38,7 @@ class Listener {
 		$payment = get_pronamic_payment_by_transaction_id( $transaction_id );
 
 		if ( null === $payment ) {
-			return false;
+			return;
 		}
 
 		// Add note.
