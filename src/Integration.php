@@ -45,7 +45,6 @@ class Integration extends AbstractGatewayIntegration {
 				'url'           =>  'http://www.mollie.com/en/',
 				'product_url'   =>  \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
 				'dashboard_url' =>  'https://www.mollie.com/dashboard/',
-				'register_url'  =>  'https://www.mollie.com/nl/signup/665327',
 				'provider'      =>  'mollie',
 				'supports'      =>  array(
 					'payment_status_request',
@@ -56,7 +55,6 @@ class Integration extends AbstractGatewayIntegration {
 					'webhook_log',
 					'webhook_no_config',
 				),
-				'manual_url'    => \__( 'https://www.pronamic.eu/support/how-to-connect-mollie-with-wordpress-via-pronamic-pay/', 'pronamic_ideal' ),
 			)
 		);
 
