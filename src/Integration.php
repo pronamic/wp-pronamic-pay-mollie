@@ -97,6 +97,15 @@ class Integration extends AbstractGatewayIntegration {
 		$upgrades = $this->get_upgrades();
 
 		$upgrades->add( new Upgrade300() );
+
+		/**
+		 * CLI.
+		 *
+		 * @link https://github.com/woocommerce/woocommerce/blob/3.9.0/includes/class-woocommerce.php#L453-L455
+		 */
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			$this->cli = new CLI();
+		}
 	}
 
 	/**
@@ -110,7 +119,7 @@ class Integration extends AbstractGatewayIntegration {
 		/**
 		 * Tables.
 		 */
-		$wpdb->pronamic_pay_mollie_organisations  = $wpdb->base_prefix . 'pronamic_pay_mollie_organisations';
+		$wpdb->pronamic_pay_mollie_organizations  = $wpdb->base_prefix . 'pronamic_pay_mollie_organizations';
 		$wpdb->pronamic_pay_mollie_customers      = $wpdb->base_prefix . 'pronamic_pay_mollie_customers';
 		$wpdb->pronamic_pay_mollie_customer_users = $wpdb->base_prefix . 'pronamic_pay_mollie_customer_users';
 	}

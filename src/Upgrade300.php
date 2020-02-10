@@ -52,7 +52,7 @@ class Upgrade300 extends Upgrade {
 		 * Queries.
 		 */
 		$queries = "
-			CREATE TABLE $wpdb->pronamic_pay_mollie_organisations (
+			CREATE TABLE $wpdb->pronamic_pay_mollie_organizations (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				mollie_id VARCHAR( 16 ) NOT NULL,
 
@@ -98,7 +98,7 @@ class Upgrade300 extends Upgrade {
 		$wpdb->query( "
 			ALTER TABLE $wpdb->pronamic_pay_mollie_customers 
 			ADD FOREIGN KEY ( organisation_id )
-			REFERENCES $wpdb->pronamic_pay_mollie_organisations ( id )
+			REFERENCES $wpdb->pronamic_pay_mollie_organizations ( id )
 			ON DELETE RESTRICT
 			ON UPDATE RESTRICT
 			;
