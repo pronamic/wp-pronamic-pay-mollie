@@ -11,7 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Gateways\Common\AbstractIntegration;
+use Pronamic\WordPress\Pay\AbstractGatewayIntegration;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use WP_User;
 
@@ -25,7 +25,7 @@ use WP_User;
  * @version 2.0.9
  * @since   1.0.0
  */
-class Integration extends AbstractIntegration {
+class Integration extends AbstractGatewayIntegration {
 	/**
 	 * Register URL.
 	 *
@@ -37,26 +37,30 @@ class Integration extends AbstractIntegration {
 	 * Construct and intialize Mollie integration.
 	 */
 	public function __construct() {
-	    parent::__construct();
-
-		$this->id            = 'mollie';
-		$this->name          = 'Mollie';
-		$this->url           = 'http://www.mollie.com/en/';
-		$this->product_url   = __( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' );
-		$this->dashboard_url = 'https://www.mollie.com/dashboard/';
-		$this->register_url  = 'https://www.mollie.com/nl/signup/665327';
-		$this->provider      = 'mollie';
-		$this->supports      = array(
-			'payment_status_request',
-			'recurring_direct_debit',
-			'recurring_credit_card',
-			'recurring',
-			'webhook',
-			'webhook_log',
-			'webhook_no_config',
+		$args = wp_parse_args(
+			$args,
+			array(
+				'id'            =>  'mollie',
+				'name'          =>  'Mollie',
+				'url'           =>  'http://www.mollie.com/en/',
+				'product_url'   =>  \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
+				'dashboard_url' =>  'https://www.mollie.com/dashboard/',
+				'register_url'  =>  'https://www.mollie.com/nl/signup/665327',
+				'provider'      =>  'mollie',
+				'supports'      =>  array(
+					'payment_status_request',
+					'recurring_direct_debit',
+					'recurring_credit_card',
+					'recurring',
+					'webhook',
+					'webhook_log',
+					'webhook_no_config',
+				),
+				'manual_url'    => \__( 'https://www.pronamic.eu/support/how-to-connect-mollie-with-wordpress-via-pronamic-pay/', 'pronamic_ideal' ),
+			)
 		);
 
-		$this->set_manual_url( __( 'https://www.pronamic.eu/support/how-to-connect-mollie-with-wordpress-via-pronamic-pay/', 'pronamic_ideal' ) );
+	    parent::__construct( $args );
 
 		// Actions.
 		$function = array( __NAMESPACE__ . '\Listener', 'listen' );
