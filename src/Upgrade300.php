@@ -93,6 +93,7 @@ class Upgrade300 extends Upgrade {
 		 * Foreign keys.
 		 *
 		 * @link https://core.trac.wordpress.org/ticket/19207
+		 * @link https://dev.mysql.com/doc/refman/5.6/en/create-table-foreign-keys.html
 		 */
 		$wpdb->query( "
 			ALTER TABLE $wpdb->pronamic_pay_mollie_customers 
@@ -116,8 +117,8 @@ class Upgrade300 extends Upgrade {
 			ALTER TABLE $wpdb->pronamic_pay_mollie_customer_users 
 			ADD FOREIGN KEY ( user_id )
 			REFERENCES $wpdb->users ( id )
-			ON DELETE RESTRICT
-			ON UPDATE RESTRICT
+			ON DELETE CASCADE
+			ON UPDATE CASCADE
 			;
 		" );
 	}
