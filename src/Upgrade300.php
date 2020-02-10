@@ -55,6 +55,8 @@ class Upgrade300 extends Upgrade {
 			CREATE TABLE $wpdb->pronamic_pay_mollie_organizations (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				mollie_id VARCHAR( 16 ) NOT NULL,
+				name VARCHAR( 128 ) DEFAULT NULL,
+				email VARCHAR( 100 ) DEFAULT NULL,
 
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id )
