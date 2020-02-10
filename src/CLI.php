@@ -61,8 +61,46 @@ class CLI {
 	 * CLI connect Mollie customers to WordPress users.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/customers-api/list-customers
+	 * @link https://make.wordpress.org/cli/handbook/internal-api/wp-cli-add-command/
+	 * @link https://developer.wordpress.org/reference/classes/wpdb/query/
+	 * @param array $args       Arguments.
+	 * @param array $assoc_args Associative arguments.
 	 */
 	public function wp_cli_customers_connect_wp_users( $args, $assoc_args ) {
-		\WP_CLI::error( 'Command not implemented yet.' );
+		global $wpdb;
+
+		$query = "
+			INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customer_users (
+				customer_id,
+				user_id
+			)
+			SELECT
+				mollie_customer.id AS mollie_customer_id,
+				wp_user.ID AS wp_user_id
+			FROM
+				$wpdb->pronamic_pay_mollie_customers AS mollie_customer
+					INNER JOIN
+				$wpdb->users AS wp_user
+						ON mollie_customer.email = wp_user.user_email
+			;
+		";
+
+		$result = $wpdb->query( $query );
+
+		if ( false === $result ) {
+			\WP_CLI::error(
+				sprintf(
+					'Database error: %s.',
+					$wpdb->last_error
+				)
+			);
+		}
+
+		\WP_CLI::log(
+			sprintf(
+				'Connected %d users and Mollie customers.',
+				$result
+			)
+		);		
 	}
 }

@@ -65,13 +65,13 @@ class Upgrade300 extends Upgrade {
 			CREATE TABLE $wpdb->pronamic_pay_mollie_customers (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				mollie_id VARCHAR( 16 ) NOT NULL,
-				organisation_id BIGINT( 20 ) NOT NULL,
+				organization_id BIGINT( 20 ) UNSIGNED NOT NULL,
 				test_mode BOOL NOT NULL,
 				email VARCHAR( 100 ) DEFAULT NULL,
 
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id ),
-				KEY organisation_id ( organisation_id ),
+				KEY organization_id ( organization_id ),
 				KEY test_mode ( test_mode ),
 				KEY email ( email )
 			) $charset_collate;
@@ -98,8 +98,9 @@ class Upgrade300 extends Upgrade {
 		 * @link https://dev.mysql.com/doc/refman/5.6/en/create-table-foreign-keys.html
 		 */
 		$wpdb->query( "
-			ALTER TABLE $wpdb->pronamic_pay_mollie_customers 
-			ADD FOREIGN KEY ( organisation_id )
+			ALTER TABLE $wpdb->pronamic_pay_mollie_customers
+			ADD CONSTRAINT fk_organization_id
+			FOREIGN KEY ( organization_id )
 			REFERENCES $wpdb->pronamic_pay_mollie_organizations ( id )
 			ON DELETE RESTRICT
 			ON UPDATE RESTRICT
@@ -107,8 +108,9 @@ class Upgrade300 extends Upgrade {
 		" );
 
 		$wpdb->query( "
-			ALTER TABLE $wpdb->pronamic_pay_mollie_customer_users 
-			ADD FOREIGN KEY ( customer_id )
+			ALTER TABLE $wpdb->pronamic_pay_mollie_customer_users
+			ADD CONSTRAINT fk_customer_id
+			FOREIGN KEY customer_id ( customer_id )
 			REFERENCES $wpdb->pronamic_pay_mollie_customers ( id )
 			ON DELETE RESTRICT
 			ON UPDATE RESTRICT
@@ -116,8 +118,9 @@ class Upgrade300 extends Upgrade {
 		" );
 
 		$wpdb->query( "
-			ALTER TABLE $wpdb->pronamic_pay_mollie_customer_users 
-			ADD FOREIGN KEY ( user_id )
+			ALTER TABLE $wpdb->pronamic_pay_mollie_customer_users
+			ADD CONSTRAINT fk_user_id
+			FOREIGN KEY user_id ( user_id )
 			REFERENCES $wpdb->users ( id )
 			ON DELETE CASCADE
 			ON UPDATE CASCADE
