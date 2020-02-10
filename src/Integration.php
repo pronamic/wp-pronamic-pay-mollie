@@ -35,8 +35,10 @@ class Integration extends AbstractGatewayIntegration {
 
 	/**
 	 * Construct and intialize Mollie integration.
+	 *
+	 * @param array $args Arguments.
 	 */
-	public function __construct() {
+	public function __construct( $args = array() ) {
 		$args = wp_parse_args(
 			$args,
 			array(
@@ -87,6 +89,30 @@ class Integration extends AbstractGatewayIntegration {
 		}
 
 		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
+
+		// Tables.
+		$this->register_tables();
+
+		// Upgrades.
+		$upgrades = $this->get_upgrades();
+
+		$upgrades->add( new Upgrade300() );
+	}
+
+	/**
+	 * Register tables.
+	 *
+	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-includes/wp-db.php#L894-L937
+	 */
+	private function register_tables() {
+		global $wpdb;
+
+		/**
+		 * Tables.
+		 */
+		$wpdb->pronamic_pay_mollie_organisations  = $wpdb->base_prefix . 'pronamic_pay_mollie_organisations';
+		$wpdb->pronamic_pay_mollie_customers      = $wpdb->base_prefix . 'pronamic_pay_mollie_customers';
+		$wpdb->pronamic_pay_mollie_customer_users = $wpdb->base_prefix . 'pronamic_pay_mollie_customer_users';
 	}
 
 	/**
