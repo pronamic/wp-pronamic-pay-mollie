@@ -37,7 +37,7 @@ class Integration extends AbstractIntegration {
 	 * Construct and intialize Mollie integration.
 	 */
 	public function __construct() {
-		parent::__construct();
+	    parent::__construct();
 
 		$this->id            = 'mollie';
 		$this->name          = 'Mollie';
