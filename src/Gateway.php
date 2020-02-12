@@ -477,6 +477,64 @@ class Gateway extends Core_Gateway {
 	}
 
 	/**
+	 * Get Mollie customers for the specified payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return array<string>
+	 */
+	private function get_customer_ids_for_payment( Payment $payment ) {
+		$customer = $payment->get_customer();
+
+		if ( null === $customer ) {
+			return array();
+		}
+
+		$user_id = $customer->get_user_id();
+
+		if ( empty( $user_id ) ) {
+			return array();
+		}
+
+		return $this->get_customer_ids_for_user( $user_id );
+	}
+
+	/**
+	 * Get Mollie customers for the specified WordPress user ID.
+	 *
+	 * @param int $user_id WordPress user ID.
+	 * @return array<string>
+	 */
+	private function get_customer_ids_for_user( $user_id ) {
+		$customer_query = new CustomerQuery( array(
+			'user_id' => $user_id,
+		) );
+
+		$customers = $customer_query->get_customers();
+
+		$customer_ids = wp_list_pluck( $customers, 'mollie_id' );
+
+		return $customer_ids;
+	}
+
+	/**
+	 * Get first existing customer from customers list.
+	 *
+	 * @param array $customers Customers.
+	 * @return string|null
+	 */
+	private function get_first_existing_customer_id( $customers ) {
+		foreach ( $customer_ids as $customer_id ) {
+			$customer = $this->client->get_customer( $customer_id );
+
+			if ( null !== $customer ) {
+				return $customer;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get Mollie customer ID for payment.
 	 *
 	 * @param Payment $payment Payment.
