@@ -120,6 +120,7 @@ class Integration extends AbstractGatewayIntegration {
 		 * Tables.
 		 */
 		$wpdb->pronamic_pay_mollie_organizations  = $wpdb->base_prefix . 'pronamic_pay_mollie_organizations';
+		$wpdb->pronamic_pay_mollie_profiles       = $wpdb->base_prefix . 'pronamic_pay_mollie_profiles';
 		$wpdb->pronamic_pay_mollie_customers      = $wpdb->base_prefix . 'pronamic_pay_mollie_customers';
 		$wpdb->pronamic_pay_mollie_customer_users = $wpdb->base_prefix . 'pronamic_pay_mollie_customer_users';
 	}
