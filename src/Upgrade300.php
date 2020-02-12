@@ -58,7 +58,6 @@ class Upgrade300 extends Upgrade {
 				mollie_id VARCHAR( 16 ) NOT NULL,
 				name VARCHAR( 128 ) DEFAULT NULL,
 				email VARCHAR( 100 ) DEFAULT NULL,
-
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id )
 			) $charset_collate;
@@ -69,7 +68,6 @@ class Upgrade300 extends Upgrade {
 				organization_id BIGINT( 20 ) UNSIGNED DEFAULT NULL,
 				name VARCHAR( 128 ) DEFAULT NULL,
 				email VARCHAR( 100 ) DEFAULT NULL,
-
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id ),
 				KEY organization_id ( organization_id )
@@ -82,7 +80,6 @@ class Upgrade300 extends Upgrade {
 				profile_id BIGINT( 20 ) UNSIGNED DEFAULT NULL,
 				test_mode BOOL NOT NULL,
 				email VARCHAR( 100 ) DEFAULT NULL,
-
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id ),
 				KEY organization_id ( organization_id ),
@@ -95,7 +92,6 @@ class Upgrade300 extends Upgrade {
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				customer_id BIGINT( 20 ) UNSIGNED NOT NULL,
 				user_id BIGINT( 20 ) UNSIGNED NOT NULL,
-
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY customer_user ( customer_id, user_id )
 			) $charset_collate;
@@ -103,6 +99,9 @@ class Upgrade300 extends Upgrade {
 
 		/**
 		 * Execute.
+		 *
+		 * @link https://developer.wordpress.org/reference/functions/dbdelta/
+		 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/upgrade.php#L2538-L2915
 		 */
 		\dbDelta( $queries );
 
@@ -112,69 +111,117 @@ class Upgrade300 extends Upgrade {
 		 * @link https://core.trac.wordpress.org/ticket/19207
 		 * @link https://dev.mysql.com/doc/refman/5.6/en/create-table-foreign-keys.html
 		 */
-		$queries = array();
+		$data = array(
+			(object) array(
+				'table' => $wpdb->pronamic_pay_mollie_profiles,
+				'name'  => 'fk_profile_organization_id',
+				'query' => "
+					ALTER TABLE  $wpdb->pronamic_pay_mollie_profiles
+					ADD CONSTRAINT fk_profile_organization_id
+					FOREIGN KEY ( organization_id )
+					REFERENCES $wpdb->pronamic_pay_mollie_organizations ( id )
+					ON DELETE RESTRICT
+					ON UPDATE RESTRICT
+					;
+				",
+			),
+			(object) array(
+				'table' => $wpdb->pronamic_pay_mollie_customers,
+				'name'  => 'fk_customer_organization_id',
+				'query' => "
+					ALTER TABLE $wpdb->pronamic_pay_mollie_customers
+					ADD CONSTRAINT fk_customer_organization_id
+					FOREIGN KEY ( organization_id )
+					REFERENCES $wpdb->pronamic_pay_mollie_organizations ( id )
+					ON DELETE RESTRICT
+					ON UPDATE RESTRICT
+					;
+				",
+			),
+			(object) array(
+				'table' => $wpdb->pronamic_pay_mollie_customers,
+				'name'  => 'fk_customer_profile_id',
+				'query' => "
+					ALTER TABLE $wpdb->pronamic_pay_mollie_customers
+					ADD CONSTRAINT fk_customer_profile_id
+					FOREIGN KEY ( profile_id )
+					REFERENCES $wpdb->pronamic_pay_mollie_profiles ( id )
+					ON DELETE RESTRICT
+					ON UPDATE RESTRICT
+					;
+				",
+			),
+			(object) array(
+				'table' => $wpdb->pronamic_pay_mollie_customer_users,
+				'name'  => 'fk_customer_id',
+				'query' => "
+					ALTER TABLE $wpdb->pronamic_pay_mollie_customer_users
+					ADD CONSTRAINT fk_customer_id
+					FOREIGN KEY customer_id ( customer_id )
+					REFERENCES $wpdb->pronamic_pay_mollie_customers ( id )
+					ON DELETE RESTRICT
+					ON UPDATE RESTRICT
+					;
+				",
+			),
+			(object) array(
+				'table' => $wpdb->pronamic_pay_mollie_customer_users,
+				'name'  => 'fk_customer_user_id',
+				'query' => "
+					ALTER TABLE $wpdb->pronamic_pay_mollie_customer_users
+					ADD CONSTRAINT fk_customer_user_id
+					FOREIGN KEY user_id ( user_id )
+					REFERENCES $wpdb->users ( id )
+					ON DELETE CASCADE
+					ON UPDATE CASCADE
+					;
+				",
+			),
+		);
 
-		$queries['fk_profile_organization_id'] = "
-			ALTER TABLE $wpdb->pronamic_pay_mollie_profiles
-			ADD CONSTRAINT fk_profile_organization_id
-			FOREIGN KEY ( organization_id )
-			REFERENCES $wpdb->pronamic_pay_mollie_organizations ( id )
-			ON DELETE RESTRICT
-			ON UPDATE RESTRICT
-			;
-		";
+		foreach ( $data as $item ) {
+			/**
+			 * Check if foreign key exists
+			 *
+			 * @link https://github.com/woocommerce/woocommerce/blob/3.9.0/includes/class-wc-install.php#L663-L681
+			 */
+			$result = $wpdb->get_var( $wpdb->prepare( "
+				SELECT COUNT(*)
+				FROM information_schema.TABLE_CONSTRAINTS
+				WHERE CONSTRAINT_SCHEMA = %s
+				AND CONSTRAINT_NAME = %s
+				AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+				AND TABLE_NAME = %s
+				",
+				$wpdb->dbname,
+				$item->name,
+				$item->table
+			) );
 
-		$queries['fk_customer_organization_id'] = "
-			ALTER TABLE $wpdb->pronamic_pay_mollie_customers
-			ADD CONSTRAINT fk_customer_organization_id
-			FOREIGN KEY ( organization_id )
-			REFERENCES $wpdb->pronamic_pay_mollie_organizations ( id )
-			ON DELETE RESTRICT
-			ON UPDATE RESTRICT
-			;
-		";
-
-		$queries['fk_customer_profile_id'] = "
-			ALTER TABLE $wpdb->pronamic_pay_mollie_customers
-			ADD CONSTRAINT fk_customer_profile_id
-			FOREIGN KEY ( profile_id )
-			REFERENCES $wpdb->pronamic_pay_mollie_profiles ( id )
-			ON DELETE RESTRICT
-			ON UPDATE RESTRICT
-			;
-		";
-
-		$queries['fk_customer_id'] = "
-			ALTER TABLE $wpdb->pronamic_pay_mollie_customer_users
-			ADD CONSTRAINT fk_customer_id
-			FOREIGN KEY customer_id ( customer_id )
-			REFERENCES $wpdb->pronamic_pay_mollie_customers ( id )
-			ON DELETE RESTRICT
-			ON UPDATE RESTRICT
-			;
-		";
-
-		$queries['fk_customer_user_id'] = "
-			ALTER TABLE $wpdb->pronamic_pay_mollie_customer_users
-			ADD CONSTRAINT fk_customer_user_id
-			FOREIGN KEY user_id ( user_id )
-			REFERENCES $wpdb->users ( id )
-			ON DELETE CASCADE
-			ON UPDATE CASCADE
-			;
-		";
-
-		foreach ( $queries as $index_name => $query ) {
-			$result = $wpdb->query( $query );
-
-			if ( false === $result ) {
+			if ( null === $result ) {
 				throw new \Exception(
 					\sprintf(
-						'Could not add foreign key: %s, database error: %s.',
-						$index_name,
+						'Could not count foreign keys: %s, database error: %s.',
+						$$item->name,
 						$wpdb->last_error
 					)
 				);
+			}
+
+			$number_constraints = \intval( $result );
+
+			if ( 0 === $number_constraints ) {
+				$result = $wpdb->query( $item->query );
+
+				if ( false === $result ) {
+					throw new \Exception(
+						\sprintf(
+							'Could not add foreign key: %s, database error: %s.',
+							$item->name,
+							$wpdb->last_error
+						)
+					);
+				}
 			}
 		}
 
