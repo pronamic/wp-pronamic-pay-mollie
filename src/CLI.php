@@ -67,7 +67,41 @@ class CLI {
 	 * @param array $assoc_args Associative arguments.
 	 */
 	public function wp_cli_customers_synchronize( $args, $assoc_args ) {
-		\WP_CLI::error( 'Command not implemented yet.' );
+		global $post;
+
+		$query = new \WP_Query( array(
+			'post_type'   => 'pronamic_gateway',
+			'post_status' => 'publish',
+			'nopaging'    => true,
+			'meta_query'  => array(
+				array(
+					'key'     => '_pronamic_gateway_id',
+					'value'   => 'mollie',
+				),
+				array(
+					'key'     => '_pronamic_gateway_mollie_api_key',
+					'compare' => 'EXISTS',
+				),
+			)
+		) );
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+
+				$api_key = get_post_meta( $post->ID, '_pronamic_gateway_mollie_api_key', true );
+
+				\WP_CLI::log( $post->post_title );
+				\WP_CLI::log( $api_key );
+				\WP_CLI::log( '' );
+
+				$client = new Client( $api_key );
+			}
+
+			\wp_reset_postdata();
+		}
+
+		\WP_CLI::error( 'Command not fully implemented yet.' );
 	}
 
 	/**
