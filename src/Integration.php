@@ -42,13 +42,13 @@ class Integration extends AbstractGatewayIntegration {
 		$args = wp_parse_args(
 			$args,
 			array(
-				'id'            =>  'mollie',
-				'name'          =>  'Mollie',
-				'url'           =>  'http://www.mollie.com/en/',
-				'product_url'   =>  \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
-				'dashboard_url' =>  'https://www.mollie.com/dashboard/',
-				'provider'      =>  'mollie',
-				'supports'      =>  array(
+				'id'            => 'mollie',
+				'name'          => 'Mollie',
+				'url'           => 'http://www.mollie.com/en/',
+				'product_url'   => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
+				'dashboard_url' => 'https://www.mollie.com/dashboard/',
+				'provider'      => 'mollie',
+				'supports'      => array(
 					'payment_status_request',
 					'recurring_direct_debit',
 					'recurring_credit_card',
@@ -60,7 +60,7 @@ class Integration extends AbstractGatewayIntegration {
 			)
 		);
 
-	    parent::__construct( $args );
+		parent::__construct( $args );
 
 		// Actions.
 		$function = array( __NAMESPACE__ . '\Listener', 'listen' );

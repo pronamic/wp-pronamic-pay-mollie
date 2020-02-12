@@ -26,17 +26,26 @@ class CLI {
 	 * Construct CLI.
 	 */
 	public function __construct() {
-		\WP_CLI::add_command( 'pronamic-pay mollie organizations synchronize', function( $args, $assoc_args ) {
-			$this->wp_cli_organizations_synchronize( $args, $assoc_args );
-		} );
+		\WP_CLI::add_command(
+			'pronamic-pay mollie organizations synchronize',
+			function( $args, $assoc_args ) {
+				$this->wp_cli_organizations_synchronize( $args, $assoc_args );
+			}
+		);
 
-		\WP_CLI::add_command( 'pronamic-pay mollie customers synchronize', function( $args, $assoc_args ) {
-			$this->wp_cli_customers_synchronize( $args, $assoc_args );
-		} );
+		\WP_CLI::add_command(
+			'pronamic-pay mollie customers synchronize',
+			function( $args, $assoc_args ) {
+				$this->wp_cli_customers_synchronize( $args, $assoc_args );
+			}
+		);
 
-		\WP_CLI::add_command( 'pronamic-pay mollie customers connect-wp-users', function( $args, $assoc_args ) {
-			$this->wp_cli_customers_connect_wp_users( $args, $assoc_args );
-		} );
+		\WP_CLI::add_command(
+			'pronamic-pay mollie customers connect-wp-users',
+			function( $args, $assoc_args ) {
+				$this->wp_cli_customers_connect_wp_users( $args, $assoc_args );
+			}
+		);
 	}
 
 	/**

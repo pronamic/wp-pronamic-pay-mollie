@@ -69,8 +69,8 @@ class Client {
 	/**
 	 * Send request with the specified action and parameters
 	 *
-	 * @param string                             $end_point Requested endpoint.
-	 * @param string                             $method    HTTP method to use.
+	 * @param string                            $end_point Requested endpoint.
+	 * @param string                            $method    HTTP method to use.
 	 * @param array<string, string|object|null> $data      Request data.
 	 * @return object
 	 * @throws Error Throws Error when Mollie error occurs.
