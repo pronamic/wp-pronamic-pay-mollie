@@ -11,25 +11,25 @@
  * @link  https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
  */
 
-$data = array(
-	'_pronamic_pay_mollie_customer_id'      => __( 'Customer live ID', 'pronamic_ideal' ),
-	'_pronamic_pay_mollie_customer_id_test' => __( 'Customer test ID', 'pronamic_ideal' ),
+global $wpdb;
+
+$query = $wpdb->prepare( "
+	SELECT
+		mollie_customer.mollie_id,
+		mollie_customer.test_mode
+	FROM
+		$wpdb->pronamic_pay_mollie_customer_users AS mollie_customer_user
+			INNER JOIN
+		$wpdb->pronamic_pay_mollie_customers AS mollie_customer
+				ON mollie_customer_user.customer_id = mollie_customer.id
+	WHERE
+		mollie_customer_user.user_id = %d
+	;
+	",
+	$user->ID
 );
 
-$customers = array();
-
-foreach ( $data as $meta_key => $label ) {
-	$customer_id = get_user_meta( $user->ID, $meta_key, true );
-
-	if ( empty( $customer_id ) ) {
-		continue;
-	}
-
-	$customers[] = (object) array(
-		'id'    => $customer_id,
-		'label' => $label,
-	);
-}
+$customers = $wpdb->get_results( $query );
 
 if ( empty( $customers ) ) {
 	return;
@@ -38,32 +38,45 @@ if ( empty( $customers ) ) {
 ?>
 <h2><?php esc_html_e( 'Mollie', 'pronamic_ideal' ); ?></h2>
 
-<table class="form-table">
-
-	<?php foreach ( $customers as $customer ) : ?>
-
+<table class="widefat striped">
+	<thead>
 		<tr>
-			<th>
-				<?php echo esc_html( $customer->label ); ?>
-			</th>
-			<td>
-				<?php
-
-				$mollie_link = sprintf(
-					'https://www.mollie.com/dashboard/customers/%s',
-					$customer->id
-				);
-
-				printf(
-					'<a href="%s">%s</a>',
-					esc_url( $mollie_link ),
-					esc_html( $customer->id )
-				);
-
-				?>
-			</td>
+			<th scope="col"><?php esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
+			<th scope="col"><?php esc_html_e( 'Test', 'pronamic_ideal' ); ?></th>
+			<th scope="col"><?php esc_html_e( 'Link', 'pronamic_ideal' ); ?></th>
 		</tr>
+	</thead>
 
-	<?php endforeach; ?>
+	<tbody>
 
+		<?php foreach ( $customers as $customer ) : ?>
+
+			<tr>
+				<td>
+					<code><?php echo esc_html( $customer->mollie_id ); ?>
+				</td>
+				<td>
+					<?php $customer->test_mode ? esc_html_e( 'Yes', 'pronamic_ideal' ) : esc_html_e( 'No', 'pronamic_ideal' ); ?>
+				</td>
+				<td>
+					<?php
+
+					$mollie_link = sprintf(
+						'https://www.mollie.com/dashboard/customers/%s',
+						$customer->mollie_id
+					);
+
+					printf(
+						'<a href="%s">%s</a>',
+						esc_url( $mollie_link ),
+						esc_html( $mollie_link )
+					);
+
+					?>
+				</td>
+			</tr>
+
+		<?php endforeach; ?>
+
+	</tbody>
 </table>
