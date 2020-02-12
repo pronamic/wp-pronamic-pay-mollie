@@ -101,6 +101,6 @@ class CLI {
 				'Connected %d users and Mollie customers.',
 				$result
 			)
-		);		
+		);
 	}
 }
