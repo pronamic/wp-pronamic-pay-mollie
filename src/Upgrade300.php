@@ -34,6 +34,7 @@ class Upgrade300 extends Upgrade {
 	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/schema.php#L25-L344
 	 * @link https://developer.wordpress.org/reference/functions/dbdelta/
 	 * @link https://github.com/wp-premium/gravityforms/blob/2.4.16/includes/class-gf-upgrade.php#L518-L531
+	 * @throws \Exception Throws exception when database update query fails.
 	 */
 	public function execute() {
 		global $wpdb;
@@ -167,8 +168,8 @@ class Upgrade300 extends Upgrade {
 			$result = $wpdb->query( $query );
 
 			if ( false === $result ) {
-				throw new Exception(
-					sprintf(
+				throw new \Exception(
+					\sprintf(
 						'Could not add foreign key: %s, database error: %s.',
 						$index_name,
 						$wpdb->last_error
@@ -185,6 +186,8 @@ class Upgrade300 extends Upgrade {
 
 	/**
 	 * Convert user meta.
+	 *
+	 * @throws \Exception Throws exception when database update query fails.
 	 */
 	private function convert_user_meta() {
 		global $wpdb;

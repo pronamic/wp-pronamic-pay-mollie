@@ -52,6 +52,8 @@ class CLI {
 	 * CLI organizations synchronize.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/organizations-api/current-organization
+	 * @param array $args       Arguments.
+	 * @param array $assoc_args Associative arguments.
 	 */
 	public function wp_cli_organizations_synchronize( $args, $assoc_args ) {
 		\WP_CLI::error( 'Command not implemented yet.' );
@@ -61,6 +63,8 @@ class CLI {
 	 * CLI customers synchronize.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/customers-api/list-customers
+	 * @param array $args       Arguments.
+	 * @param array $assoc_args Associative arguments.
 	 */
 	public function wp_cli_customers_synchronize( $args, $assoc_args ) {
 		\WP_CLI::error( 'Command not implemented yet.' );
