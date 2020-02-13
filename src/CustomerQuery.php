@@ -32,7 +32,6 @@ class CustomerQuery {
 			array(
 				'user_id'         => null,
 				'organization_id' => null,
-				'profile_id'      => null,
 			)
 		);
 	}

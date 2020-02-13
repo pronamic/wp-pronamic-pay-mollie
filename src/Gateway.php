@@ -19,6 +19,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 
 /**
  * Title: Mollie
@@ -271,7 +272,7 @@ class Gateway extends Core_Gateway {
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
 
-		if ( is_string( $customer_id ) && ! empty( $customer_id ) ) {
+		if ( null !== $customer_id ) {
 			$request->customer_id = $customer_id;
 		}
 
@@ -477,6 +478,40 @@ class Gateway extends Core_Gateway {
 	}
 
 	/**
+	 * Get Mollie customer ID for payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return bool|string
+	 */
+	public function get_customer_id_for_payment( Payment $payment ) {
+		// Try to get existing Mollie customer ID.
+		$customer_ids = $this->get_customer_ids_for_payment( $payment );
+
+		$subscription_customer_id = $this->get_customer_id_for_subscription( $payment->get_subscription() );
+
+		\array_unshift( $customer_ids, $subscription_customer_id );
+
+		$customer_id = $this->get_first_existing_customer_id( $customer_ids );
+
+		// Create new customer if no valid customer was found.
+		if ( null === $customer_id ) {
+			$customer_id = $this->create_customer_for_payment( $payment );
+		}
+
+		// Store customer ID in subscription meta.
+		$subscription = $payment->get_subscription();
+
+		if ( null === $subscription_customer_id && null !== $customer_id && null !== $subscription ) {
+			$subscription->set_meta( 'mollie_customer_id', $customer_id );
+		}
+
+		// Copy customer ID from subscription to user meta.
+		$this->copy_customer_id_to_wp_user( $payment );
+
+		return $customer_id;
+	}
+
+	/**
 	 * Get Mollie customers for the specified payment.
 	 *
 	 * @param Payment $payment Payment.
@@ -517,12 +552,40 @@ class Gateway extends Core_Gateway {
 	}
 
 	/**
-	 * Get first existing customer from customers list.
+	 * Get customer ID for subscription.
 	 *
-	 * @param array $customers Customers.
+	 * @param Subscription $subscription Subscription.
+	 *
 	 * @return string|null
 	 */
-	private function get_first_existing_customer_id( $customers ) {
+	private function get_customer_id_for_subscription( Subscription $subscription ) {
+		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+		// Try to get (legacy) customer ID from first payment.
+		$first_payment = $subscription->get_first_payment();
+
+		if ( empty( $customer_id ) && $first_payment ) {
+			$customer_id = $first_payment->get_meta( 'mollie_customer_id' );
+		}
+
+		if ( ! empty( $customer_id ) ) {
+			return $customer_id;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get first existing customer from customers list.
+	 *
+	 * @param array $customer_ids Customers.
+	 * @return string|null
+	 */
+	private function get_first_existing_customer_id( $customer_ids ) {
+		$customer_ids = \array_filter( $customer_ids );
+
+		$customer_ids = \array_unique( $customer_ids );
+
 		foreach ( $customer_ids as $customer_id ) {
 			$customer = $this->client->get_customer( $customer_id );
 
@@ -535,84 +598,42 @@ class Gateway extends Core_Gateway {
 	}
 
 	/**
-	 * Get Mollie customer ID for payment.
+	 * Create customer for payment.
 	 *
-	 * @param Payment $payment Payment.
-	 * @return bool|string
+	 * @param Payment $payment
+	 * @return string|null
+	 * @throws Error Throws Error when Mollie error occurs.
 	 */
-	public function get_customer_id_for_payment( Payment $payment ) {
+	private function create_customer_for_payment( Payment $payment ) {
 		$customer = $payment->get_customer();
 
-		// Get WordPress user ID from payment customer.
-		$user_id = ( null === $customer ? null : $customer->get_user_id() );
+		// Customer name.
+		$name = null;
 
-		// Get Mollie customer ID from user meta.
-		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
-
-		$subscription = $payment->get_subscription();
-
-		// Get customer ID from subscription meta.
-		if ( $subscription ) {
-			$subscription_customer_id = $subscription->get_meta( 'mollie_customer_id' );
-
-			// Try to get (legacy) customer ID from first payment.
-			if ( empty( $subscription_customer_id ) && $subscription->get_first_payment() ) {
-				$first_payment = $subscription->get_first_payment();
-
-				$subscription_customer_id = $first_payment->get_meta( 'mollie_customer_id' );
-			}
-
-			if ( ! empty( $subscription_customer_id ) ) {
-				$customer_id = $subscription_customer_id;
-			}
+		if ( null !== $customer && null !== $customer->get_name() ) {
+			$name = strval( $customer->get_name() );
 		}
 
-		// Create new customer if the customer does not exist at Mollie.
-		if ( ( empty( $customer_id ) || null === $this->client->get_customer( $customer_id ) ) && Core_Recurring::RECURRING !== $payment->recurring_type ) {
-			$customer_name = null;
+		// Create customer.
+		$customer_id = $this->client->create_customer( $payment->get_email(), $name );
 
-			if ( null !== $customer && null !== $customer->get_name() ) {
-				$customer_name = strval( $customer->get_name() );
-			}
-
-			$customer_id = $this->client->create_customer( $payment->get_email(), $customer_name );
-
-			$this->update_wp_user_customer_id( $user_id, $customer_id );
+		// Store customer ID for user.
+		if ( null !== $customer_id && null !== $customer ) {
+			$this->update_wp_user_customer_id( $customer->get_user_id(), $customer_id );
 		}
-
-		// Store customer ID in subscription meta.
-		if ( $subscription && empty( $subscription_customer_id ) && ! empty( $customer_id ) ) {
-			$subscription->set_meta( 'mollie_customer_id', $customer_id );
-		}
-
-		// Copy customer ID from subscription to user meta.
-		$this->copy_customer_id_to_wp_user( $payment );
 
 		return $customer_id;
 	}
 
 	/**
-	 * Get Mollie customer ID by the specified WordPress user ID.
-	 *
-	 * @param int $user_id WordPress user ID.
-	 * @return string|bool
-	 */
-	public function get_customer_id_by_wp_user_id( $user_id ) {
-		if ( empty( $user_id ) ) {
-			return false;
-		}
-
-		return get_user_meta( $user_id, $this->meta_key_customer_id, true );
-	}
-
-	/**
 	 * Update Mollie customer ID meta for WordPress user.
 	 *
-	 * @param int    $user_id     WordPress user ID.
-	 * @param string $customer_id Mollie Customer ID.
+	 * @param int         $user_id     WordPress user ID.
+	 * @param string      $customer_id Mollie Customer ID.
+	 * @param string|null $email       Email address.
 	 * @return void
 	 */
-	private function update_wp_user_customer_id( $user_id, $customer_id ) {
+	private function update_wp_user_customer_id( $user_id, $customer_id, $email = null ) {
 		if ( empty( $user_id ) || is_bool( $user_id ) ) {
 			return;
 		}
@@ -621,7 +642,28 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
-		update_user_meta( $user_id, $this->meta_key_customer_id, $customer_id );
+		$customer_ids = $this->get_customer_ids_for_user( $user_id );
+
+		if ( false !== \array_search( $customer_id, $customer_ids ) ) {
+			return;
+		}
+
+		// Insert customer ID.
+		global $wpdb;
+
+		$test_mode = (int) self::MODE_TEST === $this->config->mode;
+
+		$query = "
+			INSERT INTO
+				$wpdb->pronamic_pay_mollie_customers ( mollie_id, test_mode, email )
+			VALUES
+				$customer_id,
+			    $test_mode,
+				$email
+			;
+		";
+
+		$wpdb->get_results( $query );
 	}
 
 	/**
@@ -637,30 +679,21 @@ class Gateway extends Core_Gateway {
 
 		$subscription = $payment->get_subscription();
 
-		if ( ! $subscription ) {
-			return;
-		}
-
+		// Check subscription customer.
 		$customer = $subscription->get_customer();
 
 		if ( null === $customer ) {
 			return;
 		}
 
-		$user_id = $customer->get_user_id();
+		// Get customer ID for subscription.
+		$customer_id  = $this->get_customer_id_for_subscription( $subscription );
 
-		if ( empty( $user_id ) ) {
+		if ( null === $customer_id ) {
 			return;
 		}
 
-		// Get customer ID from subscription meta.
-		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
-
-		$user_customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
-
-		if ( empty( $user_customer_id ) ) {
-			// Set customer ID as user meta.
-			$this->update_wp_user_customer_id( $user_id, (string) $customer_id );
-		}
+		// Update user customer IDs.
+		$this->update_wp_user_customer_id( $customer->get_user_id(), (string) $customer_id, $customer->get_email() );
 	}
 }
