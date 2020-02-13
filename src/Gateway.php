@@ -36,7 +36,14 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @var Client
 	 */
-	protected $client;
+	public $client;
+
+	/**
+	 * Connect.
+	 *
+	 * @var Connect
+	 */
+	public $connect;
 
 	/**
 	 * Meta key for customer ID.
@@ -66,8 +73,15 @@ class Gateway extends Core_Gateway {
 			'webhook_no_config',
 		);
 
+		// Connect.
+		$this->connect = new Connect( $config->id );
+		$this->connect->set_access_token( $config->access_token );
+		$this->connect->set_access_token_valid_until( $config->access_token_valid_until );
+		$this->connect->set_refresh_token( $config->refresh_token );
+
 		// Client.
-		$this->client = new Client( \strval( $config->api_key ) );
+		$this->client = new Client( $this->connect );
+		$this->client->set_api_key( $config->api_key );
 		$this->client->set_mode( $config->mode );
 
 		// Mollie customer ID meta key.

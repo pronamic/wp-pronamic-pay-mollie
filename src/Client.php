@@ -34,7 +34,7 @@ class Client {
 	/**
 	 * Mollie API Key ID
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	private $api_key;
 
@@ -47,11 +47,28 @@ class Client {
 	private $mode;
 
 	/**
+	 * Mollie Connect.
+	 *
+	 * @var Connect
+	 */
+	private $connect;
+
+	/**
 	 * Constructs and initializes an Mollie client object
 	 *
-	 * @param string $api_key Mollie API key.
+	 * @param Connect $connect Mollie oAuth connector.
 	 */
-	public function __construct( $api_key ) {
+	public function __construct( Connect $connect ) {
+		$this->connect = $connect;
+	}
+
+	/**
+	 * Set API key.
+	 *
+	 * @param string $api_key API key.
+	 * @return void
+	 */
+	public function set_api_key( $api_key ) {
 		$this->api_key = $api_key;
 	}
 
@@ -80,12 +97,20 @@ class Client {
 		// Request.
 		$url = self::API_URL . $end_point;
 
+		$this->connect->maybe_refresh_access_token();
+
+		$authorization_token = $this->connect->get_access_token();
+
+		if ( '' === $authorization_token ) {
+			$authorization_token = $this->api_key;
+		}
+
 		$response = wp_remote_request(
 			$url,
 			array(
 				'method'  => $method,
 				'headers' => array(
-					'Authorization' => 'Bearer ' . $this->api_key,
+					'Authorization' => 'Bearer ' . $authorization_token,
 				),
 				'body'    => $data,
 			)

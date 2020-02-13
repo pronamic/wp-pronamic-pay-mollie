@@ -43,4 +43,25 @@ class Config extends GatewayConfig {
 	 * @var string|null
 	 */
 	public $due_date_days;
+
+	/**
+	 * Access token.
+	 *
+	 * @var string
+	 */
+	public $access_token;
+
+	/**
+	 * Access token valid until.
+	 *
+	 * @var string|null
+	 */
+	public $access_token_valid_until;
+
+	/**
+	 * Refresh token.
+	 *
+	 * @var string
+	 */
+	public $refresh_token;
 }

@@ -88,6 +88,12 @@ class Integration extends AbstractGatewayIntegration {
 			\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function, 10, 2 );
 		}
 
+		$function = array( $this, 'maybe_handle_oauth_authorization' );
+
+		if ( ! \has_action( 'init', $function ) ) {
+			\add_filter( 'init', $function );
+		}
+
 		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
 
 		// Tables.
@@ -128,21 +134,38 @@ class Integration extends AbstractGatewayIntegration {
 	/**
 	 * Get settings fields.
 	 *
+	 * @param int|null $config_id Config ID.
 	 * @return array<int, array<string, array<int, string>|int|string|true>>
 	 */
-	public function get_settings_fields() {
+	public function get_settings_fields( $config_id = null ) {
 		$fields = array();
 
-		// API Key.
+		$api_key = \get_post_meta( $config_id, '_pronamic_gateway_mollie_api_key', true );
+
+		/*
+		 * Mollie Connect.
+		 */
 		$fields[] = array(
 			'section'  => 'general',
-			'filter'   => FILTER_SANITIZE_STRING,
-			'meta_key' => '_pronamic_gateway_mollie_api_key',
-			'title'    => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
-			'type'     => 'text',
-			'classes'  => array( 'regular-text', 'code' ),
-			'tooltip'  => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
+			'type'     => 'html',
+			'callback' => function( $field ) use ( $config_id ) {
+				$this->field_mollie_connect( $field, $config_id );
+			},
 		);
+
+		if ( ! empty( $api_key ) ) {
+			// API Key.
+			$fields[] = array(
+				'section'  => 'general',
+				'filter'   => FILTER_SANITIZE_STRING,
+				'methods'  => array( 'mollie-deprecated' ),
+				'meta_key' => '_pronamic_gateway_mollie_api_key',
+				'title'    => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
+				'type'     => 'text',
+				'classes'  => array( 'regular-text', 'code' ),
+				'tooltip'  => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
+			);
+		}
 
 		// Due date days.
 		$fields[] = array(
@@ -176,6 +199,71 @@ class Integration extends AbstractGatewayIntegration {
 		);
 
 		return $fields;
+	}
+
+	/**
+	 * Field mollie connect.
+	 *
+	 * @param array $field     Setting field.
+	 * @param int   $config_id Config ID.
+	 * @return void
+	 */
+	public function field_mollie_connect( $field, $config_id ) {
+		// Authorize URL.
+		$state = array(
+			'redirect_uri' => \home_url(),
+			'post_id'      => $config_id,
+		);
+
+		$authorize_url = \add_query_arg(
+			array(
+				'state' => \base64_encode( \wp_json_encode( $state ) ),
+			),
+			Connect::WP_PAY_MOLLIE_CONNECT_API_URL . 'oauth2/authorize/'
+		);
+
+		// Check connection.
+		$connect = new Connect( $config_id );
+
+		$connect->set_refresh_token( $this->get_meta( $config_id, 'mollie_refresh_token' ) );
+		$connect->set_access_token( $this->get_meta( $config_id, 'mollie_access_token' ) );
+		$connect->set_access_token_valid_until( $this->get_meta( $config_id, 'mollie_access_token_valid_until' ) );
+
+		if ( $connect->is_access_token_valid() ) {
+			printf(
+				/* translators: %s: reconnect HTML link */
+				\esc_html__( 'Connected with Mollie (%s)', 'pronamic_ideal' ),
+				sprintf(
+					'<a href="%1$s" title="%2$s">%2$s</a>',
+					\esc_url( $authorize_url ),
+					\esc_html__( 'reconnect', 'pronamiic_ideal' )
+				)
+			);
+
+			return;
+		}
+
+		?>
+
+		<p>
+			<a href="<?php echo \esc_url( $authorize_url ); ?>" title="<?php echo \esc_attr_x( 'Connect via Mollie', 'mollie', 'pronamic_ideal' ); ?>">
+				<?php
+
+				printf(
+					'<img src="%s" alt="%s" />',
+					\esc_url( \plugins_url( '../images/mollie_connect.svg', __FILE__ ) ),
+					\esc_html_x( 'Connect via Mollie', 'mollie', 'pronamic_ideal' )
+				);
+
+				?>
+			</a>
+		</p>
+
+		<p>
+			<em><?php esc_html_e( 'Click the Connect via Mollie button to authorize a Mollie account.', 'pronamic_ideal' ); ?></em>
+		</p>
+
+		<?php
 	}
 
 	/**
@@ -246,10 +334,13 @@ class Integration extends AbstractGatewayIntegration {
 	public function get_config( $post_id ) {
 		$config = new Config();
 
-		$config->id            = intval( $post_id );
-		$config->api_key       = $this->get_meta( $post_id, 'mollie_api_key' );
-		$config->mode          = $this->get_meta( $post_id, 'mode' );
-		$config->due_date_days = $this->get_meta( $post_id, 'mollie_due_date_days' );
+		$config->id                       = intval( $post_id );
+		$config->api_key                  = $this->get_meta( $post_id, 'mollie_api_key' );
+		$config->mode                     = $this->get_meta( $post_id, 'mode' );
+		$config->due_date_days            = $this->get_meta( $post_id, 'mollie_due_date_days' );
+		$config->refresh_token            = $this->get_meta( $post_id, 'mollie_refresh_token' );
+		$config->access_token             = $this->get_meta( $post_id, 'mollie_access_token' );
+		$config->access_token_valid_until = $this->get_meta( $post_id, 'mollie_access_token_valid_until' );
 
 		return $config;
 	}
@@ -343,5 +434,45 @@ class Integration extends AbstractGatewayIntegration {
 		$next_payment_delivery_date->setTime( 0, 0, 0 );
 
 		return $next_payment_delivery_date;
+	}
+
+	/**
+	 * Maybe handle Mollie oAuth authorization.
+	 *
+	 * @return void
+	 */
+	public function maybe_handle_oauth_authorization() {
+		if ( ! filter_has_var( \INPUT_GET, 'code' ) ) {
+			return;
+		}
+
+		if ( ! filter_has_var( \INPUT_GET, 'state' ) ) {
+			return;
+		}
+
+		$code  = filter_input( \INPUT_GET, 'code', \FILTER_SANITIZE_STRING );
+		$state = filter_input( \INPUT_GET, 'state', \FILTER_SANITIZE_STRING );
+
+		if ( empty( $code ) || empty( $state ) ) {
+			return;
+		}
+
+		$state_data = json_decode( base64_decode( $state ) );
+
+		if ( ! is_object( $state_data ) ) {
+			return;
+		}
+
+		if ( ! isset( $state_data->post_id ) ) {
+			return;
+		}
+
+		if ( \filter_has_var( \INPUT_GET, 'error' ) && \filter_has_var( \INPUT_GET, 'error_description' ) ) {
+			die( \esc_html( \filter_input( \INPUT_GET, 'error_description' ) ) );
+		}
+
+		$connect = new Connect( $state_data->post_id );
+
+		$connect->handle_authorization( $code, $state_data );
 	}
 }
