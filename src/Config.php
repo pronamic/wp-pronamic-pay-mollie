@@ -38,13 +38,6 @@ class Config extends GatewayConfig {
 	public $api_key;
 
 	/**
-	 * Profile ID.
-	 *
-	 * @var string|null
-	 */
-	public $profile_id;
-
-	/**
 	 * Bank transfer due date days.
 	 *
 	 * @var string|null

@@ -70,9 +70,6 @@ class Gateway extends Core_Gateway {
 		$this->client = new Client( \strval( $config->api_key ) );
 		$this->client->set_mode( $config->mode );
 
-		// Update profile ID.
-		$this->maybe_update_profile_id();
-
 		// Mollie customer ID meta key.
 		if ( self::MODE_TEST === $config->mode ) {
 			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
@@ -664,30 +661,6 @@ class Gateway extends Core_Gateway {
 		if ( empty( $user_customer_id ) ) {
 			// Set customer ID as user meta.
 			$this->update_wp_user_customer_id( $user_id, (string) $customer_id );
-		}
-	}
-
-	/**
-	 * Maybe update profile ID.
-	 */
-	private function maybe_update_profile_id() {
-		$profile_id = $this->config->profile_id;
-
-		// Get profile ID for API key.
-		if ( '' === $profile_id ) {
-			try {
-				$profile = $this->client->get_current_profile();
-
-				if ( isset( $profile->id ) ) {
-					$profile_id = $profile->id;
-				}
-			} catch( \Exception $e ) {
-				return;
-			}
-
-			$this->config->profile_id = $profile_id;
-
-			\update_post_meta( $this->config->id, '_pronamic_gateway_mollie_profile_id', $profile_id );
 		}
 	}
 }
