@@ -61,7 +61,6 @@ class Upgrade300 extends Upgrade {
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id )
 			) $charset_collate;
-
 			CREATE TABLE $wpdb->pronamic_pay_mollie_profiles (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				mollie_id VARCHAR( 16 ) NOT NULL,
@@ -72,7 +71,6 @@ class Upgrade300 extends Upgrade {
 				UNIQUE KEY mollie_id ( mollie_id ),
 				KEY organization_id ( organization_id )
 			) $charset_collate;
-
 			CREATE TABLE $wpdb->pronamic_pay_mollie_customers (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				mollie_id VARCHAR( 16 ) NOT NULL,
@@ -87,7 +85,6 @@ class Upgrade300 extends Upgrade {
 				KEY test_mode ( test_mode ),
 				KEY email ( email )
 			) $charset_collate;
-
 			CREATE TABLE $wpdb->pronamic_pay_mollie_customer_users (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				customer_id BIGINT( 20 ) UNSIGNED NOT NULL,
