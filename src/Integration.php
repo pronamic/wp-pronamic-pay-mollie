@@ -186,11 +186,8 @@ class Integration extends AbstractGatewayIntegration {
 	 * @return void
 	 */
 	public function save_post( $post_id ) {
-		$api_key = get_post_meta( $post_id, '_pronamic_gateway_mollie_api_key', true );
-
-		if ( ! is_string( $api_key ) ) {
-			return;
-		}
+		// Set mode based on API key type.
+		$api_key = (string) get_post_meta( $post_id, '_pronamic_gateway_mollie_api_key', true );
 
 		$api_key_prefix = substr( $api_key, 0, 4 );
 
@@ -198,12 +195,16 @@ class Integration extends AbstractGatewayIntegration {
 			case 'live':
 				update_post_meta( $post_id, '_pronamic_gateway_mode', Gateway::MODE_LIVE );
 
-				return;
+				break;
 			case 'test':
+			default:
 				update_post_meta( $post_id, '_pronamic_gateway_mode', Gateway::MODE_TEST );
 
-				return;
+				break;
 		}
+
+		// Delete profile ID meta.
+		\delete_post_meta( $post_id, '_pronamic_gateway_mollie_profile_id' );
 	}
 
 	/**
@@ -247,8 +248,9 @@ class Integration extends AbstractGatewayIntegration {
 		$config = new Config();
 
 		$config->id            = intval( $post_id );
-		$config->api_key       = $this->get_meta( $post_id, 'mollie_api_key' );
 		$config->mode          = $this->get_meta( $post_id, 'mode' );
+		$config->api_key       = $this->get_meta( $post_id, 'mollie_api_key' );
+		$config->profile_id    = $this->get_meta( $post_id, 'mollie_profile_id' );
 		$config->due_date_days = $this->get_meta( $post_id, 'mollie_due_date_days' );
 
 		return $config;
