@@ -62,7 +62,6 @@ class Gateway extends Core_Gateway {
 
 		// Client.
 		$this->client = new Client( \strval( $config->api_key ) );
-		$this->client->set_mode( $config->mode );
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
