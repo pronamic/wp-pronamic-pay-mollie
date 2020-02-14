@@ -621,6 +621,8 @@ class Gateway extends Core_Gateway {
 	 * @return void
 	 */
 	private function update_wp_user_customer_id( $user_id, $customer_id, $email = null ) {
+		global $wpdb;
+
 		if ( empty( $user_id ) || is_bool( $user_id ) ) {
 			return;
 		}
@@ -635,22 +637,36 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
-		// Insert customer ID.
-		global $wpdb;
+		/**
+		 * Insert Mollie customer.
+		 *
+		 * @link https://developer.wordpress.org/reference/classes/wpdb/insert/
+		 */
+		$result = $wpdb->insert(
+			$wpdb->pronamic_pay_mollie_customers,
+			array(
+				'mollie_id' => $customer_id,
+				'test_mode' => $this->config->is_test_mode(),
+				'email'     => $email,
+			),
+			array(
+				'mollie_id' => '%s',
+				'test_mode' => '%d',
+				'email'     => '%s',
+			)
+		);
 
-		$test_mode = (int) self::MODE_TEST === $this->config->mode;
+		if ( false === $result ) {
+			throw new \Exception(
+				sprintf(
+					'Could not insert Mollie customer ID: %s, error: %s.',
+					$customer_id,
+					$wpdb->last_error
+				)
+			);
+		}
 
-		$query = "
-			INSERT INTO
-				$wpdb->pronamic_pay_mollie_customers ( mollie_id, test_mode, email )
-			VALUES
-				$customer_id,
-			    $test_mode,
-				$email
-			;
-		";
-
-		$wpdb->get_results( $query );
+		$customer_id = $wpdb->insert_id;
 	}
 
 	/**
