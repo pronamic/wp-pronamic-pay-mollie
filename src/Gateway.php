@@ -40,13 +40,6 @@ class Gateway extends Core_Gateway {
 	protected $client;
 
 	/**
-	 * Meta key for customer ID.
-	 *
-	 * @var string
-	 */
-	private $meta_key_customer_id = '_pronamic_pay_mollie_customer_id';
-
-	/**
 	 * Constructs and initializes an Mollie gateway
 	 *
 	 * @param Config $config Config.
@@ -70,11 +63,6 @@ class Gateway extends Core_Gateway {
 		// Client.
 		$this->client = new Client( \strval( $config->api_key ) );
 		$this->client->set_mode( $config->mode );
-
-		// Mollie customer ID meta key.
-		if ( self::MODE_TEST === $config->mode ) {
-			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
-		}
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
