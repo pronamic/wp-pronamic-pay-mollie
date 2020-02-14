@@ -27,6 +27,13 @@ use WP_User;
  */
 class Integration extends AbstractGatewayIntegration {
 	/**
+	 * REST route namespace.
+	 *
+	 * @var string
+	 */
+	const REST_ROUTE_NAMESPACE = 'pronamic-pay/mollie/v1';
+
+	/**
 	 * Register URL.
 	 *
 	 * @var string
@@ -63,12 +70,6 @@ class Integration extends AbstractGatewayIntegration {
 		parent::__construct( $args );
 
 		// Actions.
-		$function = array( __NAMESPACE__ . '\Listener', 'listen' );
-
-		if ( ! has_action( 'wp_loaded', $function ) ) {
-			add_action( 'wp_loaded', $function );
-		}
-
 		if ( is_admin() ) {
 			$function = array( __CLASS__, 'user_profile' );
 
@@ -106,6 +107,22 @@ class Integration extends AbstractGatewayIntegration {
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			$this->cli = new CLI();
 		}
+	}
+
+	/**
+	 * Plugins loaded.
+	 *
+	 * @return void
+	 */
+	public function plugins_loaded() {
+		if ( ! $this->get_dependencies()->are_met() ) {
+			return;
+		}
+
+		// Webhook controller.
+		$webhook_controller = new WebhookController();
+
+		$webhook_controller->setup();
 	}
 
 	/**

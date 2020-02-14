@@ -29,6 +29,23 @@ development environment you could use a service like [ngrok](https://ngrok.com/)
 > Lennard van Gunst
 > Mollie
 
+### REST API
+
+The Pronamic Pay Mollie gateway can handle Mollie webhook requests via the WordPress REST API.
+
+**Route:** `/wp-json/pronamic-pay/mollie/v1/webhook`
+
+The WordPress REST API Mollie webhook endpoint can be tested with for example cURL:
+
+```
+curl --request POST --data "id=tr_d0b0E3EA3v" http://pay.test/wp-json/pronamic-pay/mollie/v1/webhook
+```
+
+Legacy webhook URL:
+
+```
+curl --request POST --data "id=tr_d0b0E3EA3v" "http://pay.test/?mollie_webhook"
+```
 
 ## Links
 

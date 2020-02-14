@@ -241,7 +241,7 @@ class Gateway extends Core_Gateway {
 			return null;
 		}
 
-		$url = add_query_arg( 'mollie_webhook', '', $url );
+		$url = \rest_url( self::REST_ROUTE_NAMESPACE . '/webhook' );
 
 		return $url;
 	}
