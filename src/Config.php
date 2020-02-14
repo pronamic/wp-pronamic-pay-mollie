@@ -43,4 +43,13 @@ class Config extends GatewayConfig {
 	 * @var string|null
 	 */
 	public $due_date_days;
+
+	/**
+	 * Function to check for test API key.
+	 *
+	 * @return bool True if test mode, false otherwise.
+	 */
+	public function is_test_mode() {
+		return ( 'test_' === substr( $this->api_key, 0, 5 ) );
+	}
 }
