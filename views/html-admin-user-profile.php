@@ -13,9 +13,11 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-$customer_query = new CustomerQuery( array(
-	'user_id' => $user->ID,
-) );
+$customer_query = new CustomerQuery(
+	array(
+		'user_id' => $user->ID,
+	)
+);
 
 $customers = $customer_query->get_customers();
 

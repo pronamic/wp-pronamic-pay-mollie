@@ -69,21 +69,23 @@ class CLI {
 	public function wp_cli_customers_synchronize( $args, $assoc_args ) {
 		global $post;
 
-		$query = new \WP_Query( array(
-			'post_type'   => 'pronamic_gateway',
-			'post_status' => 'publish',
-			'nopaging'    => true,
-			'meta_query'  => array(
-				array(
-					'key'     => '_pronamic_gateway_id',
-					'value'   => 'mollie',
-				),
-				array(
-					'key'     => '_pronamic_gateway_mollie_api_key',
-					'compare' => 'EXISTS',
+		$query = new \WP_Query(
+			array(
+				'post_type'   => 'pronamic_gateway',
+				'post_status' => 'publish',
+				'nopaging'    => true,
+				'meta_query'  => array(
+					array(
+						'key'   => '_pronamic_gateway_id',
+						'value' => 'mollie',
+					),
+					array(
+						'key'     => '_pronamic_gateway_mollie_api_key',
+						'compare' => 'EXISTS',
+					),
 				),
 			)
-		) );
+		);
 
 		if ( $query->have_posts() ) {
 			while ( $query->have_posts() ) {

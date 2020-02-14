@@ -144,7 +144,9 @@ class Upgrade300 extends Upgrade {
 			 *
 			 * @link https://github.com/woocommerce/woocommerce/blob/3.9.0/includes/class-wc-install.php#L663-L681
 			 */
-			$result = $wpdb->get_var( $wpdb->prepare( "
+			$result = $wpdb->get_var(
+				$wpdb->prepare(
+					"
 				SELECT COUNT(*)
 				FROM information_schema.TABLE_CONSTRAINTS
 				WHERE CONSTRAINT_SCHEMA = %s
@@ -152,10 +154,11 @@ class Upgrade300 extends Upgrade {
 				AND CONSTRAINT_TYPE = 'FOREIGN KEY'
 				AND TABLE_NAME = %s
 				",
-				$wpdb->dbname,
-				$item->name,
-				$item->table
-			) );
+					$wpdb->dbname,
+					$item->name,
+					$item->table
+				)
+			);
 
 			if ( null === $result ) {
 				throw new \Exception(

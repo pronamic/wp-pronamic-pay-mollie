@@ -527,9 +527,11 @@ class Gateway extends Core_Gateway {
 	 * @return array<string>
 	 */
 	private function get_customer_ids_for_user( $user_id ) {
-		$customer_query = new CustomerQuery( array(
-			'user_id' => $user_id,
-		) );
+		$customer_query = new CustomerQuery(
+			array(
+				'user_id' => $user_id,
+			)
+		);
 
 		$customers = $customer_query->get_customers();
 
@@ -696,7 +698,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Get customer ID for subscription.
-		$customer_id  = $this->get_customer_id_for_subscription( $subscription );
+		$customer_id = $this->get_customer_id_for_subscription( $subscription );
 
 		if ( null === $customer_id ) {
 			return;

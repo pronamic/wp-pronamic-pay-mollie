@@ -71,10 +71,12 @@ class WebhookController {
 		 *
 		 * @link https://developer.wordpress.org/reference/functions/wp_send_json_success/
 		 */
-		$response = \rest_ensure_response( array(
-			'success' => true,
-			'id'      => $id,
-		) );
+		$response = \rest_ensure_response(
+			array(
+				'success' => true,
+				'id'      => $id,
+			)
+		);
 
 		$response->add_link( 'self', rest_url( $request->get_route() ) );
 
@@ -84,7 +86,7 @@ class WebhookController {
 			/**
 			 * How to handle unknown IDs?
 			 *
-			 * To not leak any information to malicious third parties, it is recommended 
+			 * To not leak any information to malicious third parties, it is recommended
 			 * to return a 200 OK response even if the ID is not known to your system.
 			 *
 			 * @link https://docs.mollie.com/guides/webhooks#how-to-handle-unknown-ids
