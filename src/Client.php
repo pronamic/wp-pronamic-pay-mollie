@@ -208,31 +208,21 @@ class Client {
 	/**
 	 * Create customer.
 	 *
-	 * @param string|null $email Customer email address.
-	 * @param string|null $name  Customer name.
-	 * @return string|null
+	 * @param Customer $customer Customer.
+	 * @return Customer
 	 * @throws Error Throws Error when Mollie error occurs.
 	 * @since 1.1.6
 	 */
-	public function create_customer( $email, $name ) {
-		if ( empty( $email ) ) {
-			return null;
-		}
-
+	public function create_customer( Customer $customer ) {
 		$response = $this->send_request(
 			'customers',
 			'POST',
-			array(
-				'name'  => $name,
-				'email' => $email,
-			)
+			$customer->get_array()
 		);
 
-		if ( ! isset( $response->id ) ) {
-			return null;
-		}
+		$customer->set_id( $response->id );
 
-		return $response->id;
+		return $customer;
 	}
 
 	/**

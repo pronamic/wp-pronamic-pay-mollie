@@ -592,24 +592,30 @@ class Gateway extends Core_Gateway {
 	 * @throws Error Throws Error when Mollie error occurs.
 	 */
 	private function create_customer_for_payment( Payment $payment ) {
-		$customer = $payment->get_customer();
+		$mollie_customer = new Customer();
+		$mollie_customer->set_email( $payment->get_email() );
 
-		// Customer name.
-		$name = null;
+		$pronamic_customer = $payment->get_customer();
 
-		if ( null !== $customer && null !== $customer->get_name() ) {
-			$name = strval( $customer->get_name() );
+		if ( null !== $pronamic_customer ) {
+			$name = $pronamic_customer->get_name();
+
+			if ( null !== $name ) {
+				$mollie_customer->set_name( \strval( $name ) );
+			}
 		}
 
 		// Create customer.
-		$customer_id = $this->client->create_customer( $payment->get_email(), $name );
+		$mollie_customer = $this->client->create_customer( $mollie_customer );
+
+		$mollie_customer_id = $mollie_customer->get_id();
 
 		// Store customer ID for user.
-		if ( null !== $customer_id && null !== $customer ) {
-			$this->update_wp_user_customer_id( $customer->get_user_id(), $customer_id );
+		if ( null !== $mollie_customer_id && null !== $customer ) {
+			$this->update_wp_user_customer_id( $customer->get_user_id(), $mollie_customer_id );
 		}
 
-		return $customer_id;
+		return $mollie_customer_id;
 	}
 
 	/**
