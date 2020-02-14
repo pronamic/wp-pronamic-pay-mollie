@@ -43,7 +43,23 @@ if ( empty( $customers ) ) {
 
 			<tr>
 				<td>
-					<code><?php echo \esc_html( $customer->mollie_id ); ?>
+					<?php
+
+					$url = \add_query_arg(
+						array(
+							'page' => 'pronamic_pay_mollie_customers',
+							'id'   => $customer->mollie_id,
+						),
+						\admin_url( 'admin.php' )
+					);
+
+					\printf(
+						'<a href="%s"><code>%s</code></a>',
+						\esc_url( $url ),
+						\esc_html( $customer->mollie_id )
+					);
+
+					?>
 				</td>
 				<td>
 					<?php $customer->test_mode ? \esc_html_e( 'Yes', 'pronamic_ideal' ) : \esc_html_e( 'No', 'pronamic_ideal' ); ?>

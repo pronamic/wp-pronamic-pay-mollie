@@ -69,19 +69,6 @@ class Integration extends AbstractGatewayIntegration {
 
 		parent::__construct( $args );
 
-		// Actions.
-		if ( is_admin() ) {
-			$function = array( __CLASS__, 'user_profile' );
-
-			if ( ! has_action( 'show_user_profile', $function ) ) {
-				add_action( 'show_user_profile', $function );
-			}
-
-			if ( ! has_action( 'edit_user_profile', $function ) ) {
-				add_action( 'edit_user_profile', $function );
-			}
-		}
-
 		// Filters.
 		$function = array( $this, 'next_payment_delivery_date' );
 
@@ -98,6 +85,13 @@ class Integration extends AbstractGatewayIntegration {
 		$upgrades = $this->get_upgrades();
 
 		$upgrades->add( new Upgrade300() );
+
+		/**
+		 * Admin
+		 */
+		if ( \is_admin() ) {
+			$this->admin = new Admin();
+		}
 
 		/**
 		 * CLI.
@@ -221,18 +215,6 @@ class Integration extends AbstractGatewayIntegration {
 
 				return;
 		}
-	}
-
-	/**
-	 * User profile.
-	 *
-	 * @since 1.1.6
-	 * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
-	 * @param WP_User $user WordPress user.
-	 * @return void
-	 */
-	public static function user_profile( $user ) {
-		include __DIR__ . '/../views/html-admin-user-profile.php';
 	}
 
 	/**
