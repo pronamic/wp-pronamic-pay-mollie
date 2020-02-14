@@ -78,7 +78,7 @@ class Customer {
 	 * @return string|null
 	 */
 	public function get_mode() {
-		return $this->id;
+		return $this->mode;
 	}
 
 	/**
