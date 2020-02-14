@@ -39,31 +39,12 @@ class Client {
 	private $api_key;
 
 	/**
-	 * Mode
-	 *
-	 * @since 1.1.9
-	 * @var string|null
-	 */
-	private $mode;
-
-	/**
 	 * Constructs and initializes an Mollie client object
 	 *
 	 * @param string $api_key Mollie API key.
 	 */
 	public function __construct( $api_key ) {
 		$this->api_key = $api_key;
-	}
-
-	/**
-	 * Set mode
-	 *
-	 * @since 1.1.9
-	 * @param string $mode Mode (test or live).
-	 * @return void
-	 */
-	public function set_mode( $mode ) {
-		$this->mode = $mode;
 	}
 
 	/**
