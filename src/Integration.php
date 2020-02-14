@@ -187,7 +187,7 @@ class Integration extends AbstractGatewayIntegration {
 			'title'    => __( 'Webhook URL', 'pronamic_ideal' ),
 			'type'     => 'text',
 			'classes'  => array( 'large-text', 'code' ),
-			'value'    => add_query_arg( 'mollie_webhook', '', home_url( '/' ) ),
+			'value'    => rest_url( self::REST_ROUTE_NAMESPACE . '/webhook' ),
 			'readonly' => true,
 			'tooltip'  => __( 'The Webhook URL as sent with each transaction to receive automatic payment status updates on.', 'pronamic_ideal' ),
 		);
