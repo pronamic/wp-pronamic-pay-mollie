@@ -486,19 +486,33 @@ class Gateway extends Core_Gateway {
 	 * @return array<string>
 	 */
 	private function get_customer_ids_for_payment( Payment $payment ) {
+		$customer_ids = array();
+
+		// Customer ID from subscription meta.
+		$subscription = $payment->get_subscription();
+
+		if ( null !== $subscription ) {
+			$customer_id = $this->get_customer_id_for_subscription( $payment->get_subscription() );
+
+			if ( null !== $customer_id ) {
+				$customer_ids[] = $customer_id;
+			}
+		}
+
+		// Customer ID from WordPress user.
 		$customer = $payment->get_customer();
 
-		if ( null === $customer ) {
-			return array();
+		if ( null !== $customer ) {
+			$user_id = $customer->get_user_id();
+
+			if ( ! empty( $user_id ) ) {
+				$user_customer_ids = $this->get_customer_ids_for_user( $user_id );
+
+				$customer_ids = \array_merge( $customer_ids, $user_customer_ids );
+			}
 		}
 
-		$user_id = $customer->get_user_id();
-
-		if ( empty( $user_id ) ) {
-			return array();
-		}
-
-		return $this->get_customer_ids_for_user( $user_id );
+		return $customer_ids;
 	}
 
 	/**
@@ -599,6 +613,13 @@ class Gateway extends Core_Gateway {
 
 		if ( false !== $user && $user->exists() ) {
 			$this->connect_mollie_customer_to_wp_user( $customer_id, $user );
+		}
+
+		// Store customer ID in subscription meta.
+		$subscription = $payment->get_subscription();
+
+		if ( null !== $subscription ) {
+			$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
 		}
 
 		return $mollie_customer->get_id();
