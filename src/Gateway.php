@@ -597,7 +597,7 @@ class Gateway extends Core_Gateway {
 		// Connect to user.
 		$user = \get_user_by( 'id', $pronamic_customer->get_user_id() );
 
-		if ( $user->exists() ) {
+		if ( false !== $user && $user->exists() ) {
 			$this->connect_mollie_customer_to_wp_user( $customer_id, $user );
 		}
 
