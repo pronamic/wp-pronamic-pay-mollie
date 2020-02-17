@@ -539,24 +539,25 @@ class Gateway extends Core_Gateway {
 	 * Get customer ID for subscription.
 	 *
 	 * @param Subscription $subscription Subscription.
-	 *
 	 * @return string|null
 	 */
 	private function get_customer_id_for_subscription( Subscription $subscription ) {
 		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
-		// Try to get (legacy) customer ID from first payment.
-		$first_payment = $subscription->get_first_payment();
+		if ( empty( $customer_id ) ) {
+			// Try to get (legacy) customer ID from first payment.
+			$first_payment = $subscription->get_first_payment();
 
-		if ( empty( $customer_id ) && $first_payment ) {
-			$customer_id = $first_payment->get_meta( 'mollie_customer_id' );
+			if ( null !== $first_payment ) {
+				$customer_id = $first_payment->get_meta( 'mollie_customer_id' );
+			}
 		}
 
-		if ( ! empty( $customer_id ) ) {
-			return $customer_id;
+		if ( empty( $customer_id ) ) {
+			return null;
 		}
 
-		return null;
+		return $customer_id;
 	}
 
 	/**
