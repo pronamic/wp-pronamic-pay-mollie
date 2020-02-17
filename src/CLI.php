@@ -68,6 +68,7 @@ class CLI {
 	 */
 	public function wp_cli_customers_synchronize( $args, $assoc_args ) {
 		global $post;
+		global $wpdb;
 
 		$query = new \WP_Query(
 			array(
@@ -98,6 +99,104 @@ class CLI {
 				\WP_CLI::log( '' );
 
 				$client = new Client( $api_key );
+
+				$urls = array(
+					'https://api.mollie.com/v2/customers?limit=250',
+				);
+
+				while ( ! empty( $urls ) ) {
+					$url = array_shift( $urls );
+
+					\WP_CLI::log( $url );
+
+					$response = $client->send_request( $url );
+
+					if ( isset( $response->count ) ) {
+						\WP_CLI::log(
+							\sprintf(
+								'Found %d customer(s).',
+								$response->count
+							)
+						);
+					}
+
+					if ( isset( $response->_embedded->customers ) ) {
+						\WP_CLI\Utils\format_items(
+							'table',
+							$response->_embedded->customers,
+							array(
+								'id',
+								'mode',
+								'name',
+								'email',
+								'locale',
+							)
+						);
+
+						foreach ( $response->_embedded->customers as $object ) {
+							$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->pronamic_pay_mollie_customers WHERE mollie_id = %s", $object->id ) );
+
+							$data = array(
+								'test_mode' => ( 'test' === $object->mode ),
+								'email'     => $object->email,
+								'name'      => $object->name,
+							);
+
+							$format = array(
+								'test_mode' => '%d',
+								'email'     => '%s',
+								'name'      => '%s',
+							);
+
+							if ( null === $id ) {
+								$data['mollie_id']   = $object->id;
+								$foramt['mollie_id'] = '%s';
+
+								$result = $wpdb->insert(
+									$wpdb->pronamic_pay_mollie_customers,
+									$data,
+									$format
+								);
+
+								if ( false === $result ) {
+									\WP_CLI::error(
+										sprintf(
+											'Database error: %s.',
+											$wpdb->last_error
+										)
+									);
+								}
+							} else {
+								$result = $wpdb->update(
+									$wpdb->pronamic_pay_mollie_customers,
+									$data,
+									array(
+										'id' => $id,
+									),
+									$format,
+									array(
+										'id' => '%d'
+									)
+								);
+
+								if ( false === $result ) {
+									\WP_CLI::error(
+										sprintf(
+											'Database error: %s.',
+											$wpdb->last_error
+										)
+									);
+								}
+
+								$id = $wpdb->insert_id;
+							}
+						}
+					}
+
+					if ( isset( $response->_links->next->href ) ) {
+						$urls[] = $response->_links->next->href;
+					}
+				}
 			}
 
 			\wp_reset_postdata();

@@ -50,17 +50,15 @@ class Client {
 	/**
 	 * Send request with the specified action and parameters
 	 *
-	 * @param string                            $end_point Requested endpoint.
-	 * @param string                            $method    HTTP method to use.
-	 * @param array<string, string|object|null> $data      Request data.
+	 * @param string                            $url    URL.
+	 * @param string                            $method HTTP method to use.
+	 * @param array<string, string|object|null> $data   Request data.
 	 * @return object
 	 * @throws Error Throws Error when Mollie error occurs.
 	 * @throws \Exception Throws exception when error occurs.
 	 */
-	private function send_request( $end_point, $method = 'GET', array $data = array() ) {
+	public function send_request( $url, $method = 'GET', array $data = array() ) {
 		// Request.
-		$url = self::API_URL . $end_point;
-
 		$response = wp_remote_request(
 			$url,
 			array(
@@ -114,13 +112,36 @@ class Client {
 	}
 
 	/**
+	 * Get URL.
+	 *
+	 * @return string $endpoint URL endpoint.
+	 */
+	public function get_url( $endpoint ) {
+		$url = self::API_URL . $endpoint;
+
+		return $url;
+	}
+
+	/**
+	 * Send request to endpoint.
+	 *
+	 * @param string                            $url    URL.
+	 * @param string                            $method HTTP method to use.
+	 * @param array<string, string|object|null> $data   Request data.
+	 * @return object
+	 */
+	public function send_request_to_endpoint( $endpoint, $method = 'GET', array $data = array() ) {
+		return $this->send_request( $this->get_url( $endpoint ), $method, $data );
+	}
+
+	/**
 	 * Create payment.
 	 *
 	 * @param PaymentRequest $request Payment request.
 	 * @return object
 	 */
 	public function create_payment( PaymentRequest $request ) {
-		return $this->send_request( 'payments', 'POST', $request->get_array() );
+		return $this->send_request_to_endpoint( 'payments', 'POST', $request->get_array() );
 	}
 
 	/**
@@ -129,7 +150,7 @@ class Client {
 	 * @return bool|object
 	 */
 	public function get_payments() {
-		return $this->send_request( 'payments', 'GET' );
+		return $this->send_request_to_endpoint( 'payments', 'GET' );
 	}
 
 	/**
@@ -145,7 +166,7 @@ class Client {
 			throw new \InvalidArgumentException( 'Mollie payment ID can not be empty string.' );
 		}
 
-		return $this->send_request( 'payments/' . $payment_id, 'GET' );
+		return $this->send_request_to_endpoint( 'payments/' . $payment_id, 'GET' );
 	}
 
 	/**
@@ -154,7 +175,7 @@ class Client {
 	 * @return array<string>
 	 */
 	public function get_issuers() {
-		$response = $this->send_request( 'methods/ideal?include=issuers', 'GET' );
+		$response = $this->send_request_to_endpoint( 'methods/ideal?include=issuers', 'GET' );
 
 		$issuers = array();
 
@@ -185,7 +206,7 @@ class Client {
 			$data['sequenceType'] = $sequence_type;
 		}
 
-		$response = $this->send_request( 'methods', 'GET', $data );
+		$response = $this->send_request_to_endpoint( 'methods', 'GET', $data );
 
 		$payment_methods = array();
 
@@ -214,7 +235,7 @@ class Client {
 	 * @since 1.1.6
 	 */
 	public function create_customer( Customer $customer ) {
-		$response = $this->send_request(
+		$response = $this->send_request_to_endpoint(
 			'customers',
 			'POST',
 			$customer->get_array()
@@ -240,7 +261,7 @@ class Client {
 		}
 
 		try {
-			return $this->send_request( 'customers/' . $customer_id, 'GET' );
+			return $this->send_request_to_endpoint( 'customers/' . $customer_id, 'GET' );
 		} catch ( Error $error ) {
 			if ( 404 === $error->get_status() ) {
 				return null;
@@ -263,7 +284,7 @@ class Client {
 			throw new \InvalidArgumentException( 'Mollie customer ID can not be empty string.' );
 		}
 
-		return $this->send_request( 'customers/' . $customer_id . '/mandates?limit=250', 'GET' );
+		return $this->send_request_to_endpoint( 'customers/' . $customer_id . '/mandates?limit=250', 'GET' );
 	}
 
 	/**

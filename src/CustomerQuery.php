@@ -53,7 +53,9 @@ class CustomerQuery {
 		$query = "
 			SELECT
 				mollie_customer.mollie_id,
-				mollie_customer.test_mode
+				mollie_customer.test_mode,
+				mollie_customer.name,
+				mollie_customer.email
 			FROM
 				$wpdb->pronamic_pay_mollie_customer_users AS mollie_customer_user
 					INNER JOIN

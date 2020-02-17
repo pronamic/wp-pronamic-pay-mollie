@@ -24,7 +24,7 @@ class Upgrade300 extends Upgrade {
 	 * Construct 3.0.0 upgrade.
 	 */
 	public function __construct() {
-		parent::__construct( '3.0.0' );
+		parent::__construct( '3.0.1' );
 	}
 
 	/**
@@ -67,6 +67,7 @@ class Upgrade300 extends Upgrade {
 				organization_id BIGINT( 20 ) UNSIGNED DEFAULT NULL,
 				test_mode BOOL NOT NULL,
 				email VARCHAR( 100 ) DEFAULT NULL,
+				name VARCHAR( 255 ) DEFAULT NULL,
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id ),
 				KEY organization_id ( organization_id ),

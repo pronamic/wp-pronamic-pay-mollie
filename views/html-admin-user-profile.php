@@ -33,6 +33,8 @@ if ( empty( $customers ) ) {
 		<tr>
 			<th scope="col"><?php \esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
 			<th scope="col"><?php \esc_html_e( 'Test', 'pronamic_ideal' ); ?></th>
+			<th scope="col"><?php \esc_html_e( 'Name', 'pronamic_ideal' ); ?></th>
+			<th scope="col"><?php \esc_html_e( 'Email', 'pronamic_ideal' ); ?></th>
 			<th scope="col"><?php \esc_html_e( 'Link', 'pronamic_ideal' ); ?></th>
 		</tr>
 	</thead>
@@ -63,6 +65,22 @@ if ( empty( $customers ) ) {
 				</td>
 				<td>
 					<?php $customer->test_mode ? \esc_html_e( 'Yes', 'pronamic_ideal' ) : \esc_html_e( 'No', 'pronamic_ideal' ); ?>
+				</td>
+				<td>
+					<?php echo \esc_html( $customer->name ); ?>
+				</td>
+				<td>
+					<?php
+
+					if ( null !== $customer->email ) {
+						printf(
+							'<a href="%s">%s</a>',
+							esc_attr( 'mailto:' . $customer->email ),
+							esc_html( $customer->email )
+						);
+					}
+
+					?>
 				</td>
 				<td>
 					<?php
