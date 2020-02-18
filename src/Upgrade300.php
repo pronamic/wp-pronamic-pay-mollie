@@ -24,7 +24,7 @@ class Upgrade300 extends Upgrade {
 	 * Construct 3.0.0 upgrade.
 	 */
 	public function __construct() {
-		parent::__construct( '3.0.1' );
+		parent::__construct( '3.0.2' );
 	}
 
 	/**
@@ -61,16 +61,30 @@ class Upgrade300 extends Upgrade {
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id )
 			) $charset_collate;
+			CREATE TABLE $wpdb->pronamic_pay_mollie_profiles (
+				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
+				mollie_id VARCHAR( 16 ) NOT NULL,
+				organization_id BIGINT( 20 ) UNSIGNED DEFAULT NULL,
+				name VARCHAR( 128 ) DEFAULT NULL,
+				email VARCHAR( 100 ) DEFAULT NULL,
+				api_key_test VARCHAR( 35 ) DEFAULT NULL,
+				api_key_live VARCHAR( 35 ) DEFAULT NULL,
+				PRIMARY KEY  ( id ),
+				UNIQUE KEY mollie_id ( mollie_id ),
+				KEY organization_id ( organization_id )
+			) $charset_collate;
 			CREATE TABLE $wpdb->pronamic_pay_mollie_customers (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				mollie_id VARCHAR( 16 ) NOT NULL,
 				organization_id BIGINT( 20 ) UNSIGNED DEFAULT NULL,
+				profile_id BIGINT( 20 ) UNSIGNED DEFAULT NULL,
 				test_mode BOOL NOT NULL,
 				email VARCHAR( 100 ) DEFAULT NULL,
 				name VARCHAR( 255 ) DEFAULT NULL,
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id ),
 				KEY organization_id ( organization_id ),
+				KEY profile_id ( profile_id ),
 				KEY test_mode ( test_mode ),
 				KEY email ( email )
 			) $charset_collate;
@@ -98,6 +112,19 @@ class Upgrade300 extends Upgrade {
 		 * @link https://dev.mysql.com/doc/refman/5.6/en/create-table-foreign-keys.html
 		 */
 		$data = array(
+			(object) array(	
+				'table' => $wpdb->pronamic_pay_mollie_profiles,
+				'name'  => 'fk_profile_organization_id',
+				'query' => "
+					ALTER TABLE  $wpdb->pronamic_pay_mollie_profiles
+					ADD CONSTRAINT fk_profile_organization_id
+					FOREIGN KEY ( organization_id )
+					REFERENCES $wpdb->pronamic_pay_mollie_organizations ( id )
+					ON DELETE RESTRICT
+					ON UPDATE RESTRICT
+					;
+				",
+			),
 			(object) array(
 				'table' => $wpdb->pronamic_pay_mollie_customers,
 				'name'  => 'fk_customer_organization_id',
@@ -106,6 +133,19 @@ class Upgrade300 extends Upgrade {
 					ADD CONSTRAINT fk_customer_organization_id
 					FOREIGN KEY ( organization_id )
 					REFERENCES $wpdb->pronamic_pay_mollie_organizations ( id )
+					ON DELETE RESTRICT
+					ON UPDATE RESTRICT
+					;
+				",
+			),
+			(object) array(	
+				'table' => $wpdb->pronamic_pay_mollie_customers,
+				'name'  => 'fk_customer_profile_id',
+				'query' => "
+					ALTER TABLE $wpdb->pronamic_pay_mollie_customers
+					ADD CONSTRAINT fk_customer_profile_id
+					FOREIGN KEY ( profile_id )
+					REFERENCES $wpdb->pronamic_pay_mollie_profiles ( id )
 					ON DELETE RESTRICT
 					ON UPDATE RESTRICT
 					;
