@@ -24,7 +24,7 @@ class Upgrade300 extends Upgrade {
 	 * Construct 3.0.0 upgrade.
 	 */
 	public function __construct() {
-		parent::__construct( '3.0.2' );
+		parent::__construct( '3.0.3' );
 	}
 
 	/**
