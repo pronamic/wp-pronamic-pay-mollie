@@ -287,7 +287,7 @@ class CLI {
 									'profile_id' => $profile_id,
 								),
 								array(
-									'profile_id' => '%s',
+									'profile_id' => '%d',
 								)
 							);
 						}
