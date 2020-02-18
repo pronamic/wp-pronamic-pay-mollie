@@ -296,7 +296,6 @@ class Client {
 	 * Get mandates for customer.
 	 *
 	 * @param string $customer_id Mollie customer ID.
-	 *
 	 * @return object
 	 * @throws \InvalidArgumentException Throws exception on empty customer ID argument.
 	 */
