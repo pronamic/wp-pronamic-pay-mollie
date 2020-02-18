@@ -60,6 +60,139 @@ class CLI {
 	}
 
 	/**
+	 * Insert or update Mollie profile.
+	 *
+	 * @param object $object Mollie profile object.
+	 * @param array  $data   Data.
+	 * @param array  $format Format.
+	 * @return int Mollie proflie ID.
+	 */
+	private function insert_or_update_profile( $object, $data = array(), $format = array() ) {
+		global $wpdb;
+
+		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->pronamic_pay_mollie_profiles WHERE mollie_id = %s", $object->id ) );
+
+		$data['email']   = $object->email;
+		$format['email'] = '%s';
+
+		$data['name']   = $object->name;
+		$format['name'] = '%s';
+
+		if ( null === $id ) {
+			$data['mollie_id']   = $object->id;
+			$foramt['mollie_id'] = '%s';
+
+			$result = $wpdb->insert(
+				$wpdb->pronamic_pay_mollie_profiles,
+				$data,
+				$format
+			);
+
+			if ( false === $result ) {
+				\WP_CLI::error(
+					sprintf(
+						'Database error: %s.',
+						$wpdb->last_error
+					)
+				);
+			}
+
+			$id = $wpdb->insert_id;
+		} else {
+			$result = $wpdb->update(
+				$wpdb->pronamic_pay_mollie_profiles,
+				$data,
+				array(
+					'id' => $id,
+				),
+				$format,
+				array(
+					'id' => '%d'
+				)
+			);
+
+			if ( false === $result ) {
+				\WP_CLI::error(
+					sprintf(
+						'Database error: %s.',
+						$wpdb->last_error
+					)
+				);
+			}
+		}
+
+		return $id;
+	}
+
+	/**
+	 * Insert or update Mollie customer.
+	 *
+	 * @param object $object Mollie customer object.
+	 * @param array  $data   Data.
+	 * @param array  $format Format.
+	 * @return int Mollie customer ID.
+	 */
+	private function insert_or_update_customer( $object, $data = array(), $format = array() ) {
+		global $wpdb;
+
+		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->pronamic_pay_mollie_customers WHERE mollie_id = %s", $object->id ) );
+
+		$data['test_mode']   = ( 'test' === $object->mode );
+		$format['test_mode'] = '%d';
+
+		$data['email']   = $object->email;
+		$format['email'] = '%s';
+
+		$data['name']   = $object->name;
+		$format['name'] = '%s';
+
+		if ( null === $id ) {
+			$data['mollie_id']   = $object->id;
+			$foramt['mollie_id'] = '%s';
+
+			$result = $wpdb->insert(
+				$wpdb->pronamic_pay_mollie_customers,
+				$data,
+				$format
+			);
+
+			if ( false === $result ) {
+				\WP_CLI::error(
+					sprintf(
+						'Database error: %s.',
+						$wpdb->last_error
+					)
+				);
+			}
+
+			$id = $wpdb->insert_id;
+		} else {
+			$result = $wpdb->update(
+				$wpdb->pronamic_pay_mollie_customers,
+				$data,
+				array(
+					'id' => $id,
+				),
+				$format,
+				array(
+					'id' => '%d'
+				)
+			);
+
+			if ( false === $result ) {
+				\WP_CLI::error(
+					sprintf(
+						'Database error: %s.',
+						$wpdb->last_error
+					)
+				);
+			}
+		}
+
+		return $id;
+	}
+
+	/**
 	 * CLI customers synchronize.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/customers-api/list-customers
@@ -104,6 +237,20 @@ class CLI {
 					'https://api.mollie.com/v2/customers?limit=250',
 				);
 
+				$profile = $client->get_current_profile();
+
+				$profile_id = $this->insert_or_update_profile(
+					$profile,
+					array(
+						'api_key_live' => ( 'live_' === substr( $api_key, 0, 5 ) ) ? $api_key : null,
+						'api_key_test' => ( 'test_' === substr( $api_key, 0, 5 ) ) ? $api_key : null,
+					),
+					array(
+						'api_key_live' => '%s',
+						'api_key_test' => '%s',
+					)
+				);
+
 				while ( ! empty( $urls ) ) {
 					$url = array_shift( $urls );
 
@@ -134,62 +281,15 @@ class CLI {
 						);
 
 						foreach ( $response->_embedded->customers as $object ) {
-							$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->pronamic_pay_mollie_customers WHERE mollie_id = %s", $object->id ) );
-
-							$data = array(
-								'test_mode' => ( 'test' === $object->mode ),
-								'email'     => $object->email,
-								'name'      => $object->name,
+							$customer_id = $this->insert_or_update_customer(
+								$object,
+								array(
+									'profile_id' => $profile_id,
+								),
+								array(
+									'profile_id' => '%s',
+								)
 							);
-
-							$format = array(
-								'test_mode' => '%d',
-								'email'     => '%s',
-								'name'      => '%s',
-							);
-
-							if ( null === $id ) {
-								$data['mollie_id']   = $object->id;
-								$foramt['mollie_id'] = '%s';
-
-								$result = $wpdb->insert(
-									$wpdb->pronamic_pay_mollie_customers,
-									$data,
-									$format
-								);
-
-								if ( false === $result ) {
-									\WP_CLI::error(
-										sprintf(
-											'Database error: %s.',
-											$wpdb->last_error
-										)
-									);
-								}
-							} else {
-								$result = $wpdb->update(
-									$wpdb->pronamic_pay_mollie_customers,
-									$data,
-									array(
-										'id' => $id,
-									),
-									$format,
-									array(
-										'id' => '%d'
-									)
-								);
-
-								if ( false === $result ) {
-									\WP_CLI::error(
-										sprintf(
-											'Database error: %s.',
-											$wpdb->last_error
-										)
-									);
-								}
-
-								$id = $wpdb->insert_id;
-							}
 						}
 					}
 
@@ -201,8 +301,6 @@ class CLI {
 
 			\wp_reset_postdata();
 		}
-
-		\WP_CLI::error( 'Command not fully implemented yet.' );
 	}
 
 	/**

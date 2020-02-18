@@ -135,6 +135,27 @@ class Client {
 	}
 
 	/**
+	 * Get profile.
+	 *
+	 * @param string $profile Mollie profile ID.
+	 * @return object
+	 * @throws Error
+	 */
+	public function get_profile( $profile ) {
+		return $this->send_request_to_endpoint( 'profiles/' . $profile, 'GET' );
+	}
+
+	/**
+	 * Get current profile.
+	 *
+	 * @return object
+	 * @throws Error
+	 */
+	public function get_current_profile() {
+		return $this->get_profile( 'me' );
+	}
+
+	/**
 	 * Create payment.
 	 *
 	 * @param PaymentRequest $request Payment request.
