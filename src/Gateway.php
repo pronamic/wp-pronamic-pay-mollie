@@ -295,6 +295,14 @@ class Gateway extends Core_Gateway {
 			$request->issuer = $payment->get_issuer();
 		}
 
+		// Consumer bank details.
+		$consumer_bank_details = $payment->get_consumer_bank_details();
+
+		if ( Methods::DIRECT_DEBIT === $request->method && null !== $consumer_bank_details ) {
+			$request->consumer_name    = $consumer_bank_details->get_name();
+			$request->consumer_account = $consumer_bank_details->get_iban();
+		}
+
 		// Due date.
 		try {
 			$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );

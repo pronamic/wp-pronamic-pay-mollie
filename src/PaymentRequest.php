@@ -130,6 +130,26 @@ class PaymentRequest {
 	public $sequence_type;
 
 	/**
+	 * Consumer name for SEPA Direct Debit.
+	 *
+	 * Beneficiary name of the account holder. Only available if one-off payments are enabled
+	 * on your account. Will pre-fill the beneficiary name in the checkout screen if present.
+	 *
+	 * @var string|null
+	 */
+	public $consumer_name;
+
+	/**
+	 * Consumer account for SEPA Direct Debit.
+	 *
+	 * IBAN of the account holder. Only available if one-off payments are enabled on your account.
+	 * Will pre-fill the IBAN in the checkout screen if present.
+	 *
+	 * @var string|null
+	 */
+	public $consumer_account;
+
+	/**
 	 * Create Mollie payment request object.
 	 *
 	 * @param Amount $amount      The amount that you want to charge.
@@ -173,17 +193,19 @@ class PaymentRequest {
 		}
 
 		$array = array(
-			'amount'       => $this->amount->get_json(),
-			'description'  => $this->description,
-			'method'       => $this->method,
-			'redirectUrl'  => $this->redirect_url,
-			'metadata'     => $this->meta_data,
-			'locale'       => $this->locale,
-			'webhookUrl'   => $this->webhook_url,
-			'issuer'       => $this->issuer,
-			'dueDate'      => $due_date,
-			'sequenceType' => $this->sequence_type,
-			'customerId'   => $this->customer_id,
+			'amount'          => $this->amount->get_json(),
+			'description'     => $this->description,
+			'method'          => $this->method,
+			'redirectUrl'     => $this->redirect_url,
+			'metadata'        => $this->meta_data,
+			'locale'          => $this->locale,
+			'webhookUrl'      => $this->webhook_url,
+			'consumerName'    => $this->consumer_name,
+			'consumerAccount' => $this->consumer_account,
+			'issuer'          => $this->issuer,
+			'dueDate'         => $due_date,
+			'sequenceType'    => $this->sequence_type,
+			'customerId'      => $this->customer_id,
 		);
 
 		/*
