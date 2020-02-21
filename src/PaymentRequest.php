@@ -130,6 +130,15 @@ class PaymentRequest {
 	public $sequence_type;
 
 	/**
+	 * Mandate ID.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @since unreleased
+	 * @var string|null
+	 */
+	public $mandate_id;
+
+	/**
 	 * Consumer name for SEPA Direct Debit.
 	 *
 	 * Beneficiary name of the account holder. Only available if one-off payments are enabled
@@ -206,6 +215,7 @@ class PaymentRequest {
 			'dueDate'         => $due_date,
 			'sequenceType'    => $this->sequence_type,
 			'customerId'      => $this->customer_id,
+			'mandateId'       => $this->mandate_id,
 		);
 
 		/*

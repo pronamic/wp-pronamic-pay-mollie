@@ -270,6 +270,37 @@ class Gateway extends Core_Gateway {
 		// Recurring payment method.
 		$is_recurring_method = ( $payment->get_subscription() && PaymentMethods::is_recurring_method( $payment_method ) );
 
+		// Consumer bank details.
+		$consumer_bank_details = $payment->get_consumer_bank_details();
+
+		if ( PaymentMethods::DIRECT_DEBIT === $payment_method && null !== $consumer_bank_details ) {
+			$consumer_name = $consumer_bank_details->get_name();
+			$consumer_iban = $consumer_bank_details->get_iban();
+
+			$request->consumer_name    = $consumer_name;
+			$request->consumer_account = $consumer_iban;
+
+			// Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
+			if ( null !== $customer_id ) {
+				// Find or create mandate.
+				$mandate_id = $this->client->has_valid_mandate( $customer_id, PaymentMethods::DIRECT_DEBIT, $consumer_iban );
+
+				if ( false === $mandate_id ) {
+					$mandate = $this->client->create_mandate( $customer_id, $consumer_bank_details );
+
+					$mandate_id = $mandate->id;
+				}
+
+				// Charge immediately on-demand.
+				$request->sequence_type = Sequence::RECURRING;
+				$request->mandate_id    = $mandate_id;
+
+				$is_recurring_method = true;
+
+				$payment->recurring = true;
+			}
+		}
+
 		if ( false === $is_recurring_method ) {
 			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
 			$is_recurring_method = PaymentMethods::is_direct_debit_method( $payment_method );
@@ -293,14 +324,6 @@ class Gateway extends Core_Gateway {
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
 			$request->issuer = $payment->get_issuer();
-		}
-
-		// Consumer bank details.
-		$consumer_bank_details = $payment->get_consumer_bank_details();
-
-		if ( Methods::DIRECT_DEBIT === $request->method && null !== $consumer_bank_details ) {
-			$request->consumer_name    = $consumer_bank_details->get_name();
-			$request->consumer_account = $consumer_bank_details->get_iban();
 		}
 
 		// Due date.

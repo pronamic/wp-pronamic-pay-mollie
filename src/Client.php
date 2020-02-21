@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Core\XML\Security;
 
 /**
@@ -293,6 +294,28 @@ class Client {
 	}
 
 	/**
+	 * Create mandate.
+	 *
+	 * @param Customer $customer Customer.
+	 * @return object
+	 * @throws Error Throws Error when Mollie error occurs.
+	 * @since unreleased
+	 */
+	public function create_mandate( $customer_id, BankAccountDetails $consumer_bank_details ) {
+		$response = $this->send_request_to_endpoint(
+			'customers/' . $customer_id . '/mandates',
+			'POST',
+			array(
+				'method'          => Methods::DIRECT_DEBIT,
+				'consumerName'    => $consumer_bank_details->get_name(),
+				'consumerAccount' => $consumer_bank_details->get_iban(),
+			)
+		);
+
+		return $response;
+	}
+
+	/**
 	 * Get mandates for customer.
 	 *
 	 * @param string $customer_id Mollie customer ID.
@@ -316,7 +339,7 @@ class Client {
 	 * @return boolean
 	 * @throws \Exception Throws exception for mandates on failed request or invalid response.
 	 */
-	public function has_valid_mandate( $customer_id, $payment_method = null ) {
+	public function has_valid_mandate( $customer_id, $payment_method = null, $search = null ) {
 		$mandates = $this->get_mandates( $customer_id );
 
 		$mollie_method = Methods::transform( $payment_method );
@@ -325,13 +348,32 @@ class Client {
 			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
-		foreach ( $mandates->_embedded as $mandate ) {
-			if ( $mollie_method !== $mandate->method ) {
+		foreach ( $mandates->_embedded->mandates as $mandate ) {
+			if ( null !== $mollie_method && $mollie_method !== $mandate->method ) {
 				continue;
 			}
 
+			// Search consumer account or card number.
+			if ( null !== $search ) {
+				switch ( $mollie_method ) {
+					case Methods::DIRECT_DEBIT:
+					case Methods::PAYPAL:
+						if ( $search !== $mandate->details->consumerAccount ) {
+							continue 2;
+						}
+
+						break;
+					case Methods::CREDITCARD:
+						if ( $search !== $mandate->details->cardNumber ) {
+							continue 2;
+						}
+
+						break;
+				}
+			}
+
 			if ( 'valid' === $mandate->status ) {
-				return true;
+				return $mandate->id;
 			}
 		}
 
@@ -356,7 +398,7 @@ class Client {
 			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
-		foreach ( $mandates->_embedded as $mandate ) {
+		foreach ( $mandates->_embedded->mandates as $mandate ) {
 			if ( $mollie_method !== $mandate->method ) {
 				continue;
 			}
