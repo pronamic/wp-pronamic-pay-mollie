@@ -62,6 +62,10 @@ class Gateway extends Core_Gateway {
 
 		// Client.
 		$this->client = new Client( \strval( $config->api_key ) );
+
+		// Data Stores.
+		$this->profile_data_store  = new ProfileDataStore();
+		$this->customer_data_store = new CustomerDataStore();
 	}
 
 	/**
@@ -435,6 +439,57 @@ class Gateway extends Core_Gateway {
 			$payment->set_status( Statuses::transform( $mollie_payment->status ) );
 		}
 
+		/**
+		 * If the Mollie payment contains a customer ID we will try to connect
+		 * this Mollie customer ID the WordPress user and subscription.
+		 * This can be usefull in case when a WordPress user is created after 
+		 * a succesfull payment.
+		 *
+		 * @link https://www.gravityforms.com/add-ons/user-registration/
+		 */
+		if ( isset( $mollie_payment->customerId ) ) {
+			$mollie_profile = new Profile();
+			$mollie_profile->set_id( $mollie_payment->profileId );
+
+			$profile_id = $this->profile_data_store->save_profile( $mollie_profile );
+
+			$mollie_customer = new Customer();
+			$mollie_customer->set_id( $mollie_payment->customerId );
+
+			$mollie_customer_data = $this->customer_data_store->get_customer( $mollie_customer );
+
+			if ( null === $mollie_customer_data ) {
+				$this->customer_data_store->insert_customer(
+					$mollie_customer,
+					array(
+						'profile_id' => $profile_id,
+					),
+					array(
+						'profile_id' => '%s',
+					)
+				);
+			}
+
+			$customer = $payment->get_customer();
+
+			if ( null !== $customer ) {
+				// Connect to user.
+				$user = \get_user_by( 'id', $customer->get_user_id() );
+
+				$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+			}
+
+			$subscription = $payment->get_subscription();
+
+			if ( null !== $subscription ) {
+				$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+				if ( empty( $customer_id ) ) {
+
+				}
+			}
+		}
+
 		if ( isset( $mollie_payment->details ) ) {
 			$consumer_bank_details = $payment->get_consumer_bank_details();
 
@@ -638,14 +693,12 @@ class Gateway extends Core_Gateway {
 		// Create customer.
 		$mollie_customer = $this->client->create_customer( $mollie_customer );
 
-		$customer_id = $this->insert_mollie_customer( $mollie_customer );
+		$customer_id = $this->customer_data_store->insert_customer( $mollie_customer );
 
 		// Connect to user.
 		$user = \get_user_by( 'id', $pronamic_customer->get_user_id() );
 
-		if ( false !== $user && $user->exists() ) {
-			$this->connect_mollie_customer_to_wp_user( $customer_id, $user );
-		}
+		$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
 
 		// Store customer ID in subscription meta.
 		$subscription = $payment->get_subscription();
@@ -655,97 +708,5 @@ class Gateway extends Core_Gateway {
 		}
 
 		return $mollie_customer->get_id();
-	}
-
-	/**
-	 * Insert Mollie customer.
-	 *
-	 * @link https://developer.wordpress.org/reference/classes/wpdb/insert/
-	 * @param Customer $customer Mollie customer.
-	 * @return int
-	 */
-	private function insert_mollie_customer( Customer $customer ) {
-		global $wpdb;
-
-		$mollie_id = $customer->get_id();
-
-		if ( empty( $mollie_id ) ) {
-			throw new \Exception( 'Can not insert Mollie customer with empty ID.' );
-		}
-
-		$result = $wpdb->insert(
-			$wpdb->pronamic_pay_mollie_customers,
-			array(
-				'mollie_id' => $mollie_id,
-				'test_mode' => ( 'test' === $customer->get_mode() ),
-				'email'     => $customer->get_email(),
-			),
-			array(
-				'mollie_id' => '%s',
-				'test_mode' => '%d',
-				'email'     => '%s',
-			)
-		);
-
-		if ( false === $result ) {
-			throw new \Exception(
-				sprintf(
-					'Could not insert Mollie customer ID: %s, error: %s.',
-					$mollie_id,
-					$wpdb->last_error
-				)
-			);
-		}
-
-		$id = $wpdb->insert_id;
-
-		return $id;
-	}
-
-	/**
-	 * Connect Mollie customer to WordPress user.
-	 *
-	 * @param int      $custoemr_id Customer ID.
-	 * @param \WP_User $user        WordPress user.
-	 */
-	private function connect_mollie_customer_to_wp_user( $customer_id, \WP_User $user ) {
-		global $wpdb;
-
-		if ( ! $user->exists() ) {
-			throw new \Exception(
-				sprintf(
-					'Can not connect Mollie customer (%s) to non non-existent WordPress user (%s).',
-					$customer_id,
-					$user->ID
-				)
-			);
-		}
-
-		$result = $wpdb->insert(
-			$wpdb->pronamic_pay_mollie_customer_users,
-			array(
-				'customer_id' => $customer_id,
-				'user_id'     => $user->ID,
-			),
-			array(
-				'customer_id' => '%d',
-				'user_id'     => '%d',
-			)
-		);
-
-		if ( false === $result ) {
-			throw new \Exception(
-				sprintf(
-					'Could not connect Mollie customer (%s) to WordPress user (%s), error: %s.',
-					$customer_id,
-					$user->ID,
-					$wpdb->last_error
-				)
-			);
-		}
-
-		$id = $wpdb->insert_id;
-
-		return $id;
 	}
 }
