@@ -21,7 +21,13 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @since   3.0.0
  */
 class ProfileDataStore {
-	public function get_profile( $profile ) {
+	/**
+	 * Get profile data for specified Mollie profile.
+	 *
+	 * @param Profile $profile Profile.
+	 * @return object|null
+	 */
+	public function get_profile( Profile $profile ) {
 		global $wpdb;
 
 		$id = $profile->get_id();
@@ -37,7 +43,15 @@ class ProfileDataStore {
 		return $data;
 	}
 
-	public function save_profile( $profile, $data = array(), $format = array() ) {
+	/**
+	 * Save Mollie profile.
+	 *
+	 * @param Profile $profile Profile.
+	 * @param array $data   Data.
+	 * @param array $format Format.
+	 * @return int
+	 */
+	public function save_profile( Profile $profile, $data = array(), $format = array() ) {
 		global $wpdb;
 
 		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->pronamic_pay_mollie_profiles WHERE mollie_id = %s", $profile->get_id() ) );

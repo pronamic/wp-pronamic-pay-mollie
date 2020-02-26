@@ -21,7 +21,13 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @since   3.0.0
  */
 class CustomerDataStore {
-	public function get_customer( $customer ) {
+	/**
+	 * Get customer data for specified Mollie customer.
+	 *
+	 * @param Customer $customer Mollie customer.
+	 * @return object|null
+	 */
+	public function get_customer( Customer $customer ) {
 		global $wpdb;
 
 		$id = $customer->get_id();
@@ -37,7 +43,14 @@ class CustomerDataStore {
 		return $data;
 	}
 
-	public function insert_customer( $customer, $data = array(), $format = array()  ) {
+	/**
+	 * Insert Mollie customer.
+	 *
+	 * @param Customer $customer Customer.
+	 * @param array $data   Data.
+	 * @param array $format Format.
+	 */
+	public function insert_customer( Customer $customer, $data = array(), $format = array()  ) {
 		global $wpdb;
 
 		$mollie_id = $customer->get_id();
@@ -106,7 +119,7 @@ class CustomerDataStore {
 			$customer->get_id(),
 			$user->ID
 		);
-
+echo $query;exit;
 		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {

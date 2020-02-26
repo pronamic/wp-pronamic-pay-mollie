@@ -440,6 +440,14 @@ class Gateway extends Core_Gateway {
 		}
 
 		/**
+		 * Mollie profile.
+		 */
+		$mollie_profile = new Profile();
+		$mollie_profile->set_id( $mollie_payment->profileId );
+
+		$profile_id = $this->profile_data_store->save_profile( $mollie_profile );
+
+		/**
 		 * If the Mollie payment contains a customer ID we will try to connect
 		 * this Mollie customer ID the WordPress user and subscription.
 		 * This can be usefull in case when a WordPress user is created after 
@@ -448,11 +456,6 @@ class Gateway extends Core_Gateway {
 		 * @link https://www.gravityforms.com/add-ons/user-registration/
 		 */
 		if ( isset( $mollie_payment->customerId ) ) {
-			$mollie_profile = new Profile();
-			$mollie_profile->set_id( $mollie_payment->profileId );
-
-			$profile_id = $this->profile_data_store->save_profile( $mollie_profile );
-
 			$mollie_customer = new Customer();
 			$mollie_customer->set_id( $mollie_payment->customerId );
 

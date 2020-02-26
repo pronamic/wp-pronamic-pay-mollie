@@ -125,6 +125,15 @@ class Admin {
 
 		add_submenu_page(
 			'pronamic_pay_mollie',
+			__( 'Mollie Profiles', 'pronamic_ideal' ),
+			__( 'Profiles', 'pronamic_ideal' ),
+			'manage_options',
+			'pronamic_pay_mollie_profiles',
+			array( $this, 'page_mollie_profiles' )
+		);
+
+		add_submenu_page(
+			'pronamic_pay_mollie',
 			__( 'Mollie Customers', 'pronamic_ideal' ),
 			__( 'Customers', 'pronamic_ideal' ),
 			'manage_options',
@@ -138,6 +147,19 @@ class Admin {
 	 */
 	public function page_mollie() {
 
+	}
+
+	/**
+	 * Page Mollie profiles.
+	 */
+	public function page_mollie_profiles() {
+		if ( filter_has_var( INPUT_GET, 'id' ) ) {
+			include __DIR__ . '/../views/page-profile.php';
+
+			return;
+		}
+
+		include __DIR__ . '/../views/page-profiles.php';
 	}
 
 	/**
