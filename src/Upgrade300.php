@@ -214,6 +214,7 @@ class Upgrade300 extends Upgrade {
 			$number_constraints = \intval( $result );
 
 			if ( 0 === $number_constraints ) {
+				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared.
 				$result = $wpdb->query( $item->query );
 
 				if ( false === $result ) {
@@ -262,6 +263,7 @@ class Upgrade300 extends Upgrade {
 			;
 		";
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared.
 		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {
@@ -299,6 +301,7 @@ class Upgrade300 extends Upgrade {
 			;
 		";
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared.
 		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {

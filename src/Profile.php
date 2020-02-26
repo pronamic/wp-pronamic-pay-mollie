@@ -27,6 +27,27 @@ class Profile {
 	private $id;
 
 	/**
+	 * Mode.
+	 *
+	 * @var string|null
+	 */
+	private $mode;
+
+	/**
+	 * Name.
+	 *
+	 * @var string|null
+	 */
+	private $name;
+
+	/**
+	 * Email.
+	 *
+	 * @var string|null
+	 */
+	private $email;
+
+	/**
 	 * Get ID.
 	 *
 	 * @return string|null
@@ -42,5 +63,59 @@ class Profile {
 	 */
 	public function set_id( $id ) {
 		$this->id = $id;
+	}
+
+	/**
+	 * Get mode.
+	 *
+	 * @return string|null
+	 */
+	public function get_mode() {
+		return $this->mode;
+	}
+
+	/**
+	 * Set mode.
+	 *
+	 * @param string|null $mode Mode.
+	 */
+	public function set_mode( $mode ) {
+		$this->mode = $mode;
+	}
+
+	/**
+	 * Get name.
+	 *
+	 * @return string|null
+	 */
+	public function get_name() {
+		return $this->name;
+	}
+
+	/**
+	 * Set name.
+	 *
+	 * @param string|null $name Name.
+	 */
+	public function set_name( $name ) {
+		$this->name = $name;
+	}
+
+	/**
+	 * Get email.
+	 *
+	 * @return string|null
+	 */
+	public function get_email() {
+		return $this->email;
+	}
+
+	/**
+	 * Set email.
+	 *
+	 * @param string|null $email Email.
+	 */
+	public function set_email( $email ) {
+		$this->email = $email;
 	}
 }

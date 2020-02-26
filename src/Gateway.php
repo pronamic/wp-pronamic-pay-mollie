@@ -206,7 +206,7 @@ class Gateway extends Core_Gateway {
 	 * @return string|null
 	 */
 	public function get_webhook_url() {
-		$url = home_url( '/' );
+		$url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook' );
 
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 
@@ -228,8 +228,6 @@ class Gateway extends Core_Gateway {
 			// Mollie doesn't allow the .test TLD.
 			return null;
 		}
-
-		$url = \rest_url( self::REST_ROUTE_NAMESPACE . '/webhook' );
 
 		return $url;
 	}
@@ -488,7 +486,7 @@ class Gateway extends Core_Gateway {
 				$customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
 				if ( empty( $customer_id ) ) {
-
+					$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
 				}
 			}
 		}

@@ -120,8 +120,7 @@ class CustomerDataStore {
 			$customer->get_id(),
 			$user->ID
 		);
-		echo $query;
-		exit;
+
 		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {

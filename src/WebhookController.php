@@ -60,7 +60,7 @@ class WebhookController {
 	/**
 	 * REST API Mollie webhook handler.
 	 *
-	 * @param WP_REST_Request $request Request.
+	 * @param \WP_REST_Request $request Request.
 	 * @return object
 	 */
 	public function rest_api_mollie_webhook( \WP_REST_Request $request ) {

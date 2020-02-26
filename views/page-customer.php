@@ -14,26 +14,26 @@ $mollie_customer_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
 
 global $wpdb;
 
-$query = $wpdb->prepare(
-	"
-	SELECT
-		mollie_customer.*,
-		IF ( mollie_customer.test_mode, mollie_profile.api_key_test, mollie_profile.api_key_live ) AS api_key
-	FROM
-		$wpdb->pronamic_pay_mollie_customers AS mollie_customer
-			INNER JOIN
-		$wpdb->pronamic_pay_mollie_profiles AS mollie_profile
-				ON mollie_customer.profile_id = mollie_profile.id
-	WHERE
-		mollie_customer.mollie_id = %s
-	LIMIT
-		1
-	;
-	",
-	$mollie_customer_id
+$data = $wpdb->get_row(
+	$wpdb->prepare(
+		"
+		SELECT
+			mollie_customer.*,
+			IF ( mollie_customer.test_mode, mollie_profile.api_key_test, mollie_profile.api_key_live ) AS api_key
+		FROM
+			$wpdb->pronamic_pay_mollie_customers AS mollie_customer
+				INNER JOIN
+			$wpdb->pronamic_pay_mollie_profiles AS mollie_profile
+					ON mollie_customer.profile_id = mollie_profile.id
+		WHERE
+			mollie_customer.mollie_id = %s
+		LIMIT
+			1
+		;
+		",
+		$mollie_customer_id
+	)
 );
-
-$data = $wpdb->get_row( $query );
 
 $client = new Client( $data->api_key );
 
@@ -56,30 +56,30 @@ $mandates = $response->_embedded->mandates;
 /**
  * WordPress user.
  */
-$query = $wpdb->prepare(
-	"
-	SELECT
-		user.*
-	FROM
-		$wpdb->pronamic_pay_mollie_customer_users AS mollie_customer_user
-			INNER JOIN
-		$wpdb->users AS user
-				ON mollie_customer_user.user_id = user.ID
-	WHERE
-		mollie_customer_user.customer_id = %d
-	;
-	",
-	$data->id
+$users = $wpdb->get_results(
+	$wpdb->prepare(
+		"
+		SELECT
+			user.*
+		FROM
+			$wpdb->pronamic_pay_mollie_customer_users AS mollie_customer_user
+				INNER JOIN
+			$wpdb->users AS user
+					ON mollie_customer_user.user_id = user.ID
+		WHERE
+			mollie_customer_user.customer_id = %d
+		;
+		",
+		$data->id
+	)
 );
-
-$users = $wpdb->get_results( $query );
 
 ?>
 <div class="wrap">
 	<h1><?php echo \esc_html( \get_admin_page_title() ); ?></h1>
 
 	<h2><?php \printf( \__( 'Customer %s', 'pronamic_ideal' ), \sprintf( '<code>%s</code>', $mollie_customer_id ) ); ?></h2>
-	
+
 	<h3><?php \esc_html_e( 'General', 'pronamic_ideal' ); ?></h3>
 
 	<table class="form-table">
@@ -189,7 +189,7 @@ $users = $wpdb->get_results( $query );
 		</thead>
 
 		<tbody>
-			
+
 			<?php if ( empty( $mandates ) ) : ?>
 
 				<tr>
@@ -290,7 +290,6 @@ $users = $wpdb->get_results( $query );
 							}
 
 							?>
-														
 						</td>
 						<td>
 							<?php echo \esc_html( $mandate->mandateReference ); ?>

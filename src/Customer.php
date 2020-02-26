@@ -138,7 +138,7 @@ class Customer {
 	/**
 	 * Set locale.
 	 *
-	 * @param string|null $email Email.
+	 * @param string|null $locale Locale.
 	 */
 	public function set_locale( $locale ) {
 		$this->locale = $locale;

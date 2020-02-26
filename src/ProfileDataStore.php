@@ -36,9 +36,22 @@ class ProfileDataStore {
 			return null;
 		}
 
-		$query = $wpdb->prepare( "SELECT * FROM $wpdb->pronamic_pay_mollie_profiles WHERE mollie_id = %s LIMIT 1;", $id );
-
-		$data = $wpdb->get_row( $query );
+		$data = $wpdb->get_row(
+			$wpdb->prepare(
+				"
+				SELECT
+					*
+				FROM
+					$wpdb->pronamic_pay_mollie_profiles
+				WHERE
+					mollie_id = %s
+				LIMIT
+					1
+				;
+				",
+				$id
+			)
+		);
 
 		return $data;
 	}

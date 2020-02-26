@@ -115,7 +115,8 @@ class Client {
 	/**
 	 * Get URL.
 	 *
-	 * @return string $endpoint URL endpoint.
+	 * @param string $endpoint URL endpoint.
+	 * @return string
 	 */
 	public function get_url( $endpoint ) {
 		$url = self::API_URL . $endpoint;
@@ -126,9 +127,9 @@ class Client {
 	/**
 	 * Send request to endpoint.
 	 *
-	 * @param string                            $url    URL.
-	 * @param string                            $method HTTP method to use.
-	 * @param array<string, string|object|null> $data   Request data.
+	 * @param string                            $endpoint Endpoint.
+	 * @param string                            $method   HTTP method to use.
+	 * @param array<string, string|object|null> $data     Request data.
 	 * @return object
 	 */
 	public function send_request_to_endpoint( $endpoint, $method = 'GET', array $data = array() ) {
