@@ -107,7 +107,7 @@ class CLI {
 				),
 				$format,
 				array(
-					'id' => '%d'
+					'id' => '%d',
 				)
 			);
 
@@ -175,7 +175,7 @@ class CLI {
 				),
 				$format,
 				array(
-					'id' => '%d'
+					'id' => '%d',
 				)
 			);
 

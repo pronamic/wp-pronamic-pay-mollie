@@ -289,7 +289,8 @@ $users = $wpdb->get_results( $query );
 									break;
 							}
 
-							?>							
+							?>
+														
 						</td>
 						<td>
 							<?php echo \esc_html( $mandate->mandateReference ); ?>

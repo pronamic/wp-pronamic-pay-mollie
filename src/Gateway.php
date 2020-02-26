@@ -450,7 +450,7 @@ class Gateway extends Core_Gateway {
 		/**
 		 * If the Mollie payment contains a customer ID we will try to connect
 		 * this Mollie customer ID the WordPress user and subscription.
-		 * This can be usefull in case when a WordPress user is created after 
+		 * This can be usefull in case when a WordPress user is created after
 		 * a succesfull payment.
 		 *
 		 * @link https://www.gravityforms.com/add-ons/user-registration/

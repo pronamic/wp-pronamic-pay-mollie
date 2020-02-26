@@ -112,7 +112,7 @@ class Upgrade300 extends Upgrade {
 		 * @link https://dev.mysql.com/doc/refman/5.6/en/create-table-foreign-keys.html
 		 */
 		$data = array(
-			(object) array(	
+			(object) array(
 				'table' => $wpdb->pronamic_pay_mollie_profiles,
 				'name'  => 'fk_profile_organization_id',
 				'query' => "
@@ -138,7 +138,7 @@ class Upgrade300 extends Upgrade {
 					;
 				",
 			),
-			(object) array(	
+			(object) array(
 				'table' => $wpdb->pronamic_pay_mollie_customers,
 				'name'  => 'fk_customer_profile_id',
 				'query' => "

@@ -47,10 +47,10 @@ class CustomerDataStore {
 	 * Insert Mollie customer.
 	 *
 	 * @param Customer $customer Customer.
-	 * @param array $data   Data.
-	 * @param array $format Format.
+	 * @param array    $data   Data.
+	 * @param array    $format Format.
 	 */
-	public function insert_customer( Customer $customer, $data = array(), $format = array()  ) {
+	public function insert_customer( Customer $customer, $data = array(), $format = array() ) {
 		global $wpdb;
 
 		$mollie_id = $customer->get_id();
@@ -59,14 +59,14 @@ class CustomerDataStore {
 			throw new \Exception( 'Can not insert Mollie customer with empty ID.' );
 		}
 
-		$data['mollie_id'] = $mollie_id;
+		$data['mollie_id']   = $mollie_id;
 		$format['mollie_id'] = '%s';
 
-		$data['test_mode'] = ( 'test' === $customer->get_mode() );
+		$data['test_mode']   = ( 'test' === $customer->get_mode() );
 		$format['test_mode'] = '%d';
 
-		$data['email']     = $customer->get_email();
-		$format['email']     = '%s';
+		$data['email']   = $customer->get_email();
+		$format['email'] = '%s';
 
 		$result = $wpdb->insert(
 			$wpdb->pronamic_pay_mollie_customers,
@@ -98,7 +98,8 @@ class CustomerDataStore {
 	public function connect_mollie_customer_to_wp_user( $customer, \WP_User $user ) {
 		global $wpdb;
 
-		$query = $wpdb->prepare( "
+		$query = $wpdb->prepare(
+			"
 			INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customer_users (
 				customer_id,
 				user_id
@@ -119,7 +120,8 @@ class CustomerDataStore {
 			$customer->get_id(),
 			$user->ID
 		);
-echo $query;exit;
+		echo $query;
+		exit;
 		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {

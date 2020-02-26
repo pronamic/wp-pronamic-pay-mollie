@@ -47,8 +47,8 @@ class ProfileDataStore {
 	 * Save Mollie profile.
 	 *
 	 * @param Profile $profile Profile.
-	 * @param array $data   Data.
-	 * @param array $format Format.
+	 * @param array   $data   Data.
+	 * @param array   $format Format.
 	 * @return int
 	 */
 	public function save_profile( Profile $profile, $data = array(), $format = array() ) {
@@ -91,7 +91,7 @@ class ProfileDataStore {
 				),
 				$format,
 				array(
-					'id' => '%d'
+					'id' => '%d',
 				)
 			);
 
