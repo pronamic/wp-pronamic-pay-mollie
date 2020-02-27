@@ -69,10 +69,10 @@ class ProfileDataStore {
 
 		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->pronamic_pay_mollie_profiles WHERE mollie_id = %s", $profile->get_id() ) );
 
-		$data['email']   = $profile->email;
+		$data['email']   = $profile->get_email();
 		$format['email'] = '%s';
 
-		$data['name']   = $profile->name;
+		$data['name']   = $profile->get_name();
 		$format['name'] = '%s';
 
 		if ( null === $id ) {
