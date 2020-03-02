@@ -477,7 +477,9 @@ class Gateway extends Core_Gateway {
 				// Connect to user.
 				$user = \get_user_by( 'id', $customer->get_user_id() );
 
-				$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+				if ( false !== $user ) {
+					$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+				}
 			}
 
 			$subscription = $payment->get_subscription();
@@ -699,7 +701,9 @@ class Gateway extends Core_Gateway {
 		// Connect to user.
 		$user = \get_user_by( 'id', $pronamic_customer->get_user_id() );
 
-		$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+		if ( false !== $user ) {
+			$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+		}
 
 		// Store customer ID in subscription meta.
 		$subscription = $payment->get_subscription();
