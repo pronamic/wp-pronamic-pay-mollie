@@ -21,6 +21,16 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @since   3.0.0
  */
 class ProfileDataStore {
+	public function get_or_insert_profile( Profile $profile, $data = array(), $format = array() ) {
+		$data = $this->get_profile( $profile );
+
+		if ( null !== $data ) {
+			return $data->id;
+		}
+
+		return $this->save_profile( $profile, $data = array(), $format = array() );
+	}
+
 	/**
 	 * Get profile data for specified Mollie profile.
 	 *

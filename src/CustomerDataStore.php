@@ -21,6 +21,16 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @since   3.0.0
  */
 class CustomerDataStore {
+	public function get_or_insert_customer( Customer $customer ) {
+		$data = $this->get_customer( $customer );
+
+		if ( null !== $data ) {
+			return $data->id;
+		}
+
+		return $this->insert_customer( $customer );
+	}
+
 	/**
 	 * Get customer data for specified Mollie customer.
 	 *

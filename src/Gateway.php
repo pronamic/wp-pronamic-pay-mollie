@@ -443,7 +443,7 @@ class Gateway extends Core_Gateway {
 		$mollie_profile = new Profile();
 		$mollie_profile->set_id( $mollie_payment->profileId );
 
-		$profile_id = $this->profile_data_store->save_profile( $mollie_profile );
+		$profile_internal_id = $this->profile_data_store->get_or_insert_profile( $mollie_profile );
 
 		/**
 		 * If the Mollie payment contains a customer ID we will try to connect
@@ -457,19 +457,15 @@ class Gateway extends Core_Gateway {
 			$mollie_customer = new Customer();
 			$mollie_customer->set_id( $mollie_payment->customerId );
 
-			$mollie_customer_data = $this->customer_data_store->get_customer( $mollie_customer );
-
-			if ( null === $mollie_customer_data ) {
-				$this->customer_data_store->insert_customer(
-					$mollie_customer,
-					array(
-						'profile_id' => $profile_id,
-					),
-					array(
-						'profile_id' => '%s',
-					)
-				);
-			}
+			$customer_internal_id = $this->customer_data_store->get_or_insert_customer(
+				$mollie_customer,
+				array(
+					'profile_id' => $profile_internal_id,
+				),
+				array(
+					'profile_id' => '%s',
+				)
+			);
 
 			$customer = $payment->get_customer();
 
