@@ -467,6 +467,14 @@ class Gateway extends Core_Gateway {
 				)
 			);
 
+			// Meta.
+			$customer_id = $payment->get_meta( 'mollie_customer_id' );
+
+			if ( empty( $customer_id ) ) {
+				$payment->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
+			}
+
+			// Customer.
 			$customer = $payment->get_customer();
 
 			if ( null !== $customer ) {
@@ -478,6 +486,7 @@ class Gateway extends Core_Gateway {
 				}
 			}
 
+			// Subscription.
 			$subscription = $payment->get_subscription();
 
 			if ( null !== $subscription ) {
@@ -670,7 +679,7 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Create customer for payment.
 	 *
-	 * @param Payment $payment
+	 * @param Payment $payment Payment.
 	 * @return string|null
 	 * @throws Error Throws Error when Mollie error occurs.
 	 */

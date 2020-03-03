@@ -21,11 +21,17 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @since   3.0.0
  */
 class CustomerDataStore {
+	/**
+	 * Get or insert customer.
+	 *
+	 * @param Customer $customer Customer.
+	 * @return int
+	 */
 	public function get_or_insert_customer( Customer $customer ) {
-		$data = $this->get_customer( $customer );
+		$customer_data = $this->get_customer( $customer );
 
-		if ( null !== $data ) {
-			return $data->id;
+		if ( null !== $customer_data ) {
+			return $customer_data->id;
 		}
 
 		return $this->insert_customer( $customer );
@@ -46,9 +52,22 @@ class CustomerDataStore {
 			return null;
 		}
 
-		$query = $wpdb->prepare( "SELECT * FROM $wpdb->pronamic_pay_mollie_customers WHERE mollie_id = %s LIMIT 1;", $id );
-
-		$data = $wpdb->get_row( $query );
+		$data = $wpdb->get_row(
+			$wpdb->prepare(
+				"
+				SELECT
+					*
+				FROM
+					$wpdb->pronamic_pay_mollie_customers
+				WHERE
+					mollie_id = %s
+				LIMIT
+					1
+				;
+				",
+				$id
+			)
+		);
 
 		return $data;
 	}
@@ -59,6 +78,8 @@ class CustomerDataStore {
 	 * @param Customer $customer Customer.
 	 * @param array    $data   Data.
 	 * @param array    $format Format.
+	 * @return int
+	 * @throws \Exception Throws exception on error.
 	 */
 	public function insert_customer( Customer $customer, $data = array(), $format = array() ) {
 		global $wpdb;
@@ -100,10 +121,79 @@ class CustomerDataStore {
 	}
 
 	/**
+	 * Update Mollie customer.
+	 *
+	 * @param Customer $customer Customer.
+	 * @param array    $data    Data.
+	 * @param array    $format  Format.
+	 * @throws \Exception Throws exception on error.
+	 */
+	public function update_customer( Customer $customer, $data = array(), $format = array() ) {
+		global $wpdb;
+
+		$mollie_id = $customer->get_id();
+
+		if ( empty( $mollie_id ) ) {
+			throw new \Exception( 'Can not update Mollie customer with empty ID.' );
+		}
+
+		$data['test_mode']   = ( 'test' === $customer->get_mode() );
+		$format['test_mode'] = '%d';
+
+		$data['email']   = $customer->get_email();
+		$format['email'] = '%s';
+
+		$result = $wpdb->update(
+			$wpdb->pronamic_pay_mollie_customers,
+			$data,
+			array(
+				'mollie_id' => $mollie_id,
+			),
+			$format,
+			array(
+				'mollie_id' => '%s',
+			)
+		);
+
+		if ( false === $result ) {
+			throw new \Exception(
+				sprintf(
+					'Could not update Mollie customer ID: %s, error: %s.',
+					$mollie_id,
+					$wpdb->last_error
+				)
+			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Save Mollie customer.
+	 *
+	 * @param Customer $customer Customer.
+	 * @param array    $data   Data.
+	 * @param array    $format Format.
+	 * @return int
+	 */
+	public function save_customer( Customer $customer, $data = array(), $format = array() ) {
+		$customer_data = $this->get_customer( $customer );
+
+		if ( null !== $customer_data ) {
+			$this->update_customer( $customer, $data, $format );
+
+			return $customer_data->id;
+		}
+
+		return $this->insert_customer( $customer, $data, $format );
+	}
+
+	/**
 	 * Connect Mollie customer to WordPress user.
 	 *
 	 * @param Customer $customer Mollie customer.
 	 * @param \WP_User $user     WordPress user.
+	 * @throws \Exception Throws exception on error.
 	 */
 	public function connect_mollie_customer_to_wp_user( $customer, \WP_User $user ) {
 		global $wpdb;
@@ -134,7 +224,7 @@ class CustomerDataStore {
 		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {
-			\WP_CLI::error(
+			throw new \Exception(
 				sprintf(
 					'Database error: %s.',
 					$wpdb->last_error

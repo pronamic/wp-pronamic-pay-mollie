@@ -1,6 +1,6 @@
 <?php
 /**
- * Page customers
+ * Page Mollie
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2020 Pronamic

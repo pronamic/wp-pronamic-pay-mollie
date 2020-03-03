@@ -21,14 +21,22 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @since   3.0.0
  */
 class ProfileDataStore {
+	/**
+	 * Get or insert profile.
+	 *
+	 * @param Profile $profile Profile.
+	 * @param array   $data    Data.
+	 * @param array   $format  Format.
+	 * @return int
+	 */
 	public function get_or_insert_profile( Profile $profile, $data = array(), $format = array() ) {
-		$data = $this->get_profile( $profile );
+		$profile_data = $this->get_profile( $profile );
 
-		if ( null !== $data ) {
-			return $data->id;
+		if ( null !== $profile_data ) {
+			return $profile_data->id;
 		}
 
-		return $this->save_profile( $profile, $data = array(), $format = array() );
+		return $this->insert_profile( $profile, $data, $format );
 	}
 
 	/**
@@ -67,6 +75,101 @@ class ProfileDataStore {
 	}
 
 	/**
+	 * Insert Mollie profile.
+	 *
+	 * @param Profile $profile Profile.
+	 * @param array   $data    Data.
+	 * @param array   $format  Format.
+	 * @throws \Exception Throws exception on error.
+	 */
+	public function insert_profile( Profile $profile, $data = array(), $format = array() ) {
+		global $wpdb;
+
+		$mollie_id = $profile->get_id();
+
+		if ( empty( $mollie_id ) ) {
+			throw new \Exception( 'Can not insert Mollie profile with empty ID.' );
+		}
+
+		$data['mollie_id']   = $mollie_id;
+		$format['mollie_id'] = '%s';
+
+		$data['email']   = $profile->get_email();
+		$format['email'] = '%s';
+
+		$data['name']   = $profile->get_name();
+		$format['name'] = '%s';
+
+		$result = $wpdb->insert(
+			$wpdb->pronamic_pay_mollie_profiles,
+			$data,
+			$format
+		);
+
+		if ( false === $result ) {
+			throw new \Exception(
+				sprintf(
+					'Could not insert Mollie profile ID: %s, error: %s.',
+					$mollie_id,
+					$wpdb->last_error
+				)
+			);
+		}
+
+		$id = $wpdb->insert_id;
+
+		return $id;
+	}
+
+	/**
+	 * Update Mollie profile.
+	 *
+	 * @param Profile $profile Profile.
+	 * @param array   $data    Data.
+	 * @param array   $format  Format.
+	 * @throws \Exception Throws exception on error.
+	 */
+	public function update_profile( Profile $profile, $data = array(), $format = array() ) {
+		global $wpdb;
+
+		$mollie_id = $profile->get_id();
+
+		if ( empty( $mollie_id ) ) {
+			throw new \Exception( 'Can not update Mollie profile with empty ID.' );
+		}
+
+		$data['email']   = $profile->get_email();
+		$format['email'] = '%s';
+
+		$data['name']   = $profile->get_name();
+		$format['name'] = '%s';
+
+		$result = $wpdb->update(
+			$wpdb->pronamic_pay_mollie_profiles,
+			$data,
+			array(
+				'mollie_id' => $mollie_id,
+			),
+			$format,
+			array(
+				'mollie_id' => '%s',
+			)
+		);
+
+		if ( false === $result ) {
+			throw new \Exception(
+				sprintf(
+					'Could not update Mollie profile ID: %s, error: %s.',
+					$mollie_id,
+					$wpdb->last_error
+				)
+			);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Save Mollie profile.
 	 *
 	 * @param Profile $profile Profile.
@@ -75,59 +178,14 @@ class ProfileDataStore {
 	 * @return int
 	 */
 	public function save_profile( Profile $profile, $data = array(), $format = array() ) {
-		global $wpdb;
+		$profile_data = $this->get_profile( $profile );
 
-		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->pronamic_pay_mollie_profiles WHERE mollie_id = %s", $profile->get_id() ) );
+		if ( null !== $profile_data ) {
+			$this->update_profile( $profile, $data, $format );
 
-		$data['email']   = $profile->get_email();
-		$format['email'] = '%s';
-
-		$data['name']   = $profile->get_name();
-		$format['name'] = '%s';
-
-		if ( null === $id ) {
-			$data['mollie_id']   = $profile->get_id();
-			$foramt['mollie_id'] = '%s';
-
-			$result = $wpdb->insert(
-				$wpdb->pronamic_pay_mollie_profiles,
-				$data,
-				$format
-			);
-
-			if ( false === $result ) {
-				\WP_CLI::error(
-					sprintf(
-						'Database error: %s.',
-						$wpdb->last_error
-					)
-				);
-			}
-
-			$id = $wpdb->insert_id;
-		} else {
-			$result = $wpdb->update(
-				$wpdb->pronamic_pay_mollie_profiles,
-				$data,
-				array(
-					'id' => $id,
-				),
-				$format,
-				array(
-					'id' => '%d',
-				)
-			);
-
-			if ( false === $result ) {
-				\WP_CLI::error(
-					sprintf(
-						'Database error: %s.',
-						$wpdb->last_error
-					)
-				);
-			}
+			return $profile_data->id;
 		}
 
-		return $id;
+		return $this->insert_profile( $profile, $data, $format );
 	}
 }

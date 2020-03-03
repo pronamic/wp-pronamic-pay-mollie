@@ -78,9 +78,25 @@ $users = $wpdb->get_results(
 <div class="wrap">
 	<h1><?php echo \esc_html( \get_admin_page_title() ); ?></h1>
 
-	<h2><?php \printf( \__( 'Customer %s', 'pronamic_ideal' ), \sprintf( '<code>%s</code>', $mollie_customer_id ) ); ?></h2>
+	<h2>
+	<?php
 
-	<h3><?php \esc_html_e( 'General', 'pronamic_ideal' ); ?></h3>
+	echo \wp_kses(
+		\sprintf(
+			/* translators: %s: Mollie customer ID. */
+			\__( 'Customer %s', 'pronamic_ideal' ),
+			\sprintf(
+				'<code>%s</code>',
+				$mollie_customer_id
+			)
+		),
+		array(
+			'code' => array(),
+		)
+	);
+
+	?>
+	</h2>
 
 	<table class="form-table">
 		<tbody>
@@ -228,6 +244,10 @@ $users = $wpdb->get_results(
 							<?php
 
 							switch ( $mandate->status ) {
+								case 'pending':
+									\esc_html_e( 'Pending', 'pronamic_ideal' );
+
+									break;
 								case 'valid':
 									\esc_html_e( 'Valid', 'pronamic_ideal' );
 
@@ -244,6 +264,10 @@ $users = $wpdb->get_results(
 							<?php
 
 							switch ( $mandate->method ) {
+								case 'creditcard':
+									\esc_html_e( 'Credit Card', 'pronamic_ideal' );
+
+									break;
 								case 'directdebit':
 									\esc_html_e( 'Direct Debit', 'pronamic_ideal' );
 
@@ -260,6 +284,37 @@ $users = $wpdb->get_results(
 							<?php
 
 							switch ( $mandate->method ) {
+								case 'creditcard':
+									?>
+									<dl style="margin: 0;">
+										<dt><?php \esc_html_e( 'Card Holder', 'pronamic_ideal' ); ?></dt>
+										<dd>
+											<?php echo \esc_html( $mandate->details->cardHolder ); ?>
+										</dd>
+
+										<dt><?php \esc_html_e( 'Card Number', 'pronamic_ideal' ); ?></dt>
+										<dd>
+											<?php echo \esc_html( $mandate->details->cardNumber ); ?>
+										</dd>
+
+										<dt><?php \esc_html_e( 'Card Label', 'pronamic_ideal' ); ?></dt>
+										<dd>
+											<?php echo \esc_html( $mandate->details->cardLabel ); ?>
+										</dd>
+
+										<dt><?php \esc_html_e( 'Card Fingerprint', 'pronamic_ideal' ); ?></dt>
+										<dd>
+											<?php echo \esc_html( $mandate->details->cardFingerprint ); ?>
+										</dd>
+
+										<dt><?php \esc_html_e( 'Card Expiry Date', 'pronamic_ideal' ); ?></dt>
+										<dd>
+											<?php echo \esc_html( $mandate->details->cardExpiryDate ); ?>
+										</dd>
+									</dl>
+									<?php
+
+									break;
 								case 'directdebit':
 									?>
 									<dl style="margin: 0;">
@@ -283,7 +338,7 @@ $users = $wpdb->get_results(
 									break;
 								default:
 									?>
-									<pre><?php var_dump( $mandate->details ); ?></pre>
+									<pre><?php echo \esc_html( \wp_json_encode( $mandate->details, \JSON_PRETTY_PRINT ) ); ?></pre>
 									<?php
 
 									break;

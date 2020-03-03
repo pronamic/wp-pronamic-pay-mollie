@@ -25,6 +25,33 @@ class Admin {
 	 * Construct and intialize Mollie admin.
 	 */
 	public function __construct() {
+		/**
+		 * Initialize.
+		 */
+		add_action( 'admin_init', array( $this, 'admin_init' ) );
+
+		/**
+		 * Menu.
+		 *
+		 * @link https://metabox.io/create-hidden-admin-page/
+		 */
+		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+
+		/**
+		 * Meta boxes.
+		 */
+		add_action( 'add_meta_boxes', array( $this, 'add_payment_meta_box' ), 10, 2 );
+		add_action( 'add_meta_boxes', array( $this, 'add_subscription_meta_box' ), 10, 2 );
+	}
+
+	/**
+	 * Admin init.
+	 */
+	public function admin_init() {
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
 		$function = array( __CLASS__, 'user_profile' );
 
 		if ( ! has_action( 'show_user_profile', $function ) ) {
@@ -34,13 +61,6 @@ class Admin {
 		if ( ! has_action( 'edit_user_profile', $function ) ) {
 			add_action( 'edit_user_profile', $function );
 		}
-
-		/**
-		 * Menu.
-		 *
-		 * @link https://metabox.io/create-hidden-admin-page/
-		 */
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 	}
 
 	/**
@@ -140,13 +160,31 @@ class Admin {
 			'pronamic_pay_mollie_customers',
 			array( $this, 'page_mollie_customers' )
 		);
+
+		add_submenu_page(
+			'pronamic_pay_mollie',
+			__( 'Mollie Payments', 'pronamic_ideal' ),
+			__( 'Payments', 'pronamic_ideal' ),
+			'manage_options',
+			'pronamic_pay_mollie_payments',
+			array( $this, 'page_mollie_payments' )
+		);
+
+		/**
+		 * Remove menu page.
+		 *
+		 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/plugin.php#L1708-L1729
+		 * @link https://wordpress.stackexchange.com/questions/135692/creating-a-wordpress-admin-page-without-a-menu-for-a-plugin
+		 * @link https://stackoverflow.com/questions/3902760/how-do-you-add-a-wordpress-admin-page-without-adding-it-to-the-menu
+		 */
+		remove_menu_page( 'pronamic_pay_mollie' );
 	}
 
 	/**
 	 * Page Mollie.
 	 */
 	public function page_mollie() {
-
+		include __DIR__ . '/../views/page-mollie.php';
 	}
 
 	/**
@@ -176,6 +214,19 @@ class Admin {
 	}
 
 	/**
+	 * Page Mollie payments.
+	 */
+	public function page_mollie_payments() {
+		if ( filter_has_var( INPUT_GET, 'id' ) ) {
+			include __DIR__ . '/../views/page-payment.php';
+
+			return;
+		}
+
+		include __DIR__ . '/../views/page-payments.php';
+	}
+
+	/**
 	 * User profile.
 	 *
 	 * @since 1.1.6
@@ -184,6 +235,66 @@ class Admin {
 	 * @return void
 	 */
 	public static function user_profile( $user ) {
-		include __DIR__ . '/../views/html-admin-user-profile.php';
+		include __DIR__ . '/../views/user-profile.php';
+	}
+
+	/**
+	 * Add payment meta box.
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/add_meta_box/
+	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/meta-boxes.php#L1541-L1549
+	 * @param string   $post_type Post type.
+	 * @param \WP_Post $post      Post object.
+	 */
+	public function add_payment_meta_box( $post_type, $post ) {
+		if ( 'pronamic_payment' !== $post_type ) {
+			return;
+		}
+
+		$transaction_id = \get_post_meta( $post->ID, '_pronamic_payment_transaction_id', true );
+
+		if ( 'tr_' !== \substr( $transaction_id, 0, 3 ) ) {
+			return;
+		}
+
+		\add_meta_box(
+			'pronamic_pay_mollie_payment',
+			\__( 'Mollie', 'pronamic_ideal' ),
+			function( $post ) {
+				include __DIR__ . '/../views/meta-box-payment.php';
+			},
+			$post_type,
+			'side'
+		);
+	}
+
+	/**
+	 * Add subscription meta box.
+	 *
+	 * @link https://developer.wordpress.org/reference/functions/add_meta_box/
+	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/meta-boxes.php#L1541-L1549
+	 * @param string   $post_type Post type.
+	 * @param \WP_Post $post      Post object.
+	 */
+	public function add_subscription_meta_box( $post_type, $post ) {
+		if ( 'pronamic_pay_subscr' !== $post_type ) {
+			return;
+		}
+
+		$mollie_customer_id = \get_post_meta( $post->ID, '_pronamic_subscription_mollie_customer_id', true );
+
+		if ( empty( $mollie_customer_id ) ) {
+			return;
+		}
+
+		\add_meta_box(
+			'pronamic_pay_mollie_subscription',
+			\__( 'Mollie', 'pronamic_ideal' ),
+			function( $post ) {
+				include __DIR__ . '/../views/meta-box-subscription.php';
+			},
+			$post_type,
+			'side'
+		);
 	}
 }

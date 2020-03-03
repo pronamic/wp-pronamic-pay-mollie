@@ -46,6 +46,10 @@ class CLI {
 				$this->wp_cli_customers_connect_wp_users( $args, $assoc_args );
 			}
 		);
+
+		// Data Stores.
+		$this->profile_data_store  = new ProfileDataStore();
+		$this->customer_data_store = new CustomerDataStore();
 	}
 
 	/**
@@ -57,139 +61,6 @@ class CLI {
 	 */
 	public function wp_cli_organizations_synchronize( $args, $assoc_args ) {
 		\WP_CLI::error( 'Command not implemented yet.' );
-	}
-
-	/**
-	 * Insert or update Mollie profile.
-	 *
-	 * @param object $object Mollie profile object.
-	 * @param array  $data   Data.
-	 * @param array  $format Format.
-	 * @return int Mollie proflie ID.
-	 */
-	private function insert_or_update_profile( $object, $data = array(), $format = array() ) {
-		global $wpdb;
-
-		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->pronamic_pay_mollie_profiles WHERE mollie_id = %s", $object->id ) );
-
-		$data['email']   = $object->email;
-		$format['email'] = '%s';
-
-		$data['name']   = $object->name;
-		$format['name'] = '%s';
-
-		if ( null === $id ) {
-			$data['mollie_id']   = $object->id;
-			$foramt['mollie_id'] = '%s';
-
-			$result = $wpdb->insert(
-				$wpdb->pronamic_pay_mollie_profiles,
-				$data,
-				$format
-			);
-
-			if ( false === $result ) {
-				\WP_CLI::error(
-					sprintf(
-						'Database error: %s.',
-						$wpdb->last_error
-					)
-				);
-			}
-
-			$id = $wpdb->insert_id;
-		} else {
-			$result = $wpdb->update(
-				$wpdb->pronamic_pay_mollie_profiles,
-				$data,
-				array(
-					'id' => $id,
-				),
-				$format,
-				array(
-					'id' => '%d',
-				)
-			);
-
-			if ( false === $result ) {
-				\WP_CLI::error(
-					sprintf(
-						'Database error: %s.',
-						$wpdb->last_error
-					)
-				);
-			}
-		}
-
-		return $id;
-	}
-
-	/**
-	 * Insert or update Mollie customer.
-	 *
-	 * @param object $object Mollie customer object.
-	 * @param array  $data   Data.
-	 * @param array  $format Format.
-	 * @return int Mollie customer ID.
-	 */
-	private function insert_or_update_customer( $object, $data = array(), $format = array() ) {
-		global $wpdb;
-
-		$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->pronamic_pay_mollie_customers WHERE mollie_id = %s", $object->id ) );
-
-		$data['test_mode']   = ( 'test' === $object->mode );
-		$format['test_mode'] = '%d';
-
-		$data['email']   = $object->email;
-		$format['email'] = '%s';
-
-		$data['name']   = $object->name;
-		$format['name'] = '%s';
-
-		if ( null === $id ) {
-			$data['mollie_id']   = $object->id;
-			$foramt['mollie_id'] = '%s';
-
-			$result = $wpdb->insert(
-				$wpdb->pronamic_pay_mollie_customers,
-				$data,
-				$format
-			);
-
-			if ( false === $result ) {
-				\WP_CLI::error(
-					sprintf(
-						'Database error: %s.',
-						$wpdb->last_error
-					)
-				);
-			}
-
-			$id = $wpdb->insert_id;
-		} else {
-			$result = $wpdb->update(
-				$wpdb->pronamic_pay_mollie_customers,
-				$data,
-				array(
-					'id' => $id,
-				),
-				$format,
-				array(
-					'id' => '%d',
-				)
-			);
-
-			if ( false === $result ) {
-				\WP_CLI::error(
-					sprintf(
-						'Database error: %s.',
-						$wpdb->last_error
-					)
-				);
-			}
-		}
-
-		return $id;
 	}
 
 	/**
@@ -237,9 +108,9 @@ class CLI {
 					'https://api.mollie.com/v2/customers?limit=250',
 				);
 
-				$profile = $client->get_current_profile();
+				$profile = Profile::from_object( $client->get_current_profile() );
 
-				$profile_id = $this->insert_or_update_profile(
+				$profile_id = $this->profile_data_store->save_profile(
 					$profile,
 					array(
 						'api_key_live' => ( 'live_' === substr( $api_key, 0, 5 ) ) ? $api_key : null,
@@ -281,8 +152,10 @@ class CLI {
 						);
 
 						foreach ( $response->_embedded->customers as $object ) {
-							$customer_id = $this->insert_or_update_customer(
-								$object,
+							$customer = Customer::from_object( $object );
+
+							$customer_id = $this->customer_data_store->save_customer(
+								$customer,
 								array(
 									'profile_id' => $profile_id,
 								),
@@ -331,6 +204,7 @@ class CLI {
 			;
 		";
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepare is OK.
 		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {

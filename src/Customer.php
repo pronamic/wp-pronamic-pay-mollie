@@ -163,4 +163,36 @@ class Customer {
 
 		return $array;
 	}
+
+	/**
+	 * Create customer from object.
+	 *
+	 * @param object $object Object.
+	 * @return Customer
+	 */
+	public static function from_object( $object ) {
+		$customer = new self();
+
+		if ( property_exists( $object, 'id' ) ) {
+			$customer->set_id( $object->id );
+		}
+
+		if ( property_exists( $object, 'mode' ) ) {
+			$customer->set_mode( $object->mode );
+		}
+
+		if ( property_exists( $object, 'name' ) ) {
+			$customer->set_name( $object->name );
+		}
+
+		if ( property_exists( $object, 'email' ) ) {
+			$customer->set_email( $object->email );
+		}
+
+		if ( property_exists( $object, 'locale' ) ) {
+			$customer->set_locale( $object->locale );
+		}
+
+		return $customer;
+	}
 }
