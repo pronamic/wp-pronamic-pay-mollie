@@ -287,30 +287,51 @@ $users = $wpdb->get_results(
 								case 'creditcard':
 									?>
 									<dl style="margin: 0;">
-										<dt><?php \esc_html_e( 'Card Holder', 'pronamic_ideal' ); ?></dt>
-										<dd>
-											<?php echo \esc_html( $mandate->details->cardHolder ); ?>
-										</dd>
 
-										<dt><?php \esc_html_e( 'Card Number', 'pronamic_ideal' ); ?></dt>
-										<dd>
-											<?php echo \esc_html( $mandate->details->cardNumber ); ?>
-										</dd>
+										<?php if ( ! empty( $mandate->details->cardHolder ) ) : ?>
 
-										<dt><?php \esc_html_e( 'Card Label', 'pronamic_ideal' ); ?></dt>
-										<dd>
-											<?php echo \esc_html( $mandate->details->cardLabel ); ?>
-										</dd>
+											<dt><?php \esc_html_e( 'Card Holder', 'pronamic_ideal' ); ?></dt>
+											<dd>
+												<?php echo \esc_html( $mandate->details->cardHolder ); ?>
+											</dd>
 
-										<dt><?php \esc_html_e( 'Card Fingerprint', 'pronamic_ideal' ); ?></dt>
-										<dd>
-											<?php echo \esc_html( $mandate->details->cardFingerprint ); ?>
-										</dd>
+										<?php endif; ?>
 
-										<dt><?php \esc_html_e( 'Card Expiry Date', 'pronamic_ideal' ); ?></dt>
-										<dd>
-											<?php echo \esc_html( $mandate->details->cardExpiryDate ); ?>
-										</dd>
+										<?php if ( ! empty( $mandate->details->cardNumber ) ) : ?>
+
+											<dt><?php \esc_html_e( 'Card Number', 'pronamic_ideal' ); ?></dt>
+											<dd>
+												<?php echo \esc_html( $mandate->details->cardNumber ); ?>
+											</dd>
+
+										<?php endif; ?>
+
+										<?php if ( ! empty( $mandate->details->cardLabel ) ) : ?>
+
+											<dt><?php \esc_html_e( 'Card Label', 'pronamic_ideal' ); ?></dt>
+											<dd>
+												<?php echo \esc_html( $mandate->details->cardLabel ); ?>
+											</dd>
+
+										<?php endif; ?>
+
+										<?php if ( ! empty( $mandate->details->cardFingerprint ) ) : ?>
+
+											<dt><?php \esc_html_e( 'Card Fingerprint', 'pronamic_ideal' ); ?></dt>
+											<dd>
+												<?php echo \esc_html( $mandate->details->cardFingerprint ); ?>
+											</dd>
+
+										<?php endif; ?>
+
+										<?php if ( ! empty( $mandate->details->cardExpiryDate ) ) : ?>
+
+											<dt><?php \esc_html_e( 'Card Expiry Date', 'pronamic_ideal' ); ?></dt>
+											<dd>
+												<?php echo \esc_html( $mandate->details->cardExpiryDate ); ?>
+											</dd>
+
+										<?php endif; ?>
 									</dl>
 									<?php
 
@@ -318,20 +339,33 @@ $users = $wpdb->get_results(
 								case 'directdebit':
 									?>
 									<dl style="margin: 0;">
-										<dt><?php \esc_html_e( 'Consumer Name', 'pronamic_ideal' ); ?></dt>
-										<dd>
-											<?php echo \esc_html( $mandate->details->consumerName ); ?>
-										</dd>
 
-										<dt><?php \esc_html_e( 'Consumer Account', 'pronamic_ideal' ); ?></dt>
-										<dd>
-											<?php echo \esc_html( $mandate->details->consumerAccount ); ?>
-										</dd>
+										<?php if ( ! empty( $mandate->details->consumerName ) ) : ?>
 
-										<dt><?php \esc_html_e( 'Consumer BIC', 'pronamic_ideal' ); ?></dt>
-										<dd>
-											<?php echo \esc_html( $mandate->details->consumerBic ); ?>
-										</dd>
+											<dt><?php \esc_html_e( 'Consumer Name', 'pronamic_ideal' ); ?></dt>
+											<dd>
+												<?php echo \esc_html( $mandate->details->consumerName ); ?>
+											</dd>
+
+										<?php endif; ?>
+
+										<?php if ( ! empty( $mandate->details->consumerAccount ) ) : ?>
+
+											<dt><?php \esc_html_e( 'Consumer Account', 'pronamic_ideal' ); ?></dt>
+											<dd>
+												<?php echo \esc_html( $mandate->details->consumerAccount ); ?>
+											</dd>
+
+										<?php endif; ?>
+
+										<?php if ( ! empty( $mandate->details->consumerBic ) ) : ?>
+
+											<dt><?php \esc_html_e( 'Consumer BIC', 'pronamic_ideal' ); ?></dt>
+											<dd>
+												<?php echo \esc_html( $mandate->details->consumerBic ); ?>
+											</dd>
+
+										<?php endif; ?>
 									</dl>
 									<?php
 
