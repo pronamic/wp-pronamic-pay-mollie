@@ -722,10 +722,10 @@ class Gateway extends Core_Gateway {
 
 		if ( null !== $pronamic_customer ) {
 			// Name.
-			$name = $pronamic_customer->get_name();
+			$name = \strval( $pronamic_customer->get_name() );
 
-			if ( null !== $name ) {
-				$mollie_customer->set_name( \strval( $name ) );
+			if ( '' !== $name ) {
+				$mollie_customer->set_name( $name );
 			}
 
 			// Locale.
@@ -733,6 +733,17 @@ class Gateway extends Core_Gateway {
 
 			if ( null !== $locale ) {
 				$mollie_customer->set_locale( LocaleHelper::transform( $locale ) );
+			}
+		}
+
+		// Try to get name from consumer bank details.
+		$consumer_bank_details = $payment->get_consumer_bank_details();
+
+		if ( null === $mollie_customer->get_name() && null !== $consumer_bank_details ) {
+			$name = $consumer_bank_details->get_name();
+
+			if ( null !== $name ) {
+				$mollie_customer->set_name( $name );
 			}
 		}
 
