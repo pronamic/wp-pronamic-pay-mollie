@@ -17,6 +17,7 @@ use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
+use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
@@ -554,6 +555,35 @@ class Gateway extends Core_Gateway {
 
 			if ( isset( $details->consumerBic ) ) {
 				$consumer_bank_details->set_bic( $details->consumerBic );
+			}
+
+			/*
+			 * Failure reason.
+			 */
+			$failure_reason = $payment->get_failure_reason();
+
+			if ( null === $failure_reason ) {
+				$failure_reason = new FailureReason();
+
+				$payment->set_failure_reason( $failure_reason );
+			}
+
+			// SEPA Direct Debit.
+			if ( isset( $details->bankReasonCode ) ) {
+				$failure_reason->set_code( $details->bankReasonCode );
+			}
+
+			if ( isset( $details->bankReasonCode ) ) {
+				$failure_reason->set_message( $details->bankReason );
+			}
+
+			// Credit card.
+			if ( isset( $details->failureReason ) ) {
+				$failure_reason->set_code( $details->failureReason );
+			}
+
+			if ( isset( $details->failureMessage ) ) {
+				$failure_reason->set_message( $details->failureMessage );
 			}
 			// @codingStandardsIgnoreEnd
 		}
