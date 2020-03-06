@@ -721,10 +721,18 @@ class Gateway extends Core_Gateway {
 		$pronamic_customer = $payment->get_customer();
 
 		if ( null !== $pronamic_customer ) {
+			// Name.
 			$name = $pronamic_customer->get_name();
 
 			if ( null !== $name ) {
 				$mollie_customer->set_name( \strval( $name ) );
+			}
+
+			// Locale.
+			$locale = $pronamic_customer->get_locale();
+
+			if ( null !== $locale ) {
+				$mollie_customer->set_locale( LocaleHelper::transform( $locale ) );
 			}
 		}
 
