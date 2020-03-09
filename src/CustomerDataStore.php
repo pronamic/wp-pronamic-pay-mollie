@@ -27,14 +27,14 @@ class CustomerDataStore {
 	 * @param Customer $customer Customer.
 	 * @return int
 	 */
-	public function get_or_insert_customer( Customer $customer ) {
+	public function get_or_insert_customer( Customer $customer, $data = array(), $format = array() ) {
 		$customer_data = $this->get_customer( $customer );
 
 		if ( null !== $customer_data ) {
 			return $customer_data->id;
 		}
 
-		return $this->insert_customer( $customer );
+		return $this->insert_customer( $customer, $data, $format );
 	}
 
 	/**
