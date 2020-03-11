@@ -56,7 +56,7 @@ class Upgrade300 extends Upgrade {
 		 *
 		 * If a storage engine is specified that is not available, MySQL uses
 		 * the default engine instead. Normally, this is MyISAM. For example,
-		 * if a table definition includes the ENGINE=INNODB option but the MySQL 
+		 * if a table definition includes the ENGINE=INNODB option but the MySQL
 		 * server does not support INNODB tables, the table is created as a
 		 * MyISAM table.
 		 *
@@ -121,6 +121,25 @@ class Upgrade300 extends Upgrade {
 		 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/upgrade.php#L2538-L2915
 		 */
 		\dbDelta( $queries );
+
+		/**
+		 * Add foreign keys.
+		 */
+		$this->add_foreign_keys();
+
+		/**
+		 * Convert user meta.
+		 */
+		$this->convert_user_meta();
+	}
+
+	/**
+	 * Add foreign keys.
+	 *
+	 * @t
+	 */
+	private function add_foreign_keys() {
+		global $wpdb;
 
 		/**
 		 * Foreign keys.
@@ -197,59 +216,71 @@ class Upgrade300 extends Upgrade {
 		);
 
 		foreach ( $data as $item ) {
-			/**
-			 * Check if foreign key exists
-			 *
-			 * @link https://github.com/woocommerce/woocommerce/blob/3.9.0/includes/class-wc-install.php#L663-L681
-			 */
-			$result = $wpdb->get_var(
-				$wpdb->prepare(
-					"
-				SELECT COUNT(*)
-				FROM information_schema.TABLE_CONSTRAINTS
-				WHERE CONSTRAINT_SCHEMA = %s
-				AND CONSTRAINT_NAME = %s
-				AND CONSTRAINT_TYPE = 'FOREIGN KEY'
-				AND TABLE_NAME = %s
-				",
-					$wpdb->dbname,
+			try {
+				$this->add_foreign_key( $item );
+			} catch ( \Exception $e ) {
+				// Foreign keys are not strictly required.
+				continue;
+			}
+		}
+	}
+
+	/**
+	 * Add specified foreign key.
+	 *
+	 * @param object $item Foreig key data.
+	 * @throws \Exception Throws exception when adding foreign key fails.
+	 */
+	private function add_foreign_key( $item ) {
+		global $wpdb;
+
+		/**
+		 * Check if foreign key exists
+		 *
+		 * @link https://github.com/woocommerce/woocommerce/blob/3.9.0/includes/class-wc-install.php#L663-L681
+		 */
+		$result = $wpdb->get_var(
+			$wpdb->prepare(
+				"
+			SELECT COUNT(*)
+			FROM information_schema.TABLE_CONSTRAINTS
+			WHERE CONSTRAINT_SCHEMA = %s
+			AND CONSTRAINT_NAME = %s
+			AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+			AND TABLE_NAME = %s
+			",
+				$wpdb->dbname,
+				$item->name,
+				$item->table
+			)
+		);
+
+		if ( null === $result ) {
+			throw new \Exception(
+				\sprintf(
+					'Could not count foreign keys: %s, database error: %s.',
 					$item->name,
-					$item->table
+					$wpdb->last_error
 				)
 			);
+		}
 
-			if ( null === $result ) {
+		$number_constraints = \intval( $result );
+
+		if ( 0 === $number_constraints ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared.
+			$result = $wpdb->query( $item->query );
+
+			if ( false === $result ) {
 				throw new \Exception(
 					\sprintf(
-						'Could not count foreign keys: %s, database error: %s.',
-						$$item->name,
+						'Could not add foreign key: %s, database error: %s.',
+						$item->name,
 						$wpdb->last_error
 					)
 				);
 			}
-
-			$number_constraints = \intval( $result );
-
-			if ( 0 === $number_constraints ) {
-				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared.
-				$result = $wpdb->query( $item->query );
-
-				if ( false === $result ) {
-					throw new \Exception(
-						\sprintf(
-							'Could not add foreign key: %s, database error: %s.',
-							$item->name,
-							$wpdb->last_error
-						)
-					);
-				}
-			}
 		}
-
-		/**
-		 * Convert user meta.
-		 */
-		$this->convert_user_meta();
 	}
 
 	/**
