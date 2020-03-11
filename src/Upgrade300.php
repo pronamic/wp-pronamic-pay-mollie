@@ -71,33 +71,33 @@ class Upgrade300 extends Upgrade {
 		 */
 		$queries = "
 			CREATE TABLE $wpdb->pronamic_pay_mollie_organizations (
-				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
-				mollie_id VARCHAR( 16 ) NOT NULL,
-				name VARCHAR( 128 ) DEFAULT NULL,
-				email VARCHAR( 100 ) DEFAULT NULL,
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				mollie_id varchar(16) NOT NULL,
+				name varchar(128) DEFAULT NULL,
+				email varchar(100) DEFAULT NULL,
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id )
 			) $table_options;
 			CREATE TABLE $wpdb->pronamic_pay_mollie_profiles (
-				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
-				mollie_id VARCHAR( 16 ) NOT NULL,
-				organization_id BIGINT( 20 ) UNSIGNED DEFAULT NULL,
-				name VARCHAR( 128 ) DEFAULT NULL,
-				email VARCHAR( 100 ) DEFAULT NULL,
-				api_key_test VARCHAR( 35 ) DEFAULT NULL,
-				api_key_live VARCHAR( 35 ) DEFAULT NULL,
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				mollie_id varchar(16) NOT NULL,
+				organization_id bigint(20) unsigned DEFAULT NULL,
+				name varchar(128) DEFAULT NULL,
+				email varchar(100) DEFAULT NULL,
+				api_key_test varchar(35) DEFAULT NULL,
+				api_key_live varchar(35) DEFAULT NULL,
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id ),
 				KEY organization_id ( organization_id )
 			) $table_options;
 			CREATE TABLE $wpdb->pronamic_pay_mollie_customers (
-				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
-				mollie_id VARCHAR( 16 ) NOT NULL,
-				organization_id BIGINT( 20 ) UNSIGNED DEFAULT NULL,
-				profile_id BIGINT( 20 ) UNSIGNED DEFAULT NULL,
-				test_mode BOOL NOT NULL,
-				email VARCHAR( 100 ) DEFAULT NULL,
-				name VARCHAR( 255 ) DEFAULT NULL,
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				mollie_id varchar(16) NOT NULL,
+				organization_id bigint(20) unsigned DEFAULT NULL,
+				profile_id bigint(20) unsigned DEFAULT NULL,
+				test_mode tinyint(1) NOT NULL,
+				email varchar(100) DEFAULT NULL,
+				name varchar(255) DEFAULT NULL,
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id ),
 				KEY organization_id ( organization_id ),
@@ -106,9 +106,9 @@ class Upgrade300 extends Upgrade {
 				KEY email ( email )
 			) $table_options;
 			CREATE TABLE $wpdb->pronamic_pay_mollie_customer_users (
-				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
-				customer_id BIGINT( 20 ) UNSIGNED NOT NULL,
-				user_id BIGINT( 20 ) UNSIGNED NOT NULL,
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				customer_id bigint(20) unsigned NOT NULL,
+				user_id bigint(20) unsigned NOT NULL,
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY customer_user ( customer_id, user_id )
 			) $table_options;
