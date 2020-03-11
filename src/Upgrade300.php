@@ -24,7 +24,7 @@ class Upgrade300 extends Upgrade {
 	 * Construct 3.0.0 upgrade.
 	 */
 	public function __construct() {
-		parent::__construct( '3.0.3' );
+		parent::__construct( '3.0.7' );
 	}
 
 	/**
@@ -45,12 +45,29 @@ class Upgrade300 extends Upgrade {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		/**
-		 * Other.
+		 * Table options.
+		 *
+		 * In MySQL 5.6, InnoDB is the default MySQL storage engine. Unless you
+		 * have configured a different default storage engine,  issuing a
+		 * CREATE TABLE statement without an ENGINE= clause creates an InnoDB
+		 * table.
+		 *
+		 * @link https://dev.mysql.com/doc/refman/5.6/en/innodb-introduction.html
+		 *
+		 * If a storage engine is specified that is not available, MySQL uses
+		 * the default engine instead. Normally, this is MyISAM. For example,
+		 * if a table definition includes the ENGINE=INNODB option but the MySQL 
+		 * server does not support INNODB tables, the table is created as a
+		 * MyISAM table.
+		 *
+		 * @link https://dev.mysql.com/doc/refman/5.6/en/create-table.html
 		 */
-		$charset_collate = $wpdb->get_charset_collate();
+		$table_options = 'ENGINE=InnoDB ' . $wpdb->get_charset_collate();
 
 		/**
 		 * Queries.
+		 *
+		 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/schema.php
 		 */
 		$queries = "
 			CREATE TABLE $wpdb->pronamic_pay_mollie_organizations (
@@ -60,7 +77,7 @@ class Upgrade300 extends Upgrade {
 				email VARCHAR( 100 ) DEFAULT NULL,
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id )
-			) $charset_collate;
+			) $table_options;
 			CREATE TABLE $wpdb->pronamic_pay_mollie_profiles (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				mollie_id VARCHAR( 16 ) NOT NULL,
@@ -72,7 +89,7 @@ class Upgrade300 extends Upgrade {
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY mollie_id ( mollie_id ),
 				KEY organization_id ( organization_id )
-			) $charset_collate;
+			) $table_options;
 			CREATE TABLE $wpdb->pronamic_pay_mollie_customers (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				mollie_id VARCHAR( 16 ) NOT NULL,
@@ -87,14 +104,14 @@ class Upgrade300 extends Upgrade {
 				KEY profile_id ( profile_id ),
 				KEY test_mode ( test_mode ),
 				KEY email ( email )
-			) $charset_collate;
+			) $table_options;
 			CREATE TABLE $wpdb->pronamic_pay_mollie_customer_users (
 				id BIGINT( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT,
 				customer_id BIGINT( 20 ) UNSIGNED NOT NULL,
 				user_id BIGINT( 20 ) UNSIGNED NOT NULL,
 				PRIMARY KEY  ( id ),
 				UNIQUE KEY customer_user ( customer_id, user_id )
-			) $charset_collate;
+			) $table_options;
 		";
 
 		/**
