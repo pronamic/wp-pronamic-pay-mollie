@@ -28,83 +28,82 @@ if ( empty( $customers ) ) {
 ?>
 <h2><?php esc_html_e( 'Mollie', 'pronamic_ideal' ); ?></h2>
 
-<p class="description" style="margin-bottom: 1em;">
-	Mollie biedt de mogelijkheid om betalers als klant ('customer') te registreren binnen het Mollie-betaalplatform. Deze functionaliteit onthoudt de betaalvoorkeuren van een klant om een volgende betaling sneller te laten verlopen. De Mollie-klanten kunnen gekoppeld zijn aan WordPress-gebruikers. Hieronder is een lijst van Mollie-klanten te zien die gekoppeld zijn aan deze WordPress-gebruiker. Voor abonnementen kunnen de machtigingen bij een Mollie-klant gebruikt worden voor terugkerende betalingen.
-</p>
+<style type="text/css">
+	.form-table .pronamic-pay-mollie-customers-table th,
+	.form-table .pronamic-pay-mollie-customers-table td {
+		padding: 8px 10px;
+	}
+</style>
 
-<table class="widefat striped">
-	<thead>
-		<tr>
-			<th scope="col"><?php \esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
-			<th scope="col"><?php \esc_html_e( 'Test', 'pronamic_ideal' ); ?></th>
-			<th scope="col"><?php \esc_html_e( 'Name', 'pronamic_ideal' ); ?></th>
-			<th scope="col"><?php \esc_html_e( 'Email', 'pronamic_ideal' ); ?></th>
-			<th scope="col"><?php \esc_html_e( 'Link', 'pronamic_ideal' ); ?></th>
-		</tr>
-	</thead>
-
+<table class="form-table" id="fieldset-billing">
 	<tbody>
+		<tr>
+			<th>
+				<?php echo esc_html( _x( 'Customers', 'mollie', 'pronamic_ideal' ) ); ?>
+			</th>
+			<td>
+				<table class="widefat striped pronamic-pay-mollie-customers-table">
+					<thead>
+						<tr>
+							<th scope="col"><?php \esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Test', 'pronamic_ideal' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Name', 'pronamic_ideal' ); ?></th>
+							<th scope="col"><?php \esc_html_e( 'Email', 'pronamic_ideal' ); ?></th>
+						</tr>
+					</thead>
 
-		<?php foreach ( $customers as $customer ) : ?>
+					<tbody>
 
-			<tr>
-				<td>
-					<?php
+						<?php foreach ( $customers as $customer ) : ?>
 
-					$url = \add_query_arg(
-						array(
-							'page' => 'pronamic_pay_mollie_customers',
-							'id'   => $customer->mollie_id,
-						),
-						\admin_url( 'admin.php' )
-					);
+							<tr>
+								<td>
+									<?php
 
-					\printf(
-						'<a href="%s"><code>%s</code></a>',
-						\esc_url( $url ),
-						\esc_html( $customer->mollie_id )
-					);
+									$url = \add_query_arg(
+										array(
+											'page' => 'pronamic_pay_mollie_customers',
+											'id'   => $customer->mollie_id,
+										),
+										\admin_url( 'admin.php' )
+									);
 
-					?>
-				</td>
-				<td>
-					<?php $customer->test_mode ? \esc_html_e( 'Yes', 'pronamic_ideal' ) : \esc_html_e( 'No', 'pronamic_ideal' ); ?>
-				</td>
-				<td>
-					<?php echo \esc_html( $customer->name ); ?>
-				</td>
-				<td>
-					<?php
+									\printf(
+										'<a href="%s"><code>%s</code></a>',
+										\esc_url( $url ),
+										\esc_html( $customer->mollie_id )
+									);
 
-					if ( null !== $customer->email ) {
-						printf(
-							'<a href="%s">%s</a>',
-							esc_attr( 'mailto:' . $customer->email ),
-							esc_html( $customer->email )
-						);
-					}
+									?>
+								</td>
+								<td>
+									<?php $customer->test_mode ? \esc_html_e( 'Yes', 'pronamic_ideal' ) : \esc_html_e( 'No', 'pronamic_ideal' ); ?>
+								</td>
+								<td>
+									<?php echo empty( $customer->name ) ? '—' : \esc_html( $customer->name ); ?>
+								</td>
+								<td>
+									<?php
 
-					?>
-				</td>
-				<td>
-					<?php
+									empty( $customer->email ) ? print( '—' ): \printf(
+										'<a href="%s">%s</a>',
+										esc_attr( 'mailto:' . $customer->email ),
+										esc_html( $customer->email )
+									);
 
-					$mollie_link = \sprintf(
-						'https://www.mollie.com/dashboard/customers/%s',
-						$customer->mollie_id
-					);
+									?>
+								</td>
+							</tr>
 
-					\printf(
-						'<a href="%s">%s</a>',
-						\esc_url( $mollie_link ),
-						\esc_html( $mollie_link )
-					);
+						<?php endforeach; ?>
 
-					?>
-				</td>
-			</tr>
+					</tbody>
+				</table>
 
-		<?php endforeach; ?>
-
+				<p class="description">
+					Mollie biedt de mogelijkheid om betalers als klant ('customer') te registreren binnen het Mollie-betaalplatform. Deze functionaliteit onthoudt de betaalvoorkeuren van een klant om een volgende betaling sneller te laten verlopen. De Mollie-klanten kunnen gekoppeld zijn aan WordPress-gebruikers. Hieronder is een lijst van Mollie-klanten te zien die gekoppeld zijn aan deze WordPress-gebruiker. Voor abonnementen kunnen de machtigingen bij een Mollie-klant gebruikt worden voor terugkerende betalingen.
+				</p>
+			</td>
+		</tr>
 	</tbody>
 </table>
