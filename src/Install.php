@@ -1,42 +1,79 @@
 <?php
 /**
- * Upgrade 3.0.0
+ * Mollie install.
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
- * @package   Pronamic\WordPress\Pay\Gateways\Mollie
+ * @package   Pronamic\WordPress\Pay
  */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Pay\Upgrades\Upgrade;
-
 /**
- * Upgrade 3.0.0
+ * Title: Mollie install.
+ * Description:
+ * Copyright: 2005-2020 Pronamic
+ * Company: Pronamic
  *
  * @author  Remco Tolsma
  * @version 3.0.0
  * @since   3.0.0
  */
-class Upgrade300 extends Upgrade {
+class Install {
 	/**
-	 * Construct 3.0.0 upgrade.
+	 * Integration.
+	 *
+	 * @var Integration
 	 */
-	public function __construct() {
-		parent::__construct( '3.0.7' );
+	private $integration;
+
+	/**
+	 * Construct install.
+	 *
+	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-woocommerce.php#L368
+	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L1568
+	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L153-L166
+	 * @param Integration $integration Integration.
+	 */
+	public function __construct( Integration $integration ) {
+		$this->integration = $integration;
+
+		add_action( 'init', array( $this, 'check_version' ), 5 );
 	}
 
 	/**
-	 * Execute.
+	 * Check version.
 	 *
-	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-includes/wp-db.php#L992-L1072
-	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/schema.php#L25-L344
-	 * @link https://developer.wordpress.org/reference/functions/dbdelta/
-	 * @link https://github.com/wp-premium/gravityforms/blob/2.4.16/includes/class-gf-upgrade.php#L518-L531
-	 * @throws \Exception Throws exception when database update query fails.
+	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L168-L178
 	 */
-	public function execute() {
+	public function check_version() {
+		$version_option = $this->integration->get_version_option();
+
+		if ( version_compare( $version_option, $this->integration->get_version(), '<' ) ) {
+			$this->install();
+		}
+	}
+
+	/**
+	 * Install.
+	 *
+	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L272-L306
+	 */
+	public function install() {
+		$this->create_tables();
+		$this->add_foreign_keys();
+		$this->convert_user_meta();
+
+		$this->integration->update_version_option();
+	}
+
+	/**
+	 * Create tables.
+	 *
+	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L630-L720
+	 */
+	private function create_tables() {
 		global $wpdb;
 
 		/**
@@ -121,22 +158,10 @@ class Upgrade300 extends Upgrade {
 		 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/upgrade.php#L2538-L2915
 		 */
 		\dbDelta( $queries );
-
-		/**
-		 * Add foreign keys.
-		 */
-		$this->add_foreign_keys();
-
-		/**
-		 * Convert user meta.
-		 */
-		$this->convert_user_meta();
 	}
 
 	/**
 	 * Add foreign keys.
-	 *
-	 * @t
 	 */
 	private function add_foreign_keys() {
 		global $wpdb;

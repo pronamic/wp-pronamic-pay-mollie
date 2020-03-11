@@ -49,13 +49,14 @@ class Integration extends AbstractGatewayIntegration {
 		$args = wp_parse_args(
 			$args,
 			array(
-				'id'            => 'mollie',
-				'name'          => 'Mollie',
-				'url'           => 'http://www.mollie.com/en/',
-				'product_url'   => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
-				'dashboard_url' => 'https://www.mollie.com/dashboard/',
-				'provider'      => 'mollie',
-				'supports'      => array(
+				'id'                     => 'mollie',
+				'name'                   => 'Mollie',
+				'version'                => '3.0.0',
+				'url'                    => 'http://www.mollie.com/en/',
+				'product_url'            => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
+				'dashboard_url'          => 'https://www.mollie.com/dashboard/',
+				'provider'               => 'mollie',
+				'supports'               => array(
 					'payment_status_request',
 					'recurring_direct_debit',
 					'recurring_credit_card',
@@ -64,6 +65,8 @@ class Integration extends AbstractGatewayIntegration {
 					'webhook_log',
 					'webhook_no_config',
 				),
+				'version_option_name'    => 'pronamic_pay_mollie_version',
+				'db_version_option_name' => 'pronamic_pay_mollie_db_version',
 			)
 		);
 
@@ -81,10 +84,10 @@ class Integration extends AbstractGatewayIntegration {
 		// Tables.
 		$this->register_tables();
 
-		// Upgrades.
-		$upgrades = $this->get_upgrades();
-
-		$upgrades->add( new Upgrade300() );
+		/**
+		 * Install.
+		 */
+		$this->install = new Install( $this );
 
 		/**
 		 * Admin
