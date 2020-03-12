@@ -30,21 +30,30 @@ class CLI {
 			'pronamic-pay mollie organizations synchronize',
 			function( $args, $assoc_args ) {
 				$this->wp_cli_organizations_synchronize( $args, $assoc_args );
-			}
+			},
+			array(
+				'shortdesc' => 'Synchronize Mollie organizations to WordPress (not implemented yet).',
+			)
 		);
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie customers synchronize',
 			function( $args, $assoc_args ) {
 				$this->wp_cli_customers_synchronize( $args, $assoc_args );
-			}
+			},
+			array(
+				'shortdesc' => 'Synchronize Mollie customers to WordPress.',
+			)
 		);
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie customers connect-wp-users',
 			function( $args, $assoc_args ) {
 				$this->wp_cli_customers_connect_wp_users( $args, $assoc_args );
-			}
+			},
+			array(
+				'shortdesc' => 'Connect Mollie customers to WordPress users by email.',
+			)
 		);
 
 		// Data Stores.
