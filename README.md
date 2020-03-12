@@ -70,7 +70,7 @@ See 'wp help pronamic-pay mollie <command>' for more information on a specific c
 Synchronize Mollie customers to WordPress.
 
 ```bash
-$ wp wp pronamic-pay mollie customers synchronize
+$ wp pronamic-pay mollie customers synchronize
 ```
 
 ### Command `pronamic-pay mollie customers connect-wp-users`
@@ -78,7 +78,7 @@ $ wp wp pronamic-pay mollie customers synchronize
 Connect Mollie customers to WordPress users by email.
 
 ```bash
-$ wp wp pronamic-pay mollie customers connect-wp-users
+$ wp pronamic-pay mollie customers connect-wp-users
 ```
 
 ## Links
