@@ -462,10 +462,8 @@ class Gateway extends Core_Gateway {
 
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 		if ( isset( $mollie_payment->customerId ) ) {
-			$mollie_customer = new Customer();
-
 			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-			$mollie_customer->set_id( $mollie_payment->customerId );
+			$mollie_customer = new Customer( $mollie_payment->customerId );
 
 			$customer_internal_id = $this->customer_data_store->get_or_insert_customer(
 				$mollie_customer,
@@ -795,7 +793,7 @@ class Gateway extends Core_Gateway {
 		// Customer.
 		$customer = $payment->get_customer();
 
-		if ( null === $customer ) {
+		if ( null === $customer && null !== $subscription ) {
 			$customer = $subscription->get_customer();
 		}
 
@@ -810,28 +808,27 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
+		// Customer IDs.
+		$customer_ids = array();
+
 		// Payment.
-		$customer_id = $payment->get_meta( 'mollie_customer_id' );
-
-		if ( ! empty( $customer_id ) ) {
-			$customer = new Customer( $customer_id );
-
-			$customer_internal_id = $this->customer_data_store->get_or_insert_customer( $customer );
-
-			$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
-		}
+		$customer_ids[] = $payment->get_meta( 'mollie_customer_id' );
 
 		// Subscription.
 		if ( null !== $subscription ) {
-			$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+			$customer_ids[] = $subscription->get_meta( 'mollie_customer_id' );
+		}
 
-			if ( ! empty( $customer_id ) ) {
-				$customer = new Customer( $customer_id );
+		// Connect.
+		$customer_ids = \array_filter( $customer_ids );
+		$customer_ids = \array_unique( $customer_ids );
 
-				$customer_internal_id = $this->customer_data_store->get_or_insert_customer( $customer );
+		foreach ( $customer_ids as $customer_id ) {
+			$customer = new Customer( $customer_id );
 
-				$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
-			}
+			$this->customer_data_store->get_or_insert_customer( $customer );
+
+			$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
 		}
 	}
 }
