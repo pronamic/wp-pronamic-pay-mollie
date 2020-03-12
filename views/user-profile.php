@@ -85,7 +85,7 @@ if ( empty( $customers ) ) {
 								<td>
 									<?php
 
-									empty( $customer->email ) ? print( '—' ): \printf(
+									empty( $customer->email ) ? print( '—' ) : \printf(
 										'<a href="%s">%s</a>',
 										esc_attr( 'mailto:' . $customer->email ),
 										esc_html( $customer->email )
