@@ -390,7 +390,7 @@ class GatewayTest extends WP_UnitTestCase {
 		$this->assertInternalType( 'array', $user_customer_ids );
 
 		if ( is_string( $expected ) ) {
-			$this->assertContains( $expected, $user_customer_ids );			
+			$this->assertContains( $expected, $user_customer_ids );
 		}
 	}
 
