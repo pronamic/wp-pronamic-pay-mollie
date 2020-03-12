@@ -385,9 +385,13 @@ class GatewayTest extends WP_UnitTestCase {
 		$this->gateway->copy_customer_id_to_wp_user( $payment );
 
 		// Get customer ID from user meta.
-		$user_customer_id = $this->gateway->get_customer_id_by_wp_user_id( $user_id );
+		$user_customer_ids = $this->gateway->get_customer_ids_for_user( $user_id );
 
-		$this->assertEquals( $expected, $user_customer_id );
+		$this->assertInternalType( 'array', $user_customer_ids );
+
+		if ( is_string( $expected ) ) {
+			$this->assertContains( $expected, $user_customer_ids );			
+		}
 	}
 
 	/**
