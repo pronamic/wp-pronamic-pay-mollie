@@ -67,6 +67,9 @@ class Gateway extends Core_Gateway {
 		// Data Stores.
 		$this->profile_data_store  = new ProfileDataStore();
 		$this->customer_data_store = new CustomerDataStore();
+
+		// Actions.
+		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
 	}
 
 	/**
@@ -767,5 +770,53 @@ class Gateway extends Core_Gateway {
 		}
 
 		return $mollie_customer->get_id();
+	}
+
+	/**
+	 * Copy Mollie customer ID from subscription meta to WordPress user meta.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return void
+	 */
+	public function copy_customer_id_to_wp_user( Payment $payment ) {
+		if ( $this->config->id !== $payment->config_id ) {
+			return;
+		}
+
+		// Customer.
+		$customer = $payment->get_customer();
+
+		if ( null === $customer ) {
+			return;
+		}
+
+		// WordPress user.
+		$user = \get_user_by( 'id', $customer->get_user_id() );
+
+		if ( false !== $user ) {
+			return;
+		}
+
+		/**
+		 * Payment.
+		 */
+		$customer_id = $payment->get_meta( 'mollie_customer_id' );
+
+		if ( ! empty( $customer_id ) ) {
+			$this->customer_data_store->connect_mollie_customer_to_wp_user( new Customer( $customer_id ), $user );
+		}
+
+		/**
+		 * Subscription.
+		 */
+		$subscription = $payment->get_subscription();
+
+		if ( null !== $subscription ) {
+			$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+			if ( ! empty( $customer_id ) ) {
+				$this->customer_data_store->connect_mollie_customer_to_wp_user( new Customer( $customer_id ), $user );
+			}
+		}
 	}
 }

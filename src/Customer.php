@@ -55,6 +55,15 @@ class Customer {
 	public $locale;
 
 	/**
+	 * Construct Mollie customer.
+	 *
+	 * @param string|null $id Mollie customer ID.
+	 */
+	public function __construct( $id = null ) {
+		$this->set_id( $id );
+	}
+
+	/**
 	 * Get ID.
 	 *
 	 * @return string|null
