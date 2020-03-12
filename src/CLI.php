@@ -17,8 +17,8 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 3.0.0
- * @since   3.0.0
+ * @version 2.1.0
+ * @since   2.1.0
  * @link    https://github.com/woocommerce/woocommerce/blob/3.9.0/includes/class-wc-cli.php
  */
 class CLI {

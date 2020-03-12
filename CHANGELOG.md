@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.1.0] - 
+- 
+
 ## [2.0.10] - 2020-02-03
 - Fixed notice "Not Found - No customer exists with token cst_XXXXXXXXXX" in some cases.
 

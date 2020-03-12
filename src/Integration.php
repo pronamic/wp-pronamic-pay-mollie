@@ -51,7 +51,7 @@ class Integration extends AbstractGatewayIntegration {
 			array(
 				'id'                     => 'mollie',
 				'name'                   => 'Mollie',
-				'version'                => '3.0.0',
+				'version'                => '2.1.0',
 				'url'                    => 'http://www.mollie.com/en/',
 				'product_url'            => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
 				'dashboard_url'          => 'https://www.mollie.com/dashboard/',
