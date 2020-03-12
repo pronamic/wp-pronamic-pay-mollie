@@ -29,7 +29,7 @@ development environment you could use a service like [ngrok](https://ngrok.com/)
 > Lennard van Gunst
 > Mollie
 
-### REST API
+## REST API
 
 The Pronamic Pay Mollie gateway can handle Mollie webhook requests via the WordPress REST API.
 
@@ -45,6 +45,40 @@ Legacy webhook URL:
 
 ```
 curl --request POST --data "id=tr_d0b0E3EA3v" "http://pay.test/?mollie_webhook"
+```
+
+## WP-CLI
+
+### What is WP-CLI?
+
+For those who have never heard before WP-CLI, here's a brief description extracted from the [official website](https://wp-cli.org/).
+
+> **WP-CLI** is a set of command-line tools for managing WordPress installations. You can update plugins, set up multisite installs and much more, without using a web browser.
+
+### Commands
+
+```bash
+$ wp pronamic-pay mollie
+usage: wp pronamic-pay mollie customers <command>
+   or: wp pronamic-pay mollie organizations <command>
+
+See 'wp help pronamic-pay mollie <command>' for more information on a specific command.
+```
+
+### Command `pronamic-pay mollie customers synchronize`
+
+Synchronize Mollie customers to WordPress.
+
+```bash
+$ wp wp pronamic-pay mollie customers synchronize
+```
+
+### Command `pronamic-pay mollie customers connect-wp-users`
+
+Connect Mollie customers to WordPress users by email.
+
+```bash
+$ wp wp pronamic-pay mollie customers connect-wp-users
 ```
 
 ## Links
