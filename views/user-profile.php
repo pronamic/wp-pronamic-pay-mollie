@@ -101,7 +101,11 @@ if ( empty( $customers ) ) {
 				</table>
 
 				<p class="description">
-					Mollie biedt de mogelijkheid om betalers als klant ('customer') te registreren binnen het Mollie-betaalplatform. Deze functionaliteit onthoudt de betaalvoorkeuren van een klant om een volgende betaling sneller te laten verlopen. De Mollie-klanten kunnen gekoppeld zijn aan WordPress-gebruikers. Hieronder is een lijst van Mollie-klanten te zien die gekoppeld zijn aan deze WordPress-gebruiker. Voor abonnementen kunnen de machtigingen bij een Mollie-klant gebruikt worden voor terugkerende betalingen.
+					<?php
+
+					esc_html_e( 'Mollie offers the possibility to register payers as a customer within the Mollie payment platform. This functionality remembers payment preferences to make future payments easier. The Mollie customers can be linked to WordPress users. This is a list of Mollie customers associated with this WordPress user. For subscriptions, a Mollie customer mandate can be used for recurring payments.', 'pronamic_ideal' );
+
+					?>
 				</p>
 			</td>
 		</tr>
