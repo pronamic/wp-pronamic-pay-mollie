@@ -241,34 +241,42 @@ class GatewayTest extends WP_UnitTestCase {
 	 * @dataProvider webhook_url_provider
 	 */
 	public function test_webhook_url( $home_url, $expected ) {
-		$this->home_url = $home_url;
+		$filter_home_url = function( $url ) use ( $home_url ) {
+			return $home_url;
+		};
 
-		add_filter( 'home_url', array( $this, 'home_url' ), 10, 1 );
+		add_filter( 'home_url', $filter_home_url );
 
 		$this->assertEquals( $expected, $this->gateway->get_webhook_url() );
+
+		remove_filter( 'home_url', $filter_home_url );
 	}
 
 	/**
 	 * Webhook URL data provider.
 	 *
+	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-includes/rest-api.php#L329-L400
 	 * @return array
 	 */
 	public function webhook_url_provider() {
+		$home_url = 'https://example.org/';
+
+		$filter_home_url = function( $url ) use ( $home_url ) {
+			return $home_url;
+		};
+
+		add_filter( 'home_url', $filter_home_url );
+
+		$webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook' );
+
+		remove_filter( 'home_url', $filter_home_url );
+
 		return array(
-			array( 'https://example.org/', 'https://example.org/?mollie_webhook' ),
+			array( $home_url, $webhook_url ),
 			array( 'https://localhost/', null ),
 			array( 'https://example.dev/', null ),
 			array( 'https://example.local/', null ),
 		);
-	}
-
-	/**
-	 * Filter `home_url` callback.
-	 *
-	 * @return mixed
-	 */
-	public function home_url() {
-		return $this->home_url;
 	}
 
 	/**
