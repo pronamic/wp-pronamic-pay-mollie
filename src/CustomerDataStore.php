@@ -25,6 +25,8 @@ class CustomerDataStore {
 	 * Get or insert customer.
 	 *
 	 * @param Customer $customer Customer.
+	 * @param array    $data     Data.
+	 * @param array    $format   Format.
 	 * @return int
 	 */
 	public function get_or_insert_customer( Customer $customer, $data = array(), $format = array() ) {
@@ -198,30 +200,30 @@ class CustomerDataStore {
 	public function connect_mollie_customer_to_wp_user( $customer, \WP_User $user ) {
 		global $wpdb;
 
-		$query = $wpdb->prepare(
-			"
-			INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customer_users (
-				customer_id,
-				user_id
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				"
+				INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customer_users (
+					customer_id,
+					user_id
+				)
+				SELECT
+					mollie_customer.id AS mollie_customer_id,
+					wp_user.ID AS wp_user_id
+				FROM
+					$wpdb->pronamic_pay_mollie_customers AS mollie_customer
+						JOIN
+					$wpdb->users AS wp_user
+				WHERE
+					mollie_customer.mollie_id = %s
+						AND
+					wp_user.ID = %d
+				;
+				",
+				$customer->get_id(),
+				$user->ID
 			)
-			SELECT
-				mollie_customer.id AS mollie_customer_id,
-				wp_user.ID AS wp_user_id
-			FROM
-				$wpdb->pronamic_pay_mollie_customers AS mollie_customer
-					JOIN
-				$wpdb->users AS wp_user
-			WHERE
-				mollie_customer.mollie_id = %s
-					AND
-				wp_user.ID = %d
-			;
-			",
-			$customer->get_id(),
-			$user->ID
 		);
-
-		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {
 			throw new \Exception(

@@ -66,6 +66,7 @@ class CustomerQuery {
 			;
 		";
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared.
 		return $wpdb->get_results( $query );
 	}
 }

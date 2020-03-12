@@ -297,7 +297,8 @@ class Client {
 	/**
 	 * Create mandate.
 	 *
-	 * @param string $customer_id Customer ID.
+	 * @param string             $customer_id           Customer ID.
+	 * @param BankAccountDetails $consumer_bank_details Consumer bank details.
 	 * @return object
 	 * @throws Error Throws Error when Mollie error occurs.
 	 * @since unreleased
@@ -336,6 +337,7 @@ class Client {
 	 *
 	 * @param string      $customer_id    Mollie customer ID.
 	 * @param string|null $payment_method Payment method to find mandates for.
+	 * @param string|null $search         Search.
 	 *
 	 * @return boolean
 	 * @throws \Exception Throws exception for mandates on failed request or invalid response.

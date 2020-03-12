@@ -445,6 +445,8 @@ class Gateway extends Core_Gateway {
 		 * Mollie profile.
 		 */
 		$mollie_profile = new Profile();
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 		$mollie_profile->set_id( $mollie_payment->profileId );
 
 		$profile_internal_id = $this->profile_data_store->get_or_insert_profile( $mollie_profile );
@@ -457,8 +459,12 @@ class Gateway extends Core_Gateway {
 		 *
 		 * @link https://www.gravityforms.com/add-ons/user-registration/
 		 */
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 		if ( isset( $mollie_payment->customerId ) ) {
 			$mollie_customer = new Customer();
+
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 			$mollie_customer->set_id( $mollie_payment->customerId );
 
 			$customer_internal_id = $this->customer_data_store->get_or_insert_customer(

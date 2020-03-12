@@ -378,11 +378,17 @@ $users = $wpdb->get_results(
 								?>
 							</td>
 							<td>
-								<?php echo \esc_html( $mandate->mandateReference ); ?>
+								<?php
+
+								// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
+								echo \esc_html( $mandate->mandateReference );
+
+								?>
 							</td>
 							<td>
 								<?php
 
+								// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 								$signature_date = new \DateTime( $mandate->signatureDate );
 
 								echo \esc_html( $signature_date->format( 'd-m-Y' ) );
@@ -392,6 +398,7 @@ $users = $wpdb->get_results(
 							<td>
 								<?php
 
+								// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 								$created_on = new \DateTime( $mandate->createdAt );
 
 								echo \esc_html( $created_on->format( 'd-m-Y H:i:s' ) );

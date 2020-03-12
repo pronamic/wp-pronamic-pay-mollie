@@ -79,6 +79,7 @@ class CLI {
 				'post_type'   => 'pronamic_gateway',
 				'post_status' => 'publish',
 				'nopaging'    => true,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Slow query allowed on CLI.
 				'meta_query'  => array(
 					array(
 						'key'   => '_pronamic_gateway_id',
