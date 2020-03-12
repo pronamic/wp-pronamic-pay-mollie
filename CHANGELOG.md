@@ -7,8 +7,14 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
-## [2.1.0] - 
-- 
+## [2.1.0] - 2020-03-13
+- Added custom tables for Mollie profiles, customers and WordPress users.
+- Added experimental CLI integration.
+- Moved webhook logic to REST API.
+- Improved WordPress user profile Mollie section.
+- Added WordPress admin dashboard page for Mollie customers.
+- Added support for one-off SEPA Direct Debit payment method.
+- Added support for payment failure reason.
 
 ## [2.0.10] - 2020-02-03
 - Fixed notice "Not Found - No customer exists with token cst_XXXXXXXXXX" in some cases.
