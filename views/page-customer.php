@@ -416,26 +416,20 @@ $users = $wpdb->get_results(
 
 	<?php endif; ?>
 
-	<h3><?php \esc_html_e( 'WordPress Users', 'pronamic_ideal' ); ?></h3>
+	<?php if ( ! empty( $users ) ) : ?>
 
-	<table class="widefat">
-		<thead>
-			<tr>
-				<th><?php \esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
-				<th><?php \esc_html_e( 'Email', 'pronamic_ideal' ); ?></th>
-				<th><?php \esc_html_e( 'Display Name', 'pronamic_ideal' ); ?></th>
-			</tr>
-		</thead>
+		<h3><?php \esc_html_e( 'WordPress Users', 'pronamic_ideal' ); ?></h3>
 
-		<tbody>	
-
-			<?php if ( empty( $users ) ) : ?>
-
+		<table class="widefat">
+			<thead>
 				<tr>
-					<td colspan="3"><?php esc_html_e( 'No users found.', 'pronamic_ideal' ); ?></td>
+					<th><?php \esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
+					<th><?php \esc_html_e( 'Email', 'pronamic_ideal' ); ?></th>
+					<th><?php \esc_html_e( 'Display Name', 'pronamic_ideal' ); ?></th>
 				</tr>
+			</thead>
 
-			<?php else : ?>
+			<tbody>	
 
 				<?php foreach ( $users as $user ) : ?>
 
@@ -461,8 +455,9 @@ $users = $wpdb->get_results(
 
 				<?php endforeach; ?>
 
-			<?php endif; ?>
+			</tbody>
+		</table>
 
-		</tbody>
-	</table>
+	<?php endif; ?>
+
 </div>
