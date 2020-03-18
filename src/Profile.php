@@ -60,6 +60,7 @@ class Profile {
 	 * Set ID.
 	 *
 	 * @param string|null $id ID.
+	 * @return void
 	 */
 	public function set_id( $id ) {
 		$this->id = $id;
@@ -78,6 +79,7 @@ class Profile {
 	 * Set mode.
 	 *
 	 * @param string|null $mode Mode.
+	 * @return void
 	 */
 	public function set_mode( $mode ) {
 		$this->mode = $mode;
@@ -96,6 +98,7 @@ class Profile {
 	 * Set name.
 	 *
 	 * @param string|null $name Name.
+	 * @return void
 	 */
 	public function set_name( $name ) {
 		$this->name = $name;
@@ -114,6 +117,7 @@ class Profile {
 	 * Set email.
 	 *
 	 * @param string|null $email Email.
+	 * @return void
 	 */
 	public function set_email( $email ) {
 		$this->email = $email;

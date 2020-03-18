@@ -24,9 +24,9 @@ class CustomerDataStore {
 	/**
 	 * Get or insert customer.
 	 *
-	 * @param Customer $customer Customer.
-	 * @param array    $data     Data.
-	 * @param array    $format   Format.
+	 * @param Customer      $customer Customer.
+	 * @param array<string> $data     Data.
+	 * @param array<string> $format   Format.
 	 * @return int
 	 */
 	public function get_or_insert_customer( Customer $customer, $data = array(), $format = array() ) {
@@ -77,9 +77,9 @@ class CustomerDataStore {
 	/**
 	 * Insert Mollie customer.
 	 *
-	 * @param Customer $customer Customer.
-	 * @param array    $data   Data.
-	 * @param array    $format Format.
+	 * @param Customer      $customer Customer.
+	 * @param array<string> $data     Data.
+	 * @param array<string> $format   Format.
 	 * @return int
 	 * @throws \Exception Throws exception on error.
 	 */
@@ -125,9 +125,10 @@ class CustomerDataStore {
 	/**
 	 * Update Mollie customer.
 	 *
-	 * @param Customer $customer Customer.
-	 * @param array    $data    Data.
-	 * @param array    $format  Format.
+	 * @param Customer      $customer Customer.
+	 * @param array<string> $data     Data.
+	 * @param array<string> $format   Format.
+	 * @return int The number of rows updated.
 	 * @throws \Exception Throws exception on error.
 	 */
 	public function update_customer( Customer $customer, $data = array(), $format = array() ) {
@@ -173,9 +174,9 @@ class CustomerDataStore {
 	/**
 	 * Save Mollie customer.
 	 *
-	 * @param Customer $customer Customer.
-	 * @param array    $data   Data.
-	 * @param array    $format Format.
+	 * @param Customer      $customer Customer.
+	 * @param array<string> $data     Data.
+	 * @param array<string> $format   Format.
 	 * @return int
 	 */
 	public function save_customer( Customer $customer, $data = array(), $format = array() ) {
@@ -195,6 +196,7 @@ class CustomerDataStore {
 	 *
 	 * @param Customer $customer Mollie customer.
 	 * @param \WP_User $user     WordPress user.
+	 * @return int Number of rows affected.
 	 * @throws \Exception Throws exception on error.
 	 */
 	public function connect_mollie_customer_to_wp_user( $customer, \WP_User $user ) {

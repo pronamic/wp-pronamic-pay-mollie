@@ -46,6 +46,7 @@ class Install {
 	 * Check version.
 	 *
 	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L168-L178
+	 * @return void
 	 */
 	public function check_version() {
 		$version_option = $this->integration->get_version_option();
@@ -59,6 +60,7 @@ class Install {
 	 * Install.
 	 *
 	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L272-L306
+	 * @return void
 	 */
 	public function install() {
 		$this->create_tables();
@@ -72,6 +74,7 @@ class Install {
 	 * Create tables.
 	 *
 	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L630-L720
+	 * @return void
 	 */
 	private function create_tables() {
 		global $wpdb;
@@ -162,6 +165,8 @@ class Install {
 
 	/**
 	 * Add foreign keys.
+	 *
+	 * @return void
 	 */
 	private function add_foreign_keys() {
 		global $wpdb;
@@ -254,6 +259,7 @@ class Install {
 	 * Add specified foreign key.
 	 *
 	 * @param object $item Foreig key data.
+	 * @return void
 	 * @throws \Exception Throws exception when adding foreign key fails.
 	 */
 	private function add_foreign_key( $item ) {
@@ -311,6 +317,7 @@ class Install {
 	/**
 	 * Convert user meta.
 	 *
+	 * @return void
 	 * @throws \Exception Throws exception when database update query fails.
 	 */
 	private function convert_user_meta() {
@@ -340,7 +347,7 @@ class Install {
 		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {
-			throw new Exception(
+			throw new \Exception(
 				sprintf(
 					'Could not convert user meta, database error: %s.',
 					$wpdb->last_error
@@ -378,7 +385,7 @@ class Install {
 		$result = $wpdb->query( $query );
 
 		if ( false === $result ) {
-			throw new Exception(
+			throw new \Exception(
 				sprintf(
 					'Could not convert user meta, database error: %s.',
 					$wpdb->last_error

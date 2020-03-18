@@ -43,7 +43,7 @@ class Integration extends AbstractGatewayIntegration {
 	/**
 	 * Construct and intialize Mollie integration.
 	 *
-	 * @param array $args Arguments.
+	 * @param array<string, array> $args Arguments.
 	 */
 	public function __construct( $args = array() ) {
 		$args = wp_parse_args(
@@ -87,13 +87,13 @@ class Integration extends AbstractGatewayIntegration {
 		/**
 		 * Install.
 		 */
-		$this->install = new Install( $this );
+		new Install( $this );
 
 		/**
 		 * Admin
 		 */
 		if ( \is_admin() ) {
-			$this->admin = new Admin();
+			new Admin();
 		}
 
 		/**
@@ -102,7 +102,7 @@ class Integration extends AbstractGatewayIntegration {
 		 * @link https://github.com/woocommerce/woocommerce/blob/3.9.0/includes/class-woocommerce.php#L453-L455
 		 */
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			$this->cli = new CLI();
+			new CLI();
 		}
 	}
 
@@ -127,6 +127,7 @@ class Integration extends AbstractGatewayIntegration {
 	 * Register tables.
 	 *
 	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-includes/wp-db.php#L894-L937
+	 * @return void
 	 */
 	private function register_tables() {
 		global $wpdb;

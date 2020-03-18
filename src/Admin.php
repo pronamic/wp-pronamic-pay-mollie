@@ -46,6 +46,8 @@ class Admin {
 
 	/**
 	 * Admin init.
+	 *
+	 * @return void
 	 */
 	public function admin_init() {
 		if ( ! \current_user_can( 'manage_options' ) ) {
@@ -118,6 +120,8 @@ class Admin {
 
 	/**
 	 * Admin menu.
+	 *
+	 * @return void
 	 */
 	public function admin_menu() {
 		try {
@@ -182,6 +186,8 @@ class Admin {
 
 	/**
 	 * Page Mollie.
+	 *
+	 * @return void
 	 */
 	public function page_mollie() {
 		include __DIR__ . '/../views/page-mollie.php';
@@ -189,6 +195,8 @@ class Admin {
 
 	/**
 	 * Page Mollie profiles.
+	 *
+	 * @return void
 	 */
 	public function page_mollie_profiles() {
 		if ( filter_has_var( INPUT_GET, 'id' ) ) {
@@ -202,6 +210,8 @@ class Admin {
 
 	/**
 	 * Page Mollie customers.
+	 *
+	 * @return void
 	 */
 	public function page_mollie_customers() {
 		if ( filter_has_var( INPUT_GET, 'id' ) ) {
@@ -215,6 +225,8 @@ class Admin {
 
 	/**
 	 * Page Mollie payments.
+	 *
+	 * @return void
 	 */
 	public function page_mollie_payments() {
 		if ( filter_has_var( INPUT_GET, 'id' ) ) {
@@ -245,6 +257,7 @@ class Admin {
 	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/meta-boxes.php#L1541-L1549
 	 * @param string   $post_type Post type.
 	 * @param \WP_Post $post      Post object.
+	 * @return void
 	 */
 	public function add_payment_meta_box( $post_type, $post ) {
 		if ( 'pronamic_payment' !== $post_type ) {
@@ -275,6 +288,7 @@ class Admin {
 	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-admin/includes/meta-boxes.php#L1541-L1549
 	 * @param string   $post_type Post type.
 	 * @param \WP_Post $post      Post object.
+	 * @return void
 	 */
 	public function add_subscription_meta_box( $post_type, $post ) {
 		if ( 'pronamic_pay_subscr' !== $post_type ) {

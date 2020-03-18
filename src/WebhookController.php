@@ -116,6 +116,7 @@ class WebhookController {
 	 * WordPress loaded, check for deprecated webhook call.
 	 *
 	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-includes/rest-api.php#L277-L309
+	 * @return void
 	 */
 	public function wp_loaded() {
 		if ( ! filter_has_var( INPUT_GET, 'mollie_webhook' ) ) {

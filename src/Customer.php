@@ -50,7 +50,7 @@ class Customer {
 	/**
 	 * Locale.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	public $locale;
 
@@ -76,6 +76,7 @@ class Customer {
 	 * Set ID.
 	 *
 	 * @param string|null $id ID.
+	 * @return void
 	 */
 	public function set_id( $id ) {
 		$this->id = $id;
@@ -94,6 +95,7 @@ class Customer {
 	 * Set mode.
 	 *
 	 * @param string|null $mode Mode.
+	 * @return void
 	 */
 	public function set_mode( $mode ) {
 		$this->mode = $mode;
@@ -112,6 +114,7 @@ class Customer {
 	 * Set name.
 	 *
 	 * @param string|null $name Name.
+	 * @return void
 	 */
 	public function set_name( $name ) {
 		$this->name = $name;
@@ -130,6 +133,7 @@ class Customer {
 	 * Set email.
 	 *
 	 * @param string|null $email Email.
+	 * @return void
 	 */
 	public function set_email( $email ) {
 		$this->email = $email;
@@ -148,6 +152,7 @@ class Customer {
 	 * Set locale.
 	 *
 	 * @param string|null $locale Locale.
+	 * @return void
 	 */
 	public function set_locale( $locale ) {
 		$this->locale = $locale;
@@ -156,7 +161,7 @@ class Customer {
 	/**
 	 * Get array.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_array() {
 		$array = array(

@@ -50,6 +50,10 @@ class Config extends GatewayConfig {
 	 * @return bool True if test mode, false otherwise.
 	 */
 	public function is_test_mode() {
+		if ( null === $this->api_key ) {
+			return false;
+		}
+
 		return ( 'test_' === substr( $this->api_key, 0, 5 ) );
 	}
 }

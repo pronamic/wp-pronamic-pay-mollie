@@ -22,9 +22,16 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  */
 class CustomerQuery {
 	/**
+	 * Query arguments.
+	 *
+	 * @var array<string, int>
+	 */
+	private $args;
+
+	/**
 	 * Construct customer query.
 	 *
-	 * @param array $args Query arguments.
+	 * @param array<string, int> $args Query arguments.
 	 */
 	public function __construct( $args = array() ) {
 		$this->args = \wp_parse_args(
@@ -39,7 +46,7 @@ class CustomerQuery {
 	/**
 	 * Get customers.
 	 *
-	 * @return array
+	 * @return array<object>
 	 */
 	public function get_customers() {
 		global $wpdb;

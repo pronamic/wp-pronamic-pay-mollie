@@ -24,9 +24,9 @@ class ProfileDataStore {
 	/**
 	 * Get or insert profile.
 	 *
-	 * @param Profile $profile Profile.
-	 * @param array   $data    Data.
-	 * @param array   $format  Format.
+	 * @param Profile       $profile Profile.
+	 * @param array<string> $data    Data.
+	 * @param array<string> $format  Format.
 	 * @return int
 	 */
 	public function get_or_insert_profile( Profile $profile, $data = array(), $format = array() ) {
@@ -77,9 +77,10 @@ class ProfileDataStore {
 	/**
 	 * Insert Mollie profile.
 	 *
-	 * @param Profile $profile Profile.
-	 * @param array   $data    Data.
-	 * @param array   $format  Format.
+	 * @param Profile       $profile Profile.
+	 * @param array<string> $data    Data.
+	 * @param array<string> $format  Format.
+	 * @return int
 	 * @throws \Exception Throws exception on error.
 	 */
 	public function insert_profile( Profile $profile, $data = array(), $format = array() ) {
@@ -124,9 +125,10 @@ class ProfileDataStore {
 	/**
 	 * Update Mollie profile.
 	 *
-	 * @param Profile $profile Profile.
-	 * @param array   $data    Data.
-	 * @param array   $format  Format.
+	 * @param Profile       $profile Profile.
+	 * @param array<string> $data    Data.
+	 * @param array<string> $format  Format.
+	 * @return int The number of rows updated.
 	 * @throws \Exception Throws exception on error.
 	 */
 	public function update_profile( Profile $profile, $data = array(), $format = array() ) {
@@ -172,9 +174,9 @@ class ProfileDataStore {
 	/**
 	 * Save Mollie profile.
 	 *
-	 * @param Profile $profile Profile.
-	 * @param array   $data   Data.
-	 * @param array   $format Format.
+	 * @param Profile       $profile Profile.
+	 * @param array<string> $data    Data.
+	 * @param array<string> $format  Format.
 	 * @return int
 	 */
 	public function save_profile( Profile $profile, $data = array(), $format = array() ) {
