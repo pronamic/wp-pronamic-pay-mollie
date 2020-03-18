@@ -41,6 +41,20 @@ class Gateway extends Core_Gateway {
 	protected $client;
 
 	/**
+	 * Profile data store.
+	 *
+	 * @var ProfileDataStore
+	 */
+	private $profile_data_store;
+
+	/**
+	 * Customer data store.
+	 *
+	 * @var CustomerDataStore
+	 */
+	private $customer_data_store;
+
+	/**
 	 * Constructs and initializes an Mollie gateway
 	 *
 	 * @param Config $config Config.
@@ -487,10 +501,14 @@ class Gateway extends Core_Gateway {
 
 			if ( null !== $customer ) {
 				// Connect to user.
-				$user = \get_user_by( 'id', $customer->get_user_id() );
+				$user_id = $customer->get_user_id();
 
-				if ( false !== $user ) {
-					$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+				if ( null !== $user_id ) {
+					$user = \get_user_by( 'id', $user_id );
+
+					if ( false !== $user ) {
+						$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+					}
 				}
 			}
 
@@ -761,10 +779,14 @@ class Gateway extends Core_Gateway {
 
 		// Connect to user.
 		if ( null !== $pronamic_customer ) {
-			$user = \get_user_by( 'id', $pronamic_customer->get_user_id() );
+			$user_id = $pronamic_customer->get_user_id();
 
-			if ( false !== $user ) {
-				$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+			if ( null !== $user_id ) {
+				$user = \get_user_by( 'id', $user_id );
+
+				if ( false !== $user ) {
+					$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+				}
 			}
 		}
 
