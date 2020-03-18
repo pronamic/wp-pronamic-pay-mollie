@@ -8,7 +8,7 @@
 [![Total Downloads](https://poser.pugx.org/wp-pay-gateways/mollie/downloads.svg)](https://packagist.org/packages/wp-pay-gateways/mollie)
 [![Latest Unstable Version](https://poser.pugx.org/wp-pay-gateways/mollie/v/unstable.svg)](https://packagist.org/packages/wp-pay-gateways/mollie)
 [![License](https://poser.pugx.org/wp-pay-gateways/mollie/license.svg)](https://packagist.org/packages/wp-pay-gateways/mollie)
-[![Built with Grunt](https://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/)
+[![Built with Grunt](http://cdn.gruntjs.com/builtwith.svg)](http://gruntjs.com/)
 
 
 ## Webhook URL
@@ -29,6 +29,57 @@ development environment you could use a service like [ngrok](https://ngrok.com/)
 > Lennard van Gunst
 > Mollie
 
+## REST API
+
+The Pronamic Pay Mollie gateway can handle Mollie webhook requests via the WordPress REST API.
+
+**Route:** `/wp-json/pronamic-pay/mollie/v1/webhook`
+
+The WordPress REST API Mollie webhook endpoint can be tested with for example cURL:
+
+```
+curl --request POST --data "id=tr_d0b0E3EA3v" http://pay.test/wp-json/pronamic-pay/mollie/v1/webhook
+```
+
+Legacy webhook URL:
+
+```
+curl --request POST --data "id=tr_d0b0E3EA3v" "http://pay.test/?mollie_webhook"
+```
+
+## WP-CLI
+
+### What is WP-CLI?
+
+For those who have never heard before WP-CLI, here's a brief description extracted from the [official website](https://wp-cli.org/).
+
+> **WP-CLI** is a set of command-line tools for managing WordPress installations. You can update plugins, set up multisite installs and much more, without using a web browser.
+
+### Commands
+
+```bash
+$ wp pronamic-pay mollie
+usage: wp pronamic-pay mollie customers <command>
+   or: wp pronamic-pay mollie organizations <command>
+
+See 'wp help pronamic-pay mollie <command>' for more information on a specific command.
+```
+
+### Command `pronamic-pay mollie customers synchronize`
+
+Synchronize Mollie customers to WordPress.
+
+```bash
+$ wp pronamic-pay mollie customers synchronize
+```
+
+### Command `pronamic-pay mollie customers connect-wp-users`
+
+Connect Mollie customers to WordPress users by email.
+
+```bash
+$ wp pronamic-pay mollie customers connect-wp-users
+```
 
 ## Links
 

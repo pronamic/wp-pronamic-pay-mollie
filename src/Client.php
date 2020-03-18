@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Core\XML\Security;
 
 /**
@@ -39,14 +40,6 @@ class Client {
 	private $api_key;
 
 	/**
-	 * Mode
-	 *
-	 * @since 1.1.9
-	 * @var string
-	 */
-	private $mode;
-
-	/**
 	 * Constructs and initializes an Mollie client object
 	 *
 	 * @param string $api_key Mollie API key.
@@ -56,29 +49,17 @@ class Client {
 	}
 
 	/**
-	 * Set mode
-	 *
-	 * @since 1.1.9
-	 * @param string $mode Mode (test or live).
-	 */
-	public function set_mode( $mode ) {
-		$this->mode = $mode;
-	}
-
-	/**
 	 * Send request with the specified action and parameters
 	 *
-	 * @param string $end_point              Requested endpoint.
-	 * @param string $method                 HTTP method to use.
-	 * @param array  $data                   Request data.
+	 * @param string                            $url    URL.
+	 * @param string                            $method HTTP method to use.
+	 * @param array<string, string|object|null> $data   Request data.
 	 * @return object
 	 * @throws Error Throws Error when Mollie error occurs.
 	 * @throws \Exception Throws exception when error occurs.
 	 */
-	private function send_request( $end_point, $method = 'GET', array $data = array() ) {
+	public function send_request( $url, $method = 'GET', array $data = array() ) {
 		// Request.
-		$url = self::API_URL . $end_point;
-
 		$response = wp_remote_request(
 			$url,
 			array(
@@ -132,13 +113,58 @@ class Client {
 	}
 
 	/**
+	 * Get URL.
+	 *
+	 * @param string $endpoint URL endpoint.
+	 * @return string
+	 */
+	public function get_url( $endpoint ) {
+		$url = self::API_URL . $endpoint;
+
+		return $url;
+	}
+
+	/**
+	 * Send request to endpoint.
+	 *
+	 * @param string                            $endpoint Endpoint.
+	 * @param string                            $method   HTTP method to use.
+	 * @param array<string, string|object|null> $data     Request data.
+	 * @return object
+	 */
+	public function send_request_to_endpoint( $endpoint, $method = 'GET', array $data = array() ) {
+		return $this->send_request( $this->get_url( $endpoint ), $method, $data );
+	}
+
+	/**
+	 * Get profile.
+	 *
+	 * @param string $profile Mollie profile ID.
+	 * @return object
+	 * @throws Error Throws Error when Mollie error occurs.
+	 */
+	public function get_profile( $profile ) {
+		return $this->send_request_to_endpoint( 'profiles/' . $profile, 'GET' );
+	}
+
+	/**
+	 * Get current profile.
+	 *
+	 * @return object
+	 * @throws Error Throws Error when Mollie error occurs.
+	 */
+	public function get_current_profile() {
+		return $this->get_profile( 'me' );
+	}
+
+	/**
 	 * Create payment.
 	 *
 	 * @param PaymentRequest $request Payment request.
 	 * @return object
 	 */
 	public function create_payment( PaymentRequest $request ) {
-		return $this->send_request( 'payments', 'POST', $request->get_array() );
+		return $this->send_request_to_endpoint( 'payments', 'POST', $request->get_array() );
 	}
 
 	/**
@@ -147,7 +173,7 @@ class Client {
 	 * @return bool|object
 	 */
 	public function get_payments() {
-		return $this->send_request( 'payments', 'GET' );
+		return $this->send_request_to_endpoint( 'payments', 'GET' );
 	}
 
 	/**
@@ -163,16 +189,16 @@ class Client {
 			throw new \InvalidArgumentException( 'Mollie payment ID can not be empty string.' );
 		}
 
-		return $this->send_request( 'payments/' . $payment_id, 'GET' );
+		return $this->send_request_to_endpoint( 'payments/' . $payment_id, 'GET' );
 	}
 
 	/**
 	 * Get issuers
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_issuers() {
-		$response = $this->send_request( 'methods/ideal?include=issuers', 'GET' );
+		$response = $this->send_request_to_endpoint( 'methods/ideal?include=issuers', 'GET' );
 
 		$issuers = array();
 
@@ -193,7 +219,7 @@ class Client {
 	 *
 	 * @param string $sequence_type Sequence type.
 	 *
-	 * @return array
+	 * @return array<string>
 	 * @throws \Exception Throws exception for methods on failed request or invalid response.
 	 */
 	public function get_payment_methods( $sequence_type = '' ) {
@@ -203,7 +229,7 @@ class Client {
 			$data['sequenceType'] = $sequence_type;
 		}
 
-		$response = $this->send_request( 'methods', 'GET', $data );
+		$response = $this->send_request_to_endpoint( 'methods', 'GET', $data );
 
 		$payment_methods = array();
 
@@ -226,31 +252,21 @@ class Client {
 	/**
 	 * Create customer.
 	 *
+	 * @param Customer $customer Customer.
+	 * @return Customer
+	 * @throws Error Throws Error when Mollie error occurs.
 	 * @since 1.1.6
-	 *
-	 * @param string|null $email Customer email address.
-	 * @param string|null $name  Customer name.
-	 * @return string|bool
 	 */
-	public function create_customer( $email, $name ) {
-		if ( empty( $email ) ) {
-			return false;
-		}
-
-		$response = $this->send_request(
+	public function create_customer( Customer $customer ) {
+		$response = $this->send_request_to_endpoint(
 			'customers',
 			'POST',
-			array(
-				'name'  => $name,
-				'email' => $email,
-			)
+			$customer->get_array()
 		);
 
-		if ( ! isset( $response->id ) ) {
-			return false;
-		}
+		$customer->set_id( $response->id );
 
-		return $response->id;
+		return $customer;
 	}
 
 	/**
@@ -268,7 +284,7 @@ class Client {
 		}
 
 		try {
-			return $this->send_request( 'customers/' . $customer_id, 'GET' );
+			return $this->send_request_to_endpoint( 'customers/' . $customer_id, 'GET' );
 		} catch ( Error $error ) {
 			if ( 404 === $error->get_status() ) {
 				return null;
@@ -279,10 +295,32 @@ class Client {
 	}
 
 	/**
+	 * Create mandate.
+	 *
+	 * @param string             $customer_id           Customer ID.
+	 * @param BankAccountDetails $consumer_bank_details Consumer bank details.
+	 * @return object
+	 * @throws Error Throws Error when Mollie error occurs.
+	 * @since unreleased
+	 */
+	public function create_mandate( $customer_id, BankAccountDetails $consumer_bank_details ) {
+		$response = $this->send_request_to_endpoint(
+			'customers/' . $customer_id . '/mandates',
+			'POST',
+			array(
+				'method'          => Methods::DIRECT_DEBIT,
+				'consumerName'    => $consumer_bank_details->get_name(),
+				'consumerAccount' => $consumer_bank_details->get_iban(),
+			)
+		);
+
+		return $response;
+	}
+
+	/**
 	 * Get mandates for customer.
 	 *
 	 * @param string $customer_id Mollie customer ID.
-	 *
 	 * @return object
 	 * @throws \InvalidArgumentException Throws exception on empty customer ID argument.
 	 */
@@ -291,7 +329,7 @@ class Client {
 			throw new \InvalidArgumentException( 'Mollie customer ID can not be empty string.' );
 		}
 
-		return $this->send_request( 'customers/' . $customer_id . '/mandates?limit=250', 'GET' );
+		return $this->send_request_to_endpoint( 'customers/' . $customer_id . '/mandates?limit=250', 'GET' );
 	}
 
 	/**
@@ -299,11 +337,12 @@ class Client {
 	 *
 	 * @param string      $customer_id    Mollie customer ID.
 	 * @param string|null $payment_method Payment method to find mandates for.
+	 * @param string|null $search         Search.
 	 *
 	 * @return boolean
 	 * @throws \Exception Throws exception for mandates on failed request or invalid response.
 	 */
-	public function has_valid_mandate( $customer_id, $payment_method = null ) {
+	public function has_valid_mandate( $customer_id, $payment_method = null, $search = null ) {
 		$mandates = $this->get_mandates( $customer_id );
 
 		$mollie_method = Methods::transform( $payment_method );
@@ -312,13 +351,32 @@ class Client {
 			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
-		foreach ( $mandates->_embedded as $mandate ) {
-			if ( $mollie_method !== $mandate->method ) {
+		foreach ( $mandates->_embedded->mandates as $mandate ) {
+			if ( null !== $mollie_method && $mollie_method !== $mandate->method ) {
 				continue;
 			}
 
+			// Search consumer account or card number.
+			if ( null !== $search ) {
+				switch ( $mollie_method ) {
+					case Methods::DIRECT_DEBIT:
+					case Methods::PAYPAL:
+						if ( $search !== $mandate->details->consumerAccount ) {
+							continue 2;
+						}
+
+						break;
+					case Methods::CREDITCARD:
+						if ( $search !== $mandate->details->cardNumber ) {
+							continue 2;
+						}
+
+						break;
+				}
+			}
+
 			if ( 'valid' === $mandate->status ) {
-				return true;
+				return $mandate->id;
 			}
 		}
 
@@ -343,7 +401,7 @@ class Client {
 			throw new \Exception( 'No embedded data in Mollie response.' );
 		}
 
-		foreach ( $mandates->_embedded as $mandate ) {
+		foreach ( $mandates->_embedded->mandates as $mandate ) {
 			if ( $mollie_method !== $mandate->method ) {
 				continue;
 			}

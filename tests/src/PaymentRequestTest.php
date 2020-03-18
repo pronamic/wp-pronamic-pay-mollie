@@ -31,12 +31,11 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	 * Setup.
 	 */
 	public function setUp() {
-		$request = new PaymentRequest();
+		$request = new PaymentRequest(
+			new Amount( 'EUR', '100.00' ),
+			'Test'
+		);
 
-		$amount = new Amount( 'EUR', '100.00' );
-
-		$request->amount        = $amount;
-		$request->description   = 'Test';
 		$request->redirect_url  = 'https://example.com/mollie-redirect/';
 		$request->webhook_url   = 'https://example.com/mollie-webhook/';
 		$request->method        = Methods::IDEAL;

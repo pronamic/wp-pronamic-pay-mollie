@@ -65,7 +65,18 @@ class LocaleHelper {
 
 		$search = array_search( $locale, $supported_lowercase, true );
 
-		if ( false !== $search ) {
+		// Locale not supported.
+		if ( false === $search ) {
+			return null;
+		}
+
+		/**
+		 * As with all internal PHP functions as of 5.3.0, `array_search()`
+		 * returns `NULL` if invalid parameters are passed to it.
+		 *
+		 * @link https://www.php.net/array_search
+		 */
+		if ( array_key_exists( $search, $supported ) ) {
 			return $supported[ $search ];
 		}
 

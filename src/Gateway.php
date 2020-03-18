@@ -17,8 +17,10 @@ use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
+use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 
 /**
  * Title: Mollie
@@ -39,11 +41,18 @@ class Gateway extends Core_Gateway {
 	protected $client;
 
 	/**
-	 * Meta key for customer ID.
+	 * Profile data store.
 	 *
-	 * @var string
+	 * @var ProfileDataStore
 	 */
-	private $meta_key_customer_id = '_pronamic_pay_mollie_customer_id';
+	private $profile_data_store;
+
+	/**
+	 * Customer data store.
+	 *
+	 * @var CustomerDataStore
+	 */
+	private $customer_data_store;
 
 	/**
 	 * Constructs and initializes an Mollie gateway
@@ -68,12 +77,10 @@ class Gateway extends Core_Gateway {
 
 		// Client.
 		$this->client = new Client( \strval( $config->api_key ) );
-		$this->client->set_mode( $config->mode );
 
-		// Mollie customer ID meta key.
-		if ( self::MODE_TEST === $config->mode ) {
-			$this->meta_key_customer_id = '_pronamic_pay_mollie_customer_id_test';
-		}
+		// Data Stores.
+		$this->profile_data_store  = new ProfileDataStore();
+		$this->customer_data_store = new CustomerDataStore();
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
@@ -83,6 +90,7 @@ class Gateway extends Core_Gateway {
 	 * Get issuers
 	 *
 	 * @see Core_Gateway::get_issuers()
+	 * @return array<int, array<string, array<string>>>
 	 */
 	public function get_issuers() {
 		$groups = array();
@@ -115,6 +123,7 @@ class Gateway extends Core_Gateway {
 	 * Get available payment methods.
 	 *
 	 * @see Core_Gateway::get_available_payment_methods()
+	 * @return array<string>
 	 */
 	public function get_available_payment_methods() {
 		$payment_methods = array();
@@ -188,6 +197,7 @@ class Gateway extends Core_Gateway {
 	 * Get supported payment methods
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::get_supported_payment_methods()
+	 * @return array<string>
 	 */
 	public function get_supported_payment_methods() {
 		return array(
@@ -214,7 +224,7 @@ class Gateway extends Core_Gateway {
 	 * @return string|null
 	 */
 	public function get_webhook_url() {
-		$url = home_url( '/' );
+		$url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook' );
 
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 
@@ -237,8 +247,6 @@ class Gateway extends Core_Gateway {
 			return null;
 		}
 
-		$url = add_query_arg( 'mollie_webhook', '', $url );
-
 		return $url;
 	}
 
@@ -246,25 +254,33 @@ class Gateway extends Core_Gateway {
 	 * Start
 	 *
 	 * @see Pronamic_WP_Pay_Gateway::start()
-	 *
 	 * @param Payment $payment Payment.
+	 * @return void
 	 */
 	public function start( Payment $payment ) {
-		$request               = new PaymentRequest();
-		$request->amount       = AmountTransformer::transform( $payment->get_total_amount() );
-		$request->description  = \strval( $payment->get_description() );
+		$request = new PaymentRequest(
+			AmountTransformer::transform( $payment->get_total_amount() ),
+			\strval( $payment->get_description() )
+		);
+
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
 
 		// Locale.
-		if ( null !== $payment->get_customer() ) {
-			$request->locale = LocaleHelper::transform( $payment->get_customer()->get_locale() );
+		$customer = $payment->get_customer();
+
+		if ( null !== $customer ) {
+			$request->locale = LocaleHelper::transform( $customer->get_locale() );
 		}
 
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
 
-		if ( is_string( $customer_id ) && ! empty( $customer_id ) ) {
+		if ( null === $customer_id ) {
+			$customer_id = $this->create_customer_for_payment( $payment );
+		}
+
+		if ( null !== $customer_id ) {
 			$request->customer_id = $customer_id;
 		}
 
@@ -273,6 +289,37 @@ class Gateway extends Core_Gateway {
 
 		// Recurring payment method.
 		$is_recurring_method = ( $payment->get_subscription() && PaymentMethods::is_recurring_method( $payment_method ) );
+
+		// Consumer bank details.
+		$consumer_bank_details = $payment->get_consumer_bank_details();
+
+		if ( PaymentMethods::DIRECT_DEBIT === $payment_method && null !== $consumer_bank_details ) {
+			$consumer_name = $consumer_bank_details->get_name();
+			$consumer_iban = $consumer_bank_details->get_iban();
+
+			$request->consumer_name    = $consumer_name;
+			$request->consumer_account = $consumer_iban;
+
+			// Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
+			if ( null !== $customer_id ) {
+				// Find or create mandate.
+				$mandate_id = $this->client->has_valid_mandate( $customer_id, PaymentMethods::DIRECT_DEBIT, $consumer_iban );
+
+				if ( false === $mandate_id ) {
+					$mandate = $this->client->create_mandate( $customer_id, $consumer_bank_details );
+
+					$mandate_id = $mandate->id;
+				}
+
+				// Charge immediately on-demand.
+				$request->sequence_type = Sequence::RECURRING;
+				$request->mandate_id    = $mandate_id;
+
+				$is_recurring_method = true;
+
+				$payment->recurring = true;
+			}
+		}
 
 		if ( false === $is_recurring_method ) {
 			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
@@ -393,7 +440,6 @@ class Gateway extends Core_Gateway {
 	 * Update status of the specified payment
 	 *
 	 * @param Payment $payment Payment.
-	 *
 	 * @return void
 	 */
 	public function update_status( Payment $payment ) {
@@ -407,6 +453,75 @@ class Gateway extends Core_Gateway {
 
 		if ( isset( $mollie_payment->status ) ) {
 			$payment->set_status( Statuses::transform( $mollie_payment->status ) );
+		}
+
+		/**
+		 * Mollie profile.
+		 */
+		$mollie_profile = new Profile();
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
+		$mollie_profile->set_id( $mollie_payment->profileId );
+
+		$profile_internal_id = $this->profile_data_store->get_or_insert_profile( $mollie_profile );
+
+		/**
+		 * If the Mollie payment contains a customer ID we will try to connect
+		 * this Mollie customer ID the WordPress user and subscription.
+		 * This can be usefull in case when a WordPress user is created after
+		 * a succesfull payment.
+		 *
+		 * @link https://www.gravityforms.com/add-ons/user-registration/
+		 */
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
+		if ( isset( $mollie_payment->customerId ) ) {
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
+			$mollie_customer = new Customer( $mollie_payment->customerId );
+
+			$customer_internal_id = $this->customer_data_store->get_or_insert_customer(
+				$mollie_customer,
+				array(
+					'profile_id' => $profile_internal_id,
+				),
+				array(
+					'profile_id' => '%s',
+				)
+			);
+
+			// Meta.
+			$customer_id = $payment->get_meta( 'mollie_customer_id' );
+
+			if ( empty( $customer_id ) ) {
+				$payment->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
+			}
+
+			// Customer.
+			$customer = $payment->get_customer();
+
+			if ( null !== $customer ) {
+				// Connect to user.
+				$user_id = $customer->get_user_id();
+
+				if ( null !== $user_id ) {
+					$user = \get_user_by( 'id', $user_id );
+
+					if ( false !== $user ) {
+						$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+					}
+				}
+			}
+
+			// Subscription.
+			$subscription = $payment->get_subscription();
+
+			if ( null !== $subscription ) {
+				$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+				if ( empty( $customer_id ) ) {
+					$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
+				}
+			}
 		}
 
 		if ( isset( $mollie_payment->details ) ) {
@@ -466,6 +581,35 @@ class Gateway extends Core_Gateway {
 			if ( isset( $details->consumerBic ) ) {
 				$consumer_bank_details->set_bic( $details->consumerBic );
 			}
+
+			/*
+			 * Failure reason.
+			 */
+			$failure_reason = $payment->get_failure_reason();
+
+			if ( null === $failure_reason ) {
+				$failure_reason = new FailureReason();
+
+				$payment->set_failure_reason( $failure_reason );
+			}
+
+			// SEPA Direct Debit.
+			if ( isset( $details->bankReasonCode ) ) {
+				$failure_reason->set_code( $details->bankReasonCode );
+			}
+
+			if ( isset( $details->bankReasonCode ) ) {
+				$failure_reason->set_message( $details->bankReason );
+			}
+
+			// Credit card.
+			if ( isset( $details->failureReason ) ) {
+				$failure_reason->set_code( $details->failureReason );
+			}
+
+			if ( isset( $details->failureMessage ) ) {
+				$failure_reason->set_message( $details->failureMessage );
+			}
 			// @codingStandardsIgnoreEnd
 		}
 	}
@@ -474,98 +618,192 @@ class Gateway extends Core_Gateway {
 	 * Get Mollie customer ID for payment.
 	 *
 	 * @param Payment $payment Payment.
-	 *
-	 * @return bool|string
+	 * @return string|null
 	 */
 	public function get_customer_id_for_payment( Payment $payment ) {
-		// Get WordPress user ID from payment customer.
-		$user_id = ( null === $payment->get_customer() ? null : $payment->get_customer()->get_user_id() );
+		$customer_ids = $this->get_customer_ids_for_payment( $payment );
 
-		// Get Mollie customer ID from user meta.
-		$customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
-
-		$subscription = $payment->get_subscription();
-
-		// Get customer ID from subscription meta.
-		if ( $subscription ) {
-			$subscription_customer_id = $subscription->get_meta( 'mollie_customer_id' );
-
-			// Try to get (legacy) customer ID from first payment.
-			if ( empty( $subscription_customer_id ) && $subscription->get_first_payment() ) {
-				$first_payment = $subscription->get_first_payment();
-
-				$subscription_customer_id = $first_payment->get_meta( 'mollie_customer_id' );
-			}
-
-			if ( ! empty( $subscription_customer_id ) ) {
-				$customer_id = $subscription_customer_id;
-			}
-		}
-
-		// Create new customer if the customer does not exist at Mollie.
-		if ( ( empty( $customer_id ) || null === $this->client->get_customer( $customer_id ) ) && Core_Recurring::RECURRING !== $payment->recurring_type ) {
-			$customer_name = null;
-
-			if ( null !== $payment->get_customer() && null !== $payment->get_customer()->get_name() ) {
-				$customer_name = strval( $payment->get_customer()->get_name() );
-			}
-
-			$customer_id = $this->client->create_customer( $payment->get_email(), $customer_name );
-
-			$this->update_wp_user_customer_id( $user_id, $customer_id );
-		}
-
-		// Store customer ID in subscription meta.
-		if ( $subscription && empty( $subscription_customer_id ) && ! empty( $customer_id ) ) {
-			$subscription->set_meta( 'mollie_customer_id', $customer_id );
-		}
-
-		// Copy customer ID from subscription to user meta.
-		$this->copy_customer_id_to_wp_user( $payment );
+		$customer_id = $this->get_first_existing_customer_id( $customer_ids );
 
 		return $customer_id;
 	}
 
 	/**
-	 * Get Mollie customer ID by the specified WordPress user ID.
+	 * Get Mollie customers for the specified payment.
 	 *
-	 * @param int $user_id WordPress user ID.
-	 *
-	 * @return string|bool
+	 * @param Payment $payment Payment.
+	 * @return array<string>
 	 */
-	public function get_customer_id_by_wp_user_id( $user_id ) {
-		if ( empty( $user_id ) ) {
-			return false;
+	private function get_customer_ids_for_payment( Payment $payment ) {
+		$customer_ids = array();
+
+		// Customer ID from subscription meta.
+		$subscription = $payment->get_subscription();
+
+		if ( null !== $subscription ) {
+			$customer_id = $this->get_customer_id_for_subscription( $subscription );
+
+			if ( null !== $customer_id ) {
+				$customer_ids[] = $customer_id;
+			}
 		}
 
-		return get_user_meta( $user_id, $this->meta_key_customer_id, true );
+		// Customer ID from WordPress user.
+		$customer = $payment->get_customer();
+
+		if ( null !== $customer ) {
+			$user_id = $customer->get_user_id();
+
+			if ( ! empty( $user_id ) ) {
+				$user_customer_ids = $this->get_customer_ids_for_user( $user_id );
+
+				$customer_ids = \array_merge( $customer_ids, $user_customer_ids );
+			}
+		}
+
+		return $customer_ids;
 	}
 
 	/**
-	 * Update Mollie customer ID meta for WordPress user.
+	 * Get Mollie customers for the specified WordPress user ID.
 	 *
-	 * @param int    $user_id     WordPress user ID.
-	 * @param string $customer_id Mollie Customer ID.
-	 *
-	 * @return bool
+	 * @param int $user_id WordPress user ID.
+	 * @return array<string>
 	 */
-	private function update_wp_user_customer_id( $user_id, $customer_id ) {
-		if ( empty( $user_id ) || is_bool( $user_id ) ) {
-			return false;
+	public function get_customer_ids_for_user( $user_id ) {
+		$customer_query = new CustomerQuery(
+			array(
+				'user_id' => $user_id,
+			)
+		);
+
+		$customers = $customer_query->get_customers();
+
+		$customer_ids = wp_list_pluck( $customers, 'mollie_id' );
+
+		return $customer_ids;
+	}
+
+	/**
+	 * Get customer ID for subscription.
+	 *
+	 * @param Subscription $subscription Subscription.
+	 * @return string|null
+	 */
+	private function get_customer_id_for_subscription( Subscription $subscription ) {
+		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+		if ( empty( $customer_id ) ) {
+			// Try to get (legacy) customer ID from first payment.
+			$first_payment = $subscription->get_first_payment();
+
+			if ( null !== $first_payment ) {
+				$customer_id = $first_payment->get_meta( 'mollie_customer_id' );
+			}
 		}
 
-		if ( ! is_string( $customer_id ) || empty( $customer_id ) || 1 === strlen( $customer_id ) ) {
-			return false;
+		if ( empty( $customer_id ) ) {
+			return null;
 		}
 
-		update_user_meta( $user_id, $this->meta_key_customer_id, $customer_id );
+		return $customer_id;
+	}
+
+	/**
+	 * Get first existing customer from customers list.
+	 *
+	 * @param array<string> $customer_ids Customers.
+	 * @return string|null
+	 */
+	private function get_first_existing_customer_id( $customer_ids ) {
+		$customer_ids = \array_filter( $customer_ids );
+
+		$customer_ids = \array_unique( $customer_ids );
+
+		foreach ( $customer_ids as $customer_id ) {
+			$customer = $this->client->get_customer( $customer_id );
+
+			if ( null !== $customer ) {
+				return $customer_id;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Create customer for payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return string|null
+	 * @throws Error Throws Error when Mollie error occurs.
+	 */
+	private function create_customer_for_payment( Payment $payment ) {
+		$mollie_customer = new Customer();
+		$mollie_customer->set_mode( $this->config->is_test_mode() ? 'test' : 'live' );
+		$mollie_customer->set_email( $payment->get_email() );
+
+		$pronamic_customer = $payment->get_customer();
+
+		if ( null !== $pronamic_customer ) {
+			// Name.
+			$name = \strval( $pronamic_customer->get_name() );
+
+			if ( '' !== $name ) {
+				$mollie_customer->set_name( $name );
+			}
+
+			// Locale.
+			$locale = $pronamic_customer->get_locale();
+
+			if ( null !== $locale ) {
+				$mollie_customer->set_locale( LocaleHelper::transform( $locale ) );
+			}
+		}
+
+		// Try to get name from consumer bank details.
+		$consumer_bank_details = $payment->get_consumer_bank_details();
+
+		if ( null === $mollie_customer->get_name() && null !== $consumer_bank_details ) {
+			$name = $consumer_bank_details->get_name();
+
+			if ( null !== $name ) {
+				$mollie_customer->set_name( $name );
+			}
+		}
+
+		// Create customer.
+		$mollie_customer = $this->client->create_customer( $mollie_customer );
+
+		$customer_id = $this->customer_data_store->insert_customer( $mollie_customer );
+
+		// Connect to user.
+		if ( null !== $pronamic_customer ) {
+			$user_id = $pronamic_customer->get_user_id();
+
+			if ( null !== $user_id ) {
+				$user = \get_user_by( 'id', $user_id );
+
+				if ( false !== $user ) {
+					$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+				}
+			}
+		}
+
+		// Store customer ID in subscription meta.
+		$subscription = $payment->get_subscription();
+
+		if ( null !== $subscription ) {
+			$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
+		}
+
+		return $mollie_customer->get_id();
 	}
 
 	/**
 	 * Copy Mollie customer ID from subscription meta to WordPress user meta.
 	 *
 	 * @param Payment $payment Payment.
-	 *
 	 * @return void
 	 */
 	public function copy_customer_id_to_wp_user( Payment $payment ) {
@@ -573,22 +811,54 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
+		// Subscription.
 		$subscription = $payment->get_subscription();
 
-		if ( ! $subscription || null === $subscription->get_customer() || empty( $subscription->get_customer()->get_user_id() ) ) {
+		// Customer.
+		$customer = $payment->get_customer();
+
+		if ( null === $customer && null !== $subscription ) {
+			$customer = $subscription->get_customer();
+		}
+
+		if ( null === $customer ) {
 			return;
 		}
 
-		$user_id = $subscription->get_customer()->get_user_id();
+		// WordPress user.
+		$user_id = $customer->get_user_id();
 
-		// Get customer ID from subscription meta.
-		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+		if ( null === $user_id ) {
+			return;
+		}
 
-		$user_customer_id = $this->get_customer_id_by_wp_user_id( $user_id );
+		$user = \get_user_by( 'id', $user_id );
 
-		if ( empty( $user_customer_id ) ) {
-			// Set customer ID as user meta.
-			$this->update_wp_user_customer_id( $user_id, (string) $customer_id );
+		if ( false === $user ) {
+			return;
+		}
+
+		// Customer IDs.
+		$customer_ids = array();
+
+		// Payment.
+		$customer_ids[] = $payment->get_meta( 'mollie_customer_id' );
+
+		// Subscription.
+		if ( null !== $subscription ) {
+			$customer_ids[] = $subscription->get_meta( 'mollie_customer_id' );
+		}
+
+		// Connect.
+		$customer_ids = \array_filter( $customer_ids );
+		$customer_ids = \array_unique( $customer_ids );
+
+		foreach ( $customer_ids as $customer_id ) {
+			$customer = new Customer( $customer_id );
+
+			$this->customer_data_store->get_or_insert_customer( $customer );
+
+			$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
 		}
 	}
 }

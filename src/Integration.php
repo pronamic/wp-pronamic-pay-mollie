@@ -11,7 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Gateways\Common\AbstractIntegration;
+use Pronamic\WordPress\Pay\AbstractGatewayIntegration;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use WP_User;
 
@@ -25,7 +25,14 @@ use WP_User;
  * @version 2.0.9
  * @since   1.0.0
  */
-class Integration extends AbstractIntegration {
+class Integration extends AbstractGatewayIntegration {
+	/**
+	 * REST route namespace.
+	 *
+	 * @var string
+	 */
+	const REST_ROUTE_NAMESPACE = 'pronamic-pay/mollie/v1';
+
 	/**
 	 * Register URL.
 	 *
@@ -35,45 +42,35 @@ class Integration extends AbstractIntegration {
 
 	/**
 	 * Construct and intialize Mollie integration.
+	 *
+	 * @param array<string, array> $args Arguments.
 	 */
-	public function __construct() {
-		$this->id            = 'mollie';
-		$this->name          = 'Mollie';
-		$this->url           = 'http://www.mollie.com/en/';
-		$this->product_url   = __( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' );
-		$this->dashboard_url = 'https://www.mollie.com/dashboard/';
-		$this->register_url  = 'https://www.mollie.com/nl/signup/665327';
-		$this->provider      = 'mollie';
-		$this->supports      = array(
-			'payment_status_request',
-			'recurring_direct_debit',
-			'recurring_credit_card',
-			'recurring',
-			'webhook',
-			'webhook_log',
-			'webhook_no_config',
+	public function __construct( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'id'                     => 'mollie',
+				'name'                   => 'Mollie',
+				'version'                => '2.1.0',
+				'url'                    => 'http://www.mollie.com/en/',
+				'product_url'            => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
+				'dashboard_url'          => 'https://www.mollie.com/dashboard/',
+				'provider'               => 'mollie',
+				'supports'               => array(
+					'payment_status_request',
+					'recurring_direct_debit',
+					'recurring_credit_card',
+					'recurring',
+					'webhook',
+					'webhook_log',
+					'webhook_no_config',
+				),
+				'version_option_name'    => 'pronamic_pay_mollie_version',
+				'db_version_option_name' => 'pronamic_pay_mollie_db_version',
+			)
 		);
 
-		$this->set_manual_url( __( 'https://www.pronamic.eu/support/how-to-connect-mollie-with-wordpress-via-pronamic-pay/', 'pronamic_ideal' ) );
-
-		// Actions.
-		$function = array( __NAMESPACE__ . '\Listener', 'listen' );
-
-		if ( ! has_action( 'wp_loaded', $function ) ) {
-			add_action( 'wp_loaded', $function );
-		}
-
-		if ( is_admin() ) {
-			$function = array( __CLASS__, 'user_profile' );
-
-			if ( ! has_action( 'show_user_profile', $function ) ) {
-				add_action( 'show_user_profile', $function );
-			}
-
-			if ( ! has_action( 'edit_user_profile', $function ) ) {
-				add_action( 'edit_user_profile', $function );
-			}
-		}
+		parent::__construct( $args );
 
 		// Filters.
 		$function = array( $this, 'next_payment_delivery_date' );
@@ -83,12 +80,71 @@ class Integration extends AbstractIntegration {
 		}
 
 		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
+
+		// Tables.
+		$this->register_tables();
+
+		/**
+		 * Install.
+		 */
+		new Install( $this );
+
+		/**
+		 * Admin
+		 */
+		if ( \is_admin() ) {
+			new Admin();
+		}
+
+		/**
+		 * CLI.
+		 *
+		 * @link https://github.com/woocommerce/woocommerce/blob/3.9.0/includes/class-woocommerce.php#L453-L455
+		 */
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			new CLI();
+		}
+	}
+
+	/**
+	 * Setup gateway integration.
+	 *
+	 * @return void
+	 */
+	public function setup() {
+		// Check if dependencies are met and integration is active.
+		if ( ! $this->is_active() ) {
+			return;
+		}
+
+		// Webhook controller.
+		$webhook_controller = new WebhookController();
+
+		$webhook_controller->setup();
+	}
+
+	/**
+	 * Register tables.
+	 *
+	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-includes/wp-db.php#L894-L937
+	 * @return void
+	 */
+	private function register_tables() {
+		global $wpdb;
+
+		/**
+		 * Tables.
+		 */
+		$wpdb->pronamic_pay_mollie_organizations  = $wpdb->base_prefix . 'pronamic_pay_mollie_organizations';
+		$wpdb->pronamic_pay_mollie_profiles       = $wpdb->base_prefix . 'pronamic_pay_mollie_profiles';
+		$wpdb->pronamic_pay_mollie_customers      = $wpdb->base_prefix . 'pronamic_pay_mollie_customers';
+		$wpdb->pronamic_pay_mollie_customer_users = $wpdb->base_prefix . 'pronamic_pay_mollie_customer_users';
 	}
 
 	/**
 	 * Get settings fields.
 	 *
-	 * @return array
+	 * @return array<int, array<string, array<int, string>|int|string|true>>
 	 */
 	public function get_settings_fields() {
 		$fields = array();
@@ -130,7 +186,7 @@ class Integration extends AbstractIntegration {
 			'title'    => __( 'Webhook URL', 'pronamic_ideal' ),
 			'type'     => 'text',
 			'classes'  => array( 'large-text', 'code' ),
-			'value'    => add_query_arg( 'mollie_webhook', '', home_url( '/' ) ),
+			'value'    => rest_url( self::REST_ROUTE_NAMESPACE . '/webhook' ),
 			'readonly' => true,
 			'tooltip'  => __( 'The Webhook URL as sent with each transaction to receive automatic payment status updates on.', 'pronamic_ideal' ),
 		);
@@ -142,8 +198,8 @@ class Integration extends AbstractIntegration {
 	 * Save post.
 	 *
 	 * @link https://developer.wordpress.org/reference/functions/get_post_meta/
-	 *
 	 * @param int $post_id Post ID.
+	 * @return void
 	 */
 	public function save_post( $post_id ) {
 		$api_key = get_post_meta( $post_id, '_pronamic_gateway_mollie_api_key', true );
@@ -167,36 +223,28 @@ class Integration extends AbstractIntegration {
 	}
 
 	/**
-	 * User profile.
-	 *
-	 * @param WP_User $user WordPress user.
-	 *
-	 * @since 1.1.6
-	 * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
-	 */
-	public static function user_profile( $user ) {
-		include __DIR__ . '/../views/html-admin-user-profile.php';
-	}
-
-	/**
 	 * Payment provider URL.
 	 *
-	 * @param string  $url     Payment provider URL.
-	 * @param Payment $payment Payment.
-	 *
-	 * @return string
+	 * @param string|null $url     Payment provider URL.
+	 * @param Payment     $payment Payment.
+	 * @return string|null
 	 */
 	public function payment_provider_url( $url, Payment $payment ) {
+		$transaction_id = $payment->get_transaction_id();
+
+		if ( null === $transaction_id ) {
+			return $url;
+		}
+
 		return sprintf(
 			'https://www.mollie.com/dashboard/payments/%s',
-			$payment->get_transaction_id()
+			$transaction_id
 		);
 	}
 	/**
 	 * Get configuration by post ID.
 	 *
 	 * @param int $post_id Post ID.
-	 *
 	 * @return Config
 	 */
 	public function get_config( $post_id ) {
@@ -225,7 +273,6 @@ class Integration extends AbstractIntegration {
 	 *
 	 * @param \DateTime $next_payment_delivery_date Next payment delivery date.
 	 * @param Payment   $payment                    Payment.
-	 *
 	 * @return \DateTime
 	 */
 	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {

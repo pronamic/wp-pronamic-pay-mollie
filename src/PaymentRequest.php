@@ -45,7 +45,7 @@ class PaymentRequest {
 	 * the right page referencing the order when the consumer returns.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
-	 * @var string
+	 * @var string|null
 	 */
 	public $redirect_url;
 
@@ -108,7 +108,7 @@ class PaymentRequest {
 	 * is tomorrow and the maximum date is 100 days after tomorrow.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
-	 * @var null|\DateTimeInterface
+	 * @var \DateTimeInterface|null
 	 */
 	private $due_date;
 
@@ -116,7 +116,7 @@ class PaymentRequest {
 	 * Customer ID for Mollie checkout.
 	 *
 	 * @link https://www.mollie.com/nl/docs/checkout
-	 * @var string
+	 * @var string|null
 	 */
 	public $customer_id;
 
@@ -125,9 +125,49 @@ class PaymentRequest {
 	 *
 	 * @link https://www.mollie.com/nl/docs/recurring
 	 * @since 1.1.9
-	 * @var string
+	 * @var string|null
 	 */
 	public $sequence_type;
+
+	/**
+	 * Mandate ID.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @since unreleased
+	 * @var string|null
+	 */
+	public $mandate_id;
+
+	/**
+	 * Consumer name for SEPA Direct Debit.
+	 *
+	 * Beneficiary name of the account holder. Only available if one-off payments are enabled
+	 * on your account. Will pre-fill the beneficiary name in the checkout screen if present.
+	 *
+	 * @var string|null
+	 */
+	public $consumer_name;
+
+	/**
+	 * Consumer account for SEPA Direct Debit.
+	 *
+	 * IBAN of the account holder. Only available if one-off payments are enabled on your account.
+	 * Will pre-fill the IBAN in the checkout screen if present.
+	 *
+	 * @var string|null
+	 */
+	public $consumer_account;
+
+	/**
+	 * Create Mollie payment request object.
+	 *
+	 * @param Amount $amount      The amount that you want to charge.
+	 * @param string $description The description of the payment you’re creating.
+	 */
+	public function __construct( $amount, $description ) {
+		$this->amount      = $amount;
+		$this->description = $description;
+	}
 
 	/**
 	 * Get due date.
@@ -142,6 +182,7 @@ class PaymentRequest {
 	 * Set due date.
 	 *
 	 * @param null|\DateTimeInterface $due_date Due date.
+	 * @return void
 	 */
 	public function set_due_date( $due_date ) {
 		$this->due_date = $due_date;
@@ -150,7 +191,7 @@ class PaymentRequest {
 	/**
 	 * Get array of this Mollie payment request object.
 	 *
-	 * @return array
+	 * @return array<string,object>
 	 */
 	public function get_array() {
 		// Due date.
@@ -161,17 +202,20 @@ class PaymentRequest {
 		}
 
 		$array = array(
-			'amount'       => $this->amount->get_json(),
-			'description'  => $this->description,
-			'method'       => $this->method,
-			'redirectUrl'  => $this->redirect_url,
-			'metadata'     => $this->meta_data,
-			'locale'       => $this->locale,
-			'webhookUrl'   => $this->webhook_url,
-			'issuer'       => $this->issuer,
-			'dueDate'      => $due_date,
-			'sequenceType' => $this->sequence_type,
-			'customerId'   => $this->customer_id,
+			'amount'          => $this->amount->get_json(),
+			'description'     => $this->description,
+			'method'          => $this->method,
+			'redirectUrl'     => $this->redirect_url,
+			'metadata'        => $this->meta_data,
+			'locale'          => $this->locale,
+			'webhookUrl'      => $this->webhook_url,
+			'consumerName'    => $this->consumer_name,
+			'consumerAccount' => $this->consumer_account,
+			'issuer'          => $this->issuer,
+			'dueDate'         => $due_date,
+			'sequenceType'    => $this->sequence_type,
+			'customerId'      => $this->customer_id,
+			'mandateId'       => $this->mandate_id,
 		);
 
 		/*
