@@ -49,9 +49,10 @@ class Install {
 	 * @return void
 	 */
 	public function check_version() {
-		$version_option = $this->integration->get_version_option();
+		$version_option = \strval( $this->integration->get_version_option() );
+		$version        = \strval( $this->integration->get_version() );
 
-		if ( version_compare( $version_option, $this->integration->get_version(), '<' ) ) {
+		if ( version_compare( $version_option, $version, '<' ) ) {
 			$this->install();
 		}
 	}

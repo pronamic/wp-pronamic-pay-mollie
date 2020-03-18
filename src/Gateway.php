@@ -623,7 +623,7 @@ class Gateway extends Core_Gateway {
 		$subscription = $payment->get_subscription();
 
 		if ( null !== $subscription ) {
-			$customer_id = $this->get_customer_id_for_subscription( $payment->get_subscription() );
+			$customer_id = $this->get_customer_id_for_subscription( $subscription );
 
 			if ( null !== $customer_id ) {
 				$customer_ids[] = $customer_id;
@@ -694,7 +694,7 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Get first existing customer from customers list.
 	 *
-	 * @param array $customer_ids Customers.
+	 * @param array<string> $customer_ids Customers.
 	 * @return string|null
 	 */
 	private function get_first_existing_customer_id( $customer_ids ) {
@@ -760,10 +760,12 @@ class Gateway extends Core_Gateway {
 		$customer_id = $this->customer_data_store->insert_customer( $mollie_customer );
 
 		// Connect to user.
-		$user = \get_user_by( 'id', $pronamic_customer->get_user_id() );
+		if ( null !== $pronamic_customer ) {
+			$user = \get_user_by( 'id', $pronamic_customer->get_user_id() );
 
-		if ( false !== $user ) {
-			$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+			if ( false !== $user ) {
+				$this->customer_data_store->connect_mollie_customer_to_wp_user( $mollie_customer, $user );
+			}
 		}
 
 		// Store customer ID in subscription meta.
@@ -802,7 +804,13 @@ class Gateway extends Core_Gateway {
 		}
 
 		// WordPress user.
-		$user = \get_user_by( 'id', $customer->get_user_id() );
+		$user_id = $customer->get_user_id();
+
+		if ( null === $user_id ) {
+			return;
+		}
+
+		$user = \get_user_by( 'id', $user_id );
 
 		if ( false === $user ) {
 			return;

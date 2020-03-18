@@ -65,8 +65,9 @@ class CLI {
 	 * CLI organizations synchronize.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/organizations-api/current-organization
-	 * @param array $args       Arguments.
-	 * @param array $assoc_args Associative arguments.
+	 * @param array<string> $args       Arguments.
+	 * @param array<string> $assoc_args Associative arguments.
+	 * @return void
 	 */
 	public function wp_cli_organizations_synchronize( $args, $assoc_args ) {
 		\WP_CLI::error( 'Command not implemented yet.' );
@@ -76,8 +77,9 @@ class CLI {
 	 * CLI customers synchronize.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/customers-api/list-customers
-	 * @param array $args       Arguments.
-	 * @param array $assoc_args Associative arguments.
+	 * @param array<string> $args       Arguments.
+	 * @param array<string> $assoc_args Associative arguments.
+	 * @return void
 	 */
 	public function wp_cli_customers_synchronize( $args, $assoc_args ) {
 		global $post;
@@ -192,8 +194,9 @@ class CLI {
 	 * @link https://docs.mollie.com/reference/v2/customers-api/list-customers
 	 * @link https://make.wordpress.org/cli/handbook/internal-api/wp-cli-add-command/
 	 * @link https://developer.wordpress.org/reference/classes/wpdb/query/
-	 * @param array $args       Arguments.
-	 * @param array $assoc_args Associative arguments.
+	 * @param array<string> $args       Arguments.
+	 * @param array<string> $assoc_args Associative arguments.
+	 * @return void
 	 */
 	public function wp_cli_customers_connect_wp_users( $args, $assoc_args ) {
 		global $wpdb;

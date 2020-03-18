@@ -243,7 +243,7 @@ class Admin {
 	 *
 	 * @since 1.1.6
 	 * @link https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
-	 * @param WP_User $user WordPress user.
+	 * @param \WP_User $user WordPress user.
 	 * @return void
 	 */
 	public static function user_profile( $user ) {
