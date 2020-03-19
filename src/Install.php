@@ -368,7 +368,7 @@ class Install {
 				$wpdb->pronamic_pay_mollie_customers AS mollie_customer
 					INNER JOIN
 				$wpdb->usermeta AS wp_user_meta
-						ON wp_user_meta.meta_value = mollie_customer.mollie_id
+						ON wp_user_meta.meta_value = mollie_customer.mollie_id COLLATE $wpdb->collate
 					INNER JOIN
 				$wpdb->users AS wp_user
 						ON wp_user_meta.user_id = wp_user.ID
