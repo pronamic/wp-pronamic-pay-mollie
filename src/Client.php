@@ -223,7 +223,9 @@ class Client {
 	 * @throws \Exception Throws exception for methods on failed request or invalid response.
 	 */
 	public function get_payment_methods( $sequence_type = '' ) {
-		$data = array();
+		$data = array(
+			'includeWallets' => Methods::APPLE_PAY,
+		);
 
 		if ( '' !== $sequence_type ) {
 			$data['sequenceType'] = $sequence_type;
