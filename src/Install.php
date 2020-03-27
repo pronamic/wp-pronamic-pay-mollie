@@ -267,6 +267,18 @@ class Install {
 		global $wpdb;
 
 		/**
+		 * Suppress errors.
+		 *
+		 * We suppress errors because adding foreign keys to for example
+		 * a `$wpdb->users` MyISAM table will trigger the following error:
+		 *
+		 * "Error in query (1005): Can't create table '●●●●●●●●. # Sql-●●●●●●●●●●' (errno: 150)"
+		 *
+		 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-includes/wp-db.php#L1544-L1559
+		 */
+		$suppress_errors = $wpdb->suppress_errors( true );
+
+		/**
 		 * Check if foreign key exists
 		 *
 		 * @link https://github.com/woocommerce/woocommerce/blob/3.9.0/includes/class-wc-install.php#L663-L681
@@ -303,6 +315,8 @@ class Install {
 			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Query is prepared.
 			$result = $wpdb->query( $item->query );
 
+			$wpdb->suppress_errors( $suppress_errors );
+
 			if ( false === $result ) {
 				throw new \Exception(
 					\sprintf(
@@ -313,6 +327,8 @@ class Install {
 				);
 			}
 		}
+
+		$wpdb->suppress_errors( $suppress_errors );
 	}
 
 	/**
@@ -356,6 +372,24 @@ class Install {
 			);
 		}
 
+		/**
+		 * Collate caluse.
+		 *
+		 * Force a specific collate to fix:
+		 * "Illegal mix of collations (utf8mb4_unicode_ci,IMPLICIT) and
+		 * (utf8mb4_unicode_520_ci,IMPLICIT) for operation '='. ".
+		 *
+		 * @link https://dev.mysql.com/doc/refman/8.0/en/charset-collate.html
+		 */
+		$collate_clause = '';
+
+		if ( ! empty( $wpdb->collate ) ) {
+			$collate_clause = \sprintf(
+				'COLLATE %s',
+				$wpdb->collate
+			);
+		}
+
 		$query = "
 			INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customer_users (
 				customer_id,
@@ -368,7 +402,7 @@ class Install {
 				$wpdb->pronamic_pay_mollie_customers AS mollie_customer
 					INNER JOIN
 				$wpdb->usermeta AS wp_user_meta
-						ON wp_user_meta.meta_value = mollie_customer.mollie_id COLLATE $wpdb->collate
+						ON wp_user_meta.meta_value = mollie_customer.mollie_id $collate_clause
 					INNER JOIN
 				$wpdb->users AS wp_user
 						ON wp_user_meta.user_id = wp_user.ID
