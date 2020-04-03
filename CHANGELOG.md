@@ -7,6 +7,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.1.2] - 2020-04-03
+- Fixed install issues on some specific WordPress installations.
+- Add initial Apple Pay support.
+
 ## [2.1.1] - 2020-03-19
 - Force a specific collate to fix "Illegal mix of collations" error.
 
@@ -141,7 +145,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.1.1...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.1.2...HEAD
+[2.1.2]: https://github.com/wp-pay-gateways/mollie/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/wp-pay-gateways/mollie/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/wp-pay-gateways/mollie/compare/2.0.10...2.1.0
 [2.0.10]: https://github.com/wp-pay-gateways/mollie/compare/2.0.9...2.0.10

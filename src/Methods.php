@@ -24,6 +24,13 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  */
 class Methods {
 	/**
+	 * Constant for the Apple Pay method.
+	 *
+	 * @var string
+	 */
+	const APPLE_PAY = 'applepay';
+
+	/**
 	 * Constant for the Bancontact method.
 	 *
 	 * @var string
@@ -126,6 +133,7 @@ class Methods {
 	 * @var array<string>
 	 */
 	private static $map = array(
+		PaymentMethods::APPLE_PAY               => self::APPLE_PAY,
 		PaymentMethods::BANCONTACT              => self::BANCONTACT,
 		PaymentMethods::BANK_TRANSFER           => self::BANKTRANSFER,
 		PaymentMethods::CREDIT_CARD             => self::CREDITCARD,
