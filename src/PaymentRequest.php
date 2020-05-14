@@ -104,6 +104,14 @@ class PaymentRequest {
 	public $issuer;
 
 	/**
+	 * Billing email.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @var string|null
+	 */
+	private $billing_email;
+
+	/**
 	 * The date the payment should expire, in YYYY-MM-DD format. Please note: the minimum date
 	 * is tomorrow and the maximum date is 100 days after tomorrow.
 	 *
@@ -189,6 +197,27 @@ class PaymentRequest {
 	}
 
 	/**
+	 * Get billing email.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @return string|null
+	 */
+	public function get_billing_email() {
+		return $this->billing_email;
+	}
+
+	/**
+	 * Set billing email.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @param string|null $email Billing email.
+	 * @return void
+	 */
+	public function set_billing_email( $email = null ) {
+		$this->billing_email = $email;
+	}
+
+	/**
 	 * Get array of this Mollie payment request object.
 	 *
 	 * @return array<string,object>
@@ -212,6 +241,7 @@ class PaymentRequest {
 			'consumerName'    => $this->consumer_name,
 			'consumerAccount' => $this->consumer_account,
 			'issuer'          => $this->issuer,
+			'billingEmail'    => $this->billing_email,
 			'dueDate'         => $due_date,
 			'sequenceType'    => $this->sequence_type,
 			'customerId'      => $this->customer_id,

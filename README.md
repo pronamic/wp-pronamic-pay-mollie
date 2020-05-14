@@ -81,6 +81,40 @@ Connect Mollie customers to WordPress users by email.
 $ wp pronamic-pay mollie customers connect-wp-users
 ```
 
+## WordPress Filters
+
+### `pronamic_pay_mollie_payment_billing_email`
+
+#### Description
+
+Filters the Mollie payment billing email used for bank transfer payment instructions.
+
+#### Usage
+
+```php
+\add_filter( 'pronamic_pay_mollie_payment_billing_email', 'your_function_name', 10, 2 );
+```
+
+#### Parameters
+
+**`$billing_email`** | string|null
+
+The Mollie payment billing email.
+
+**`$payment`** | [Payment Object](https://github.com/wp-pay/core/blob/2.3.0/src/Payments/Payment.php)
+
+The WordPress payment object.
+
+#### Examples
+
+```php
+\add_filter( 'pronamic_pay_mollie_payment_billing_email', function( $billing_email, $payment ) {
+	$billing_email = 'mollie-billing-email@example.com';
+
+	return $billing_email;
+}, 10, 2 );
+```
+
 ## Links
 
 *	http://www.mollie.nl/
