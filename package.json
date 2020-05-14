@@ -32,7 +32,7 @@
   },
   "homepage": "http://www.wp-pay.org/gateways/mollie/",
   "devDependencies": {
-    "grunt": "^1.0.4",
+    "grunt": "^1.1.0",
     "grunt-contrib-jshint": "^2.1.0",
     "grunt-phpcs": "^0.4.0",
     "grunt-phplint": "0.1.0",
