@@ -10,13 +10,11 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Money\Money;
-
 /**
  * Payment request test
  *
  * @author  Remco Tolsma
- * @version 2.0.9
+ * @version 2.1.3
  * @since   1.0.0
  */
 class PaymentRequestTest extends \PHPUnit_Framework_TestCase {

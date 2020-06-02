@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 - Added support for Mollie payment billing email.
 
+## [2.1.3] - 2020-06-02
+- Add support for Mollie payment billing email and filter `pronamic_pay_mollie_payment_billing_email`.
+
 ## [2.1.2] - 2020-04-03
 - Fixed install issues on some specific WordPress installations.
 - Add initial Apple Pay support.
@@ -145,7 +148,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.1.2...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.1.3...HEAD
+[2.1.3]: https://github.com/wp-pay-gateways/mollie/compare/2.1.2...2.1.3
 [2.1.2]: https://github.com/wp-pay-gateways/mollie/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/wp-pay-gateways/mollie/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/wp-pay-gateways/mollie/compare/2.0.10...2.1.0
