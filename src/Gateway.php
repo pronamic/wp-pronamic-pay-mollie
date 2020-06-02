@@ -10,15 +10,12 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use DateInterval;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
-use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 
@@ -29,7 +26,7 @@ use Pronamic\WordPress\Pay\Subscriptions\Subscription;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.9
+ * @version 2.1.3
  * @since   1.1.0
  */
 class Gateway extends Core_Gateway {
@@ -346,6 +343,21 @@ class Gateway extends Core_Gateway {
 		if ( Methods::IDEAL === $request->method ) {
 			$request->issuer = $payment->get_issuer();
 		}
+
+		// Billing email.
+		$billing_email = $payment->get_email();
+
+		/**
+		 * Filters the Mollie payment billing email used for bank transfer payment instructions.
+		 *
+		 * @since 2.2.0
+		 *
+		 * @param string|null $billing_email Billing email.
+		 * @param Payment     $payment       Payment.
+		 */
+		$billing_email = \apply_filters( 'pronamic_pay_mollie_payment_billing_email', $billing_email, $payment );
+
+		$request->set_billing_email( $billing_email );
 
 		// Due date.
 		try {

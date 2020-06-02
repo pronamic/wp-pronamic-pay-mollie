@@ -10,13 +10,11 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Money\Money;
-
 /**
  * Payment request test
  *
  * @author  Remco Tolsma
- * @version 2.0.9
+ * @version 2.1.3
  * @since   1.0.0
  */
 class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
@@ -93,6 +91,32 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 				'sequenceType' => 'first',
 			),
 			$this->request->get_array()
+		);
+	}
+
+	/**
+	 * Test billing email.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @link https://help.mollie.com/hc/en-us/articles/115000711569-What-is-bank-transfer-and-how-does-it-work-
+	 */
+	public function test_billing_email() {
+		$request = new PaymentRequest(
+			new Amount( 'EUR', '100.00' ),
+			'Test'
+		);
+
+		$request->set_billing_email( 'john@example.com' );
+
+		$this->assertEquals( 'john@example.com', $request->get_billing_email() );
+
+		$this->assertEquals(
+			array(
+				'amount'       => $request->amount->get_json(),
+				'description'  => 'Test',
+				'billingEmail' => 'john@example.com',
+			),
+			$request->get_array()
 		);
 	}
 }
