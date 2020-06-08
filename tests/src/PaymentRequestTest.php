@@ -37,7 +37,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 		$request->redirect_url  = 'https://example.com/mollie-redirect/';
 		$request->webhook_url   = 'https://example.com/mollie-webhook/';
 		$request->method        = Methods::IDEAL;
-		$request->meta_data     = 'meta';
+		$request->set_metadata( 'meta' );
 		$request->locale        = Locales::NL_NL;
 		$request->issuer        = 'ideal_INGBNL2A';
 		$request->customer_id   = 'cst_8wmqcHMN4U';
@@ -115,6 +115,37 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 				'amount'       => $request->amount->get_json(),
 				'description'  => 'Test',
 				'billingEmail' => 'john@example.com',
+			),
+			$request->get_array()
+		);
+	}
+
+	/**
+	 * Test billing metadata.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 */
+	public function test_metadata() {
+		$request = new PaymentRequest(
+			new Amount( 'EUR', '100.00' ),
+			'Test'
+		);
+
+		$metadata = (object) array(
+			'vat_number'   => 'NL123456789B01',
+			'edd_order_id' => 1234,
+			'gf_entry_id'  => 5678,
+		);
+
+		$request->set_metadata( $metadata );
+
+		$this->assertEquals( $metadata, $request->get_metadata() );
+
+		$this->assertEquals(
+			array(
+				'amount'      => $request->amount->get_json(),
+				'description' => 'Test',
+				'metadata'    => $metadata,
 			),
 			$request->get_array()
 		);
