@@ -83,6 +83,59 @@ $ wp pronamic-pay mollie customers connect-wp-users
 
 ## WordPress Filters
 
+### `pronamic_pay_mollie_payment_metadata`
+
+#### Description
+
+Filters the Mollie payment metadata.
+
+#### Usage
+
+```php
+\add_filter( 'pronamic_pay_mollie_payment_metadata', 'your_function_name', 10, 2 );
+```
+
+#### Parameters
+
+**`$metadata`** | mixed
+
+Mollie payment metadata.
+
+**`$payment`** | [Payment Object](https://github.com/wp-pay/core/blob/2.3.0/src/Payments/Payment.php)
+
+The WordPress payment object.
+
+#### Examples
+
+```php
+\add_filter( 'pronamic_pay_mollie_payment_metadata', function( $metadata, $payment ) {
+	$data = array();
+
+	$customer = $payment->get_customer();
+
+	if ( null !== $customer ) {
+		$vat_number = $customer->get_vat_number();
+
+		if ( null !== $vat_number ) {
+			$data['vat_number'] = $vat_number->normalized();
+		}
+	}
+
+	switch ( $payment->get_source() ) {
+		case 'easydigitaldownloads':
+			$data['edd_order_id'] = $payment->get_source_id();
+
+			break;
+		case 'gravityformsideal':
+			$data['gf_entry_id'] = $payment->get_source_id();
+
+			break;
+	}
+
+	return (object) $data;
+}, 10, 2 );
+```
+
 ### `pronamic_pay_mollie_payment_billing_email`
 
 #### Description

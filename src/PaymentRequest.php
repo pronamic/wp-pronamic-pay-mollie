@@ -75,9 +75,10 @@ class PaymentRequest {
 	 * to 1kB of JSON.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://en.wikipedia.org/wiki/Metadata
 	 * @var mixed|null
 	 */
-	public $meta_data;
+	private $metadata;
 
 	/**
 	 * Allow you to preset the language to be used in the payment screens shown to the consumer.
@@ -218,6 +219,29 @@ class PaymentRequest {
 	}
 
 	/**
+	 * Get metadata.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @link https://en.wikipedia.org/wiki/Metadata
+	 * @return mixed
+	 */
+	public function get_metadata() {
+		return $this->metadata;
+	}
+
+	/**
+	 * Set metadata.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @link https://en.wikipedia.org/wiki/Metadata
+	 * @param mixed $metadata Metadata.
+	 * @return void
+	 */
+	public function set_metadata( $metadata = null ) {
+		$this->metadata = $metadata;
+	}
+
+	/**
 	 * Get array of this Mollie payment request object.
 	 *
 	 * @return array<string,object>
@@ -235,7 +259,7 @@ class PaymentRequest {
 			'description'     => $this->description,
 			'method'          => $this->method,
 			'redirectUrl'     => $this->redirect_url,
-			'metadata'        => $this->meta_data,
+			'metadata'        => $this->metadata,
 			'locale'          => $this->locale,
 			'webhookUrl'      => $this->webhook_url,
 			'consumerName'    => $this->consumer_name,

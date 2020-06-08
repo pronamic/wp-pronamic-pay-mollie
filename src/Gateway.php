@@ -339,6 +339,31 @@ class Gateway extends Core_Gateway {
 		// Leap of faith if the WordPress payment method could not transform to a Mollie method?
 		$request->method = Methods::transform( $payment_method, $payment_method );
 
+		/**
+		 * Metadata.
+		 *
+		 * Provide any data you like, for example a string or a JSON object.
+		 * We will save the data alongside the payment. Whenever you fetch
+		 * the payment with our API, we’ll also include the metadata. You
+		 * can use up to approximately 1kB.
+		 *
+		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 	 * @link https://en.wikipedia.org/wiki/Metadata
+		 */
+		$metadata = null;
+
+		/**
+		 * Filters the Mollie metadata.
+		 *
+		 * @since 2.2.0
+		 *
+		 * @param mixed   $metadata Metadata.
+		 * @param Payment $payment  Payment.
+		 */
+		$metadata = \apply_filters( 'pronamic_pay_mollie_payment_metadata', $metadata, $payment );
+
+		$request->set_metadata( $metadata );
+
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
 			$request->issuer = $payment->get_issuer();
