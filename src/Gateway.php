@@ -17,6 +17,7 @@ use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 
 /**
@@ -286,7 +287,9 @@ class Gateway extends Core_Gateway {
 		$payment_method = $payment->get_method();
 
 		// Recurring payment method.
-		$is_recurring_method = ( $payment->get_subscription() && PaymentMethods::is_recurring_method( $payment_method ) );
+		$subscription = $payment->get_subscription();
+
+		$is_recurring_method = ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) );
 
 		// Consumer bank details.
 		$consumer_bank_details = $payment->get_consumer_bank_details();
@@ -332,6 +335,11 @@ class Gateway extends Core_Gateway {
 			}
 
 			if ( Sequence::RECURRING === $request->sequence_type ) {
+				// Use mandate from subscription.
+				if ( $subscription && empty( $request->mandate_id ) ) {
+					$request->mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+				}
+
 				$payment->set_action_url( $payment->get_return_url() );
 			}
 		}
@@ -559,6 +567,16 @@ class Gateway extends Core_Gateway {
 				if ( empty( $customer_id ) ) {
 					$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
 				}
+
+				// Update mandate in subscription meta.
+				if ( isset( $mollie_payment->mandateId ) ) {
+					$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+					// Only update if no mandate has been set yet or if payment succeeded.
+					if ( empty( $mandate_id ) || PaymentStatus::SUCCESS === $payment->get_status() ) {
+						$this->update_subscription_mandate( $subscription, $mollie_payment->mandateId );
+					}
+				}
 			}
 		}
 
@@ -650,6 +668,32 @@ class Gateway extends Core_Gateway {
 			}
 			// @codingStandardsIgnoreEnd
 		}
+	}
+
+	/**
+	 * Update subscription mandate.
+	 *
+	 * @param Subscription $subscrption Subscription.
+	 * @param string       $mandate_id  Mollie mandate ID.
+	 * @return void
+	 */
+	public function update_subscription_mandate( Subscription $subscription, $mandate_id ) {
+		$old_mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+		// Update meta.
+		$subscription->set_meta( 'mollie_mandate_id', $mandate_id );
+
+		$subscription->save();
+
+		// Add note.
+		$note = \sprintf(
+			/* translators: 1: old mandate ID, 2: new mandate ID */
+			\__( 'Mandate for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
+			\esc_html( $old_mandate_id ),
+			\esc_html( $mandate_id )
+		);
+
+		$subscription->add_note( $note );
 	}
 
 	/**
