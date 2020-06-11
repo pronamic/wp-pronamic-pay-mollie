@@ -37,11 +37,11 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 		$request->redirect_url  = 'https://example.com/mollie-redirect/';
 		$request->webhook_url   = 'https://example.com/mollie-webhook/';
 		$request->method        = Methods::IDEAL;
-		$request->set_metadata( 'meta' );
 		$request->locale        = Locales::NL_NL;
 		$request->issuer        = 'ideal_INGBNL2A';
 		$request->customer_id   = 'cst_8wmqcHMN4U';
 		$request->sequence_type = Sequence::FIRST;
+		$request->set_metadata( 'meta' );
 
 		$this->request = $request;
 	}

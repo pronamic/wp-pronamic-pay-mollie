@@ -53,12 +53,14 @@ $mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
 if ( ! empty( $mandate_id ) ) :
 
-?>
+	?>
+
 	<p>
 		<?php
 
 		echo esc_html(
 			sprintf(
+				/* translators: %s: Mollie mandate ID */
 				\__( 'Mandate: %s', 'pronamic_ideal' ),
 				$mandate_id
 			)

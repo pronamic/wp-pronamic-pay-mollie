@@ -356,7 +356,7 @@ class Gateway extends Core_Gateway {
 		 * can use up to approximately 1kB.
 		 *
 		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
-	 	 * @link https://en.wikipedia.org/wiki/Metadata
+		 * @link https://en.wikipedia.org/wiki/Metadata
 		 */
 		$metadata = null;
 
@@ -569,6 +569,7 @@ class Gateway extends Core_Gateway {
 				}
 
 				// Update mandate in subscription meta.
+				// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 				if ( isset( $mollie_payment->mandateId ) ) {
 					$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
@@ -577,6 +578,7 @@ class Gateway extends Core_Gateway {
 						$this->update_subscription_mandate( $subscription, $mollie_payment->mandateId );
 					}
 				}
+				// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 			}
 		}
 
@@ -673,8 +675,8 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Update subscription mandate.
 	 *
-	 * @param Subscription $subscrption Subscription.
-	 * @param string       $mandate_id  Mollie mandate ID.
+	 * @param Subscription $subscription Subscription.
+	 * @param string       $mandate_id   Mollie mandate ID.
 	 * @return void
 	 */
 	public function update_subscription_mandate( Subscription $subscription, $mandate_id ) {
