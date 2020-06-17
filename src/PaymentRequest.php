@@ -132,7 +132,8 @@ class PaymentRequest {
 	/**
 	 * Sequence type for Mollie Recurring.
 	 *
-	 * @link https://www.mollie.com/nl/docs/recurring
+	 * @link https://docs.mollie.com/payments/recurring#:~:text=sequenceType
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#:~:text=sequenceType
 	 * @since 1.1.9
 	 * @var string|null
 	 */
@@ -141,7 +142,12 @@ class PaymentRequest {
 	/**
 	 * Mandate ID.
 	 *
-	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * When creating recurring payments, the ID of a specific Mandate may be
+	 * supplied to indicate which of the consumer’s accounts should be
+	 * credited.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#:~:text=mandateId
+	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment#:~:text=mandateId
 	 * @since unreleased
 	 * @var string|null
 	 */
@@ -216,6 +222,56 @@ class PaymentRequest {
 	 */
 	public function set_billing_email( $email = null ) {
 		$this->billing_email = $email;
+	}
+
+	/**
+	 * Get sequence type.
+	 *
+	 * @return string|null
+	 */
+	public function get_sequence_type() {
+		return $this->sequence_type;
+	}
+
+	/**
+	 * Set sequence type.
+	 *
+	 * @param string|null $sequence_type Sequence type.
+	 * @return void
+	 */
+	public function set_sequence_type( $sequence_type = null ) {
+		$this->sequence_type = $sequence_type;
+	}
+
+	/**
+	 * Get mandate ID.
+	 *
+	 * When creating recurring payments, the ID of a specific Mandate may be
+	 * supplied to indicate which of the consumer’s accounts should be
+	 * credited.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#:~:text=mandateId
+	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment#:~:text=mandateId
+	 * @return string|null
+	 */
+	public function get_mandate_id() {
+		return $this->mandate_id;
+	}
+
+	/**
+	 * Set mandate ID.
+	 *
+	 * When creating recurring payments, the ID of a specific Mandate may be
+	 * supplied to indicate which of the consumer’s accounts should be
+	 * credited.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#:~:text=mandateId
+	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment#:~:text=mandateId
+	 * @param string|null $mandate_id Mandate ID.
+	 * @return void
+	 */
+	public function set_mandate_id( $mandate_id = null ) {
+		$this->mandate_id = $mandate_id;
 	}
 
 	/**

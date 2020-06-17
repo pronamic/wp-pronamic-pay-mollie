@@ -313,8 +313,8 @@ class Gateway extends Core_Gateway {
 				}
 
 				// Charge immediately on-demand.
-				$request->sequence_type = Sequence::RECURRING;
-				$request->mandate_id    = $mandate_id;
+				$request->set_sequence_type( Sequence::RECURRING );
+				$request->set_mandate_id( $mandate_id );
 
 				$is_recurring_method = true;
 
@@ -337,7 +337,7 @@ class Gateway extends Core_Gateway {
 			if ( Sequence::RECURRING === $request->sequence_type ) {
 				// Use mandate from subscription.
 				if ( $subscription && empty( $request->mandate_id ) ) {
-					$request->mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+					$request->set_mandate_id( $subscription->get_meta( 'mollie_mandate_id' ) );
 				}
 
 				$payment->set_action_url( $payment->get_return_url() );

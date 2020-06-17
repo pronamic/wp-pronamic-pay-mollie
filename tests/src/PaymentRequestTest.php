@@ -45,6 +45,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 
 		$this->request = $request;
 	}
+
 	/**
 	 * Test payment request.
 	 */
@@ -149,5 +150,21 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 			),
 			$request->get_array()
 		);
+	}
+
+	/**
+	 * Test recurring parameters.
+	 */
+	public function test_recurring_parameters() {
+		$request = new PaymentRequest(
+			new Amount( 'EUR', '100.00' ),
+			'Test'
+		);
+
+		$request->set_mandate_id( 'mdt_h3gAaD5zP' );
+		$request->set_sequence_type( 'recurring' );
+
+		$this->assertEquals( 'mdt_h3gAaD5zP', $request->get_mandate_id() );
+		$this->assertEquals( 'recurring', $request->get_sequence_type() );
 	}
 }
