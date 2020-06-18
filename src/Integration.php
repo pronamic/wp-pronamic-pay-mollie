@@ -271,12 +271,12 @@ class Integration extends AbstractGatewayIntegration {
 	/**
 	 * Next payment delivery date.
 	 *
-	 * @param \DateTime $next_payment_delivery_date Next payment delivery date.
-	 * @param Payment   $payment                    Payment.
+	 * @param \DateTime    $next_payment_delivery_date Next payment delivery date.
+	 * @param Subscription $subscription               Subscription.
 	 * @return \DateTime
 	 */
-	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
-		$config_id = $payment->get_config_id();
+	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Subscription $subscription ) {
+		$config_id = $subscription->get_config_id();
 
 		if ( null === $config_id ) {
 			return $next_payment_delivery_date;
@@ -290,20 +290,13 @@ class Integration extends AbstractGatewayIntegration {
 		}
 
 		// Check direct debit payment method.
-		$method = $payment->get_method();
+		$method = $subscription->get_method();
 
 		if ( null === $method ) {
 			return $next_payment_delivery_date;
 		}
 
 		if ( ! PaymentMethods::is_direct_debit_method( $method ) ) {
-			return $next_payment_delivery_date;
-		}
-
-		// Check subscription.
-		$subscription = $payment->get_subscription();
-
-		if ( null === $subscription ) {
 			return $next_payment_delivery_date;
 		}
 
