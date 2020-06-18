@@ -13,6 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\AbstractGatewayIntegration;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription as CoreSubscription;
 use WP_User;
 
 /**
@@ -271,11 +272,11 @@ class Integration extends AbstractGatewayIntegration {
 	/**
 	 * Next payment delivery date.
 	 *
-	 * @param \DateTime    $next_payment_delivery_date Next payment delivery date.
-	 * @param Subscription $subscription               Subscription.
+	 * @param \DateTime        $next_payment_delivery_date Next payment delivery date.
+	 * @param CoreSubscription $subscription               Subscription.
 	 * @return \DateTime
 	 */
-	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Subscription $subscription ) {
+	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, CoreSubscription $subscription ) {
 		$config_id = $subscription->get_config_id();
 
 		if ( null === $config_id ) {
