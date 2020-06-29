@@ -575,7 +575,7 @@ class Gateway extends Core_Gateway {
 
 					// Only update if no mandate has been set yet or if payment succeeded.
 					if ( empty( $mandate_id ) || PaymentStatus::SUCCESS === $payment->get_status() ) {
-						$this->update_subscription_mandate( $subscription, $mollie_payment->mandateId );
+						$this->update_subscription_mandate( $subscription, $mollie_payment->mandateId, $payment->get_method() );
 					}
 				}
 				// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
@@ -675,27 +675,66 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Update subscription mandate.
 	 *
-	 * @param Subscription $subscription Subscription.
-	 * @param string       $mandate_id   Mollie mandate ID.
+	 * @param Subscription $subscription   Subscription.
+	 * @param string       $mandate_id     Mollie mandate ID.
+	 * @param string|null  $payment_method Payment method.
 	 * @return void
+	 * @throws \Exception
 	 */
-	public function update_subscription_mandate( Subscription $subscription, $mandate_id ) {
+	public function update_subscription_mandate( Subscription $subscription, $mandate_id, $payment_method = null ) {
+		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+		$mandate = $this->client->get_mandate( $mandate_id, $customer_id );
+
+		if ( ! \is_object( $mandate ) ) {
+			return;
+		}
+
+		// Update mandate.
 		$old_mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
-		// Update meta.
 		$subscription->set_meta( 'mollie_mandate_id', $mandate_id );
 
-		$subscription->save();
-
-		// Add note.
-		$note = \sprintf(
+		if ( ! empty( $old_mandate_id ) && $old_mandate_id !== $mandate_id ) {
+			$note = \sprintf(
 			/* translators: 1: old mandate ID, 2: new mandate ID */
-			\__( 'Mandate for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
-			\esc_html( $old_mandate_id ),
-			\esc_html( $mandate_id )
-		);
+				\__( 'Mandate for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
+				\esc_html( $old_mandate_id ),
+				\esc_html( $mandate_id )
+			);
 
-		$subscription->add_note( $note );
+			$subscription->add_note( $note );
+		}
+
+		// Update payment method.
+		$old_method = $subscription->payment_method;
+		$new_method = ( null === $payment_method ? Methods::transform_gateway_method( $mandate->method ) : $payment_method );
+
+		// `Direct Debit` is not a recurring method, use `Direct Debit (mandate via ...)` instead.
+		if ( PaymentMethods::DIRECT_DEBIT === $new_method ) {
+			$new_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
+
+			// Use `Direct Debit (mandate via Bancontact)` if consumer account starts with `BE`.
+			if ( 'BE' === \substr( $mandate->details->consumerAccount, 0, 2 ) ) {
+				$new_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
+			}
+		}
+
+		if ( ! empty( $old_method ) && $old_method !== $new_method ) {
+			$subscription->payment_method = $new_method;
+
+			// Add note.
+			$note = \sprintf(
+				/* translators: 1: old payment method, 2: new payment method */
+				\__( 'Payment method for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
+				\esc_html( PaymentMethods::get_name( $old_method ) ),
+				\esc_html( PaymentMethods::get_name( $new_method ) )
+			);
+
+			$subscription->add_note( $note );
+		}
+
+		$subscription->save();
 	}
 
 	/**

@@ -320,6 +320,25 @@ class Client {
 	}
 
 	/**
+	 * Get mandate.
+	 *
+	 * @param string $mandate_id Mollie mandate ID.
+	 * @return object
+	 * @throws \InvalidArgumentException Throws exception on empty mandate ID argument.
+	 */
+	public function get_mandate( $mandate_id, $customer_id ) {
+		if ( '' === $mandate_id ) {
+			throw new \InvalidArgumentException( 'Mollie mandate ID can not be empty string.' );
+		}
+
+		if ( '' === $customer_id ) {
+			throw new \InvalidArgumentException( 'Mollie customer ID can not be empty string.' );
+		}
+
+		return $this->send_request_to_endpoint( 'customers/' . $customer_id . '/mandates/' . $mandate_id, 'GET' );
+	}
+
+	/**
 	 * Get mandates for customer.
 	 *
 	 * @param string $customer_id Mollie customer ID.
