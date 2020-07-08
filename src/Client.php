@@ -21,7 +21,7 @@ use Pronamic\WordPress\Pay\Core\XML\Security;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.9
+ * @version 2.1.4
  * @since   1.0.0
  */
 class Client {

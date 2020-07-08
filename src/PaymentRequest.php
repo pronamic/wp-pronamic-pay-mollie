@@ -17,7 +17,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.3
+ * @version 2.1.4
  * @since   1.0.0
  */
 class PaymentRequest {
