@@ -46,3 +46,27 @@ $mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
 	?>
 </p>
+
+<?php
+
+$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+if ( ! empty( $mandate_id ) ) :
+
+	?>
+
+	<p>
+		<?php
+
+		echo esc_html(
+			sprintf(
+				/* translators: %s: Mollie mandate ID */
+				\__( 'Mandate: %s', 'pronamic_ideal' ),
+				$mandate_id
+			)
+		);
+
+		?>
+	</p>
+
+<?php endif; ?>

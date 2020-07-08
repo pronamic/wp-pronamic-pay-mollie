@@ -17,6 +17,7 @@ use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 
 /**
@@ -26,7 +27,7 @@ use Pronamic\WordPress\Pay\Subscriptions\Subscription;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.3
+ * @version 2.1.4
  * @since   1.1.0
  */
 class Gateway extends Core_Gateway {
@@ -286,7 +287,9 @@ class Gateway extends Core_Gateway {
 		$payment_method = $payment->get_method();
 
 		// Recurring payment method.
-		$is_recurring_method = ( $payment->get_subscription() && PaymentMethods::is_recurring_method( $payment_method ) );
+		$subscription = $payment->get_subscription();
+
+		$is_recurring_method = ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) );
 
 		// Consumer bank details.
 		$consumer_bank_details = $payment->get_consumer_bank_details();
@@ -310,8 +313,8 @@ class Gateway extends Core_Gateway {
 				}
 
 				// Charge immediately on-demand.
-				$request->sequence_type = Sequence::RECURRING;
-				$request->mandate_id    = $mandate_id;
+				$request->set_sequence_type( Sequence::RECURRING );
+				$request->set_mandate_id( $mandate_id );
 
 				$is_recurring_method = true;
 
@@ -332,12 +335,42 @@ class Gateway extends Core_Gateway {
 			}
 
 			if ( Sequence::RECURRING === $request->sequence_type ) {
+				// Use mandate from subscription.
+				if ( $subscription && empty( $request->mandate_id ) ) {
+					$request->set_mandate_id( $subscription->get_meta( 'mollie_mandate_id' ) );
+				}
+
 				$payment->set_action_url( $payment->get_return_url() );
 			}
 		}
 
 		// Leap of faith if the WordPress payment method could not transform to a Mollie method?
 		$request->method = Methods::transform( $payment_method, $payment_method );
+
+		/**
+		 * Metadata.
+		 *
+		 * Provide any data you like, for example a string or a JSON object.
+		 * We will save the data alongside the payment. Whenever you fetch
+		 * the payment with our API, we’ll also include the metadata. You
+		 * can use up to approximately 1kB.
+		 *
+		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+		 * @link https://en.wikipedia.org/wiki/Metadata
+		 */
+		$metadata = null;
+
+		/**
+		 * Filters the Mollie metadata.
+		 *
+		 * @since 2.2.0
+		 *
+		 * @param mixed   $metadata Metadata.
+		 * @param Payment $payment  Payment.
+		 */
+		$metadata = \apply_filters( 'pronamic_pay_mollie_payment_metadata', $metadata, $payment );
+
+		$request->set_metadata( $metadata );
 
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
@@ -534,6 +567,18 @@ class Gateway extends Core_Gateway {
 				if ( empty( $customer_id ) ) {
 					$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
 				}
+
+				// Update mandate in subscription meta.
+				// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
+				if ( isset( $mollie_payment->mandateId ) ) {
+					$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+					// Only update if no mandate has been set yet or if payment succeeded.
+					if ( empty( $mandate_id ) || PaymentStatus::SUCCESS === $payment->get_status() ) {
+						$this->update_subscription_mandate( $subscription, $mollie_payment->mandateId, $payment->get_method() );
+					}
+				}
+				// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 			}
 		}
 
@@ -625,6 +670,71 @@ class Gateway extends Core_Gateway {
 			}
 			// @codingStandardsIgnoreEnd
 		}
+	}
+
+	/**
+	 * Update subscription mandate.
+	 *
+	 * @param Subscription $subscription   Subscription.
+	 * @param string       $mandate_id     Mollie mandate ID.
+	 * @param string|null  $payment_method Payment method.
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function update_subscription_mandate( Subscription $subscription, $mandate_id, $payment_method = null ) {
+		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+		$mandate = $this->client->get_mandate( $mandate_id, $customer_id );
+
+		if ( ! \is_object( $mandate ) ) {
+			return;
+		}
+
+		// Update mandate.
+		$old_mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+		$subscription->set_meta( 'mollie_mandate_id', $mandate_id );
+
+		if ( ! empty( $old_mandate_id ) && $old_mandate_id !== $mandate_id ) {
+			$note = \sprintf(
+			/* translators: 1: old mandate ID, 2: new mandate ID */
+				\__( 'Mandate for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
+				\esc_html( $old_mandate_id ),
+				\esc_html( $mandate_id )
+			);
+
+			$subscription->add_note( $note );
+		}
+
+		// Update payment method.
+		$old_method = $subscription->payment_method;
+		$new_method = ( null === $payment_method ? Methods::transform_gateway_method( $mandate->method ) : $payment_method );
+
+		// `Direct Debit` is not a recurring method, use `Direct Debit (mandate via ...)` instead.
+		if ( PaymentMethods::DIRECT_DEBIT === $new_method ) {
+			$new_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
+
+			// Use `Direct Debit (mandate via Bancontact)` if consumer account starts with `BE`.
+			if ( 'BE' === \substr( $mandate->details->consumerAccount, 0, 2 ) ) {
+				$new_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
+			}
+		}
+
+		if ( ! empty( $old_method ) && $old_method !== $new_method ) {
+			$subscription->payment_method = $new_method;
+
+			// Add note.
+			$note = \sprintf(
+				/* translators: 1: old payment method, 2: new payment method */
+				\__( 'Payment method for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
+				\esc_html( PaymentMethods::get_name( $old_method ) ),
+				\esc_html( PaymentMethods::get_name( $new_method ) )
+			);
+
+			$subscription->add_note( $note );
+		}
+
+		$subscription->save();
 	}
 
 	/**

@@ -17,7 +17,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.1.3
+ * @version 2.1.4
  * @since   1.0.0
  */
 class PaymentRequest {
@@ -75,9 +75,10 @@ class PaymentRequest {
 	 * to 1kB of JSON.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
+	 * @link https://en.wikipedia.org/wiki/Metadata
 	 * @var mixed|null
 	 */
-	public $meta_data;
+	private $metadata;
 
 	/**
 	 * Allow you to preset the language to be used in the payment screens shown to the consumer.
@@ -131,7 +132,8 @@ class PaymentRequest {
 	/**
 	 * Sequence type for Mollie Recurring.
 	 *
-	 * @link https://www.mollie.com/nl/docs/recurring
+	 * @link https://docs.mollie.com/payments/recurring#:~:text=sequenceType
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#:~:text=sequenceType
 	 * @since 1.1.9
 	 * @var string|null
 	 */
@@ -140,7 +142,12 @@ class PaymentRequest {
 	/**
 	 * Mandate ID.
 	 *
-	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * When creating recurring payments, the ID of a specific Mandate may be
+	 * supplied to indicate which of the consumer’s accounts should be
+	 * credited.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#:~:text=mandateId
+	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment#:~:text=mandateId
 	 * @since unreleased
 	 * @var string|null
 	 */
@@ -218,6 +225,79 @@ class PaymentRequest {
 	}
 
 	/**
+	 * Get sequence type.
+	 *
+	 * @return string|null
+	 */
+	public function get_sequence_type() {
+		return $this->sequence_type;
+	}
+
+	/**
+	 * Set sequence type.
+	 *
+	 * @param string|null $sequence_type Sequence type.
+	 * @return void
+	 */
+	public function set_sequence_type( $sequence_type = null ) {
+		$this->sequence_type = $sequence_type;
+	}
+
+	/**
+	 * Get mandate ID.
+	 *
+	 * When creating recurring payments, the ID of a specific Mandate may be
+	 * supplied to indicate which of the consumer’s accounts should be
+	 * credited.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#:~:text=mandateId
+	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment#:~:text=mandateId
+	 * @return string|null
+	 */
+	public function get_mandate_id() {
+		return $this->mandate_id;
+	}
+
+	/**
+	 * Set mandate ID.
+	 *
+	 * When creating recurring payments, the ID of a specific Mandate may be
+	 * supplied to indicate which of the consumer’s accounts should be
+	 * credited.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#:~:text=mandateId
+	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment#:~:text=mandateId
+	 * @param string|null $mandate_id Mandate ID.
+	 * @return void
+	 */
+	public function set_mandate_id( $mandate_id = null ) {
+		$this->mandate_id = $mandate_id;
+	}
+
+	/**
+	 * Get metadata.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @link https://en.wikipedia.org/wiki/Metadata
+	 * @return mixed
+	 */
+	public function get_metadata() {
+		return $this->metadata;
+	}
+
+	/**
+	 * Set metadata.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 * @link https://en.wikipedia.org/wiki/Metadata
+	 * @param mixed $metadata Metadata.
+	 * @return void
+	 */
+	public function set_metadata( $metadata = null ) {
+		$this->metadata = $metadata;
+	}
+
+	/**
 	 * Get array of this Mollie payment request object.
 	 *
 	 * @return array<string,object>
@@ -235,7 +315,7 @@ class PaymentRequest {
 			'description'     => $this->description,
 			'method'          => $this->method,
 			'redirectUrl'     => $this->redirect_url,
-			'metadata'        => $this->meta_data,
+			'metadata'        => $this->metadata,
 			'locale'          => $this->locale,
 			'webhookUrl'      => $this->webhook_url,
 			'consumerName'    => $this->consumer_name,

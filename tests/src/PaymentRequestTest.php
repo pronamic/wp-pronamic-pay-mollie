@@ -14,7 +14,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * Payment request test
  *
  * @author  Remco Tolsma
- * @version 2.1.3
+ * @version 2.1.4
  * @since   1.0.0
  */
 class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
@@ -37,14 +37,15 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 		$request->redirect_url  = 'https://example.com/mollie-redirect/';
 		$request->webhook_url   = 'https://example.com/mollie-webhook/';
 		$request->method        = Methods::IDEAL;
-		$request->meta_data     = 'meta';
 		$request->locale        = Locales::NL_NL;
 		$request->issuer        = 'ideal_INGBNL2A';
 		$request->customer_id   = 'cst_8wmqcHMN4U';
 		$request->sequence_type = Sequence::FIRST;
+		$request->set_metadata( 'meta' );
 
 		$this->request = $request;
 	}
+
 	/**
 	 * Test payment request.
 	 */
@@ -118,5 +119,52 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 			),
 			$request->get_array()
 		);
+	}
+
+	/**
+	 * Test billing metadata.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+	 */
+	public function test_metadata() {
+		$request = new PaymentRequest(
+			new Amount( 'EUR', '100.00' ),
+			'Test'
+		);
+
+		$metadata = (object) array(
+			'vat_number'   => 'NL123456789B01',
+			'edd_order_id' => 1234,
+			'gf_entry_id'  => 5678,
+		);
+
+		$request->set_metadata( $metadata );
+
+		$this->assertEquals( $metadata, $request->get_metadata() );
+
+		$this->assertEquals(
+			array(
+				'amount'      => $request->amount->get_json(),
+				'description' => 'Test',
+				'metadata'    => $metadata,
+			),
+			$request->get_array()
+		);
+	}
+
+	/**
+	 * Test recurring parameters.
+	 */
+	public function test_recurring_parameters() {
+		$request = new PaymentRequest(
+			new Amount( 'EUR', '100.00' ),
+			'Test'
+		);
+
+		$request->set_mandate_id( 'mdt_h3gAaD5zP' );
+		$request->set_sequence_type( 'recurring' );
+
+		$this->assertEquals( 'mdt_h3gAaD5zP', $request->get_mandate_id() );
+		$this->assertEquals( 'recurring', $request->get_sequence_type() );
 	}
 }

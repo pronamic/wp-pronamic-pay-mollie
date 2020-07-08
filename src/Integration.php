@@ -13,6 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\AbstractGatewayIntegration;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription as CoreSubscription;
 use WP_User;
 
 /**
@@ -22,7 +23,7 @@ use WP_User;
  * Company: Pronamic
  *
  * @author  Remco Tolsma
- * @version 2.0.9
+ * @version 2.1.4
  * @since   1.0.0
  */
 class Integration extends AbstractGatewayIntegration {
@@ -271,12 +272,12 @@ class Integration extends AbstractGatewayIntegration {
 	/**
 	 * Next payment delivery date.
 	 *
-	 * @param \DateTime $next_payment_delivery_date Next payment delivery date.
-	 * @param Payment   $payment                    Payment.
+	 * @param \DateTime        $next_payment_delivery_date Next payment delivery date.
+	 * @param CoreSubscription $subscription               Subscription.
 	 * @return \DateTime
 	 */
-	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Payment $payment ) {
-		$config_id = $payment->get_config_id();
+	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, CoreSubscription $subscription ) {
+		$config_id = $subscription->get_config_id();
 
 		if ( null === $config_id ) {
 			return $next_payment_delivery_date;
@@ -290,20 +291,13 @@ class Integration extends AbstractGatewayIntegration {
 		}
 
 		// Check direct debit payment method.
-		$method = $payment->get_method();
+		$method = $subscription->get_method();
 
 		if ( null === $method ) {
 			return $next_payment_delivery_date;
 		}
 
 		if ( ! PaymentMethods::is_direct_debit_method( $method ) ) {
-			return $next_payment_delivery_date;
-		}
-
-		// Check subscription.
-		$subscription = $payment->get_subscription();
-
-		if ( null === $subscription ) {
 			return $next_payment_delivery_date;
 		}
 
