@@ -656,7 +656,7 @@ class Gateway extends Core_Gateway {
 				$failure_reason->set_code( $details->bankReasonCode );
 			}
 
-			if ( isset( $details->bankReasonCode ) ) {
+			if ( isset( $details->bankReason ) ) {
 				$failure_reason->set_message( $details->bankReason );
 			}
 
