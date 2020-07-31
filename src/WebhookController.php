@@ -96,7 +96,7 @@ class WebhookController {
 
 		// Add note.
 		$note = \sprintf(
-			/* translators: %s: Mollie */
+			/* translators: %s: payment provider name */
 			\__( 'Webhook requested by %s.', 'pronamic_ideal' ),
 			\__( 'Mollie', 'pronamic_ideal' )
 		);
