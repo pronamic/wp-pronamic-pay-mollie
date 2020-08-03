@@ -679,7 +679,7 @@ class Gateway extends Core_Gateway {
 	 * @param string       $mandate_id     Mollie mandate ID.
 	 * @param string|null  $payment_method Payment method.
 	 * @return void
-	 * @throws \Exception
+	 * @throws \Exception Throws exception if subscription note could not be added.
 	 */
 	public function update_subscription_mandate( Subscription $subscription, $mandate_id, $payment_method = null ) {
 		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
