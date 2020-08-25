@@ -46,13 +46,14 @@ class WebhookController {
 			Integration::REST_ROUTE_NAMESPACE,
 			'/webhook',
 			array(
-				'methods'  => 'POST',
-				'callback' => array( $this, 'rest_api_mollie_webhook' ),
-				'args'     => array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_api_mollie_webhook' ),
+				'args'                => array(
 					'id' => array(
 						'required' => true,
 					),
 				),
+				'permission_callback' => '__return_true',
 			)
 		);
 	}
