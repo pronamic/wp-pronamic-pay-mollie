@@ -13,6 +13,10 @@
 
 $subscription = \get_pronamic_subscription( $post->ID );
 
+if ( null === $subscription ) :
+	return;
+endif;
+
 $mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
 ?>
@@ -34,7 +38,7 @@ $mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 			\sprintf(
 				'<a href="%s">%s</a>',
 				\esc_url( $customer_url ),
-				\esc_html( $mollie_customer_id )
+				\esc_html( (string) $mollie_customer_id )
 			)
 		),
 		array(

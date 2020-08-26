@@ -145,7 +145,7 @@ class Integration extends AbstractGatewayIntegration {
 	/**
 	 * Get settings fields.
 	 *
-	 * @return array<int, array<string, array<int, string>|int|string|true>>
+	 * @return array<int, array<string, callable|int|string|bool|array<int|string,int|string>>>
 	 */
 	public function get_settings_fields() {
 		$fields = array();

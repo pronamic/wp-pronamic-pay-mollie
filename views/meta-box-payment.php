@@ -13,6 +13,11 @@
 
 $payment = \get_pronamic_payment( $post->ID );
 
+// Check valid payment.
+if ( null === $payment ) {
+	return;
+}
+
 $mollie_payment_id  = $payment->get_transaction_id();
 $mollie_customer_id = $payment->get_meta( 'mollie_customer_id' );
 
@@ -35,7 +40,7 @@ $mollie_customer_id = $payment->get_meta( 'mollie_customer_id' );
 			\sprintf(
 				'<a href="%s">%s</a>',
 				\esc_url( $payment_url ),
-				\esc_html( $mollie_payment_id )
+				\esc_html( (string) $mollie_payment_id )
 			)
 		),
 		array(

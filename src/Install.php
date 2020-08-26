@@ -49,8 +49,15 @@ class Install {
 	 * @return void
 	 */
 	public function check_version() {
-		$version_option = \strval( $this->integration->get_version_option() );
-		$version        = \strval( $this->integration->get_version() );
+		$version_option = $this->integration->get_version_option();
+		$version        = $this->integration->get_version();
+
+		if ( null === $version_option || null === $version ) {
+			return;
+		}
+
+		$version_option = \strval( $version_option );
+		$version        = \strval( $version );
 
 		if ( version_compare( $version_option, $version, '<' ) ) {
 			$this->install();
@@ -259,12 +266,25 @@ class Install {
 	/**
 	 * Add specified foreign key.
 	 *
-	 * @param object $item Foreig key data.
+	 * @param object $item Foreign key data.
 	 * @return void
 	 * @throws \Exception Throws exception when adding foreign key fails.
+	 * @throws \InvalidArgumentException Throws invalid argument exception if item misses required `table`, `name` or `query` property.
 	 */
 	private function add_foreign_key( $item ) {
 		global $wpdb;
+
+		if ( ! \property_exists( $item, 'table' ) ) {
+			throw new \InvalidArgumentException( 'Foreign key item must contain `table` property.' );
+		}
+
+		if ( ! \property_exists( $item, 'name' ) ) {
+			throw new \InvalidArgumentException( 'Foreign key item must contain `name` property.' );
+		}
+
+		if ( ! \property_exists( $item, 'query' ) ) {
+			throw new \InvalidArgumentException( 'Foreign key item must contain `query` property.' );
+		}
 
 		/**
 		 * Suppress errors.

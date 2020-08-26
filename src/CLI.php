@@ -23,6 +23,20 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  */
 class CLI {
 	/**
+	 * Customer data store.
+	 *
+	 * @var CustomerDataStore
+	 */
+	protected $customer_data_store;
+
+	/**
+	 * Profile data store.
+	 *
+	 * @var ProfileDataStore
+	 */
+	protected $profile_data_store;
+
+	/**
 	 * Construct CLI.
 	 */
 	public function __construct() {
@@ -135,7 +149,7 @@ class CLI {
 				);
 
 				while ( ! empty( $urls ) ) {
-					$url = array_shift( $urls );
+					$url = (string) array_shift( $urls );
 
 					\WP_CLI::log( $url );
 
@@ -150,7 +164,7 @@ class CLI {
 						);
 					}
 
-					if ( isset( $response->_embedded->customers ) ) {
+					if ( \property_exists( $response, '_embedded' ) && isset( $response->_embedded->customers ) ) {
 						\WP_CLI\Utils\format_items(
 							'table',
 							$response->_embedded->customers,
@@ -178,7 +192,7 @@ class CLI {
 						}
 					}
 
-					if ( isset( $response->_links->next->href ) ) {
+					if ( \property_exists( $response, '_links' ) && isset( $response->_links->next->href ) ) {
 						$urls[] = $response->_links->next->href;
 					}
 				}

@@ -1,6 +1,9 @@
 parameters:
 	customRulesetUsed: false
 	level: max
-	bootstrap: tests/bootstrap.php
+	bootstrapFiles:
+		- tests/bootstrap.php
 	paths:
 		- src
+	scanDirectories:
+		- vendor/wp-cli

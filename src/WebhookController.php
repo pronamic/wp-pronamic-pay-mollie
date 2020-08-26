@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Plugin;
+use WP_Error;
 
 /**
  * Webhook controller
@@ -79,9 +80,15 @@ class WebhookController {
 			)
 		);
 
-		$response->add_link( 'self', rest_url( $request->get_route() ) );
+		if ( ! ( $response instanceof WP_Error ) ) {
+			$response->add_link( 'self', rest_url( $request->get_route() ) );
+		}
 
-		$payment = \get_pronamic_payment_by_transaction_id( $id );
+		$payment = null;
+
+		if ( ! empty( $id ) ) {
+			$payment = \get_pronamic_payment_by_transaction_id( $id );
+		}
 
 		if ( null === $payment ) {
 			/**

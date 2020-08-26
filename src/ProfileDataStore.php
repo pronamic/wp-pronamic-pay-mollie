@@ -28,11 +28,16 @@ class ProfileDataStore {
 	 * @param array<string> $data    Data.
 	 * @param array<string> $format  Format.
 	 * @return int
+	 * @throws \Exception Throws exception if Mollie profile ID could not be retrieved from existing profile.
 	 */
 	public function get_or_insert_profile( Profile $profile, $data = array(), $format = array() ) {
 		$profile_data = $this->get_profile( $profile );
 
 		if ( null !== $profile_data ) {
+			if ( ! \property_exists( $profile_data, 'id' ) ) {
+				throw new \Exception( 'Unable to get Mollie profile ID for existing profile.' );
+			}
+
 			return $profile_data->id;
 		}
 
@@ -178,11 +183,16 @@ class ProfileDataStore {
 	 * @param array<string> $data    Data.
 	 * @param array<string> $format  Format.
 	 * @return int
+	 * @throws \Exception Throws exception if unable to update existing profile.
 	 */
 	public function save_profile( Profile $profile, $data = array(), $format = array() ) {
 		$profile_data = $this->get_profile( $profile );
 
 		if ( null !== $profile_data ) {
+			if ( ! \property_exists( $profile_data, 'id' ) ) {
+				throw new \Exception( 'Can not update Mollie profile without ID.' );
+			}
+
 			$this->update_profile( $profile, $data, $format );
 
 			return $profile_data->id;

@@ -24,15 +24,20 @@ class CustomerDataStore {
 	/**
 	 * Get or insert customer.
 	 *
-	 * @param Customer      $customer Customer.
-	 * @param array<string> $data     Data.
-	 * @param array<string> $format   Format.
+	 * @param Customer                  $customer Customer.
+	 * @param array<string, int|string> $data     Data.
+	 * @param array<string, string>     $format   Format.
 	 * @return int
+	 * @throws \Exception Throws exception if Mollie customer ID could not be retrieved from existing customer.
 	 */
 	public function get_or_insert_customer( Customer $customer, $data = array(), $format = array() ) {
 		$customer_data = $this->get_customer( $customer );
 
 		if ( null !== $customer_data ) {
+			if ( ! \property_exists( $customer_data, 'id' ) ) {
+				throw new \Exception( 'Unable to get Mollie customer ID for existing customer.' );
+			}
+
 			return $customer_data->id;
 		}
 
@@ -77,9 +82,9 @@ class CustomerDataStore {
 	/**
 	 * Insert Mollie customer.
 	 *
-	 * @param Customer      $customer Customer.
-	 * @param array<string> $data     Data.
-	 * @param array<string> $format   Format.
+	 * @param Customer                  $customer Customer.
+	 * @param array<string, int|string> $data     Data.
+	 * @param array<string, string>     $format   Format.
 	 * @return int
 	 * @throws \Exception Throws exception on error.
 	 */
@@ -125,9 +130,9 @@ class CustomerDataStore {
 	/**
 	 * Update Mollie customer.
 	 *
-	 * @param Customer      $customer Customer.
-	 * @param array<string> $data     Data.
-	 * @param array<string> $format   Format.
+	 * @param Customer                  $customer Customer.
+	 * @param array<string, int|string> $data     Data.
+	 * @param array<string, string>     $format   Format.
 	 * @return int The number of rows updated.
 	 * @throws \Exception Throws exception on error.
 	 */
@@ -174,15 +179,20 @@ class CustomerDataStore {
 	/**
 	 * Save Mollie customer.
 	 *
-	 * @param Customer      $customer Customer.
-	 * @param array<string> $data     Data.
-	 * @param array<string> $format   Format.
+	 * @param Customer                  $customer Customer.
+	 * @param array<string, int|string> $data     Data.
+	 * @param array<string, string>     $format   Format.
 	 * @return int
+	 * @throws \Exception Throws exception if unable to update existing customer.
 	 */
 	public function save_customer( Customer $customer, $data = array(), $format = array() ) {
 		$customer_data = $this->get_customer( $customer );
 
 		if ( null !== $customer_data ) {
+			if ( ! \property_exists( $customer_data, 'id' ) ) {
+				throw new \Exception( 'Can not update Mollie customer without ID.' );
+			}
+
 			$this->update_customer( $customer, $data, $format );
 
 			return $customer_data->id;
