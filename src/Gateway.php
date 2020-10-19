@@ -852,6 +852,7 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param array<string> $customer_ids Customers.
 	 * @return string|null
+	 * @throws Error Throws error on Mollie error.
 	 */
 	private function get_first_existing_customer_id( $customer_ids ) {
 		$customer_ids = \array_filter( $customer_ids );
@@ -859,7 +860,16 @@ class Gateway extends Core_Gateway {
 		$customer_ids = \array_unique( $customer_ids );
 
 		foreach ( $customer_ids as $customer_id ) {
-			$customer = $this->client->get_customer( $customer_id );
+			try {
+				$customer = $this->client->get_customer( $customer_id );
+			} catch ( Error $error ) {
+				// Check for status 410 ("Gone - The customer is no longer available").
+				if ( 410 === $error->get_status() ) {
+					continue;
+				}
+
+				throw $error;
+			}
 
 			if ( null !== $customer ) {
 				return $customer_id;
