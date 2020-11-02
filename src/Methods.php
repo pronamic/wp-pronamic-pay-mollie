@@ -110,6 +110,13 @@ class Methods {
 	const PODIUMCADEAUKAART = 'podiumcadeaukaart';
 
 	/**
+	 * Constant for the Przelewy24 method.
+	 *
+	 * @var string
+	 */
+	const PRZELEWY24 = 'przelewy24';
+
+	/**
 	 * Constant for the KBC/CBC Payment Button method.
 	 *
 	 * @link https://www.mollie.com/en/kbccbc
@@ -144,6 +151,7 @@ class Methods {
 		PaymentMethods::EPS                     => self::EPS,
 		PaymentMethods::GIROPAY                 => self::GIROPAY,
 		PaymentMethods::PAYPAL                  => self::PAYPAL,
+		PaymentMethods::PRZELEWY24              => self::PRZELEWY24,
 		PaymentMethods::SOFORT                  => self::SOFORT,
 		PaymentMethods::IDEAL                   => self::IDEAL,
 		PaymentMethods::KBC                     => self::KBC,

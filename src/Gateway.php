@@ -215,6 +215,7 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::IDEAL,
 			PaymentMethods::KBC,
 			PaymentMethods::PAYPAL,
+			PaymentMethods::PRZELEWY24,
 			PaymentMethods::SOFORT,
 		);
 	}
