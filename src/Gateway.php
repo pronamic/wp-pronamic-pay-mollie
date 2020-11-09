@@ -74,7 +74,7 @@ class Gateway extends Core_Gateway {
 		);
 
 		// Client.
-		$this->client = new Client( \strval( $config->api_key ) );
+		$this->client = new Client( (string) $config->api_key );
 
 		// Data Stores.
 		$this->profile_data_store  = new ProfileDataStore();
@@ -121,7 +121,7 @@ class Gateway extends Core_Gateway {
 	 * Get available payment methods.
 	 *
 	 * @see Core_Gateway::get_available_payment_methods()
-	 * @return array<string>
+	 * @return array<int, string>
 	 */
 	public function get_available_payment_methods() {
 		$payment_methods = array();
@@ -175,14 +175,16 @@ class Gateway extends Core_Gateway {
 
 		// Transform to WordPress payment methods.
 		foreach ( $results as $method => $title ) {
+			$method = (string) $method;
+
+			$payment_method = Methods::transform_gateway_method( $method );
+
 			if ( PaymentMethods::is_recurring_method( $method ) ) {
 				$payment_method = $method;
-			} else {
-				$payment_method = Methods::transform_gateway_method( $method );
 			}
 
-			if ( $payment_method ) {
-				$payment_methods[] = $payment_method;
+			if ( null !== $payment_method ) {
+				$payment_methods[] = (string) $payment_method;
 			}
 		}
 
@@ -213,6 +215,7 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::IDEAL,
 			PaymentMethods::KBC,
 			PaymentMethods::PAYPAL,
+			PaymentMethods::PRZELEWY24,
 			PaymentMethods::SOFORT,
 		);
 	}
@@ -255,11 +258,12 @@ class Gateway extends Core_Gateway {
 	 * @see Pronamic_WP_Pay_Gateway::start()
 	 * @param Payment $payment Payment.
 	 * @return void
+	 * @throws \Exception Throws exception on error creating Mollie customer for payment.
 	 */
 	public function start( Payment $payment ) {
 		$request = new PaymentRequest(
 			AmountTransformer::transform( $payment->get_total_amount() ),
-			\strval( $payment->get_description() )
+			(string) $payment->get_description()
 		);
 
 		$request->redirect_url = $payment->get_return_url();
@@ -289,7 +293,7 @@ class Gateway extends Core_Gateway {
 		// Recurring payment method.
 		$subscription = $payment->get_subscription();
 
-		$is_recurring_method = ( $subscription && PaymentMethods::is_recurring_method( $payment_method ) );
+		$is_recurring_method = ( $subscription && PaymentMethods::is_recurring_method( (string) $payment_method ) );
 
 		// Consumer bank details.
 		$consumer_bank_details = $payment->get_consumer_bank_details();
@@ -309,12 +313,16 @@ class Gateway extends Core_Gateway {
 				if ( false === $mandate_id ) {
 					$mandate = $this->client->create_mandate( $customer_id, $consumer_bank_details );
 
+					if ( ! \property_exists( $mandate, 'id' ) ) {
+						throw new \Exception( 'Missing mandate ID.' );
+					}
+
 					$mandate_id = $mandate->id;
 				}
 
 				// Charge immediately on-demand.
 				$request->set_sequence_type( Sequence::RECURRING );
-				$request->set_mandate_id( $mandate_id );
+				$request->set_mandate_id( (string) $mandate_id );
 
 				$is_recurring_method = true;
 
@@ -322,7 +330,7 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		if ( false === $is_recurring_method ) {
+		if ( false === $is_recurring_method && null !== $payment_method ) {
 			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
 			$is_recurring_method = PaymentMethods::is_direct_debit_method( $payment_method );
 		}
@@ -337,7 +345,11 @@ class Gateway extends Core_Gateway {
 			if ( Sequence::RECURRING === $request->sequence_type ) {
 				// Use mandate from subscription.
 				if ( $subscription && empty( $request->mandate_id ) ) {
-					$request->set_mandate_id( $subscription->get_meta( 'mollie_mandate_id' ) );
+					$subscription_mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+					if ( false !== $subscription_mandate_id ) {
+						$request->set_mandate_id( $subscription_mandate_id );
+					}
 				}
 
 				$payment->set_action_url( $payment->get_return_url() );
@@ -506,8 +518,10 @@ class Gateway extends Core_Gateway {
 		 */
 		$mollie_profile = new Profile();
 
-		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-		$mollie_profile->set_id( $mollie_payment->profileId );
+		if ( \property_exists( $mollie_payment, 'profileId' ) ) {
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
+			$mollie_profile->set_id( $mollie_payment->profileId );
+		}
 
 		$profile_internal_id = $this->profile_data_store->get_or_insert_profile( $mollie_profile );
 
@@ -617,7 +631,9 @@ class Gateway extends Core_Gateway {
 			}
 
 			if ( isset( $details->consumerAccount ) ) {
-				switch ( $mollie_payment->method ) {
+				$mollie_method = \property_exists( $mollie_payment, 'method' ) ? $mollie_payment->method : null;
+
+				switch ( $mollie_method ) {
 					case Methods::BELFIUS:
 					case Methods::DIRECT_DEBIT:
 					case Methods::IDEAL:
@@ -656,7 +672,7 @@ class Gateway extends Core_Gateway {
 				$failure_reason->set_code( $details->bankReasonCode );
 			}
 
-			if ( isset( $details->bankReasonCode ) ) {
+			if ( isset( $details->bankReason ) ) {
 				$failure_reason->set_message( $details->bankReason );
 			}
 
@@ -679,10 +695,10 @@ class Gateway extends Core_Gateway {
 	 * @param string       $mandate_id     Mollie mandate ID.
 	 * @param string|null  $payment_method Payment method.
 	 * @return void
-	 * @throws \Exception
+	 * @throws \Exception Throws exception if subscription note could not be added.
 	 */
 	public function update_subscription_mandate( Subscription $subscription, $mandate_id, $payment_method = null ) {
-		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
+		$customer_id = (string) $subscription->get_meta( 'mollie_customer_id' );
 
 		$mandate = $this->client->get_mandate( $mandate_id, $customer_id );
 
@@ -708,14 +724,14 @@ class Gateway extends Core_Gateway {
 
 		// Update payment method.
 		$old_method = $subscription->payment_method;
-		$new_method = ( null === $payment_method ? Methods::transform_gateway_method( $mandate->method ) : $payment_method );
+		$new_method = ( null === $payment_method && \property_exists( $mandate, 'method' ) ? Methods::transform_gateway_method( $mandate->method ) : $payment_method );
 
 		// `Direct Debit` is not a recurring method, use `Direct Debit (mandate via ...)` instead.
 		if ( PaymentMethods::DIRECT_DEBIT === $new_method ) {
 			$new_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
 
 			// Use `Direct Debit (mandate via Bancontact)` if consumer account starts with `BE`.
-			if ( 'BE' === \substr( $mandate->details->consumerAccount, 0, 2 ) ) {
+			if ( \property_exists( $mandate, 'details' ) && 'BE' === \substr( $mandate->details->consumerAccount, 0, 2 ) ) {
 				$new_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
 			}
 		}
@@ -727,8 +743,8 @@ class Gateway extends Core_Gateway {
 			$note = \sprintf(
 				/* translators: 1: old payment method, 2: new payment method */
 				\__( 'Payment method for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
-				\esc_html( PaymentMethods::get_name( $old_method ) ),
-				\esc_html( PaymentMethods::get_name( $new_method ) )
+				\esc_html( (string) PaymentMethods::get_name( $old_method ) ),
+				\esc_html( (string) PaymentMethods::get_name( $new_method ) )
 			);
 
 			$subscription->add_note( $note );
@@ -837,6 +853,7 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param array<string> $customer_ids Customers.
 	 * @return string|null
+	 * @throws Error Throws error on Mollie error.
 	 */
 	private function get_first_existing_customer_id( $customer_ids ) {
 		$customer_ids = \array_filter( $customer_ids );
@@ -844,7 +861,16 @@ class Gateway extends Core_Gateway {
 		$customer_ids = \array_unique( $customer_ids );
 
 		foreach ( $customer_ids as $customer_id ) {
-			$customer = $this->client->get_customer( $customer_id );
+			try {
+				$customer = $this->client->get_customer( $customer_id );
+			} catch ( Error $error ) {
+				// Check for status 410 ("Gone - The customer is no longer available").
+				if ( 410 === $error->get_status() ) {
+					continue;
+				}
+
+				throw $error;
+			}
 
 			if ( null !== $customer ) {
 				return $customer_id;
@@ -860,6 +886,7 @@ class Gateway extends Core_Gateway {
 	 * @param Payment $payment Payment.
 	 * @return string|null
 	 * @throws Error Throws Error when Mollie error occurs.
+	 * @throws \Exception Throws exception when error in customer data store occurs.
 	 */
 	private function create_customer_for_payment( Payment $payment ) {
 		$mollie_customer = new Customer();
@@ -870,7 +897,7 @@ class Gateway extends Core_Gateway {
 
 		if ( null !== $pronamic_customer ) {
 			// Name.
-			$name = \strval( $pronamic_customer->get_name() );
+			$name = (string) $pronamic_customer->get_name();
 
 			if ( '' !== $name ) {
 				$mollie_customer->set_name( $name );

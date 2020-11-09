@@ -207,6 +207,10 @@ class Client {
 				$id   = Security::filter( $issuer->id );
 				$name = Security::filter( $issuer->name );
 
+				if ( null === $id || null === $name ) {
+					continue;
+				}
+
 				$issuers[ $id ] = $name;
 			}
 		}
@@ -244,6 +248,10 @@ class Client {
 				$id   = Security::filter( $payment_method->id );
 				$name = Security::filter( $payment_method->description );
 
+				if ( null === $id || null === $name ) {
+					continue;
+				}
+
 				$payment_methods[ $id ] = $name;
 			}
 		}
@@ -266,7 +274,9 @@ class Client {
 			$customer->get_array()
 		);
 
-		$customer->set_id( $response->id );
+		if ( \property_exists( $response, 'id' ) ) {
+			$customer->set_id( $response->id );
+		}
 
 		return $customer;
 	}
@@ -323,6 +333,7 @@ class Client {
 	 * Get mandate.
 	 *
 	 * @param string $mandate_id Mollie mandate ID.
+	 * @param string $customer_id Mollie customer ID.
 	 * @return object
 	 * @throws \InvalidArgumentException Throws exception on empty mandate ID argument.
 	 */
@@ -360,7 +371,7 @@ class Client {
 	 * @param string|null $payment_method Payment method to find mandates for.
 	 * @param string|null $search         Search.
 	 *
-	 * @return boolean
+	 * @return string|bool
 	 * @throws \Exception Throws exception for mandates on failed request or invalid response.
 	 */
 	public function has_valid_mandate( $customer_id, $payment_method = null, $search = null ) {

@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Plugin;
+use WP_Error;
 
 /**
  * Webhook controller
@@ -46,13 +47,14 @@ class WebhookController {
 			Integration::REST_ROUTE_NAMESPACE,
 			'/webhook',
 			array(
-				'methods'  => 'POST',
-				'callback' => array( $this, 'rest_api_mollie_webhook' ),
-				'args'     => array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_api_mollie_webhook' ),
+				'args'                => array(
 					'id' => array(
 						'required' => true,
 					),
 				),
+				'permission_callback' => '__return_true',
 			)
 		);
 	}
@@ -78,9 +80,15 @@ class WebhookController {
 			)
 		);
 
-		$response->add_link( 'self', rest_url( $request->get_route() ) );
+		if ( ! ( $response instanceof WP_Error ) ) {
+			$response->add_link( 'self', rest_url( $request->get_route() ) );
+		}
 
-		$payment = \get_pronamic_payment_by_transaction_id( $id );
+		$payment = null;
+
+		if ( ! empty( $id ) ) {
+			$payment = \get_pronamic_payment_by_transaction_id( $id );
+		}
 
 		if ( null === $payment ) {
 			/**
@@ -96,7 +104,7 @@ class WebhookController {
 
 		// Add note.
 		$note = \sprintf(
-			/* translators: %s: Mollie */
+			/* translators: %s: payment provider name */
 			\__( 'Webhook requested by %s.', 'pronamic_ideal' ),
 			\__( 'Mollie', 'pronamic_ideal' )
 		);

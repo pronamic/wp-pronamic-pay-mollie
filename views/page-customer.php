@@ -10,6 +10,12 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+/**
+ * Valid global.
+ *
+ * @see Pronamic\WordPress\Pay\Gateways\Mollie\Admin::page_mollie_customers()
+ * @psalm-suppress InvalidGlobal
+ */
 global $wpdb;
 
 $mollie_customer_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
@@ -369,7 +375,7 @@ $users = $wpdb->get_results(
 										break;
 									default:
 										?>
-										<pre><?php echo \esc_html( \wp_json_encode( $mandate->details, \JSON_PRETTY_PRINT ) ); ?></pre>
+										<pre><?php echo \esc_html( (string) \wp_json_encode( $mandate->details, \JSON_PRETTY_PRINT ) ); ?></pre>
 										<?php
 
 										break;

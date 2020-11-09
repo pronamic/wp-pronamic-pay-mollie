@@ -110,6 +110,13 @@ class Methods {
 	const PODIUMCADEAUKAART = 'podiumcadeaukaart';
 
 	/**
+	 * Constant for the Przelewy24 method.
+	 *
+	 * @var string
+	 */
+	const PRZELEWY24 = 'przelewy24';
+
+	/**
 	 * Constant for the KBC/CBC Payment Button method.
 	 *
 	 * @link https://www.mollie.com/en/kbccbc
@@ -144,6 +151,7 @@ class Methods {
 		PaymentMethods::EPS                     => self::EPS,
 		PaymentMethods::GIROPAY                 => self::GIROPAY,
 		PaymentMethods::PAYPAL                  => self::PAYPAL,
+		PaymentMethods::PRZELEWY24              => self::PRZELEWY24,
 		PaymentMethods::SOFORT                  => self::SOFORT,
 		PaymentMethods::IDEAL                   => self::IDEAL,
 		PaymentMethods::KBC                     => self::KBC,
@@ -160,7 +168,7 @@ class Methods {
 	 * @return string|null
 	 */
 	public static function transform( $payment_method, $default = null ) {
-		if ( ! is_scalar( $payment_method ) ) {
+		if ( ! \is_scalar( $payment_method ) ) {
 			return null;
 		}
 
@@ -182,16 +190,16 @@ class Methods {
 	 * @return string|null
 	 */
 	public static function transform_gateway_method( $method ) {
-		if ( ! is_scalar( $method ) ) {
+		if ( ! \is_scalar( $method ) ) {
 			return null;
 		}
 
-		$payment_method = array_search( $method, self::$map, true );
+		$payment_method = \array_search( $method, self::$map, true );
 
-		if ( ! $payment_method ) {
+		if ( false === $payment_method ) {
 			return null;
 		}
 
-		return $payment_method;
+		return \strval( $payment_method );
 	}
 }

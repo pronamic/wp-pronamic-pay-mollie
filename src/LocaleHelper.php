@@ -28,11 +28,15 @@ class LocaleHelper {
 	 * @return string|null
 	 */
 	public static function transform( $locale ) {
-		if ( ! is_string( $locale ) ) {
+		if ( ! \is_string( $locale ) ) {
 			return null;
 		}
 
-		// Supported locales.
+		/**
+		 * Supported locales.
+		 *
+		 * @var array<int, string>
+		 */
 		$supported = array(
 			Locales::EN_US,
 			Locales::NL_NL,
@@ -57,13 +61,13 @@ class LocaleHelper {
 			Locales::LT_LT,
 		);
 
-		// Lower case.
-		$locale = strtolower( $locale );
+		// Lowercase.
+		$locale = \strtolower( $locale );
 
 		// Is supported?
-		$supported_lowercase = array_map( 'strtolower', $supported );
+		$supported_lowercase = \array_map( 'strtolower', $supported );
 
-		$search = array_search( $locale, $supported_lowercase, true );
+		$search = \array_search( $locale, $supported_lowercase, true );
 
 		// Locale not supported.
 		if ( false === $search ) {
@@ -76,7 +80,7 @@ class LocaleHelper {
 		 *
 		 * @link https://www.php.net/array_search
 		 */
-		if ( array_key_exists( $search, $supported ) ) {
+		if ( \array_key_exists( $search, $supported ) ) {
 			return $supported[ $search ];
 		}
 

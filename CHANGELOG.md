@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
-- Added support for Mollie payment billing email.
+-
+
+## [2.2.0] - 2020-11-09
+- Added Przelewy24 payment method.
+- Added REST route permission callback.
+- Improved determining customer if previously used customer has been removed at Mollie.
+- Fixed filtering next payment delivery date.
+- Fixed incorrect check for failed payment bank reason detail.
 
 ## [2.1.4] - 2020-07-08
 - Added filter for Mollie payment metadata.
@@ -152,7 +159,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.1.4...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.2.0...HEAD
+[2.2.0]: https://github.com/wp-pay-gateways/mollie/compare/2.1.4...2.2.0
 [2.1.4]: https://github.com/wp-pay-gateways/mollie/compare/2.1.3...2.1.4
 [2.1.3]: https://github.com/wp-pay-gateways/mollie/compare/2.1.2...2.1.3
 [2.1.2]: https://github.com/wp-pay-gateways/mollie/compare/2.1.1...2.1.2

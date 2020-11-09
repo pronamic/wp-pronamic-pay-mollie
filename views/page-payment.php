@@ -21,7 +21,7 @@ $mollie_payment_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
 
 	echo \wp_kses(
 		\sprintf(
-			/* translators: %s: Mollie payment ID. */
+			/* translators: %s: payment number */
 			\__( 'Payment %s', 'pronamic_ideal' ),
 			\sprintf(
 				'<code>%s</code>',
