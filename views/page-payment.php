@@ -10,7 +10,11 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Admin\AdminPaymentPostType;
+
 $mollie_payment_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
+
+$payment = \get_pronamic_payment_by_transaction_id( $mollie_payment_id );
 
 ?>
 <div class="wrap">
@@ -63,6 +67,51 @@ $mollie_payment_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
 					?>
 				</td>
 			</tr>
+
+			<?php if ( null !== $payment ) : ?>
+
+				<?php
+
+				$url = $payment->get_meta( 'mollie_change_payment_state_url' );
+
+				if ( ! empty( $url ) ) :
+
+					?>
+
+					<tr>
+						<th scope="row"><?php \esc_html_e( 'Change Payment State', 'pronamic_ideal' ); ?></th>
+						<td>
+							<?php
+
+							\printf(
+								'<a href="%1$s" title="%2$s">%3$s</a>',
+								\esc_url( $url ),
+								\esc_attr( \__( 'Change Payment State', 'pronamic_ideal' ) ),
+								\esc_html( $url )
+							);
+
+							?>
+						</td>
+					</tr>
+
+				<?php endif; ?>
+
+				<tr>
+					<th scope="row"><?php \esc_html_e( 'Pronamic Pay Payment', 'pronamic_ideal' ); ?></th>
+					<td>
+						<?php
+
+						\do_action(
+							'manage_' . AdminPaymentPostType::POST_TYPE . '_posts_custom_column',
+							'pronamic_payment_title',
+							$payment->get_id()
+						);
+
+						?>
+					</td>
+				</tr>
+
+			<?php endif; ?>
 		</tbody>
 	</table>
 </div>

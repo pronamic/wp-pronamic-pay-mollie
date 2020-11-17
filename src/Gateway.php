@@ -486,10 +486,18 @@ class Gateway extends Core_Gateway {
 			// @codingStandardsIgnoreEnd
 		}
 
-		// Set action URL.
+		// Handle links.
 		if ( isset( $result->_links ) ) {
-			if ( isset( $result->_links->checkout->href ) ) {
-				$payment->set_action_url( $result->_links->checkout->href );
+			$links = $result->_links;
+
+			// Action URL.
+			if ( isset( $links->checkout->href ) ) {
+				$payment->set_action_url( $links->checkout->href );
+			}
+
+			// Change payment state URL.
+			if ( isset( $links->changePaymentState->href ) ) {
+				$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
 			}
 		}
 	}
@@ -685,6 +693,15 @@ class Gateway extends Core_Gateway {
 				$failure_reason->set_message( $details->failureMessage );
 			}
 			// @codingStandardsIgnoreEnd
+		}
+
+		if ( isset( $mollie_payment->_links ) ) {
+			$links = $mollie_payment->_links;
+
+			// Change payment state URL.
+			if ( isset( $links->changePaymentState->href ) ) {
+				$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
+			}
 		}
 	}
 
