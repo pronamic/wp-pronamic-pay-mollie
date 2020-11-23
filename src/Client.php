@@ -184,12 +184,16 @@ class Client {
 	 * @return object
 	 * @throws \InvalidArgumentException Throws exception on empty payment ID argument.
 	 */
-	public function get_payment( $payment_id ) {
+	public function get_payment( $payment_id, $parameters = array() ) {
 		if ( empty( $payment_id ) ) {
 			throw new \InvalidArgumentException( 'Mollie payment ID can not be empty string.' );
 		}
 
-		return $this->send_request_to_endpoint( 'payments/' . $payment_id, 'GET' );
+		$object = $this->send_request_to_endpoint( 'payments/' . $payment_id, 'GET', $parameters );
+
+		$payment = Payment::from_json( $object );
+
+		return $payment;
 	}
 
 	/**

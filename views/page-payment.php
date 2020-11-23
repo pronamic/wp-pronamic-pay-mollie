@@ -16,6 +16,24 @@ $mollie_payment_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
 
 $payment = \get_pronamic_payment_by_transaction_id( $mollie_payment_id );
 
+$api_key = \get_post_meta( $payment->config_id, '_pronamic_gateway_mollie_api_key', true );
+
+$client = new Client( $api_key );
+
+/**
+ * Customer.
+ *
+ * @link https://docs.mollie.com/reference/v2/payments-api/get-payment
+ */
+$mollie_payment = $client->get_payment(
+	$mollie_payment_id,
+	array(
+		'embed' => 'chargebacks,refunds',
+	)
+);
+
+var_dump( $mollie_payment );
+
 ?>
 <div class="wrap">
 	<h1><?php echo \esc_html( \get_admin_page_title() ); ?></h1>

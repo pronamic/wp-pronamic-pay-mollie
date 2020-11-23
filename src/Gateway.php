@@ -517,19 +517,14 @@ class Gateway extends Core_Gateway {
 
 		$mollie_payment = $this->client->get_payment( $transaction_id );
 
-		if ( isset( $mollie_payment->status ) ) {
-			$payment->set_status( Statuses::transform( $mollie_payment->status ) );
-		}
+		$payment->set_status( Statuses::transform( $mollie_payment->get_status() ) );
 
 		/**
 		 * Mollie profile.
 		 */
 		$mollie_profile = new Profile();
 
-		if ( \property_exists( $mollie_payment, 'profileId' ) ) {
-			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-			$mollie_profile->set_id( $mollie_payment->profileId );
-		}
+		$mollie_profile->set_id( $mollie_payment->get_profile_id() );
 
 		$profile_internal_id = $this->profile_data_store->get_or_insert_profile( $mollie_profile );
 
@@ -541,11 +536,10 @@ class Gateway extends Core_Gateway {
 		 *
 		 * @link https://www.gravityforms.com/add-ons/user-registration/
 		 */
+		$mollie_customer_id = $mollie_payment->get_customer_id();
 
-		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-		if ( isset( $mollie_payment->customerId ) ) {
-			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-			$mollie_customer = new Customer( $mollie_payment->customerId );
+		if ( null !== $mollie_customer_id ) {
+			$mollie_customer = new Customer( $mollie_customer_id );
 
 			$customer_internal_id = $this->customer_data_store->get_or_insert_customer(
 				$mollie_customer,
@@ -591,16 +585,16 @@ class Gateway extends Core_Gateway {
 				}
 
 				// Update mandate in subscription meta.
-				// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-				if ( isset( $mollie_payment->mandateId ) ) {
+				$mollie_mandate_id = $mollie_payment->get_mandate_id();
+
+				if ( null !== $mollie_mandate_id ) {
 					$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
 					// Only update if no mandate has been set yet or if payment succeeded.
 					if ( empty( $mandate_id ) || PaymentStatus::SUCCESS === $payment->get_status() ) {
-						$this->update_subscription_mandate( $subscription, $mollie_payment->mandateId, $payment->get_method() );
+						$this->update_subscription_mandate( $subscription, $mollie_mandate_id, $payment->get_method() );
 					}
 				}
-				// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 			}
 		}
 
