@@ -35,6 +35,13 @@ class Payment {
 	private $status;
 
 	/**
+	 * The payment method used for this payment, either forced on creation by specifying the method parameter, or chosen by the customer on our payment method selection screen.
+	 *
+	 * @var string|null
+	 */
+	private $method;
+
+	/**
 	 * The identifier referring to the profile this payment was created on.
 	 *
 	 * @var string
@@ -56,6 +63,13 @@ class Payment {
 	private $mandate_id;
 
 	/**
+	 * Payment method specific details.
+	 *
+	 * @var PaymentDetails|null
+	 */
+	private $details;
+
+	/**
 	 * Construct payment.
 	 *
 	 * @param string            $id            Identifier.
@@ -65,7 +79,7 @@ class Payment {
 	 * @param Amount            $amount        Amount.
 	 * @param string            $description   Description.
 	 * @param string|null       $redirect_url  Redirect URL.
-	 * @param string            $method        Method.
+	 * @param string|null       $method        Method.
 	 * @param string            $metadata      Metadata.
 	 * @param string            $locale        Locale.
 	 * @param string            $profile_id    Profile ID.
@@ -95,6 +109,15 @@ class Payment {
 	 */
 	public function get_status() {
 		return $this->status;
+	}
+
+	/**
+	 * Get method.
+	 *
+	 * @return string|null
+	 */
+	public function get_method() {
+		return $this->method;
 	}
 
 	/**
@@ -153,8 +176,27 @@ class Payment {
 	}
 
 	/**
+	 * Get payment method specific details.
+	 *
+	 * @return PaymentDetails|null
+	 */
+	public function get_details() {
+		return $this->details;
+	}
+
+	/**
+	 * Set payment method specific details.
+	 *
+	 * @param PaymentDetails|null $details Details.
+	 */
+	public function set_details( PaymentDetails $details = null ) {
+		$this->details = $details;
+	}
+
+	/**
 	 * Create payment from JSON.
 	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment
 	 * @param object $json JSON object.
 	 * @return Payment
 	 * @throws \JsonSchema\Exception\ValidationException Throws JSON schema validation exception when JSON is invalid.
@@ -192,6 +234,10 @@ class Payment {
 
 		if ( \property_exists( $json, 'mandateId' ) ) {
 			$payment->set_mandate_id( $json->mandateId );
+		}
+
+		if ( \property_exists( $json, 'details' ) ) {
+			$payment->set_details( PaymentDetails::from_json( $payment->get_method(), $json->details ) );
 		}
 
 		return $payment;

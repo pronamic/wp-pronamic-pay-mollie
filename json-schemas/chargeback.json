@@ -1,0 +1,30 @@
+{
+	"$id": "https://github.com/wp-pay-gateways/mollie/blob/master/json-schemas/chargeback.json",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Mollie chargeback.",
+	"type": "object",
+	"properties": {
+		"resource": {
+			"description": "Indicates the response contains a chargeback object. Will always contain chargeback for this endpoint.",
+			"type": "string",
+			"const": "chargeback"
+		},
+		"id": {
+			"description": "The chargeback’s unique identifier.",
+			"type": "string"
+		},
+		"amount": {
+			"$ref": "amount.json"
+		},
+		"createdAt": {
+			"description": "The date and time the chargeback was issued, in ISO 8601 format.",
+			"type": "string"
+		}
+	},
+	"required": [
+		"resource",
+		"id",
+		"amount",
+		"createdAt"
+	]
+}

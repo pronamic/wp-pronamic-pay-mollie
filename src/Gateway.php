@@ -598,7 +598,9 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		if ( isset( $mollie_payment->details ) ) {
+		$mollie_payment_details = $mollie_payment->get_details();
+
+		if ( null !== $mollie_payment_details ) {
 			$consumer_bank_details = $payment->get_consumer_bank_details();
 
 			if ( null === $consumer_bank_details ) {
@@ -607,55 +609,51 @@ class Gateway extends Core_Gateway {
 				$payment->set_consumer_bank_details( $consumer_bank_details );
 			}
 
-			$details = $mollie_payment->details;
-
 			/*
 			 * @codingStandardsIgnoreStart
 			 *
 			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 			 */
-			if ( isset( $details->consumerName ) ) {
-				$consumer_bank_details->set_name( $details->consumerName );
+			if ( isset( $mollie_payment_details->consumerName ) ) {
+				$consumer_bank_details->set_name( $mollie_payment_details->consumerName );
 			}
 
-			if ( isset( $details->cardHolder ) ) {
-				$consumer_bank_details->set_name( $details->cardHolder );
+			if ( isset( $mollie_payment_details->cardHolder ) ) {
+				$consumer_bank_details->set_name( $mollie_payment_details->cardHolder );
 			}
 
-			if ( isset( $details->cardNumber ) ) {
+			if ( isset( $mollie_payment_details->cardNumber ) ) {
 				// The last four digits of the card number.
-				$consumer_bank_details->set_account_number( $details->cardNumber );
+				$consumer_bank_details->set_account_number( $mollie_payment_details->cardNumber );
 			}
 
-			if ( isset( $details->cardCountryCode ) ) {
+			if ( isset( $mollie_payment_details->cardCountryCode ) ) {
 				// The ISO 3166-1 alpha-2 country code of the country the card was issued in.
-				$consumer_bank_details->set_country( $details->cardCountryCode );
+				$consumer_bank_details->set_country( $mollie_payment_details->cardCountryCode );
 			}
 
-			if ( isset( $details->consumerAccount ) ) {
-				$mollie_method = \property_exists( $mollie_payment, 'method' ) ? $mollie_payment->method : null;
-
-				switch ( $mollie_method ) {
+			if ( isset( $mollie_payment_details->consumerAccount ) ) {
+				switch ( $mollie_payment->get_method() ) {
 					case Methods::BELFIUS:
 					case Methods::DIRECT_DEBIT:
 					case Methods::IDEAL:
 					case Methods::KBC:
 					case Methods::SOFORT:
-						$consumer_bank_details->set_iban( $details->consumerAccount );
+						$consumer_bank_details->set_iban( $mollie_payment_details->consumerAccount );
 
 						break;
 					case Methods::BANCONTACT:
 					case Methods::BANKTRANSFER:
 					case Methods::PAYPAL:
 					default:
-						$consumer_bank_details->set_account_number( $details->consumerAccount );
+						$consumer_bank_details->set_account_number( $mollie_payment_details->consumerAccount );
 
 						break;
 				}
 			}
 
-			if ( isset( $details->consumerBic ) ) {
-				$consumer_bank_details->set_bic( $details->consumerBic );
+			if ( isset( $mollie_payment_details->consumerBic ) ) {
+				$consumer_bank_details->set_bic( $mollie_payment_details->consumerBic );
 			}
 
 			/*
@@ -670,21 +668,21 @@ class Gateway extends Core_Gateway {
 			}
 
 			// SEPA Direct Debit.
-			if ( isset( $details->bankReasonCode ) ) {
-				$failure_reason->set_code( $details->bankReasonCode );
+			if ( isset( $mollie_payment_details->bankReasonCode ) ) {
+				$failure_reason->set_code( $mollie_payment_details->bankReasonCode );
 			}
 
-			if ( isset( $details->bankReason ) ) {
-				$failure_reason->set_message( $details->bankReason );
+			if ( isset( $mollie_payment_details->bankReason ) ) {
+				$failure_reason->set_message( $mollie_payment_details->bankReason );
 			}
 
 			// Credit card.
-			if ( isset( $details->failureReason ) ) {
-				$failure_reason->set_code( $details->failureReason );
+			if ( isset( $mollie_payment_details->failureReason ) ) {
+				$failure_reason->set_code( $mollie_payment_details->failureReason );
 			}
 
-			if ( isset( $details->failureMessage ) ) {
-				$failure_reason->set_message( $details->failureMessage );
+			if ( isset( $mollie_payment_details->failureMessage ) ) {
+				$failure_reason->set_message( $mollie_payment_details->failureMessage );
 			}
 			// @codingStandardsIgnoreEnd
 		}
@@ -695,6 +693,24 @@ class Gateway extends Core_Gateway {
 			// Change payment state URL.
 			if ( isset( $links->changePaymentState->href ) ) {
 				$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
+			}
+		}
+
+		if ( $mollie_payment->has_chargebacks() ) {
+			$mollie_payment_chargebacks = $this->client->get_payment_chargebacks( $transaction_id, array(
+				'limit' => 1,
+			) );
+
+			$mollie_payment_chargeback = \reset( $mollie_payment_chargebacks );
+
+			if ( false !== $mollie_payment_chargeback ) {
+				foreach ( $payment->get_subscriptions() as $subscription ) {
+					if ( $chargeback->get_created_at() > $subscription->get_activated_at() ) {
+						$subscription->set_on_hold();
+
+						$subscription->save();
+					}
+				}
 			}
 		}
 	}

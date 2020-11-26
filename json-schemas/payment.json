@@ -6,7 +6,8 @@
 	"properties": {
 		"resource": {
 			"description": "Indicates the response contains a payment object. Will always contain `payment` for this endpoint.",
-			"type": "string"
+			"type": "string",
+			"const": "payment"
 		},
 		"id": {
 			"description": "The identifier uniquely referring to this payment.",
@@ -43,6 +44,10 @@
 			"type": "string"
 		},
 		"_links": {
+			"type": "object"
+		},
+		"details": {
+			"description": "If the payment has been created with a `method`, or if the customer selected a method in the payment method selection screen, a `details` object becomes available on the payment object. This object contains detail fields specific to the selected payment method.",
 			"type": "object"
 		}
 	},

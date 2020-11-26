@@ -469,4 +469,16 @@ class Client {
 
 		return null;
 	}
+
+	public function get_payment_chargebacks( $payment_id, $parameters ) {
+		$object = $this->send_request_to_endpoint( 'payments/' . $payment_id . '/chargebacks', 'GET', $parameters );
+
+		$chargebacks = array();
+
+		foreach ( $object->_embedded->chargebacks as $chargeback_object ) {
+			$chargebacks[] = Chargeback::from_json( $chargeback_object );
+		}
+
+		return $chargebacks;
+	}
 }
