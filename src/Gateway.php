@@ -19,6 +19,7 @@ use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 
 /**
  * Title: Mollie
@@ -697,16 +698,28 @@ class Gateway extends Core_Gateway {
 		}
 
 		if ( $mollie_payment->has_chargebacks() ) {
-			$mollie_payment_chargebacks = $this->client->get_payment_chargebacks( $transaction_id, array(
+			$mollie_chargebacks = $this->client->get_payment_chargebacks( $transaction_id, array(
 				'limit' => 1,
 			) );
 
-			$mollie_payment_chargeback = \reset( $mollie_payment_chargebacks );
+			$mollie_chargeback = \reset( $mollie_chargebacks );
 
-			if ( false !== $mollie_payment_chargeback ) {
-				foreach ( $payment->get_subscriptions() as $subscription ) {
-					if ( $chargeback->get_created_at() > $subscription->get_activated_at() ) {
-						$subscription->set_on_hold();
+			if ( false !== $mollie_chargeback ) {
+				$subscriptions = array_filter( $payment->get_subscriptions(), function( $subscription ) {
+					return SubscriptionStatus::ACTIVE === $subscription->get_status();
+				} );
+
+				foreach ( $subscriptions as $subscription ) {
+					if ( $mollie_chargeback->get_created_at() > $subscription->get_activated_at() ) {
+						$subscription->set_status( SubscriptionStatus::ON_HOLD );
+
+						$subscription->add_note(
+							\sprintf(
+								\__( 'Subscription put on hold due to chargeback `%s` of payment `%s`.', 'pronamic_ideal' ),
+								\esc_html( $mollie_chargeback->get_id() ),
+								\esc_html( $mollie_payment->get_id() )
+							)
+						);
 
 						$subscription->save();
 					}

@@ -19,14 +19,7 @@ use DateTimeInterface;
  * @version 2.1.0
  * @since   2.1.0
  */
-class Payment {
-	/**
-	 * The identifier uniquely referring to this payment.
-	 *
-	 * @var string
-	 */
-	private $id;
-
+class Payment extends BaseResource {
 	/**
 	 * The payment’s status.
 	 *
@@ -87,7 +80,8 @@ class Payment {
 	 * @param object            $links         Links.
 	 */
 	public function __construct( $id, $mode, DateTimeInterface $created_at, $status, Amount $amount, $description, $redirect_url, $method, $metadata, $locale, $profile_id, $sequence_type, $links ) {
-		$this->id            = $id;
+		parent::__construct( $id );
+
 		$this->mode          = $mode;
 		$this->created_at    = $created_at;
 		$this->status        = $status;

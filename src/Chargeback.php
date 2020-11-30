@@ -19,14 +19,7 @@ use DateTimeInterface;
  * @version 2.1.0
  * @since   2.1.0
  */
-class Chargeback {
-	/**
-	 * The chargeback’s unique identifier.
-	 *
-	 * @var string
-	 */
-	private $id;
-
+class Chargeback extends BaseResource {
 	/**
 	 * The amount charged back by the consumer.
 	 *
@@ -49,7 +42,8 @@ class Chargeback {
 	 * @param DateTimeInterface $created_at    Created at.
 	 */
 	public function __construct( $id, Amount $amount, DateTimeInterface $created_at ) {
-		$this->id         = $id;
+		parent::__construct( $id );
+
 		$this->amount     = $amount;
 		$this->created_at = $created_at;
 	}
