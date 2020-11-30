@@ -698,7 +698,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		if ( $mollie_payment->has_chargebacks() ) {
-			$mollie_chargebacks = $this->client->get_payment_chargebacks( $transaction_id, array(
+			$mollie_chargebacks = $this->client->get_payment_chargebacks( $mollie_payment->get_id(), array(
 				'limit' => 1,
 			) );
 
