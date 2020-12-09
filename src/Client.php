@@ -13,6 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Core\XML\Security;
+use Pronamic\WordPress\Pay\Facades\Http;
 
 /**
  * Title: Mollie
@@ -60,7 +61,7 @@ class Client {
 	 */
 	public function send_request( $url, $method = 'GET', array $data = array() ) {
 		// Request.
-		$response = wp_remote_request(
+		$response = Http::request(
 			$url,
 			array(
 				'method'  => $method,
@@ -71,24 +72,7 @@ class Client {
 			)
 		);
 
-		if ( $response instanceof \WP_Error ) {
-			throw new \Exception( $response->get_error_message() );
-		}
-
-		// Body.
-		$body = wp_remote_retrieve_body( $response );
-
-		$data = json_decode( $body );
-
-		// JSON error.
-		$json_error = \json_last_error();
-
-		if ( \JSON_ERROR_NONE !== $json_error ) {
-			throw new \Exception(
-				\sprintf( 'JSON: %s', \json_last_error_msg() ),
-				$json_error
-			);
-		}
+		$data = $response->json();
 
 		// Object.
 		if ( ! \is_object( $data ) ) {
