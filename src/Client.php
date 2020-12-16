@@ -76,7 +76,7 @@ class Client {
 
 		// Object.
 		if ( ! \is_object( $data ) ) {
-			$code = \wp_remote_retrieve_response_code( $response );
+			$code = $response->status();
 
 			throw new \Exception(
 				\sprintf( 'Could not JSON decode Mollie response to an object (HTTP Status Code: %s).', $code ),
@@ -163,10 +163,9 @@ class Client {
 	/**
 	 * Get payment.
 	 *
-	 * @param string $payment_id Mollie payment ID.
-	 * @param array  $parameters Parameters.
-	 *
-	 * @return object
+	 * @param string               $payment_id Mollie payment ID.
+	 * @param array<string, mixed> $parameters Parameters.
+	 * @return Payment
 	 * @throws \InvalidArgumentException Throws exception on empty payment ID argument.
 	 */
 	public function get_payment( $payment_id, $parameters = array() ) {
@@ -458,17 +457,19 @@ class Client {
 	/**
 	 * Get payment chargebacks.
 	 *
-	 * @param string $payment_id Mollie payment ID.
-	 * @param array  $parameters Parameters.
-	 * @return array
+	 * @param string               $payment_id Mollie payment ID.
+	 * @param array<string, mixed> $parameters Parameters.
+	 * @return array<Chargeback>
 	 */
 	public function get_payment_chargebacks( $payment_id, $parameters ) {
 		$object = $this->send_request_to_endpoint( 'payments/' . $payment_id . '/chargebacks', 'GET', $parameters );
 
 		$chargebacks = array();
 
-		foreach ( $object->_embedded->chargebacks as $chargeback_object ) {
-			$chargebacks[] = Chargeback::from_json( $chargeback_object );
+		if ( \property_exists( $object, '_embedded' ) && \property_exists( $object->_embedded, 'chargebacks' ) ) {
+			foreach ( $object->_embedded->chargebacks as $chargeback_object ) {
+				$chargebacks[] = Chargeback::from_json( $chargeback_object );
+			}
 		}
 
 		return $chargebacks;

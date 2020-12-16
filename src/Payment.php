@@ -63,6 +63,72 @@ class Payment extends BaseResource {
 	private $details;
 
 	/**
+	 * The mode used to create this payment. Mode determines whether a payment is real (live mode) or a test payment.
+	 *
+	 * @var string
+	 */
+	private $mode;
+
+	/**
+	 * The payment’s date and time of creation, in ISO 8601 format.
+	 *
+	 * @var DateTimeInterface
+	 */
+	private $created_at;
+
+	/**
+	 * The amount of the payment, e.g. {"currency":"EUR", "value":"100.00"} for a €100.00 payment.
+	 *
+	 * @var Amount
+	 */
+	private $amount;
+
+	/**
+	 * A short description of the payment. The description is visible in the Dashboard and will be shown on the customer’s bank or card statement when possible.
+	 *
+	 * @var string
+	 */
+	private $description;
+
+	/**
+	 * The URL your customer will be redirected to after completing or canceling the payment process.
+	 *
+	 * @var string|null
+	 */
+	private $redirect_url;
+
+	/**
+	 * The optional metadata you provided upon payment creation. Metadata can for example be used to link an order to a payment.
+	 *
+	 * @var string
+	 */
+	private $metadata;
+
+	/**
+	 * The customer’s locale, either forced on creation by specifying the `locale` parameter, or detected by us during checkout. Will be a full locale, for example `nl_NL`.
+	 *
+	 * @var string
+	 */
+	private $locale;
+
+	/**
+	 * Indicates which type of payment this is in a recurring sequence.
+	 * Set to `first` for first payments that allow the customer to agree to automatic recurring charges taking place on their account in the future.
+	 * Set to `recurring` for payments where the customer’s card is charged automatically.
+	 * Set to `oneoff` by default, which indicates the payment is a regular non-recurring payment.
+	 *
+	 * @var string
+	 */
+	private $sequence_type;
+
+	/**
+	 * For bank transfer payments, the `_links` object will contain some additional URL objects relevant to the payment.
+	 *
+	 * @var object
+	 */
+	private $links;
+
+	/**
 	 * Construct payment.
 	 *
 	 * @param string            $id            Identifier.
@@ -136,6 +202,7 @@ class Payment extends BaseResource {
 	 * Set customer ID.
 	 *
 	 * @param string|null $customer_id Customer ID.
+	 * @return void
 	 */
 	public function set_customer_id( $customer_id ) {
 		$this->customer_id = $customer_id;
@@ -154,6 +221,7 @@ class Payment extends BaseResource {
 	 * Set mandate ID.
 	 *
 	 * @param string|null $mandate_id Mandate ID.
+	 * @return void
 	 */
 	public function set_mandate_id( $mandate_id ) {
 		$this->mandate_id = $mandate_id;
@@ -182,6 +250,7 @@ class Payment extends BaseResource {
 	 * Set payment method specific details.
 	 *
 	 * @param PaymentDetails|null $details Details.
+	 * @return void
 	 */
 	public function set_details( PaymentDetails $details = null ) {
 		$this->details = $details;
@@ -232,7 +301,7 @@ class Payment extends BaseResource {
 		}
 
 		if ( \property_exists( $json, 'details' ) ) {
-			$payment->set_details( PaymentDetails::from_json( $payment->get_method(), $json->details ) );
+			$payment->set_details( PaymentDetails::from_json( (string) $payment->get_method(), $json->details ) );
 		}
 
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.

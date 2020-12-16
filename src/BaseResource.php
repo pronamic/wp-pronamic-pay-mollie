@@ -36,9 +36,9 @@ abstract class BaseResource {
 	}
 
 	/**
-	 * Get created at.
+	 * Get identifier.
 	 *
-	 * @return DateTimeInterface
+	 * @return string
 	 */
 	public function get_id() {
 		return $this->id;

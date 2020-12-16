@@ -16,21 +16,23 @@ $mollie_payment_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
 
 $payment = \get_pronamic_payment_by_transaction_id( $mollie_payment_id );
 
-$api_key = \get_post_meta( $payment->config_id, '_pronamic_gateway_mollie_api_key', true );
+if ( null !== $payment ) {
+	$api_key = \get_post_meta( (int) $payment->get_config_id(), '_pronamic_gateway_mollie_api_key', true );
 
-$client = new Client( $api_key );
+	$client = new Client( (string) $api_key );
 
-/**
- * Customer.
- *
- * @link https://docs.mollie.com/reference/v2/payments-api/get-payment
- */
-$mollie_payment = $client->get_payment(
-	$mollie_payment_id,
-	array(
-		'embed' => 'chargebacks,refunds',
-	)
-);
+	/**
+	 * Payment.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment
+	 */
+	$mollie_payment = $client->get_payment(
+		$mollie_payment_id,
+		array(
+			'embed' => 'chargebacks,refunds',
+		)
+	);
+}
 
 ?>
 <div class="wrap">

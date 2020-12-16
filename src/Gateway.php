@@ -40,6 +40,13 @@ class Gateway extends Core_Gateway {
 	protected $client;
 
 	/**
+	 * Config
+	 *
+	 * @var Config
+	 */
+	protected $config;
+
+	/**
 	 * Profile data store.
 	 *
 	 * @var ProfileDataStore
@@ -406,13 +413,15 @@ class Gateway extends Core_Gateway {
 		$request->set_billing_email( $billing_email );
 
 		// Due date.
-		try {
-			$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
-		} catch ( \Exception $e ) {
-			$due_date = null;
-		}
+		if ( ! empty( $this->config->due_date_days ) ) {
+			try {
+				$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
+			} catch ( \Exception $e ) {
+				$due_date = null;
+			}
 
-		$request->set_due_date( $due_date );
+			$request->set_due_date( $due_date );
+		}
 
 		// Create payment.
 		$result = $this->client->create_payment( $request );

@@ -22,8 +22,8 @@ class PaymentDetails {
 	 * Create payment detailsfrom JSON.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment
-	 * @param string $method Payment method.
-	 * @param object $json   JSON object.
+	 * @param string      $method Payment method.
+	 * @param object|null $json   JSON object.
 	 * @return PaymentDetails|null
 	 * @throws \JsonSchema\Exception\ValidationException Throws JSON schema validation exception when JSON is invalid.
 	 */
