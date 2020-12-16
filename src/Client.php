@@ -163,7 +163,8 @@ class Client {
 	/**
 	 * Get payment.
 	 *
-	 * @param string $payment_id Payment ID.
+	 * @param string $payment_id Mollie payment ID.
+	 * @param array  $parameters Parameters.
 	 *
 	 * @return object
 	 * @throws \InvalidArgumentException Throws exception on empty payment ID argument.
@@ -454,6 +455,13 @@ class Client {
 		return null;
 	}
 
+	/**
+	 * Get payment chargebacks.
+	 *
+	 * @param string $payment_id Mollie payment ID.
+	 * @param array  $parameters Parameters.
+	 * @return array
+	 */
 	public function get_payment_chargebacks( $payment_id, $parameters ) {
 		$object = $this->send_request_to_endpoint( 'payments/' . $payment_id . '/chargebacks', 'GET', $parameters );
 

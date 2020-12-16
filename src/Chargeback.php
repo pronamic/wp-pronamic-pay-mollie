@@ -79,6 +79,7 @@ class Chargeback extends BaseResource {
 		$chargeback = new Chargeback(
 			$json->id,
 			Amount::from_json( $json->amount ),
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 			new \DateTimeImmutable( $json->createdAt )
 		);
 

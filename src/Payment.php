@@ -206,6 +206,7 @@ class Payment extends BaseResource {
 			\JsonSchema\Constraints\Constraint::CHECK_MODE_EXCEPTIONS
 		);
 
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 		$payment = new Payment(
 			$json->id,
 			$json->mode,
@@ -233,6 +234,8 @@ class Payment extends BaseResource {
 		if ( \property_exists( $json, 'details' ) ) {
 			$payment->set_details( PaymentDetails::from_json( $payment->get_method(), $json->details ) );
 		}
+
+		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 
 		return $payment;
 	}

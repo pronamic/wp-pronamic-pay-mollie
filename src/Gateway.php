@@ -417,13 +417,14 @@ class Gateway extends Core_Gateway {
 		// Create payment.
 		$result = $this->client->create_payment( $request );
 
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+
 		// Set transaction ID.
 		if ( isset( $result->id ) ) {
 			$payment->set_transaction_id( $result->id );
 		}
 
 		// Set expiry date.
-		/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
 		if ( isset( $result->expiresAt ) ) {
 			try {
 				$expires_at = new DateTime( $result->expiresAt );
@@ -433,7 +434,6 @@ class Gateway extends Core_Gateway {
 
 			$payment->set_expiry_date( $expires_at );
 		}
-		/* phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
 
 		// Set status.
 		if ( isset( $result->status ) ) {
@@ -460,11 +460,6 @@ class Gateway extends Core_Gateway {
 
 			$details = $result->details;
 
-			/*
-			 * @codingStandardsIgnoreStart
-			 *
-			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
-			 */
 			if ( isset( $details->bankName ) ) {
 				/**
 				 * Set `bankName` as bank details name, as result "Stichting Mollie Payments"
@@ -484,7 +479,6 @@ class Gateway extends Core_Gateway {
 			if ( isset( $details->transferReference ) ) {
 				$bank_transfer_recipient_details->set_reference( $details->transferReference );
 			}
-			// @codingStandardsIgnoreEnd
 		}
 
 		// Handle links.
@@ -501,6 +495,8 @@ class Gateway extends Core_Gateway {
 				$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
 			}
 		}
+
+		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 	}
 
 	/**
@@ -599,6 +595,7 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 		$mollie_payment_details = $mollie_payment->get_details();
 
 		if ( null !== $mollie_payment_details ) {
@@ -610,11 +607,6 @@ class Gateway extends Core_Gateway {
 				$payment->set_consumer_bank_details( $consumer_bank_details );
 			}
 
-			/*
-			 * @codingStandardsIgnoreStart
-			 *
-			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
-			 */
 			if ( isset( $mollie_payment_details->consumerName ) ) {
 				$consumer_bank_details->set_name( $mollie_payment_details->consumerName );
 			}
@@ -685,7 +677,6 @@ class Gateway extends Core_Gateway {
 			if ( isset( $mollie_payment_details->failureMessage ) ) {
 				$failure_reason->set_message( $mollie_payment_details->failureMessage );
 			}
-			// @codingStandardsIgnoreEnd
 		}
 
 		if ( isset( $mollie_payment->_links ) ) {
@@ -697,17 +688,23 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
+		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+
 		if ( $mollie_payment->has_chargebacks() ) {
-			$mollie_chargebacks = $this->client->get_payment_chargebacks( $mollie_payment->get_id(), array(
-				'limit' => 1,
-			) );
+			$mollie_chargebacks = $this->client->get_payment_chargebacks(
+				$mollie_payment->get_id(),
+				array( 'limit' => 1 )
+			);
 
 			$mollie_chargeback = \reset( $mollie_chargebacks );
 
 			if ( false !== $mollie_chargeback ) {
-				$subscriptions = array_filter( $payment->get_subscriptions(), function( $subscription ) {
-					return SubscriptionStatus::ACTIVE === $subscription->get_status();
-				} );
+				$subscriptions = array_filter(
+					$payment->get_subscriptions(),
+					function( $subscription ) {
+						return SubscriptionStatus::ACTIVE === $subscription->get_status();
+					}
+				);
 
 				foreach ( $subscriptions as $subscription ) {
 					if ( $mollie_chargeback->get_created_at() > $subscription->get_activated_at() ) {
@@ -715,7 +712,8 @@ class Gateway extends Core_Gateway {
 
 						$subscription->add_note(
 							\sprintf(
-								\__( 'Subscription put on hold due to chargeback `%s` of payment `%s`.', 'pronamic_ideal' ),
+								/* translators: 1: Mollie chargeback ID, 2: Mollie payment ID */
+								\__( 'Subscription put on hold due to chargeback `%1$s` of payment `%2$s`.', 'pronamic_ideal' ),
 								\esc_html( $mollie_chargeback->get_id() ),
 								\esc_html( $mollie_payment->get_id() )
 							)
