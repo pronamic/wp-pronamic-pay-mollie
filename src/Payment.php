@@ -257,6 +257,25 @@ class Payment extends BaseResource {
 	}
 
 	/**
+	 * Get links.
+	 *
+	 * @return object
+	 */
+	public function get_links() {
+		return $this->links;
+	}
+
+	/**
+	 * Set links.
+	 *
+	 * @param object $links Links.
+	 * @return void
+	 */
+	public function set_links( $links ) {
+		$this->links = $links;
+	}
+
+	/**
 	 * Create payment from JSON.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment

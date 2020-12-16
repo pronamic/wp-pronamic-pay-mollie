@@ -688,13 +688,11 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		if ( isset( $mollie_payment->_links ) ) {
-			$links = $mollie_payment->_links;
+		$links = $mollie_payment->get_links();
 
-			// Change payment state URL.
-			if ( isset( $links->changePaymentState->href ) ) {
-				$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
-			}
+		// Change payment state URL.
+		if ( isset( $links->changePaymentState->href ) ) {
+			$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
 		}
 
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
