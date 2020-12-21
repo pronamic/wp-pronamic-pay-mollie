@@ -691,7 +691,7 @@ class Gateway extends Core_Gateway {
 		$links = $mollie_payment->get_links();
 
 		// Change payment state URL.
-		if ( isset( $links->changePaymentState->href ) ) {
+		if ( \property_exists( $links, 'changePaymentState' ) ) {
 			$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
 		}
 
