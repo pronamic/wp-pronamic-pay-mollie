@@ -367,9 +367,14 @@ class Gateway extends Core_Gateway {
 					}
 				}
 
+				// Use credit card for recurring Apple Pay payments.
+				if ( PaymentMethods::APPLE_PAY === $payment_method ) {
+					$payment_method = PaymentMethods::CREDIT_CARD;
+				}
+
 				$direct_debit_methods = PaymentMethods::get_direct_debit_methods();
 
-				$recurring_method = \array_search( $payment_method, $direct_debit_methods );
+				$recurring_method = \array_search( $payment_method, $direct_debit_methods, true );
 
 				if ( false !== $recurring_method ) {
 					$payment_method = $recurring_method;
