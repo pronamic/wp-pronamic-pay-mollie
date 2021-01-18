@@ -7,6 +7,12 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.2.1] - 2021-01-18
+- Added support for first payment with regular iDEAL/Bancontact/Sofort payment methods.
+- Added support for recurring payments with Apple Pay.
+- Added 'Change Payment State' URL to Mollie payment admin page.
+- Chargebacks now update subscriptions status to 'On hold' (needs manual review).
+
 ## [2.2.0] - 2020-11-09
 - Added Przelewy24 payment method.
 - Added REST route permission callback.
@@ -159,7 +165,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.2.0...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.2.1...HEAD
+[2.2.1]: https://github.com/wp-pay-gateways/mollie/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/wp-pay-gateways/mollie/compare/2.1.4...2.2.0
 [2.1.4]: https://github.com/wp-pay-gateways/mollie/compare/2.1.3...2.1.4
 [2.1.3]: https://github.com/wp-pay-gateways/mollie/compare/2.1.2...2.1.3
