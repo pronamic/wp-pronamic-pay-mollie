@@ -10,11 +10,15 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use DateTimeImmutable;
+use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionsDataStoreCPT;
 use WP_Http;
 use WP_UnitTestCase;
@@ -290,17 +294,36 @@ class GatewayTest extends WP_UnitTestCase {
 	 * @param bool   $expected                  Expected Mollie Customer ID.
 	 */
 	public function test_get_customer_id_for_payment( $user_id, $subscription_customer_id, $first_payment_customer_id, $expected ) {
+		// Customer.
+		$customer = new Customer();
+
+		$customer->set_user_id( $user_id );
+
 		// New payment.
 		$payment                         = new Payment();
 		$payment->config_id              = 1;
-		$payment->user_id                = $user_id;
 		$payment->recurring_type         = Core_Recurring::FIRST;
 		$payment->subscription_source_id = null;
 
-		$payment->subscription                  = new Subscription();
-		$payment->subscription->user_id         = $user_id;
-		$payment->subscription->interval        = 30;
-		$payment->subscription->interval_period = 'D';
+		$payment->set_customer( $customer );
+
+		// Subscription.
+		$subscription = new Subscription();
+
+		$subscription->set_customer( $customer );
+
+		$subscription->add_phase(
+			new SubscriptionPhase(
+				$subscription,
+				new DateTimeImmutable(),
+				new SubscriptionInterval( 'P30D' ),
+				new TaxedMoney( 10 )
+			)
+		);
+
+		$payment->add_period( $subscription->new_period() );
+
+		$payment->subscription = $subscription;
 
 		pronamic_pay_plugin()->payments_data_store->create( $payment );
 

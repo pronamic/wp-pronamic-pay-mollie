@@ -19,6 +19,7 @@ use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 
 /**
  * Title: Mollie
@@ -37,6 +38,13 @@ class Gateway extends Core_Gateway {
 	 * @var Client
 	 */
 	protected $client;
+
+	/**
+	 * Config
+	 *
+	 * @var Config
+	 */
+	protected $config;
 
 	/**
 	 * Profile data store.
@@ -333,6 +341,13 @@ class Gateway extends Core_Gateway {
 		if ( false === $is_recurring_method && null !== $payment_method ) {
 			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
 			$is_recurring_method = PaymentMethods::is_direct_debit_method( $payment_method );
+
+			// Check for non-recurring methods for subscription payments.
+			if ( false === $is_recurring_method && null !== $payment->get_periods() ) {
+				$direct_debit_methods = PaymentMethods::get_direct_debit_methods();
+
+				$is_recurring_method = \in_array( $payment_method, $direct_debit_methods, true );
+			}
 		}
 
 		if ( $is_recurring_method ) {
@@ -350,6 +365,19 @@ class Gateway extends Core_Gateway {
 					if ( false !== $subscription_mandate_id ) {
 						$request->set_mandate_id( $subscription_mandate_id );
 					}
+				}
+
+				// Use credit card for recurring Apple Pay payments.
+				if ( PaymentMethods::APPLE_PAY === $payment_method ) {
+					$payment_method = PaymentMethods::CREDIT_CARD;
+				}
+
+				$direct_debit_methods = PaymentMethods::get_direct_debit_methods();
+
+				$recurring_method = \array_search( $payment_method, $direct_debit_methods, true );
+
+				if ( false !== $recurring_method ) {
+					$payment_method = $recurring_method;
 				}
 
 				$payment->set_action_url( $payment->get_return_url() );
@@ -405,16 +433,20 @@ class Gateway extends Core_Gateway {
 		$request->set_billing_email( $billing_email );
 
 		// Due date.
-		try {
-			$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
-		} catch ( \Exception $e ) {
-			$due_date = null;
-		}
+		if ( ! empty( $this->config->due_date_days ) ) {
+			try {
+				$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
+			} catch ( \Exception $e ) {
+				$due_date = null;
+			}
 
-		$request->set_due_date( $due_date );
+			$request->set_due_date( $due_date );
+		}
 
 		// Create payment.
 		$result = $this->client->create_payment( $request );
+
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 
 		// Set transaction ID.
 		if ( isset( $result->id ) ) {
@@ -422,7 +454,6 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Set expiry date.
-		/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
 		if ( isset( $result->expiresAt ) ) {
 			try {
 				$expires_at = new DateTime( $result->expiresAt );
@@ -432,7 +463,6 @@ class Gateway extends Core_Gateway {
 
 			$payment->set_expiry_date( $expires_at );
 		}
-		/* phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
 
 		// Set status.
 		if ( isset( $result->status ) ) {
@@ -459,11 +489,6 @@ class Gateway extends Core_Gateway {
 
 			$details = $result->details;
 
-			/*
-			 * @codingStandardsIgnoreStart
-			 *
-			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
-			 */
 			if ( isset( $details->bankName ) ) {
 				/**
 				 * Set `bankName` as bank details name, as result "Stichting Mollie Payments"
@@ -483,15 +508,24 @@ class Gateway extends Core_Gateway {
 			if ( isset( $details->transferReference ) ) {
 				$bank_transfer_recipient_details->set_reference( $details->transferReference );
 			}
-			// @codingStandardsIgnoreEnd
 		}
 
-		// Set action URL.
+		// Handle links.
 		if ( isset( $result->_links ) ) {
-			if ( isset( $result->_links->checkout->href ) ) {
-				$payment->set_action_url( $result->_links->checkout->href );
+			$links = $result->_links;
+
+			// Action URL.
+			if ( isset( $links->checkout->href ) ) {
+				$payment->set_action_url( $links->checkout->href );
+			}
+
+			// Change payment state URL.
+			if ( isset( $links->changePaymentState->href ) ) {
+				$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
 			}
 		}
+
+		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 	}
 
 	/**
@@ -509,19 +543,14 @@ class Gateway extends Core_Gateway {
 
 		$mollie_payment = $this->client->get_payment( $transaction_id );
 
-		if ( isset( $mollie_payment->status ) ) {
-			$payment->set_status( Statuses::transform( $mollie_payment->status ) );
-		}
+		$payment->set_status( Statuses::transform( $mollie_payment->get_status() ) );
 
 		/**
 		 * Mollie profile.
 		 */
 		$mollie_profile = new Profile();
 
-		if ( \property_exists( $mollie_payment, 'profileId' ) ) {
-			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-			$mollie_profile->set_id( $mollie_payment->profileId );
-		}
+		$mollie_profile->set_id( $mollie_payment->get_profile_id() );
 
 		$profile_internal_id = $this->profile_data_store->get_or_insert_profile( $mollie_profile );
 
@@ -533,11 +562,10 @@ class Gateway extends Core_Gateway {
 		 *
 		 * @link https://www.gravityforms.com/add-ons/user-registration/
 		 */
+		$mollie_customer_id = $mollie_payment->get_customer_id();
 
-		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-		if ( isset( $mollie_payment->customerId ) ) {
-			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-			$mollie_customer = new Customer( $mollie_payment->customerId );
+		if ( null !== $mollie_customer_id ) {
+			$mollie_customer = new Customer( $mollie_customer_id );
 
 			$customer_internal_id = $this->customer_data_store->get_or_insert_customer(
 				$mollie_customer,
@@ -583,20 +611,23 @@ class Gateway extends Core_Gateway {
 				}
 
 				// Update mandate in subscription meta.
-				// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
-				if ( isset( $mollie_payment->mandateId ) ) {
+				$mollie_mandate_id = $mollie_payment->get_mandate_id();
+
+				if ( null !== $mollie_mandate_id ) {
 					$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
 					// Only update if no mandate has been set yet or if payment succeeded.
 					if ( empty( $mandate_id ) || PaymentStatus::SUCCESS === $payment->get_status() ) {
-						$this->update_subscription_mandate( $subscription, $mollie_payment->mandateId, $payment->get_method() );
+						$this->update_subscription_mandate( $subscription, $mollie_mandate_id, $payment->get_method() );
 					}
 				}
-				// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie.
 			}
 		}
 
-		if ( isset( $mollie_payment->details ) ) {
+		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+		$mollie_payment_details = $mollie_payment->get_details();
+
+		if ( null !== $mollie_payment_details ) {
 			$consumer_bank_details = $payment->get_consumer_bank_details();
 
 			if ( null === $consumer_bank_details ) {
@@ -605,55 +636,46 @@ class Gateway extends Core_Gateway {
 				$payment->set_consumer_bank_details( $consumer_bank_details );
 			}
 
-			$details = $mollie_payment->details;
-
-			/*
-			 * @codingStandardsIgnoreStart
-			 *
-			 * Ignore coding standards because of sniff WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
-			 */
-			if ( isset( $details->consumerName ) ) {
-				$consumer_bank_details->set_name( $details->consumerName );
+			if ( isset( $mollie_payment_details->consumerName ) ) {
+				$consumer_bank_details->set_name( $mollie_payment_details->consumerName );
 			}
 
-			if ( isset( $details->cardHolder ) ) {
-				$consumer_bank_details->set_name( $details->cardHolder );
+			if ( isset( $mollie_payment_details->cardHolder ) ) {
+				$consumer_bank_details->set_name( $mollie_payment_details->cardHolder );
 			}
 
-			if ( isset( $details->cardNumber ) ) {
+			if ( isset( $mollie_payment_details->cardNumber ) ) {
 				// The last four digits of the card number.
-				$consumer_bank_details->set_account_number( $details->cardNumber );
+				$consumer_bank_details->set_account_number( $mollie_payment_details->cardNumber );
 			}
 
-			if ( isset( $details->cardCountryCode ) ) {
+			if ( isset( $mollie_payment_details->cardCountryCode ) ) {
 				// The ISO 3166-1 alpha-2 country code of the country the card was issued in.
-				$consumer_bank_details->set_country( $details->cardCountryCode );
+				$consumer_bank_details->set_country( $mollie_payment_details->cardCountryCode );
 			}
 
-			if ( isset( $details->consumerAccount ) ) {
-				$mollie_method = \property_exists( $mollie_payment, 'method' ) ? $mollie_payment->method : null;
-
-				switch ( $mollie_method ) {
+			if ( isset( $mollie_payment_details->consumerAccount ) ) {
+				switch ( $mollie_payment->get_method() ) {
 					case Methods::BELFIUS:
 					case Methods::DIRECT_DEBIT:
 					case Methods::IDEAL:
 					case Methods::KBC:
 					case Methods::SOFORT:
-						$consumer_bank_details->set_iban( $details->consumerAccount );
+						$consumer_bank_details->set_iban( $mollie_payment_details->consumerAccount );
 
 						break;
 					case Methods::BANCONTACT:
 					case Methods::BANKTRANSFER:
 					case Methods::PAYPAL:
 					default:
-						$consumer_bank_details->set_account_number( $details->consumerAccount );
+						$consumer_bank_details->set_account_number( $mollie_payment_details->consumerAccount );
 
 						break;
 				}
 			}
 
-			if ( isset( $details->consumerBic ) ) {
-				$consumer_bank_details->set_bic( $details->consumerBic );
+			if ( isset( $mollie_payment_details->consumerBic ) ) {
+				$consumer_bank_details->set_bic( $mollie_payment_details->consumerBic );
 			}
 
 			/*
@@ -668,23 +690,66 @@ class Gateway extends Core_Gateway {
 			}
 
 			// SEPA Direct Debit.
-			if ( isset( $details->bankReasonCode ) ) {
-				$failure_reason->set_code( $details->bankReasonCode );
+			if ( isset( $mollie_payment_details->bankReasonCode ) ) {
+				$failure_reason->set_code( $mollie_payment_details->bankReasonCode );
 			}
 
-			if ( isset( $details->bankReason ) ) {
-				$failure_reason->set_message( $details->bankReason );
+			if ( isset( $mollie_payment_details->bankReason ) ) {
+				$failure_reason->set_message( $mollie_payment_details->bankReason );
 			}
 
 			// Credit card.
-			if ( isset( $details->failureReason ) ) {
-				$failure_reason->set_code( $details->failureReason );
+			if ( isset( $mollie_payment_details->failureReason ) ) {
+				$failure_reason->set_code( $mollie_payment_details->failureReason );
 			}
 
-			if ( isset( $details->failureMessage ) ) {
-				$failure_reason->set_message( $details->failureMessage );
+			if ( isset( $mollie_payment_details->failureMessage ) ) {
+				$failure_reason->set_message( $mollie_payment_details->failureMessage );
 			}
-			// @codingStandardsIgnoreEnd
+		}
+
+		$links = $mollie_payment->get_links();
+
+		// Change payment state URL.
+		if ( \property_exists( $links, 'changePaymentState' ) ) {
+			$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
+		}
+
+		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+
+		if ( $mollie_payment->has_chargebacks() ) {
+			$mollie_chargebacks = $this->client->get_payment_chargebacks(
+				$mollie_payment->get_id(),
+				array( 'limit' => 1 )
+			);
+
+			$mollie_chargeback = \reset( $mollie_chargebacks );
+
+			if ( false !== $mollie_chargeback ) {
+				$subscriptions = array_filter(
+					$payment->get_subscriptions(),
+					function( $subscription ) {
+						return SubscriptionStatus::ACTIVE === $subscription->get_status();
+					}
+				);
+
+				foreach ( $subscriptions as $subscription ) {
+					if ( $mollie_chargeback->get_created_at() > $subscription->get_activated_at() ) {
+						$subscription->set_status( SubscriptionStatus::ON_HOLD );
+
+						$subscription->add_note(
+							\sprintf(
+								/* translators: 1: Mollie chargeback ID, 2: Mollie payment ID */
+								\__( 'Subscription put on hold due to chargeback `%1$s` of payment `%2$s`.', 'pronamic_ideal' ),
+								\esc_html( $mollie_chargeback->get_id() ),
+								\esc_html( $mollie_payment->get_id() )
+							)
+						);
+
+						$subscription->save();
+					}
+				}
+			}
 		}
 	}
 

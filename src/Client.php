@@ -13,6 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Core\XML\Security;
+use Pronamic\WordPress\Pay\Facades\Http;
 
 /**
  * Title: Mollie
@@ -60,7 +61,7 @@ class Client {
 	 */
 	public function send_request( $url, $method = 'GET', array $data = array() ) {
 		// Request.
-		$response = wp_remote_request(
+		$response = Http::request(
 			$url,
 			array(
 				'method'  => $method,
@@ -71,28 +72,11 @@ class Client {
 			)
 		);
 
-		if ( $response instanceof \WP_Error ) {
-			throw new \Exception( $response->get_error_message() );
-		}
-
-		// Body.
-		$body = wp_remote_retrieve_body( $response );
-
-		$data = json_decode( $body );
-
-		// JSON error.
-		$json_error = \json_last_error();
-
-		if ( \JSON_ERROR_NONE !== $json_error ) {
-			throw new \Exception(
-				\sprintf( 'JSON: %s', \json_last_error_msg() ),
-				$json_error
-			);
-		}
+		$data = $response->json();
 
 		// Object.
 		if ( ! \is_object( $data ) ) {
-			$code = \wp_remote_retrieve_response_code( $response );
+			$code = $response->status();
 
 			throw new \Exception(
 				\sprintf( 'Could not JSON decode Mollie response to an object (HTTP Status Code: %s).', $code ),
@@ -179,17 +163,21 @@ class Client {
 	/**
 	 * Get payment.
 	 *
-	 * @param string $payment_id Payment ID.
-	 *
-	 * @return object
+	 * @param string               $payment_id Mollie payment ID.
+	 * @param array<string, mixed> $parameters Parameters.
+	 * @return Payment
 	 * @throws \InvalidArgumentException Throws exception on empty payment ID argument.
 	 */
-	public function get_payment( $payment_id ) {
+	public function get_payment( $payment_id, $parameters = array() ) {
 		if ( empty( $payment_id ) ) {
 			throw new \InvalidArgumentException( 'Mollie payment ID can not be empty string.' );
 		}
 
-		return $this->send_request_to_endpoint( 'payments/' . $payment_id, 'GET' );
+		$object = $this->send_request_to_endpoint( 'payments/' . $payment_id, 'GET', $parameters );
+
+		$payment = Payment::from_json( $object );
+
+		return $payment;
 	}
 
 	/**
@@ -464,5 +452,26 @@ class Client {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get payment chargebacks.
+	 *
+	 * @param string               $payment_id Mollie payment ID.
+	 * @param array<string, mixed> $parameters Parameters.
+	 * @return array<Chargeback>
+	 */
+	public function get_payment_chargebacks( $payment_id, $parameters ) {
+		$object = $this->send_request_to_endpoint( 'payments/' . $payment_id . '/chargebacks', 'GET', $parameters );
+
+		$chargebacks = array();
+
+		if ( \property_exists( $object, '_embedded' ) && \property_exists( $object->_embedded, 'chargebacks' ) ) {
+			foreach ( $object->_embedded->chargebacks as $chargeback_object ) {
+				$chargebacks[] = Chargeback::from_json( $chargeback_object );
+			}
+		}
+
+		return $chargebacks;
 	}
 }
