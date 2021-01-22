@@ -376,7 +376,7 @@ class Gateway extends Core_Gateway {
 
 				$recurring_method = \array_search( $payment_method, $direct_debit_methods, true );
 
-				if ( false !== $recurring_method ) {
+				if ( \is_string( $recurring_method ) ) {
 					$payment_method = $recurring_method;
 				}
 
