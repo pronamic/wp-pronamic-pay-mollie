@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
@@ -750,6 +751,15 @@ class Gateway extends Core_Gateway {
 					}
 				}
 			}
+		}
+
+		// Refunds.
+		$amount_refunded = $mollie_payment->get_amount_refunded();
+
+		if ( null !== $amount_refunded ) {
+			$refunded_amount = new Money( $amount_refunded->get_value(), $amount_refunded->get_currency() );
+
+			$payment->set_refunded_amount( $refunded_amount );
 		}
 	}
 

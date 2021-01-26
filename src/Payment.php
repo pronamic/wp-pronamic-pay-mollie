@@ -129,6 +129,13 @@ class Payment extends BaseResource {
 	private $links;
 
 	/**
+	 * Amount refunded.
+	 *
+	 * @var Amount|null
+	 */
+	private $amount_refunded;
+
+	/**
 	 * Construct payment.
 	 *
 	 * @param string            $id            Identifier.
@@ -257,6 +264,25 @@ class Payment extends BaseResource {
 	}
 
 	/**
+	 * Get amount refunded.
+	 *
+	 * @return Amount|null
+	 */
+	public function get_amount_refunded() {
+		return $this->amount_refunded;
+	}
+
+	/**
+	 * Set amount refunded.
+	 *
+	 * @param Amount|null $amount_refunded Amount refunded.
+	 * @return void
+	 */
+	public function set_amount_refunded( Amount $amount_refunded = null ) {
+		$this->amount_refunded = $amount_refunded;
+	}
+
+	/**
 	 * Get links.
 	 *
 	 * @return object
@@ -321,6 +347,12 @@ class Payment extends BaseResource {
 
 		if ( \property_exists( $json, 'details' ) ) {
 			$payment->set_details( PaymentDetails::from_json( (string) $payment->get_method(), $json->details ) );
+		}
+
+		if ( \property_exists( $json, 'amountRefunded' ) ) {
+			$refunded_amount = Amount::from_json( $json->amountRefunded );
+
+			$payment->set_amount_refunded( $refunded_amount );
 		}
 
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
