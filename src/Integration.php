@@ -62,6 +62,7 @@ class Integration extends AbstractGatewayIntegration {
 					'recurring_direct_debit',
 					'recurring_credit_card',
 					'recurring',
+					'refunds',
 					'webhook',
 					'webhook_log',
 					'webhook_no_config',

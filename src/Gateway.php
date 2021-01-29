@@ -77,6 +77,7 @@ class Gateway extends Core_Gateway {
 			'recurring_direct_debit',
 			'recurring_credit_card',
 			'recurring',
+			'refunds',
 			'webhook',
 			'webhook_log',
 			'webhook_no_config',
@@ -826,6 +827,42 @@ class Gateway extends Core_Gateway {
 		}
 
 		$subscription->save();
+	}
+
+	/**
+	 * Create refund.
+	 *
+	 * @param string $transaction_id Transaction ID.
+	 * @param Money  $amount         Amount to refund.
+	 * @param string $description    Refund reason.
+	 * @return string
+	 */
+	public function create_refund( $transaction_id, Money $amount, $description = null ) {
+		$request = new RefundRequest( AmountTransformer::transform( $amount ) );
+
+		// Metadata payment ID.
+		$payment = \get_pronamic_payment_by_transaction_id( $transaction_id );
+
+		$payment_id = null;
+
+		if ( null !== $payment ) {
+			$payment_id = $payment->get_id();
+		}
+
+		$request->set_metadata(
+			array(
+				'pronamic_payment_id' => $payment_id,
+			)
+		);
+
+		// Description.
+		if ( ! empty( $description ) ) {
+			$request->set_description( $description );
+		}
+
+		$refund = $this->client->create_refund( $transaction_id, $request );
+
+		return $refund->get_id();
 	}
 
 	/**

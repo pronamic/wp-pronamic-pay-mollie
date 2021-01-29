@@ -455,6 +455,19 @@ class Client {
 	}
 
 	/**
+	 * Create refund.
+	 *
+	 * @param string        $payment_id     Mollie payment ID.
+	 * @param RefundRequest $refund_request Refund request.
+	 * @return Refund
+	 */
+	public function create_refund( $payment_id, RefundRequest $refund_request ) {
+		$response = $this->send_request_to_endpoint( 'payments/' . $payment_id . '/refunds', 'POST', $refund_request->get_array() );
+
+		return Refund::from_json( $response );
+	}
+
+	/**
 	 * Get payment chargebacks.
 	 *
 	 * @param string               $payment_id Mollie payment ID.
