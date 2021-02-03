@@ -62,7 +62,6 @@
 		"redirectUrl",
 		"method",
 		"metadata",
-		"locale",
 		"profileId",
 		"sequenceType",
 		"_links"
