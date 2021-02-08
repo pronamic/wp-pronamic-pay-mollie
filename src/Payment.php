@@ -16,7 +16,7 @@ use DateTimeInterface;
  * Payment
  *
  * @author  Remco Tolsma
- * @version 2.1.0
+ * @version 2.2.2
  * @since   2.1.0
  */
 class Payment extends BaseResource {
@@ -140,12 +140,11 @@ class Payment extends BaseResource {
 	 * @param string|null       $redirect_url  Redirect URL.
 	 * @param string|null       $method        Method.
 	 * @param string            $metadata      Metadata.
-	 * @param string            $locale        Locale.
 	 * @param string            $profile_id    Profile ID.
 	 * @param string            $sequence_type Sequence type.
 	 * @param object            $links         Links.
 	 */
-	public function __construct( $id, $mode, DateTimeInterface $created_at, $status, Amount $amount, $description, $redirect_url, $method, $metadata, $locale, $profile_id, $sequence_type, $links ) {
+	public function __construct( $id, $mode, DateTimeInterface $created_at, $status, Amount $amount, $description, $redirect_url, $method, $metadata, $profile_id, $sequence_type, $links ) {
 		parent::__construct( $id );
 
 		$this->mode          = $mode;
@@ -156,7 +155,6 @@ class Payment extends BaseResource {
 		$this->redirect_url  = $redirect_url;
 		$this->method        = $method;
 		$this->metadata      = $metadata;
-		$this->locale        = $locale;
 		$this->profile_id    = $profile_id;
 		$this->sequence_type = $sequence_type;
 		$this->links         = $links;
@@ -196,6 +194,25 @@ class Payment extends BaseResource {
 	 */
 	public function get_customer_id() {
 		return $this->customer_id;
+	}
+
+	/**
+	 * Get locale.
+	 *
+	 * @return string
+	 */
+	public function get_locale() {
+		return $this->locale;
+	}
+
+	/**
+	 * Set locale.
+	 *
+	 * @param string $locale Locale.
+	 * @return void
+	 */
+	public function set_locale( $locale ) {
+		$this->locale = $locale;
 	}
 
 	/**
@@ -305,11 +322,14 @@ class Payment extends BaseResource {
 			$json->redirectUrl,
 			$json->method,
 			$json->metadata,
-			$json->locale,
 			$json->profileId,
 			$json->sequenceType,
 			$json->_links
 		);
+
+		if ( \property_exists( $json, 'locale' ) ) {
+			$payment->set_locale( $json->locale );
+		}
 
 		if ( \property_exists( $json, 'customerId' ) ) {
 			$payment->set_customer_id( $json->customerId );
