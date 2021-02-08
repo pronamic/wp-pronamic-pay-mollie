@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.2.2] - 2021-02-08
+- Fixed "Error validating `/locale`: The property `locale` is required" on some status update (https://github.com/mollie/api-documentation/pull/731).
+
 ## [2.2.1] - 2021-01-18
 - Added support for first payment with regular iDEAL/Bancontact/Sofort payment methods.
 - Added support for recurring payments with Apple Pay.
@@ -165,7 +168,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.2.1...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.2.2...HEAD
+[2.2.2]: https://github.com/wp-pay-gateways/mollie/compare/2.2.1...2.2.2
 [2.2.1]: https://github.com/wp-pay-gateways/mollie/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/wp-pay-gateways/mollie/compare/2.1.4...2.2.0
 [2.1.4]: https://github.com/wp-pay-gateways/mollie/compare/2.1.3...2.1.4
