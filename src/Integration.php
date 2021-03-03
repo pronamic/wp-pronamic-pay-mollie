@@ -42,7 +42,7 @@ class Integration extends AbstractGatewayIntegration {
 	public $register_url;
 
 	/**
-	 * Construct and intialize Mollie integration.
+	 * Construct and initialize Mollie integration.
 	 *
 	 * @param array<string, array> $args Arguments.
 	 */

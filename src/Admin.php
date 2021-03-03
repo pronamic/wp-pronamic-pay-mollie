@@ -22,7 +22,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  */
 class Admin {
 	/**
-	 * Construct and intialize Mollie admin.
+	 * Construct and initialize Mollie admin.
 	 */
 	public function __construct() {
 		/**

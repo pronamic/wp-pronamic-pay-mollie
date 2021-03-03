@@ -50,7 +50,7 @@ class PaymentRequest {
 	public $redirect_url;
 
 	/**
-	 * Use this parameter to set a wehook URL for this payment only. Mollie will ignore any webhook
+	 * Use this parameter to set a webhook URL for this payment only. Mollie will ignore any webhook
 	 * set in your website profile for this payment.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
