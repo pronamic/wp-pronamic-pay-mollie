@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use DateTimeImmutable;
+use Pronamic\WordPress\Http\Factory;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
@@ -45,24 +46,14 @@ class GatewayTest extends WP_UnitTestCase {
 	private $config_id = 1;
 
 	/**
-	 * Mock HTTP responses.
-	 *
-	 * @var array
-	 */
-	private $mock_http_responses;
-
-	/**
 	 * Setup gateway test.
 	 */
 	public function setUp() {
 		parent::setUp();
 
-		$this->mock_http_responses = array();
+		$this->factory = new Factory();
 
-		// Mock HTTP response.
-		add_filter( 'pre_http_request', array( $this, 'pre_http_request' ), 10, 3 );
-
-		$this->mock_http_response( 'https://api.mollie.com/v2/methods', __DIR__ . '/../http/api-mollie-com-v2-methods.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/methods', __DIR__ . '/../http/api-mollie-com-v2-methods.http' );
 
 		$this->set_gateway(
 			array(
@@ -70,50 +61,6 @@ class GatewayTest extends WP_UnitTestCase {
 				'mode' => Gateway::MODE_TEST,
 			)
 		);
-	}
-
-	/**
-	 * Mock HTTP response.
-	 *
-	 * @param string $url  URL.
-	 * @param string $file File with HTTP response.
-	 */
-	public function mock_http_response( $url, $file ) {
-		$this->mock_http_responses[ $url ] = $file;
-	}
-
-	/**
-	 * Pre HTTP request
-	 *
-	 * @link https://github.com/WordPress/WordPress/blob/3.9.1/wp-includes/class-http.php#L150-L164
-	 *
-	 * @param false|array|WP_Error $preempt Whether to preempt an HTTP request's return value. Default false.
-	 * @param array                $r       HTTP request arguments.
-	 * @param string               $url     The request URL.
-	 *
-	 * @return array
-	 */
-	public function pre_http_request( $preempt, $r, $url ) {
-		if ( ! isset( $this->mock_http_responses[ $url ] ) ) {
-			return $preempt;
-		}
-
-		$file = $this->mock_http_responses[ $url ];
-
-		// Vary methods result based on requested sequence type.
-		if ( 'https://api.mollie.com/v2/methods' === $url && is_array( $r['body'] ) && isset( $r['body']['sequenceType'] ) ) {
-			$file = \str_replace( '.http', sprintf( '-%s.http', $r['body']['sequenceType'] ), $file );
-		}
-
-		$response = file_get_contents( $file, true );
-
-		$processed_response = WP_Http::processResponse( $response );
-
-		$processed_headers = WP_Http::processHeaders( $processed_response['headers'], $url );
-
-		$processed_headers['body'] = $processed_response['body'];
-
-		return $processed_headers;
 	}
 
 	/**
@@ -336,9 +283,9 @@ class GatewayTest extends WP_UnitTestCase {
 		$payment->recurring_type = Core_Recurring::RECURRING;
 
 		// Get customer ID for payment.
-		$this->mock_http_response( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U.http' );
-		$this->mock_http_response( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U_first', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U_first.http' );
-		$this->mock_http_response( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U_subscription', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U_subscription.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U_first', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U_first.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U_subscription', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U_subscription.http' );
 
 		$customer_id = $this->gateway->get_customer_id_for_payment( $payment );
 
