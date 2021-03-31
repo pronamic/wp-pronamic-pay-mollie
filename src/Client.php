@@ -11,9 +11,9 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Http\Facades\Http;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Core\XML\Security;
-use Pronamic\WordPress\Pay\Facades\Http;
 
 /**
  * Title: Mollie
