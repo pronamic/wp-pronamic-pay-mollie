@@ -12,6 +12,8 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use DateTimeImmutable;
 use Pronamic\WordPress\Http\Factory;
+use Pronamic\WordPress\Http\Response;
+use Pronamic\WordPress\Http\Request;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
@@ -53,7 +55,19 @@ class GatewayTest extends WP_UnitTestCase {
 
 		$this->factory = new Factory();
 
-		$this->factory->fake( 'https://api.mollie.com/v2/methods', __DIR__ . '/../http/api-mollie-com-v2-methods.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/methods', function( Request $request ) {
+			$file = __DIR__ . '/../http/api-mollie-com-v2-methods.http';
+
+			$body = $request->body();
+
+			if ( \is_array( $body ) && \array_key_exists( 'sequenceType', $body ) ) {
+				$sequence_type = $body['sequenceType'];
+
+				$file = __DIR__ . \sprintf( '/../http/api-mollie-com-v2-methods-%s.http', $sequence_type );
+			}
+
+			return Response::array_from_file( $file );
+		} );
 
 		$this->set_gateway(
 			array(
