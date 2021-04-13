@@ -32,7 +32,7 @@ Source: [src/Gateway.php](../src/Gateway.php), [line 405](../src/Gateway.php#L40
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$billing_email` | `string|null` | Billing email.
+`$billing_email` | `string\|null` | Billing email.
 `$payment` | `\Pronamic\WordPress\Pay\Payments\Payment` | Payment.
 
 Source: [src/Gateway.php](../src/Gateway.php), [line 425](../src/Gateway.php#L425-L433)
