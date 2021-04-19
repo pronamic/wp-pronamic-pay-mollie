@@ -55,19 +55,22 @@ class GatewayTest extends WP_UnitTestCase {
 
 		$this->factory = new Factory();
 
-		$this->factory->fake( 'https://api.mollie.com/v2/methods', function( Request $request ) {
-			$file = __DIR__ . '/../http/api-mollie-com-v2-methods.http';
+		$this->factory->fake(
+			'https://api.mollie.com/v2/methods',
+			function( Request $request ) {
+				$file = __DIR__ . '/../http/api-mollie-com-v2-methods.http';
 
-			$body = $request->body();
+				$body = $request->body();
 
-			if ( \is_array( $body ) && \array_key_exists( 'sequenceType', $body ) ) {
-				$sequence_type = $body['sequenceType'];
+				if ( \is_array( $body ) && \array_key_exists( 'sequenceType', $body ) ) {
+					$sequence_type = $body['sequenceType'];
 
-				$file = __DIR__ . \sprintf( '/../http/api-mollie-com-v2-methods-%s.http', $sequence_type );
+					$file = __DIR__ . \sprintf( '/../http/api-mollie-com-v2-methods-%s.http', $sequence_type );
+				}
+
+				return Response::array_from_file( $file );
 			}
-
-			return Response::array_from_file( $file );
-		} );
+		);
 
 		$this->set_gateway(
 			array(
