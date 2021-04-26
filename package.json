@@ -1,6 +1,6 @@
 {
   "name": "mollie",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Mollie driver for the WordPress payment processing library.",
   "repository": {
     "type": "git",
