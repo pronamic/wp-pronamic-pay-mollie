@@ -36,7 +36,7 @@
 
 Please note that an webhook URL with the host `localhost` or with the TLD `.dev` are not allowed,
 this library will check on WordPress URL's on `localhost` or on the `.dev` TLD and will not pass 
-the `webhookUrl` paramater to Mollie. If you want to test the Mollie webhook URL on an local 
+the `webhookUrl` parameter to Mollie. If you want to test the Mollie webhook URL on an local 
 development environment you could use a service like [ngrok](https://ngrok.com/).
 
 > Beste Remco,

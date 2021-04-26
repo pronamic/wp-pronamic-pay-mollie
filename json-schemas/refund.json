@@ -1,0 +1,49 @@
+{
+	"$id": "https://github.com/wp-pay-gateways/mollie/blob/master/json-schemas/refund.json",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Mollie refund.",
+	"type": "object",
+	"properties": {
+		"resource": {
+			"description": "Indicates the response contains a refund object. Will always contain refund for this endpoint.",
+			"type": "string",
+			"const": "refund"
+		},
+		"id": {
+			"description": "The refund’s unique identifier, for example `re_4qqhO89gsT`.",
+			"type": "string"
+		},
+		"amount": {
+			"$ref": "amount.json"
+		},
+		"description": {
+			"description": "The description of the refund that may be shown to your customer, depending on the payment method used.",
+			"type": "string"
+		},
+		"metadata": {
+			"description": "The optional metadata you provided upon refund creation. Metadata can for example be used to link an bookkeeping ID to a refund.",
+			"type": ["string", "object"]
+		},
+		"status": {
+			"description": "Since refunds may not be instant for certain payment methods, the refund carries a status field.",
+			"type": "string"
+		},
+		"paymentId": {
+			"description": "The unique identifier of the payment this refund was created for. For example: `tr_7UhSN1zuXS`.",
+			"type": "string"
+		},
+		"createdAt": {
+			"description": "The date and time the chargeback was issued, in ISO 8601 format.",
+			"type": "string"
+		}
+	},
+	"required": [
+		"resource",
+		"id",
+		"amount",
+		"description",
+		"status",
+		"paymentId",
+		"createdAt"
+	]
+}

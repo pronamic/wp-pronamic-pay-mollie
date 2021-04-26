@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.2.3] - 2021-04-26
+- Added initial support for refunds.
+- Added support for creating mandate with free trial periods.
+- Started using `pronamic/wp-http`.
+
 ## [2.2.2] - 2021-02-08
 - Fixed "Error validating `/locale`: The property `locale` is required" on some status update (https://github.com/mollie/api-documentation/pull/731).
 
@@ -94,7 +99,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 - No longer create new Mollie customer during recurring (not first) payments.
 - Update payment consumer BIC from Mollie payment details.
 - Update payment consumer name with Mollie payment card holder name.
-- Cancel subscriptions if first payment fails, to prevent future reactivation when a vailid customer ID becomes available.
+- Cancel subscriptions if first payment fails, to prevent future reactivation when a valid customer ID becomes available.
 - Update subscription status on payment start only if it's not a recurring payment for a cancelled subscription.
 
 ## [1.1.14] - 2017-05-01
@@ -124,7 +129,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [1.1.9] - 2016-10-20
 - Fixed wrong char in switch statement.
 - Added support for new Bancontact constant.
-- Use seperate customer IDs for test and live mode.
+- Use separate customer IDs for test and live mode.
 
 ## [1.1.8] - 2016-07-06
 - Excluded non-essential files in .gitattributes.
@@ -138,7 +143,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 - Reduced the use of else expressions.
 - Added WordPress payment method to Mollie method transform function.
 - Added readonly Mollie user profile fields.
-- Simplified the gateay payment start function.
+- Simplified the gateway payment start function.
 
 ## [1.1.5] - 2016-03-22
 - Added product URL, updated dashboard URL.
@@ -159,7 +164,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 - Add support for direct iDEAL payment method.
 
 ## [1.1.1] - 2015-03-03
-- Changed WordPress pay core library requirment from `~1.0.1` to `>=1.0.1`.
+- Changed WordPress pay core library requirement from `~1.0.1` to `>=1.0.1`.
 
 ## [1.1.0] - 2015-02-16
 - Improved support for unsupported Mollie locales.
@@ -168,7 +173,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.2.2...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.2.3...HEAD
+[2.2.3]: https://github.com/wp-pay-gateways/mollie/compare/2.2.2...2.2.3
 [2.2.2]: https://github.com/wp-pay-gateways/mollie/compare/2.2.1...2.2.2
 [2.2.1]: https://github.com/wp-pay-gateways/mollie/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/wp-pay-gateways/mollie/compare/2.1.4...2.2.0

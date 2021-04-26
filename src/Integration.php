@@ -3,7 +3,7 @@
  * Mollie integration.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2020 Pronamic
+ * @copyright 2005-2021 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -19,7 +19,7 @@ use Pronamic\WordPress\Pay\Subscriptions\Subscription as CoreSubscription;
 /**
  * Title: Mollie integration
  * Description:
- * Copyright: 2005-2020 Pronamic
+ * Copyright: 2005-2021 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -42,7 +42,7 @@ class Integration extends AbstractGatewayIntegration {
 	public $register_url;
 
 	/**
-	 * Construct and intialize Mollie integration.
+	 * Construct and initialize Mollie integration.
 	 *
 	 * @param array<string, array> $args Arguments.
 	 */
@@ -62,6 +62,7 @@ class Integration extends AbstractGatewayIntegration {
 					'recurring_direct_debit',
 					'recurring_credit_card',
 					'recurring',
+					'refunds',
 					'webhook',
 					'webhook_log',
 					'webhook_no_config',

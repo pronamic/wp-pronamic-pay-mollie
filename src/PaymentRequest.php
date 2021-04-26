@@ -3,7 +3,7 @@
  * Mollie payment request.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2020 Pronamic
+ * @copyright 2005-2021 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -13,7 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 /**
  * Title: Mollie payment request
  * Description:
- * Copyright: 2005-2020 Pronamic
+ * Copyright: 2005-2021 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -50,7 +50,7 @@ class PaymentRequest {
 	public $redirect_url;
 
 	/**
-	 * Use this parameter to set a wehook URL for this payment only. Mollie will ignore any webhook
+	 * Use this parameter to set a webhook URL for this payment only. Mollie will ignore any webhook
 	 * set in your website profile for this payment.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create

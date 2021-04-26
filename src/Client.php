@@ -3,7 +3,7 @@
  * Mollie client.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2020 Pronamic
+ * @copyright 2005-2021 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -11,14 +11,14 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Http\Facades\Http;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Core\XML\Security;
-use Pronamic\WordPress\Pay\Facades\Http;
 
 /**
  * Title: Mollie
  * Description:
- * Copyright: 2005-2020 Pronamic
+ * Copyright: 2005-2021 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -452,6 +452,19 @@ class Client {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Create refund.
+	 *
+	 * @param string        $payment_id     Mollie payment ID.
+	 * @param RefundRequest $refund_request Refund request.
+	 * @return Refund
+	 */
+	public function create_refund( $payment_id, RefundRequest $refund_request ) {
+		$response = $this->send_request_to_endpoint( 'payments/' . $payment_id . '/refunds', 'POST', $refund_request->get_array() );
+
+		return Refund::from_json( $response );
 	}
 
 	/**

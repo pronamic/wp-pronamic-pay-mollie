@@ -3,7 +3,7 @@
  * Mollie gateway.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2020 Pronamic
+ * @copyright 2005-2021 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
@@ -24,7 +25,7 @@ use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 /**
  * Title: Mollie
  * Description:
- * Copyright: 2005-2020 Pronamic
+ * Copyright: 2005-2021 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -76,6 +77,7 @@ class Gateway extends Core_Gateway {
 			'recurring_direct_debit',
 			'recurring_credit_card',
 			'recurring',
+			'refunds',
 			'webhook',
 			'webhook_log',
 			'webhook_no_config',
@@ -338,6 +340,13 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
+		// Check empty amount.
+		$amount = $payment->get_total_amount()->get_value();
+
+		if ( empty( $amount ) ) {
+			return;
+		}
+
 		if ( false === $is_recurring_method && null !== $payment_method ) {
 			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
 			$is_recurring_method = PaymentMethods::is_direct_debit_method( $payment_method );
@@ -376,7 +385,7 @@ class Gateway extends Core_Gateway {
 
 				$recurring_method = \array_search( $payment_method, $direct_debit_methods, true );
 
-				if ( false !== $recurring_method ) {
+				if ( \is_string( $recurring_method ) ) {
 					$payment_method = $recurring_method;
 				}
 
@@ -557,8 +566,8 @@ class Gateway extends Core_Gateway {
 		/**
 		 * If the Mollie payment contains a customer ID we will try to connect
 		 * this Mollie customer ID the WordPress user and subscription.
-		 * This can be usefull in case when a WordPress user is created after
-		 * a succesfull payment.
+		 * This can be useful in case when a WordPress user is created after
+		 * a successful payment.
 		 *
 		 * @link https://www.gravityforms.com/add-ons/user-registration/
 		 */
@@ -751,6 +760,15 @@ class Gateway extends Core_Gateway {
 				}
 			}
 		}
+
+		// Refunds.
+		$amount_refunded = $mollie_payment->get_amount_refunded();
+
+		if ( null !== $amount_refunded ) {
+			$refunded_amount = new Money( $amount_refunded->get_value(), $amount_refunded->get_currency() );
+
+			$payment->set_refunded_amount( $refunded_amount );
+		}
 	}
 
 	/**
@@ -816,6 +834,42 @@ class Gateway extends Core_Gateway {
 		}
 
 		$subscription->save();
+	}
+
+	/**
+	 * Create refund.
+	 *
+	 * @param string $transaction_id Transaction ID.
+	 * @param Money  $amount         Amount to refund.
+	 * @param string $description    Refund reason.
+	 * @return string
+	 */
+	public function create_refund( $transaction_id, Money $amount, $description = null ) {
+		$request = new RefundRequest( AmountTransformer::transform( $amount ) );
+
+		// Metadata payment ID.
+		$payment = \get_pronamic_payment_by_transaction_id( $transaction_id );
+
+		$payment_id = null;
+
+		if ( null !== $payment ) {
+			$payment_id = $payment->get_id();
+		}
+
+		$request->set_metadata(
+			array(
+				'pronamic_payment_id' => $payment_id,
+			)
+		);
+
+		// Description.
+		if ( ! empty( $description ) ) {
+			$request->set_description( $description );
+		}
+
+		$refund = $this->client->create_refund( $transaction_id, $request );
+
+		return $refund->get_id();
 	}
 
 	/**
