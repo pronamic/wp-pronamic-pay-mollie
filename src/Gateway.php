@@ -694,8 +694,6 @@ class Gateway extends Core_Gateway {
 
 			if ( null === $failure_reason ) {
 				$failure_reason = new FailureReason();
-
-				$payment->set_failure_reason( $failure_reason );
 			}
 
 			// SEPA Direct Debit.
@@ -714,6 +712,13 @@ class Gateway extends Core_Gateway {
 
 			if ( isset( $mollie_payment_details->failureMessage ) ) {
 				$failure_reason->set_message( $mollie_payment_details->failureMessage );
+			}
+
+			$failure_code    = $failure_reason->get_code();
+			$failure_message = $failure_reason->get_message();
+
+			if ( ! empty( $failure_code ) || ! empty( $failure_message ) ) {
+				$payment->set_failure_reason( $failure_reason );
 			}
 		}
 
