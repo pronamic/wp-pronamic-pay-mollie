@@ -855,17 +855,13 @@ class Gateway extends Core_Gateway {
 		// Metadata payment ID.
 		$payment = \get_pronamic_payment_by_transaction_id( $transaction_id );
 
-		$payment_id = null;
-
 		if ( null !== $payment ) {
-			$payment_id = $payment->get_id();
+			$request->set_metadata(
+				array(
+					'pronamic_payment_id' => $payment->get_id(),
+				)
+			);
 		}
-
-		$request->set_metadata(
-			array(
-				'pronamic_payment_id' => $payment_id,
-			)
-		);
 
 		// Description.
 		if ( ! empty( $description ) ) {
