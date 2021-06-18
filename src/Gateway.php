@@ -694,8 +694,6 @@ class Gateway extends Core_Gateway {
 
 			if ( null === $failure_reason ) {
 				$failure_reason = new FailureReason();
-
-				$payment->set_failure_reason( $failure_reason );
 			}
 
 			// SEPA Direct Debit.
@@ -714,6 +712,13 @@ class Gateway extends Core_Gateway {
 
 			if ( isset( $mollie_payment_details->failureMessage ) ) {
 				$failure_reason->set_message( $mollie_payment_details->failureMessage );
+			}
+
+			$failure_code    = $failure_reason->get_code();
+			$failure_message = $failure_reason->get_message();
+
+			if ( ! empty( $failure_code ) || ! empty( $failure_message ) ) {
+				$payment->set_failure_reason( $failure_reason );
 			}
 		}
 
@@ -767,7 +772,7 @@ class Gateway extends Core_Gateway {
 		if ( null !== $amount_refunded ) {
 			$refunded_amount = new Money( $amount_refunded->get_value(), $amount_refunded->get_currency() );
 
-			$payment->set_refunded_amount( $refunded_amount );
+			$payment->set_refunded_amount( $refunded_amount->get_value() > 0 ? $refunded_amount : null );
 		}
 	}
 
@@ -850,17 +855,13 @@ class Gateway extends Core_Gateway {
 		// Metadata payment ID.
 		$payment = \get_pronamic_payment_by_transaction_id( $transaction_id );
 
-		$payment_id = null;
-
 		if ( null !== $payment ) {
-			$payment_id = $payment->get_id();
+			$request->set_metadata(
+				array(
+					'pronamic_payment_id' => $payment->get_id(),
+				)
+			);
 		}
-
-		$request->set_metadata(
-			array(
-				'pronamic_payment_id' => $payment_id,
-			)
-		);
 
 		// Description.
 		if ( ! empty( $description ) ) {
