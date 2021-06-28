@@ -36,7 +36,7 @@ class AmountTransformer {
 
 		$amount = new Amount(
 			\strval( $alphabetic_code ),
-			$money->get_value()
+			$money->format()
 		);
 
 		return $amount;
