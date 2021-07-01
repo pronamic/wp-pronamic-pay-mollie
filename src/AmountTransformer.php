@@ -30,12 +30,8 @@ class AmountTransformer {
 	public static function transform( Money $money ) {
 		$alphabetic_code = $money->get_currency()->get_alphabetic_code();
 
-		if ( null === $alphabetic_code ) {
-			throw new \InvalidArgumentException( 'Alphabetic currency code is required to transform money to Mollie amount object.' );
-		}
-
 		$amount = new Amount(
-			\strval( $alphabetic_code ),
+			$alphabetic_code,
 			$money->format()
 		);
 
