@@ -32,7 +32,13 @@ class AmountTransformer {
 
 		$amount = new Amount(
 			$alphabetic_code,
-			$money->format()
+			/**
+			 * Make sure to send the right amount of decimals and omit the
+			 * thousands separator. Non-string values are not accepted.
+			 * 
+			 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+			 */
+			$money->number_format( null, '.', '' )
 		);
 
 		return $amount;
