@@ -28,10 +28,8 @@ class AmountTransformer {
 	 * @throws \InvalidArgumentException Throws exception on invalid alphabetic currency code in given money object.
 	 */
 	public static function transform( Money $money ) {
-		$alphabetic_code = $money->get_currency()->get_alphabetic_code();
-
 		$amount = new Amount(
-			$alphabetic_code,
+			$money->get_currency()->get_alphabetic_code(),
 			/**
 			 * Make sure to send the right amount of decimals and omit the
 			 * thousands separator. Non-string values are not accepted.
