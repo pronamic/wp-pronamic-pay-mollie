@@ -14,7 +14,7 @@ use DateTimeImmutable;
 use Pronamic\WordPress\Http\Factory;
 use Pronamic\WordPress\Http\Response;
 use Pronamic\WordPress\Http\Request;
-use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
 use Pronamic\WordPress\Pay\Customer;
@@ -281,7 +281,7 @@ class GatewayTest extends WP_UnitTestCase {
 				$subscription,
 				new DateTimeImmutable(),
 				new SubscriptionInterval( 'P30D' ),
-				new TaxedMoney( 10 )
+				new Money( '10' )
 			)
 		);
 
