@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [3.0.0] - 2021-08-05
+- Updated to `pronamic/wp-pay-core`  version `3.0.0`.
+- Updated to `pronamic/wp-money`  version `2.0.0`.
+- Switched to `pronamic/wp-coding-standards`.
+
 ## [2.2.4] - 2021-06-18
 - Refunds maintenance.
 
@@ -176,7 +181,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/2.2.4...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/3.0.0...HEAD
+[2.2.4]: https://github.com/wp-pay-gateways/mollie/compare/2.2.4...3.0.0
 [2.2.4]: https://github.com/wp-pay-gateways/mollie/compare/2.2.3...2.2.4
 [2.2.3]: https://github.com/wp-pay-gateways/mollie/compare/2.2.2...2.2.3
 [2.2.2]: https://github.com/wp-pay-gateways/mollie/compare/2.2.1...2.2.2
