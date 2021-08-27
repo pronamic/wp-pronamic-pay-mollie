@@ -340,13 +340,6 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		// Check empty amount.
-		$amount = $payment->get_total_amount()->get_value();
-
-		if ( empty( $amount ) ) {
-			return;
-		}
-
 		if ( false === $is_recurring_method && null !== $payment_method ) {
 			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
 			$is_recurring_method = PaymentMethods::is_direct_debit_method( $payment_method );
