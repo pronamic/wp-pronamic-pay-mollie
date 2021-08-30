@@ -271,9 +271,24 @@ class Gateway extends Core_Gateway {
 	 * @throws \Exception Throws exception on error creating Mollie customer for payment.
 	 */
 	public function start( Payment $payment ) {
+		$description = (string) $payment->get_description();
+
+		/**
+		 * Filters the Mollie payment description.
+		 * 
+		 * The maximum length of the description field differs per payment
+		 * method, with the absolute maximum being 255 characters.
+		 *
+		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#parameters
+		 * @since 3.0.1
+		 * @param string  $description Description.
+		 * @param Payment $payment     Payment.
+		 */
+		$description = \apply_filters( 'pronamic_pay_mollie_payment_description', $description, $payment );
+
 		$request = new PaymentRequest(
 			AmountTransformer::transform( $payment->get_total_amount() ),
-			(string) $payment->get_description()
+			$description
 		);
 
 		$request->redirect_url = $payment->get_return_url();
