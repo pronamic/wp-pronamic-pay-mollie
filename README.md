@@ -114,6 +114,55 @@ $ wp pronamic-pay mollie customers connect-wp-users
 
 ## WordPress Filters
 
+### `pronamic_pay_mollie_payment_description`
+
+#### Description
+
+Filters the Mollie payment description.
+
+#### Usage
+
+```php
+\add_filter( 'pronamic_pay_mollie_payment_description', 'your_function_name', 10, 2 );
+```
+
+#### Parameters
+
+**`$description`** | string
+
+Mollie payment description.
+
+**`$payment`** | [Payment Object](https://github.com/wp-pay/core/blob/2.3.0/src/Payments/Payment.php)
+
+The WordPress payment object.
+
+#### Examples
+
+```php
+\add_filter( 'pronamic_pay_mollie_payment_description', function( $description, $payment ) {
+	$periods = $payment->get_periods();
+
+	if ( null === $periods ) {
+		return $description;
+	}
+
+	foreach ( $periods as $period ) {
+		$phase = $period->get_phase();
+
+		$subscription = $phase->get_subscription();
+
+		$description = \sprintf(
+			'%s - %s - %s',
+			$subscription->get_description(),
+			$period->get_start_date()->format_i18n( 'd-m-Y' ),
+			$period->get_end_date()->format_i18n( 'd-m-Y' )
+		);
+	}
+
+	return $description;
+}, 10, 2 );
+```
+
 ### `pronamic_pay_mollie_payment_metadata`
 
 #### Description
