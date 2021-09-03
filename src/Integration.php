@@ -243,6 +243,7 @@ class Integration extends AbstractGatewayIntegration {
 			$transaction_id
 		);
 	}
+
 	/**
 	 * Get configuration by post ID.
 	 *
