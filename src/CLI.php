@@ -407,7 +407,7 @@ class CLI {
 
 			\WP_CLI::log(
 				\sprintf(
-					'`status` = %s, `createdAt` = %s, `canceledAt` = %s',
+					'- status = %s, createdAt = %s, canceledAt = %s',
 					$response->status,
 					$response->createdAt,
 					$response->canceledAt,
