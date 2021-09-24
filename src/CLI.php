@@ -70,6 +70,26 @@ class CLI {
 			)
 		);
 
+		\WP_CLI::add_command(
+			'pronamic-pay mollie payments list',
+			function( $args, $assoc_args ) {
+				$this->wp_cli_payments( $args, $assoc_args );
+			},
+			array(
+				'shortdesc' => 'Mollie payments.',
+			)
+		);
+
+		\WP_CLI::add_command(
+			'pronamic-pay mollie payments cancel',
+			function( $args, $assoc_args ) {
+				$this->wp_cli_payments_cancel( $args, $assoc_args );
+			},
+			array(
+				'shortdesc' => 'Cancel Mollie payments.',
+			)
+		);
+
 		// Data Stores.
 		$this->profile_data_store  = new ProfileDataStore();
 		$this->customer_data_store = new CustomerDataStore();
@@ -247,6 +267,169 @@ class CLI {
 			sprintf(
 				'Connected %d users and Mollie customers.',
 				$result
+			)
+		);
+	}
+
+	/**
+	 * CLI Mollie payments.
+	 *
+	 * @param array<string> $args       Arguments.
+	 * @param array<string> $assoc_args Associative arguments.
+	 * @return void
+	 */
+	public function wp_cli_payments( $args, $assoc_args ) {
+		$assoc_args = \wp_parse_args(
+			$assoc_args,
+			array(
+				'api_key' => null,
+				'api_url' => 'https://api.mollie.com/v2/payments',
+				'from'    => null,
+				'limit'   => 250,
+				'format'  => 'table',
+			)
+		);
+
+		$api_key = $assoc_args['api_key'];
+		$api_url = $assoc_args['api_url'];
+		$from    = $assoc_args['from'];
+		$limit   = $assoc_args['limit'];
+		$format  = $assoc_args['format'];
+
+		if ( empty( $api_key ) ) {
+			\WP_CLI::error( 'This command requires an API key for authentication' );
+
+			return;
+		}
+
+		$client = new Client( $api_key );
+
+		$payments = array();
+
+		$api_url = $assoc_args['api_url'];
+
+		if ( null !== $limit ) {
+			$api_url = \add_query_arg( 'limit', $limit, $api_url );
+		}
+
+		if ( null !== $from ) {
+			$api_url = \add_query_arg( 'from', $from, $api_url );
+		}
+
+		$response = $client->send_request( $api_url );
+
+		if ( \property_exists( $response, '_embedded' ) && isset( $response->_embedded->payments ) ) {
+			foreach ( $response->_embedded->payments as $object ) {
+				$payments[] = $object;
+			}
+		}
+
+		$is_cancelable = \WP_CLI\Utils\get_flag_value( $assoc_args, 'is_cancelable' );
+
+		if ( null !== $is_cancelable ) {
+			$payments = \array_filter(
+				$payments,
+				function( $payment ) {
+					if ( ! \property_exists( $payment, 'isCancelable' ) ) {
+						return false;
+					}
+
+					return $payment->isCancelable;
+				} 
+			);
+		}
+
+		$data = $payments;
+
+		if ( 'ids' === $format ) {
+			$data = \wp_list_pluck( $payments, 'id' );
+		}
+
+		\WP_CLI\Utils\format_items(
+			$format,
+			$data,
+			array(
+				'id',
+				'createdAt',
+				'mode',
+				'description',
+				'method',
+			)
+		);
+	}
+
+	/**
+	 * CLI cancel Mollie payments.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/payments-api/list-payments
+	 * @link https://make.wordpress.org/cli/handbook/internal-api/wp-cli-add-command/
+	 * @link https://developer.wordpress.org/reference/classes/wpdb/query/
+	 * @param array<string> $args       Arguments.
+	 * @param array<string> $assoc_args Associative arguments.
+	 * @return void
+	 */
+	public function wp_cli_payments_cancel( $args, $assoc_args ) {
+		$assoc_args = \wp_parse_args(
+			$assoc_args,
+			array(
+				'api_key' => null,
+			)
+		);
+
+		$api_key = $assoc_args['api_key'];
+
+		if ( empty( $api_key ) ) {
+			\WP_CLI::error( 'This command requires an API key for authentication' );
+
+			return;
+		}
+
+		$client = new Client( $api_key );
+
+		foreach ( $args as $id ) {
+			\WP_CLI::log(
+				\sprintf(
+					'Try to cancel payment `%s`…',
+					$id
+				)
+			);
+
+			$url = 'https://api.mollie.com/v2/payments/' . $id;
+
+			\WP_CLI::log(
+				\sprintf(
+					'DELETE %s',
+					$url
+				)
+			);
+
+			$response = $client->send_request( $url, 'DELETE' );
+
+			\WP_CLI::log(
+				\sprintf(
+					'`status` = %s, `createdAt` = %s, `canceledAt` = %s',
+					$response->status,
+					$response->createdAt,
+					$response->canceledAt,
+				)
+			);
+
+			\WP_CLI::log( '' );
+		}
+
+		\WP_CLI::log( '' );
+
+		\WP_CLI::log( 'If you want to cancel the next batch of payments you can run the following command:' );
+
+		\WP_CLI::log( '' );
+
+		\WP_CLI::log(
+			\sprintf(
+				'wp pronamic-pay mollie payments cancel $( wp pronamic-pay mollie payments list --api_key=%s --from=%s --is_cancelable --format=%s ) --api_key=%s',
+				\escapeshellarg( $api_key ),
+				\escapeshellarg( $id ),
+				\escapeshellarg( 'ids' ),
+				\escapeshellarg( $api_key )
 			)
 		);
 	}
