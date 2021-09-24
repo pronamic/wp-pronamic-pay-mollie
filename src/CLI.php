@@ -345,6 +345,31 @@ class CLI {
 			$data = \wp_list_pluck( $payments, 'id' );
 		}
 
+		if ( empty( $data ) ) {
+			if ( \property_exists( $response, '_links' ) && isset( $response->_links->next->href ) ) {
+				\WP_CLI::log(
+					\sprintf(
+						'Number Payments: %s, Number Filtered Payments: %s, API URL: %s.',
+						\count( $response->_embedded->payments ),
+						\count( $payments ),
+						$api_url
+					)
+				);
+
+				$automatic = \WP_CLI\Utils\get_flag_value( $assoc_args, 'automatic' );
+
+				if ( true == $automatic ) {
+					$new_assoc_args = $assoc_args;
+
+					$new_assoc_args['api_url'] = $response->_links->next->href;
+
+					$this->wp_cli_payments( $args, $new_assoc_args );
+				}
+
+				return;
+			}
+		}
+
 		\WP_CLI\Utils\format_items(
 			$format,
 			$data,
