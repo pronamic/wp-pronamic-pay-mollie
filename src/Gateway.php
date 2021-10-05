@@ -431,7 +431,7 @@ class Gateway extends Core_Gateway {
 
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
-			$request->issuer = $payment->get_issuer();
+			$request->issuer = $payment->get_meta( 'issuer' );
 		}
 
 		// Billing email.
