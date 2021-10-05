@@ -293,13 +293,13 @@ class Integration extends AbstractGatewayIntegration {
 		}
 
 		// Check direct debit payment method.
-		$method = $subscription->payment_method;
+		$payment_method = $subscription->get_payment_method();
 
-		if ( null === $method ) {
+		if ( null === $payment_method ) {
 			return $next_payment_delivery_date;
 		}
 
-		if ( ! PaymentMethods::is_direct_debit_method( $method ) ) {
+		if ( ! PaymentMethods::is_direct_debit_method( $payment_method ) ) {
 			return $next_payment_delivery_date;
 		}
 

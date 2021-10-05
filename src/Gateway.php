@@ -819,7 +819,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Update payment method.
-		$old_method = $subscription->payment_method;
+		$old_method = $subscription->get_payment_method();
 		$new_method = ( null === $payment_method && \property_exists( $mandate, 'method' ) ? Methods::transform_gateway_method( $mandate->method ) : $payment_method );
 
 		// `Direct Debit` is not a recurring method, use `Direct Debit (mandate via ...)` instead.
@@ -833,7 +833,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		if ( ! empty( $old_method ) && $old_method !== $new_method ) {
-			$subscription->payment_method = $new_method;
+			$subscription->set_payment_method( $new_method );
 
 			// Add note.
 			$note = \sprintf(
