@@ -367,40 +367,6 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		if ( $is_recurring_method ) {
-			$request->sequence_type = $payment->get_recurring() ? Sequence::RECURRING : Sequence::FIRST;
-
-			if ( Sequence::FIRST === $request->sequence_type ) {
-				$payment_method = PaymentMethods::get_first_payment_method( $payment_method );
-			}
-
-			if ( Sequence::RECURRING === $request->sequence_type ) {
-				// Use mandate from subscription.
-				if ( $subscription && empty( $request->mandate_id ) ) {
-					$subscription_mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
-
-					if ( false !== $subscription_mandate_id ) {
-						$request->set_mandate_id( $subscription_mandate_id );
-					}
-				}
-
-				// Use credit card for recurring Apple Pay payments.
-				if ( PaymentMethods::APPLE_PAY === $payment_method ) {
-					$payment_method = PaymentMethods::CREDIT_CARD;
-				}
-
-				$direct_debit_methods = PaymentMethods::get_direct_debit_methods();
-
-				$recurring_method = \array_search( $payment_method, $direct_debit_methods, true );
-
-				if ( \is_string( $recurring_method ) ) {
-					$payment_method = $recurring_method;
-				}
-
-				$payment->set_action_url( $payment->get_return_url() );
-			}
-		}
-
 		/**
 		 * Payment method.
 		 *
@@ -416,6 +382,7 @@ class Gateway extends Core_Gateway {
 		$subscriptions = $payment->get_subscriptions();
 
 		if ( \count( $subscriptions ) > 0 ) {
+			$request->method        = PaymentMethods::get_first_payment_method( $payment_method );
 			$request->sequence_type = 'first';
 
 			foreach ( $subscriptions as $subscription ) {
@@ -424,7 +391,8 @@ class Gateway extends Core_Gateway {
 				if ( ! empty( $mandate_id ) ) {
 					$request->method        = null;
 					$request->sequence_type = 'recurring';
-					$request->mandate_id    = $mandate_id;
+
+					$request->set_mandate_id( $mandate_id );
 				}
 			}
 		}
