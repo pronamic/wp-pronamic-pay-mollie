@@ -402,6 +402,13 @@ class Gateway extends Core_Gateway {
 		}
 
 		/**
+		 * Payment method.
+		 *
+		 * Leap of faith if the WordPress payment method could not transform to a Mollie method?
+		 */
+		$request->method = Methods::transform( $payment_method, $payment_method );
+
+		/**
 		 * Sequence type.
 		 *
 		 * Recurring payments are created through the Payments API by providing a `sequenceType`.
@@ -415,18 +422,12 @@ class Gateway extends Core_Gateway {
 				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
 				if ( ! empty( $mandate_id ) ) {
+					$request->method        = null;
 					$request->sequence_type = 'recurring';
 					$request->mandate_id    = $mandate_id;
 				}
 			}
 		}
-
-		/**
-		 * Payment method.
-		 *
-		 * Leap of faith if the WordPress payment method could not transform to a Mollie method?
-		 */
-		$request->method = Methods::transform( $payment_method, $payment_method );
 
 		/**
 		 * Metadata.
