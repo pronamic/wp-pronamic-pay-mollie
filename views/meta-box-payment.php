@@ -20,6 +20,7 @@ if ( null === $payment ) {
 
 $mollie_payment_id  = $payment->get_transaction_id();
 $mollie_customer_id = $payment->get_meta( 'mollie_customer_id' );
+$mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 
 ?>
 <p>
@@ -69,6 +70,35 @@ $mollie_customer_id = $payment->get_meta( 'mollie_customer_id' );
 					'<a href="%s">%s</a>',
 					\esc_url( $customer_url ),
 					\esc_html( $mollie_customer_id )
+				)
+			),
+			array(
+				'a' => array(
+					'href' => true,
+				),
+			)
+		);
+	}
+
+	if ( $mollie_mandate_id ) {
+		$mandate_url = \add_query_arg(
+			array(
+				'page' => 'pronamic_pay_mollie_mandates',
+				'id'   => $mollie_mandate_id,
+			),
+			\admin_url( 'admin.php' )
+		);
+
+		echo '<br />';
+
+		echo \wp_kses(
+			\sprintf(
+			/* translators: %s: Mollie customer ID anchor. */
+				\__( 'Mandate: %s', 'pronamic_ideal' ),
+				\sprintf(
+					'<a href="%s">%s</a>',
+					\esc_url( $mandate_url ),
+					\esc_html( $mollie_mandate_id )
 				)
 			),
 			array(

@@ -568,13 +568,6 @@ class Gateway extends Core_Gateway {
 				)
 			);
 
-			// Meta.
-			$customer_id = $payment->get_meta( 'mollie_customer_id' );
-
-			if ( empty( $customer_id ) ) {
-				$payment->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
-			}
-
 			// Customer.
 			$customer = $payment->get_customer();
 
@@ -590,27 +583,46 @@ class Gateway extends Core_Gateway {
 					}
 				}
 			}
+		}
 
-			// Subscription.
-			$subscription = $payment->get_subscription();
+		/**
+		 * Customer ID.
+		 */
+		$mollie_customer_id = $mollie_payment->get_customer_id();
 
-			if ( null !== $subscription ) {
+		if ( null !== $mollie_customer_id ) {
+			$customer_id = $payment->get_meta( 'mollie_customer_id' );
+
+			if ( empty( $customer_id ) ) {
+				$payment->set_meta( 'mollie_customer_id', $mollie_customer_id );
+			}
+
+			foreach ( $payment->get_subscriptions() as $subscription ) {
 				$customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
 				if ( empty( $customer_id ) ) {
-					$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
+					$subscription->set_meta( 'mollie_customer_id', $mollie_customer_id );
 				}
+			}
+		}
 
-				// Update mandate in subscription meta.
-				$mollie_mandate_id = $mollie_payment->get_mandate_id();
+		/**
+		 * Mandate ID.
+		 */
+		$mollie_mandate_id = $mollie_payment->get_mandate_id();
 
-				if ( null !== $mollie_mandate_id ) {
-					$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+		if ( null !== $mollie_mandate_id ) {
+			$mandate_id = $payment->get_meta( 'mollie_mandate_id' );
 
-					// Only update if no mandate has been set yet or if payment succeeded.
-					if ( empty( $mandate_id ) || PaymentStatus::SUCCESS === $payment->get_status() ) {
-						$this->update_subscription_mandate( $subscription, $mollie_mandate_id, $payment->get_payment_method() );
-					}
+			if ( empty( $mandate_id ) ) {
+				$payment->set_meta( 'mollie_mandate_id', $mollie_mandate_id );
+			}
+
+			foreach ( $payment->get_subscriptions() as $subscription ) {
+				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+				if ( empty( $mandate_id ) ) {
+					$subscription->set_meta( 'mollie_mandate_id', $mollie_mandate_id );
 				}
 			}
 		}
@@ -724,7 +736,7 @@ class Gateway extends Core_Gateway {
 			if ( false !== $mollie_chargeback ) {
 				$subscriptions = array_filter(
 					$payment->get_subscriptions(),
-					function( $subscription ) {
+					function ( $subscription ) {
 						return SubscriptionStatus::ACTIVE === $subscription->get_status();
 					}
 				);
@@ -741,8 +753,6 @@ class Gateway extends Core_Gateway {
 								\esc_html( $mollie_payment->get_id() )
 							)
 						);
-
-						$subscription->save();
 					}
 				}
 			}
@@ -755,6 +765,13 @@ class Gateway extends Core_Gateway {
 			$refunded_amount = new Money( $amount_refunded->get_value(), $amount_refunded->get_currency() );
 
 			$payment->set_refunded_amount( $refunded_amount->get_value() > 0 ? $refunded_amount : null );
+		}
+
+		// Save.
+		$payment->save();
+
+		foreach ( $payment->get_subscriptions() as $subscription ) {
+			$subscription->save();
 		}
 	}
 
