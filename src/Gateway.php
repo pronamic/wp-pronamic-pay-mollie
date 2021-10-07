@@ -313,7 +313,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Payment method.
-		$payment_method = $payment->get_method();
+		$payment_method = $payment->get_payment_method();
 
 		// Recurring payment method.
 		$subscription = $payment->get_subscription();
@@ -659,7 +659,7 @@ class Gateway extends Core_Gateway {
 
 					// Only update if no mandate has been set yet or if payment succeeded.
 					if ( empty( $mandate_id ) || PaymentStatus::SUCCESS === $payment->get_status() ) {
-						$this->update_subscription_mandate( $subscription, $mollie_mandate_id, $payment->get_method() );
+						$this->update_subscription_mandate( $subscription, $mollie_mandate_id, $payment->get_payment_method() );
 					}
 				}
 			}
