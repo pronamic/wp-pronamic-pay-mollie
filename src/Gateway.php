@@ -312,15 +312,42 @@ class Gateway extends Core_Gateway {
 			$request->customer_id = $customer_id;
 		}
 
-		// Payment method.
+		/**
+		 * Payment method.
+		 *
+		 * Leap of faith if the WordPress payment method could not transform to a Mollie method?
+		 */
 		$payment_method = $payment->get_payment_method();
 
-		// Recurring payment method.
-		$subscription = $payment->get_subscription();
+		$request->set_method( Methods::transform( $payment_method, $payment_method ) );
 
-		$is_recurring_method = ( $subscription && PaymentMethods::is_recurring_method( (string) $payment_method ) );
+		/**
+		 * Sequence type.
+		 *
+		 * Recurring payments are created through the Payments API by providing a `sequenceType`.
+		 */
+		$subscriptions = $payment->get_subscriptions();
 
-		// Consumer bank details.
+		if ( \count( $subscriptions ) > 0 ) {
+			$request->set_method( PaymentMethods::get_first_payment_method( $payment_method ) );
+			$request->set_sequence_type( 'first' );
+
+			foreach ( $subscriptions as $subscription ) {
+				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+				if ( ! empty( $mandate_id ) ) {
+					$request->set_method( null );
+					$request->set_sequence_type( 'recurring' );
+					$request->set_mandate_id( $mandate_id );
+				}
+			}
+		}
+
+		/**
+		 * Direct Debit.
+		 *
+		 * Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
+		 */
 		$consumer_bank_details = $payment->get_consumer_bank_details();
 
 		if ( PaymentMethods::DIRECT_DEBIT === $payment_method && null !== $consumer_bank_details ) {
@@ -348,40 +375,6 @@ class Gateway extends Core_Gateway {
 				// Charge immediately on-demand.
 				$request->set_sequence_type( Sequence::RECURRING );
 				$request->set_mandate_id( (string) $mandate_id );
-
-				$is_recurring_method = true;
-
-				$payment->recurring = true;
-			}
-		}
-
-		/**
-		 * Payment method.
-		 *
-		 * Leap of faith if the WordPress payment method could not transform to a Mollie method?
-		 */
-		$request->method = Methods::transform( $payment_method, $payment_method );
-
-		/**
-		 * Sequence type.
-		 *
-		 * Recurring payments are created through the Payments API by providing a `sequenceType`.
-		 */
-		$subscriptions = $payment->get_subscriptions();
-
-		if ( \count( $subscriptions ) > 0 ) {
-			$request->method        = PaymentMethods::get_first_payment_method( $payment_method );
-			$request->sequence_type = 'first';
-
-			foreach ( $subscriptions as $subscription ) {
-				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
-
-				if ( ! empty( $mandate_id ) ) {
-					$request->method        = null;
-					$request->sequence_type = 'recurring';
-
-					$request->set_mandate_id( $mandate_id );
-				}
 			}
 		}
 

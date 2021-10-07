@@ -185,6 +185,25 @@ class PaymentRequest {
 	}
 
 	/**
+	 * Get method.
+	 *
+	 * @return null|string
+	 */
+	public function get_method() {
+		return $this->method;
+	}
+
+	/**
+	 * Set method.
+	 *
+	 * @param null|string $method Method
+	 * @return void
+	 */
+	public function set_method( $method ) {
+		$this->method = $method;
+	}
+
+	/**
 	 * Get due date.
 	 *
 	 * @return null|\DateTimeInterface
