@@ -355,18 +355,6 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		if ( false === $is_recurring_method && null !== $payment_method ) {
-			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
-			$is_recurring_method = PaymentMethods::is_direct_debit_method( $payment_method );
-
-			// Check for non-recurring methods for subscription payments.
-			if ( false === $is_recurring_method && null !== $payment->get_periods() ) {
-				$direct_debit_methods = PaymentMethods::get_direct_debit_methods();
-
-				$is_recurring_method = \in_array( $payment_method, $direct_debit_methods, true );
-			}
-		}
-
 		/**
 		 * Payment method.
 		 *
