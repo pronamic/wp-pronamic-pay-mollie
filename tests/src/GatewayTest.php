@@ -263,9 +263,9 @@ class GatewayTest extends WP_UnitTestCase {
 		$customer->set_user_id( $user_id );
 
 		// New payment.
-		$payment                         = new Payment();
-		$payment->config_id              = 1;
-		$payment->subscription_source_id = null;
+		$payment = new Payment();
+
+		$payment->config_id = 1;
 
 		$payment->set_customer( $customer );
 
