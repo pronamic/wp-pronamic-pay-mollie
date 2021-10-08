@@ -16,7 +16,6 @@ use Pronamic\WordPress\Http\Response;
 use Pronamic\WordPress\Http\Request;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
@@ -266,7 +265,6 @@ class GatewayTest extends WP_UnitTestCase {
 		// New payment.
 		$payment                         = new Payment();
 		$payment->config_id              = 1;
-		$payment->recurring_type         = Core_Recurring::FIRST;
 		$payment->subscription_source_id = null;
 
 		$payment->set_customer( $customer );
@@ -295,9 +293,6 @@ class GatewayTest extends WP_UnitTestCase {
 		$payment->set_meta( 'mollie_customer_id', $first_payment_customer_id );
 
 		$payment->subscription->set_meta( 'mollie_customer_id', $subscription_customer_id );
-
-		// Prevent Mollie API call for now.
-		$payment->recurring_type = Core_Recurring::RECURRING;
 
 		// Get customer ID for payment.
 		$this->factory->fake( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U.http' );
