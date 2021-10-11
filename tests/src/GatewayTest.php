@@ -285,14 +285,12 @@ class GatewayTest extends WP_UnitTestCase {
 
 		$payment->add_period( $subscription->new_period() );
 
-		$payment->subscription = $subscription;
-
 		pronamic_pay_plugin()->payments_data_store->create( $payment );
 
 		// Set customer ID meta.
 		$payment->set_meta( 'mollie_customer_id', $first_payment_customer_id );
 
-		$payment->subscription->set_meta( 'mollie_customer_id', $subscription_customer_id );
+		$subscription->set_meta( 'mollie_customer_id', $subscription_customer_id );
 
 		// Get customer ID for payment.
 		$this->factory->fake( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U.http' );
@@ -355,14 +353,16 @@ class GatewayTest extends WP_UnitTestCase {
 		$customer = new Customer();
 		$customer->set_user_id( $user_id );
 
-		$payment->subscription = new Subscription();
-		$payment->subscription->set_id( 1 );
-		$payment->subscription->set_customer( $customer );
+		$subscription = new Subscription();
+		$subscription->set_id( 1 );
+		$subscription->set_customer( $customer );
 
 		$subscriptions_data_store = new SubscriptionsDataStoreCPT();
-		$subscriptions_data_store->update( $payment->subscription );
+		$subscriptions_data_store->update( $subscription );
 
-		$payment->subscription->set_meta( 'mollie_customer_id', $customer_id );
+		$subscription->set_meta( 'mollie_customer_id', $customer_id );
+
+		$payment->add_subscription( $subscription );
 
 		$this->gateway->copy_customer_id_to_wp_user( $payment );
 
