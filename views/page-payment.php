@@ -16,6 +16,9 @@ $mollie_payment_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
 
 $payment = \get_pronamic_payment_by_transaction_id( $mollie_payment_id );
 
+$command_curl   = null;
+$command_httpie = null;
+
 if ( null !== $payment ) {
 	$api_key = \get_post_meta( (int) $payment->get_config_id(), '_pronamic_gateway_mollie_api_key', true );
 
@@ -32,6 +35,21 @@ if ( null !== $payment ) {
 			'embed' => 'chargebacks,refunds',
 		)
 	);
+
+	/**
+	 * Commands.
+	 */
+	$url = \sprintf( 'https://api.mollie.com/v2/payments/%s', $mollie_payment_id );
+
+	$command_curl = 'curl -X GET %s \\' . "\r\n";
+	$command_curl .= "\t" . '-H "Authorization: Bearer %s"';
+
+	$command_curl = \sprintf( $command_curl, $url, $api_key );
+
+	$command_httpie = 'http GET %s \\' . "\r\n";
+	$command_httpie .= "\t" . '"Authorization:Bearer %s"';
+
+	$command_httpie = \sprintf( $command_httpie, $url, $api_key );
 }
 
 ?>
@@ -130,6 +148,33 @@ if ( null !== $payment ) {
 				</tr>
 
 			<?php endif; ?>
+
+			<?php if ( pronamic_pay_plugin()->is_debug_mode() ) : ?>
+
+				<?php if ( null !== $command_curl ) : ?>
+
+					<tr>
+						<th scope="row"><?php \esc_html_e( 'cURL', 'pronamic_ideal' ); ?></th>
+						<td>
+							<pre style="margin: 0;"><?php echo \esc_html( $command_curl ); ?></pre>
+						</td>
+					</tr>
+
+				<?php endif; ?>
+
+				<?php if ( null !== $command_httpie ) : ?>
+
+					<tr>
+						<th scope="row"><?php \esc_html_e( 'HTTPie', 'pronamic_ideal' ); ?></th>
+						<td>
+							<pre style="margin: 0;"><?php echo \esc_html( $command_httpie ); ?></pre>
+						</td>
+					</tr>
+
+				<?php endif; ?>
+
+			<?php endif; ?>
+
 		</tbody>
 	</table>
 </div>
