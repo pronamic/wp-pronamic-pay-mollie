@@ -302,6 +302,8 @@ class Integration extends AbstractGatewayIntegration {
 		// Start payment.
 		try {
 			$gateway->start( $payment );
+
+			$payment->save();
 		} catch ( \Exception $e ) {
 			\as_schedule_single_action(
 				\time() + 60,
