@@ -455,6 +455,13 @@ class Gateway extends Core_Gateway {
 					'pronamic-pay-mollie'
 				);
 
+				// Add note.
+				$code = $e->getCode();
+
+				$error_code = ( $code > 0 ? sprintf( '%s: ', $code ) : '' );
+
+				$payment->add_note( $error_code . $e->getMessage() );
+
 				return;
 			}
 
