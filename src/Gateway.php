@@ -331,7 +331,10 @@ class Gateway extends Core_Gateway {
 		$subscriptions = $payment->get_subscriptions();
 
 		if ( \count( $subscriptions ) > 0 ) {
-			$request->set_method( PaymentMethods::get_first_payment_method( $payment_method ) );
+			$first_method = PaymentMethods::get_first_payment_method( $payment_method );
+
+			$request->set_method( Methods::transform( $first_method, $first_method ) );
+
 			$request->set_sequence_type( 'first' );
 
 			foreach ( $subscriptions as $subscription ) {
