@@ -83,6 +83,13 @@ class Integration extends AbstractGatewayIntegration {
 
 		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
 
+		// Actions.
+		$function = array( $this, 'scheduled_payment_start' );
+
+		if ( ! \has_action( 'pronamic_pay_mollie_payment_start', $function ) ) {
+			\add_action( 'pronamic_pay_mollie_payment_start', $function, 10, 1 );
+		}
+
 		// Tables.
 		$this->register_tables();
 
@@ -269,6 +276,42 @@ class Integration extends AbstractGatewayIntegration {
 	 */
 	public function get_gateway( $post_id ) {
 		return new Gateway( $this->get_config( $post_id ) );
+	}
+
+	/**
+	 * Start scheduled payment.
+	 *
+	 * @param int $payment_id Payment ID.
+	 * @return void
+	 */
+	public function scheduled_payment_start( $payment_id ) {
+		// Check payment.
+		$payment = \get_pronamic_payment( $payment_id );
+
+		if ( null === $payment ) {
+			return;
+		}
+
+		// Check gateway.
+		$gateway = $payment->get_gateway();
+
+		if ( null === $gateway ) {
+			return;
+		}
+
+		// Start payment.
+		try {
+			$gateway->start( $payment );
+		} catch ( \Exception $e ) {
+			\as_schedule_single_action(
+				\time() + 60,
+				'pronamic_pay_mollie_payment_start',
+				array(
+					'payment_id' => $payment_id,
+				),
+				'pronamic-pay-mollie'
+			);
+		}
 	}
 
 	/**

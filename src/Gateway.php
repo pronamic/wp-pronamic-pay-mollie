@@ -294,6 +294,8 @@ class Gateway extends Core_Gateway {
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
 
+		$schedule_retry_on_error = false;
+
 		// Locale.
 		$customer = $payment->get_customer();
 
@@ -339,6 +341,8 @@ class Gateway extends Core_Gateway {
 					$request->set_method( null );
 					$request->set_sequence_type( 'recurring' );
 					$request->set_mandate_id( $mandate_id );
+
+					$schedule_retry_on_error = true;
 				}
 			}
 		}
@@ -435,7 +439,25 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Create payment.
-		$result = $this->client->create_payment( $request );
+		try {
+			$result = $this->client->create_payment( $request );
+		} catch ( \Exception $e ) {
+			if ( $schedule_retry_on_error ) {
+				\as_schedule_single_action(
+					\time() + 60,
+					'pronamic_pay_mollie_payment_start',
+					array(
+						'payment_id' => $payment->get_id(),
+					),
+					'pronamic-pay-mollie'
+				);
+
+				return;
+			}
+
+			// Rethrow exception.
+			throw $e;
+		}
 
 		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 
