@@ -41,12 +41,12 @@ if ( null !== $payment ) {
 	 */
 	$url = \sprintf( 'https://api.mollie.com/v2/payments/%s', $mollie_payment_id );
 
-	$command_curl = 'curl -X GET %s \\' . "\r\n";
+	$command_curl  = 'curl -X GET %s \\' . "\r\n";
 	$command_curl .= "\t" . '-H "Authorization: Bearer %s"';
 
 	$command_curl = \sprintf( $command_curl, $url, $api_key );
 
-	$command_httpie = 'http GET %s \\' . "\r\n";
+	$command_httpie  = 'http GET %s \\' . "\r\n";
 	$command_httpie .= "\t" . '"Authorization:Bearer %s"';
 
 	$command_httpie = \sprintf( $command_httpie, $url, $api_key );

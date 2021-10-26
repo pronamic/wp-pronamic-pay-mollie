@@ -334,6 +334,7 @@ class CLI {
 						return false;
 					}
 
+					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie name.
 					return $payment->isCancelable;
 				} 
 			);
@@ -434,8 +435,10 @@ class CLI {
 				\sprintf(
 					'- status = %s, createdAt = %s, canceledAt = %s',
 					$response->status,
+					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie name.
 					$response->createdAt,
-					$response->canceledAt,
+					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie name.
+					$response->canceledAt
 				)
 			);
 

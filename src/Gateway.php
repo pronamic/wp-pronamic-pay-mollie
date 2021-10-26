@@ -268,6 +268,7 @@ class Gateway extends Core_Gateway {
 	 * @see Core_Gateway::start()
 	 * @param Payment $payment Payment.
 	 * @return void
+	 * @throws Error Mollie error.
 	 * @throws \Exception Throws exception on error creating Mollie customer for payment.
 	 */
 	public function start( Payment $payment ) {

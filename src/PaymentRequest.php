@@ -196,7 +196,7 @@ class PaymentRequest {
 	/**
 	 * Set method.
 	 *
-	 * @param null|string $method Method
+	 * @param null|string $method Method.
 	 * @return void
 	 */
 	public function set_method( $method ) {

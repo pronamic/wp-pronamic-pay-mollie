@@ -283,6 +283,7 @@ class Integration extends AbstractGatewayIntegration {
 	 *
 	 * @param int $payment_id Payment ID.
 	 * @return void
+	 * @throws \Exception Throws exception after four failed attempts.
 	 */
 	public function scheduled_payment_start( $payment_id ) {
 		// Check payment.
