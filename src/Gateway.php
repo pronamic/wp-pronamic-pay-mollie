@@ -445,6 +445,17 @@ class Gateway extends Core_Gateway {
 		try {
 			$result = $this->client->create_payment( $request );
 		} catch ( \Exception $e ) {
+			$code = $e->getCode();
+
+			/*
+			 * Only schedule retry for specific status codes.
+			 *
+			 * @link https://docs.mollie.com/overview/handling-errors
+			 */
+			if ( \in_array( $code, array( 429, 502, 503 ), true ) ) {
+				$schedule_retry_on_error = false;
+			}
+
 			if ( $schedule_retry_on_error ) {
 				\as_schedule_single_action(
 					\time() + 60,
@@ -456,8 +467,6 @@ class Gateway extends Core_Gateway {
 				);
 
 				// Add note.
-				$code = $e->getCode();
-
 				$error_code = ( $code > 0 ? sprintf( '%s: ', $code ) : '' );
 
 				$payment->add_note( $error_code . $e->getMessage() );
