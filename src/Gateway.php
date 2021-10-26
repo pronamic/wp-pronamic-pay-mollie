@@ -294,8 +294,6 @@ class Gateway extends Core_Gateway {
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url();
 
-		$schedule_retry_on_error = false;
-
 		// Locale.
 		$customer = $payment->get_customer();
 
@@ -344,8 +342,6 @@ class Gateway extends Core_Gateway {
 					$request->set_method( null );
 					$request->set_sequence_type( 'recurring' );
 					$request->set_mandate_id( $mandate_id );
-
-					$schedule_retry_on_error = true;
 				}
 			}
 		}
@@ -380,7 +376,7 @@ class Gateway extends Core_Gateway {
 				}
 
 				// Charge immediately on-demand.
-				$request->set_sequence_type( Sequence::RECURRING );
+				$request->set_sequence_type( 'recurring' );
 				$request->set_mandate_id( (string) $mandate_id );
 			}
 		}
@@ -442,40 +438,50 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Create payment.
+		$attempt = (int) $payment->get_meta( 'mollie_create_payment_attempt' );
+		$attempt = empty( $attempt ) ? 1 : $attempt + 1;
+
+		$payment->set_meta( 'mollie_create_payment_attempt', $attempt );
+
 		try {
 			$result = $this->client->create_payment( $request );
-		} catch ( \Exception $e ) {
-			$code = $e->getCode();
 
-			/*
+			$payment->delete_meta( 'mollie_create_payment_attempt' );
+		} catch ( Error $error ) {
+			if ( 'recurring' !== $request->get_sequence_type() ) {
+				throw $error;
+			}
+
+			if ( null === $request->get_mandate_id() ) {
+				throw $error;
+			}
+
+			/**
 			 * Only schedule retry for specific status codes.
 			 *
 			 * @link https://docs.mollie.com/overview/handling-errors
 			 */
-			if ( \in_array( $code, array( 429, 502, 503 ), true ) ) {
-				$schedule_retry_on_error = false;
+			if ( ! \in_array( $error->get_status(), array( 429, 502, 503 ), true ) ) {
+				throw $error;
 			}
 
-			if ( $schedule_retry_on_error ) {
-				\as_schedule_single_action(
-					\time() + 60,
-					'pronamic_pay_mollie_payment_start',
-					array(
-						'payment_id' => $payment->get_id(),
-					),
-					'pronamic-pay-mollie'
-				);
+			\as_schedule_single_action(
+				\time() + $this->get_retry_seconds( $attempt ),
+				'pronamic_pay_mollie_payment_start',
+				array(
+					'payment_id' => $payment->get_id(),
+				),
+				'pronamic-pay-mollie'
+			);
 
-				// Add note.
-				$error_code = ( $code > 0 ? sprintf( '%s: ', $code ) : '' );
+			// Add note.
+			$error_code = ( $code > 0 ? sprintf( '%s: ', $code ) : '' );
 
-				$payment->add_note( $error_code . $e->getMessage() );
+			$payment->add_note( $error_code . $e->getMessage() );
 
-				return;
-			}
+			$payment->save();
 
-			// Rethrow exception.
-			throw $e;
+			return;
 		}
 
 		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
@@ -558,6 +564,26 @@ class Gateway extends Core_Gateway {
 		}
 
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+	}
+
+	/**
+	 * Get retry seconds.
+	 *
+	 * @param int $attempt Number of attempts.
+	 * @return int
+	 */
+	private function get_retry_seconds( $attempt ) {
+		switch ( $attempt ) {
+			case 1:
+				return 5 * MINUTE_IN_SECONDS;
+			case 2:
+				return HOUR_IN_SECONDS;
+			case 3:
+				return 12 * HOUR_IN_SECONDS;
+			case 4:
+			default:
+				return DAY_IN_SECONDS;
+		}
 	}
 
 	/**

@@ -299,21 +299,17 @@ class Integration extends AbstractGatewayIntegration {
 			return;
 		}
 
-		// Start payment.
-		try {
-			$gateway->start( $payment );
+		// Attempt.
+		$attempt = (int) $payment->get_meta( 'mollie_create_payment_attempt' );
 
-			$payment->save();
-		} catch ( \Exception $e ) {
-			\as_schedule_single_action(
-				\time() + 60,
-				'pronamic_pay_mollie_payment_start',
-				array(
-					'payment_id' => $payment_id,
-				),
-				'pronamic-pay-mollie'
-			);
+		if ( $attempt > 4 ) {
+			throw new \Exception( \sprintf( 'Could not create Mollie payment for %s after %s attempts.', $payment_id, $attempt ) );
 		}
+
+		// Start payment.
+		$gateway->start( $payment );
+
+		$payment->save();
 	}
 
 	/**
