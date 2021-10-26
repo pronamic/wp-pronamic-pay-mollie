@@ -340,9 +340,12 @@ class Gateway extends Core_Gateway {
 				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
 				if ( ! empty( $mandate_id ) ) {
+					$request->set_mandate_id( $mandate_id );
+				}
+
+				if ( ! $subscription->is_first_payment( $payment ) ) {
 					$request->set_method( null );
 					$request->set_sequence_type( 'recurring' );
-					$request->set_mandate_id( $mandate_id );
 				}
 			}
 		}
@@ -476,9 +479,14 @@ class Gateway extends Core_Gateway {
 			);
 
 			// Add note.
-			$error_code = ( $code > 0 ? sprintf( '%s: ', $code ) : '' );
-
-			$payment->add_note( $error_code . $e->getMessage() );
+			$payment->add_note(
+				\sprintf(
+					'%s - %s - %s',
+					$error->get_status(),
+					$error->get_title(),
+					$error->get_detail()
+				) 
+			);
 
 			$payment->save();
 
