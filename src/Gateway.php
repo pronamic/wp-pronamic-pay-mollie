@@ -500,6 +500,22 @@ class Gateway extends Core_Gateway {
 			$payment->set_transaction_id( $result->id );
 		}
 
+		// Set payment method.
+		if ( isset( $result->method ) ) {
+			$payment_method = Methods::transform_gateway_method( $result->method );
+
+			if ( null !== $payment_method ) {
+				$payment->set_payment_method( $payment_method );
+
+				// Update subscription payment method.
+				foreach ( $payment->get_subscriptions() as $subscription ) {
+					$subscription->set_payment_method( $payment->get_payment_method() );
+
+					$subscription->save();
+				}
+			}
+		}
+
 		// Set expiry date.
 		if ( isset( $result->expiresAt ) ) {
 			try {
@@ -699,6 +715,24 @@ class Gateway extends Core_Gateway {
 
 				if ( empty( $mandate_id ) ) {
 					$subscription->set_meta( 'mollie_mandate_id', $mollie_mandate_id );
+				}
+			}
+		}
+
+		// Set payment method.
+		$method = $mollie_payment->get_method();
+
+		if ( null !== $method ) {
+			$payment_method = Methods::transform_gateway_method( $method );
+
+			if ( null !== $payment_method ) {
+				$payment->set_payment_method( $payment_method );
+
+				// Update subscription payment method.
+				foreach ( $payment->get_subscriptions() as $subscription ) {
+					$subscription->set_payment_method( $payment->get_payment_method() );
+
+					$subscription->save();
 				}
 			}
 		}
