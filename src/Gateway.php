@@ -233,10 +233,11 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Get webhook URL for Mollie.
 	 *
+	 * @param Payment $payment Payment.
 	 * @return string|null
 	 */
-	public function get_webhook_url() {
-		$url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook' );
+	public function get_webhook_url( Payment $payment ) {
+		$url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook/' . (string) $payment->get_id() );
 
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 
@@ -293,7 +294,7 @@ class Gateway extends Core_Gateway {
 		);
 
 		$request->redirect_url = $payment->get_return_url();
-		$request->webhook_url  = $this->get_webhook_url();
+		$request->webhook_url  = $this->get_webhook_url( $payment );
 
 		// Locale.
 		$customer = $payment->get_customer();

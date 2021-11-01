@@ -12,6 +12,8 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Plugin;
 use WP_Error;
+use WP_REST_Request;
+use WP_REST_Response;
 
 /**
  * Webhook controller
@@ -37,13 +39,14 @@ class WebhookController {
 	/**
 	 * REST API init.
 	 *
+	 * @link https://docs.mollie.com/overview/webhooks
 	 * @link https://developer.wordpress.org/rest-api/extending-the-rest-api/adding-custom-endpoints/
 	 * @link https://developer.wordpress.org/reference/hooks/rest_api_init/
 	 *
 	 * @return void
 	 */
 	public function rest_api_init() {
-		register_rest_route(
+		\register_rest_route(
 			Integration::REST_ROUTE_NAMESPACE,
 			'/webhook',
 			array(
@@ -51,7 +54,31 @@ class WebhookController {
 				'callback'            => array( $this, 'rest_api_mollie_webhook' ),
 				'args'                => array(
 					'id' => array(
-						'required' => true,
+						'description' => \__( 'Mollie transaction ID.', 'pronamic_ideal' ),
+						'type'        => 'string',
+						'required'    => true,
+					),
+				),
+				'permission_callback' => '__return_true',
+			)
+		);
+
+		\register_rest_route(
+			Integration::REST_ROUTE_NAMESPACE,
+			'/webhook/(?P<payment_id>\d+)',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_api_mollie_webhook_payment' ),
+				'args'                => array(
+					'payment_id' => array(
+						'description' => \__( 'Payment ID.', 'pronamic_ideal' ),
+						'type'        => 'string',
+						'required'    => true,
+					),
+					'id'         => array(
+						'description' => \__( 'Mollie transaction ID.', 'pronamic_ideal' ),
+						'type'        => 'string',
+						'required'    => true,
 					),
 				),
 				'permission_callback' => '__return_true',
@@ -62,10 +89,32 @@ class WebhookController {
 	/**
 	 * REST API Mollie webhook handler.
 	 *
-	 * @param \WP_REST_Request $request Request.
+	 * @param WP_REST_Request $request Request.
 	 * @return object
 	 */
-	public function rest_api_mollie_webhook( \WP_REST_Request $request ) {
+	public function rest_api_mollie_webhook( WP_REST_Request $request ) {
+		$id = $request->get_param( 'id' );
+
+		if ( empty( $id ) ) {
+			return $this->rest_api_mollie_webhook_payment( $request );
+		}
+
+		$payment = \get_pronamic_payment_by_transaction_id( $id );
+
+		if ( null !== $payment ) {
+			$request->set_param( 'payment_id', $payment->get_id() );
+		}
+
+		return $this->rest_api_mollie_webhook_payment( $request );
+	}
+
+	/**
+	 * REST API Mollie webhook handler.
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return object
+	 */
+	public function rest_api_mollie_webhook_payment( WP_REST_Request $request ) {
 		$id = $request->get_param( 'id' );
 
 		/**
@@ -73,22 +122,25 @@ class WebhookController {
 		 *
 		 * @link https://developer.wordpress.org/reference/functions/wp_send_json_success/
 		 */
-		$response = \rest_ensure_response(
+		$response = new WP_REST_Response(
 			array(
 				'success' => true,
 				'id'      => $id,
 			)
 		);
 
-		if ( ! ( $response instanceof WP_Error ) ) {
-			$response->add_link( 'self', rest_url( $request->get_route() ) );
+		$response->add_link( 'self', rest_url( $request->get_route() ) );
+
+		/**
+		 * Payment.
+		 */
+		$payment_id = $request->get_param( 'payment_id' );
+
+		if ( empty( $payment_id ) ) {
+			return $response;
 		}
 
-		$payment = null;
-
-		if ( ! empty( $id ) ) {
-			$payment = \get_pronamic_payment_by_transaction_id( $id );
-		}
+		$payment = \get_pronamic_payment( $payment_id );
 
 		if ( null === $payment ) {
 			/**
