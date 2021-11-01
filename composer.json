@@ -35,7 +35,8 @@
 		"php": ">=5.6.20",
 		"justinrainbow/json-schema": "^5.2",
 		"pronamic/wp-http": "^1.0",
-		"wp-pay/core": "^3.0"
+		"woocommerce/action-scheduler": "^3.4",
+		"wp-pay/core": "dev-develop as 3.0"
 	},
 	"require-dev": {
 		"bamarni/composer-bin-plugin": "^1.4",
