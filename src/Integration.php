@@ -316,11 +316,11 @@ class Integration extends AbstractGatewayIntegration {
 	/**
 	 * Next payment delivery date.
 	 *
-	 * @param DateTime         $next_payment_delivery_date Next payment delivery date.
-	 * @param CoreSubscription $subscription               Subscription.
+	 * @param \DateTimeInterface $next_payment_delivery_date Next payment delivery date.
+	 * @param CoreSubscription   $subscription               Subscription.
 	 * @return DateTime
 	 */
-	public function next_payment_delivery_date( DateTime $next_payment_delivery_date, CoreSubscription $subscription ) {
+	public function next_payment_delivery_date( \DateTimeInterface $next_payment_delivery_date, CoreSubscription $subscription ) {
 		$config_id = $subscription->get_config_id();
 
 		if ( null === $config_id ) {
@@ -365,24 +365,24 @@ class Integration extends AbstractGatewayIntegration {
 		 */
 		switch ( $day_of_week ) {
 			case 'Monday':
-				$next_payment_delivery_date->modify( '-3 days' );
+				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-3 days' );
 
 				break;
 			case 'Saturday':
-				$next_payment_delivery_date->modify( '-2 days' );
+				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-2 days' );
 
 				break;
 			case 'Sunday':
-				$next_payment_delivery_date->modify( '-3 days' );
+				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-3 days' );
 
 				break;
 			default:
-				$next_payment_delivery_date->modify( '-1 day' );
+				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-1 day' );
 
 				break;
 		}
 
-		$next_payment_delivery_date->setTime( 0, 0, 0 );
+		$next_payment_delivery_date = $next_payment_delivery_date->setTime( 0, 0, 0 );
 
 		return $next_payment_delivery_date;
 	}
