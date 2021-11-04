@@ -416,9 +416,9 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Billing email.
-		$billing_email = $payment->get_email();
+		$billing_email = ( null === $customer ) ? null : $customer->get_email();
 
-		/**
+			/**
 		 * Filters the Mollie payment billing email used for bank transfer payment instructions.
 		 *
 		 * @since 2.2.0
@@ -1113,9 +1113,11 @@ class Gateway extends Core_Gateway {
 	 * @throws \Exception Throws exception when error in customer data store occurs.
 	 */
 	private function create_customer_for_payment( Payment $payment ) {
+		$customer = $payment->get_customer();
+
 		$mollie_customer = new Customer();
 		$mollie_customer->set_mode( $this->config->is_test_mode() ? 'test' : 'live' );
-		$mollie_customer->set_email( $payment->get_email() );
+		$mollie_customer->set_email( null === $customer ? null : $customer->get_email() );
 
 		$pronamic_customer = $payment->get_customer();
 
