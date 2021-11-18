@@ -295,12 +295,21 @@ class Admin {
 			return;
 		}
 
-		$mollie_customer_id = \get_post_meta( $post->ID, '_pronamic_subscription_mollie_customer_id', true );
+		// Get subscription.
+		$subscription = \get_pronamic_subscription( $post->ID );
+
+		if ( null === $subscription ) {
+			return;
+		}
+
+		// Get Mollie customer ID.
+		$mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
 		if ( empty( $mollie_customer_id ) ) {
 			return;
 		}
 
+		// Add meta box.
 		\add_meta_box(
 			'pronamic_pay_mollie_subscription',
 			\__( 'Mollie', 'pronamic_ideal' ),
