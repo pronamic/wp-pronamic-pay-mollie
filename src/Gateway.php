@@ -311,6 +311,13 @@ class Gateway extends Core_Gateway {
 
 		if ( null !== $customer_id ) {
 			$request->customer_id = $customer_id;
+
+			// Set Mollie customer ID in subscription meta.
+			foreach ( $payment->get_subscriptions() as $subscription ) {
+				$subscription->set_meta( 'mollie_customer_id', $customer_id );
+
+				$subscription->save();
+			}
 		}
 
 		/**
@@ -1010,9 +1017,9 @@ class Gateway extends Core_Gateway {
 		$customer_ids = array();
 
 		// Customer ID from subscription meta.
-		$subscription = $payment->get_subscription();
+		$subscriptions = $payment->get_subscriptions();
 
-		if ( null !== $subscription ) {
+		foreach( $subscriptions as $subscription ) {
 			$customer_id = $this->get_customer_id_for_subscription( $subscription );
 
 			if ( null !== $customer_id ) {
@@ -1167,10 +1174,12 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Store customer ID in subscription meta.
-		$subscription = $payment->get_subscription();
+		$subscriptions = $payment->get_subscriptions();
 
-		if ( null !== $subscription ) {
+		foreach ( $subscriptions as $subscription ) {
 			$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
+
+			$subscription->save();
 		}
 
 		return $mollie_customer->get_id();
@@ -1187,54 +1196,55 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
-		// Subscription.
-		$subscription = $payment->get_subscription();
+		// Subscriptions.
+		$subscriptions = $payment->get_subscriptions();
 
-		// Customer.
-		$customer = $payment->get_customer();
+		foreach ( $subscriptions as $subscription ) {
+			// Customer.
+			$customer = $payment->get_customer();
 
-		if ( null === $customer && null !== $subscription ) {
-			$customer = $subscription->get_customer();
+			if ( null === $customer ) {
+				$customer = $subscription->get_customer();
+			}
+
+			if ( null === $customer ) {
+				continue;
+			}
+
+			// WordPress user.
+			$user_id = $customer->get_user_id();
+
+			if ( null === $user_id ) {
+				continue;
+			}
+
+			$user = \get_user_by( 'id', $user_id );
+
+			if ( false === $user ) {
+				continue;
+			}
+
+			// Customer IDs.
+			$customer_ids = array(
+				// Payment.
+				$payment->get_meta( 'mollie_customer_id' ),
+
+				// Subscription.
+				$subscription->get_meta( 'mollie_customer_id' ),
+			);
+
+			// Connect.
+			$customer_ids = \array_filter( $customer_ids );
+			$customer_ids = \array_unique( $customer_ids );
+
+			foreach ( $customer_ids as $customer_id ) {
+				$customer = new Customer( $customer_id );
+
+				$this->customer_data_store->get_or_insert_customer( $customer );
+
+				$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
+			}
 		}
 
-		if ( null === $customer ) {
-			return;
-		}
-
-		// WordPress user.
-		$user_id = $customer->get_user_id();
-
-		if ( null === $user_id ) {
-			return;
-		}
-
-		$user = \get_user_by( 'id', $user_id );
-
-		if ( false === $user ) {
-			return;
-		}
-
-		// Customer IDs.
-		$customer_ids = array();
-
-		// Payment.
-		$customer_ids[] = $payment->get_meta( 'mollie_customer_id' );
-
-		// Subscription.
-		if ( null !== $subscription ) {
-			$customer_ids[] = $subscription->get_meta( 'mollie_customer_id' );
-		}
-
-		// Connect.
-		$customer_ids = \array_filter( $customer_ids );
-		$customer_ids = \array_unique( $customer_ids );
-
-		foreach ( $customer_ids as $customer_id ) {
-			$customer = new Customer( $customer_id );
-
-			$this->customer_data_store->get_or_insert_customer( $customer );
-
-			$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
-		}
 	}
 }
