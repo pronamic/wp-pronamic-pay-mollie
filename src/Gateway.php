@@ -315,9 +315,13 @@ class Gateway extends Core_Gateway {
 
 			// Set Mollie customer ID in subscription meta.
 			foreach ( $payment->get_subscriptions() as $subscription ) {
-				$subscription->set_meta( 'mollie_customer_id', $customer_id );
+				$mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
-				$subscription->save();
+				if ( empty( $mollie_customer_id ) ) {
+					$subscription->set_meta( 'mollie_customer_id', $customer_id );
+
+					$subscription->save();
+				}
 			}
 		}
 
@@ -351,7 +355,11 @@ class Gateway extends Core_Gateway {
 					$request->set_mandate_id( $mandate_id );
 				}
 
-				if ( ! $subscription->is_first_payment( $payment ) ) {
+				if (
+					! $subscription->is_first_payment( $payment )
+						&&
+					! $subscription->is_manual_renewal_payment( $payment )
+				) {
 					$request->set_method( null );
 					$request->set_sequence_type( 'recurring' );
 				}
