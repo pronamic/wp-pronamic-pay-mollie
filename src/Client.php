@@ -145,10 +145,14 @@ class Client {
 	 * Create payment.
 	 *
 	 * @param PaymentRequest $request Payment request.
-	 * @return object
+	 * @return Payment
 	 */
 	public function create_payment( PaymentRequest $request ) {
-		return $this->send_request_to_endpoint( 'payments', 'POST', $request->get_array() );
+		$object = $this->send_request_to_endpoint( 'payments', 'POST', $request->get_array() );
+
+		$payment = Payment::from_json( $object );
+
+		return $payment;
 	}
 
 	/**

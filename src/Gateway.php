@@ -16,6 +16,7 @@ use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Gateways\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
@@ -455,7 +456,7 @@ class Gateway extends Core_Gateway {
 		$payment->set_meta( 'mollie_create_payment_attempt', $attempt );
 
 		try {
-			$result = $this->client->create_payment( $request );
+			$mollie_payment = $this->client->create_payment( $request );
 
 			$payment->delete_meta( 'mollie_create_payment_attempt' );
 		} catch ( Error $error ) {
@@ -500,104 +501,8 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
-		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
-
-		// Set transaction ID.
-		if ( isset( $result->id ) ) {
-			$payment->set_transaction_id( $result->id );
-		}
-
-		// Set payment method.
-		if ( isset( $result->method ) ) {
-			$payment_method = Methods::transform_gateway_method( $result->method );
-
-			if ( null !== $payment_method ) {
-				$payment->set_payment_method( $payment_method );
-
-				// Update subscription payment method.
-				foreach ( $payment->get_subscriptions() as $subscription ) {
-					if ( null === $subscription->get_payment_method() ) {
-						$subscription->set_payment_method( $payment->get_payment_method() );
-
-						$subscription->save();
-					}
-				}
-			}
-		}
-
-		// Set expiry date.
-		if ( isset( $result->expiresAt ) ) {
-			try {
-				$expires_at = new DateTime( $result->expiresAt );
-			} catch ( \Exception $e ) {
-				$expires_at = null;
-			}
-
-			$payment->set_expiry_date( $expires_at );
-		}
-
-		// Set status.
-		if ( isset( $result->status ) ) {
-			$payment->set_status( Statuses::transform( $result->status ) );
-		}
-
-		// Set bank transfer recipient details.
-		if ( isset( $result->details ) ) {
-			$bank_transfer_recipient_details = $payment->get_bank_transfer_recipient_details();
-
-			if ( null === $bank_transfer_recipient_details ) {
-				$bank_transfer_recipient_details = new BankTransferDetails();
-
-				$payment->set_bank_transfer_recipient_details( $bank_transfer_recipient_details );
-			}
-
-			$bank_details = $bank_transfer_recipient_details->get_bank_account();
-
-			if ( null === $bank_details ) {
-				$bank_details = new BankAccountDetails();
-
-				$bank_transfer_recipient_details->set_bank_account( $bank_details );
-			}
-
-			$details = $result->details;
-
-			if ( isset( $details->bankName ) ) {
-				/**
-				 * Set `bankName` as bank details name, as result "Stichting Mollie Payments"
-				 * is not the name of a bank, but the account holder name.
-				 */
-				$bank_details->set_name( $details->bankName );
-			}
-
-			if ( isset( $details->bankAccount ) ) {
-				$bank_details->set_iban( $details->bankAccount );
-			}
-
-			if ( isset( $details->bankBic ) ) {
-				$bank_details->set_bic( $details->bankBic );
-			}
-
-			if ( isset( $details->transferReference ) ) {
-				$bank_transfer_recipient_details->set_reference( $details->transferReference );
-			}
-		}
-
-		// Handle links.
-		if ( isset( $result->_links ) ) {
-			$links = $result->_links;
-
-			// Action URL.
-			if ( isset( $links->checkout->href ) ) {
-				$payment->set_action_url( $links->checkout->href );
-			}
-
-			// Change payment state URL.
-			if ( isset( $links->changePaymentState->href ) ) {
-				$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
-			}
-		}
-
-		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+		// Update payment from Mollie payment.
+		$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
 	}
 
 	/**
@@ -633,9 +538,68 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
+		// Update payment from Mollie payment.
 		$mollie_payment = $this->client->get_payment( $transaction_id );
 
-		$payment->set_status( Statuses::transform( $mollie_payment->get_status() ) );
+		$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+	}
+
+	/**
+	 * Update payment from Mollie payment.
+	 *
+	 * @param Payment       $payment        Payment.
+	 * @param MolliePayment $mollie_payment Mollie payment.
+	 * @return void
+	 */
+	public function update_payment_from_mollie_payment( Payment $payment, MolliePayment $mollie_payment ) {
+		/**
+		 * Transaction ID.
+		 */
+		$transaction_id = $mollie_payment->get_id();
+
+		$payment->set_transaction_id( $transaction_id );
+
+		/**
+		 * Status.
+		 */
+		$status = Statuses::transform( $mollie_payment->get_status() );
+
+		if ( null !== $status ) {
+			$payment->set_status( $status );
+		}
+
+		/**
+		 * Payment method.
+		 */
+		$method = $mollie_payment->get_method();
+
+		if ( null !== $method ) {
+			$payment_method = Methods::transform_gateway_method( $method );
+
+			if ( null !== $payment_method ) {
+				$payment->set_payment_method( $payment_method );
+
+				// Update subscription payment method.
+				foreach ( $payment->get_subscriptions() as $subscription ) {
+					if ( null === $subscription->get_payment_method() ) {
+						$subscription->set_payment_method( $payment->get_payment_method() );
+
+						$subscription->save();
+					}
+				}
+			}
+		}
+
+		/**
+		 * Expiry date.
+		 */
+		$expires_at = $mollie_payment->get_expires_at();
+
+		if ( null !== $expires_at ) {
+			$expiry_date = DateTime::create_from_interface( $expires_at );
+
+			$payment->set_expiry_date( $expiry_date );
+		}
 
 		/**
 		 * Mollie profile.
@@ -728,30 +692,17 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		// Set payment method.
-		$method = $mollie_payment->get_method();
-
-		if ( null !== $method ) {
-			$payment_method = Methods::transform_gateway_method( $method );
-
-			if ( null !== $payment_method ) {
-				$payment->set_payment_method( $payment_method );
-
-				// Update subscription payment method.
-				foreach ( $payment->get_subscriptions() as $subscription ) {
-					if ( null === $subscription->get_payment_method() ) {
-						$subscription->set_payment_method( $payment->get_payment_method() );
-
-						$subscription->save();
-					}
-				}
-			}
-		}
-
 		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+
+		/**
+		 * Details.
+		 */
 		$mollie_payment_details = $mollie_payment->get_details();
 
 		if ( null !== $mollie_payment_details ) {
+			/**
+			 * Consumer bank details.
+			 */
 			$consumer_bank_details = $payment->get_consumer_bank_details();
 
 			if ( null === $consumer_bank_details ) {
@@ -802,6 +753,45 @@ class Gateway extends Core_Gateway {
 				$consumer_bank_details->set_bic( $mollie_payment_details->consumerBic );
 			}
 
+			/**
+			 * Bank transfer recipient details.
+			 */
+			$bank_transfer_recipient_details = $payment->get_bank_transfer_recipient_details();
+
+			if ( null === $bank_transfer_recipient_details ) {
+				$bank_transfer_recipient_details = new BankTransferDetails();
+
+				$payment->set_bank_transfer_recipient_details( $bank_transfer_recipient_details );
+			}
+
+			$bank_details = $bank_transfer_recipient_details->get_bank_account();
+
+			if ( null === $bank_details ) {
+				$bank_details = new BankAccountDetails();
+
+				$bank_transfer_recipient_details->set_bank_account( $bank_details );
+			}
+
+			if ( isset( $mollie_payment_details->bankName ) ) {
+				/**
+				 * Set `bankName` as bank details name, as result "Stichting Mollie Payments"
+				 * is not the name of a bank, but the account holder name.
+				 */
+				$bank_details->set_name( $mollie_payment_details->bankName );
+			}
+
+			if ( isset( $mollie_payment_details->bankAccount ) ) {
+				$bank_details->set_iban( $mollie_payment_details->bankAccount );
+			}
+
+			if ( isset( $mollie_payment_details->bankBic ) ) {
+				$bank_details->set_bic( $mollie_payment_details->bankBic );
+			}
+
+			if ( isset( $mollie_payment_details->transferReference ) ) {
+				$bank_transfer_recipient_details->set_reference( $mollie_payment_details->transferReference );
+			}
+
 			/*
 			 * Failure reason.
 			 */
@@ -837,7 +827,15 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
+		/**
+		 * Links.
+		 */
 		$links = $mollie_payment->get_links();
+
+		// Action URL.
+		if ( \property_exists( $links, 'checkout' ) ) {
+			$payment->set_action_url( $links->checkout->href );
+		}
 
 		// Change payment state URL.
 		if ( \property_exists( $links, 'changePaymentState' ) ) {
@@ -846,6 +844,9 @@ class Gateway extends Core_Gateway {
 
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 
+		/**
+		 * Chargebacks.
+		 */
 		if ( $mollie_payment->has_chargebacks() ) {
 			$mollie_chargebacks = $this->client->get_payment_chargebacks(
 				$mollie_payment->get_id(),
@@ -868,7 +869,7 @@ class Gateway extends Core_Gateway {
 
 						$subscription->add_note(
 							\sprintf(
-								/* translators: 1: Mollie chargeback ID, 2: Mollie payment ID */
+							/* translators: 1: Mollie chargeback ID, 2: Mollie payment ID */
 								\__( 'Subscription put on hold due to chargeback `%1$s` of payment `%2$s`.', 'pronamic_ideal' ),
 								\esc_html( $mollie_chargeback->get_id() ),
 								\esc_html( $mollie_payment->get_id() )
@@ -879,7 +880,9 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		// Refunds.
+		/**
+		 * Refunds.
+		 */
 		$amount_refunded = $mollie_payment->get_amount_refunded();
 
 		if ( null !== $amount_refunded ) {
@@ -1019,7 +1022,7 @@ class Gateway extends Core_Gateway {
 		// Customer ID from subscription meta.
 		$subscriptions = $payment->get_subscriptions();
 
-		foreach( $subscriptions as $subscription ) {
+		foreach ( $subscriptions as $subscription ) {
 			$customer_id = $this->get_customer_id_for_subscription( $subscription );
 
 			if ( null !== $customer_id ) {
