@@ -51,7 +51,14 @@ $mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 		)
 	);
 
-	if ( $mollie_customer_id ) {
+	?>
+</p>
+
+<?php if ( ! empty( $mollie_customer_id ) ) : ?>
+
+	<p>
+		<?php
+
 		$customer_url = \add_query_arg(
 			array(
 				'page' => 'pronamic_pay_mollie_customers',
@@ -59,8 +66,6 @@ $mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 			),
 			\admin_url( 'admin.php' )
 		);
-
-		echo '<br />';
 
 		echo \wp_kses(
 			\sprintf(
@@ -78,36 +83,26 @@ $mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 				),
 			)
 		);
-	}
 
-	if ( $mollie_mandate_id ) {
-		$mandate_url = \add_query_arg(
-			array(
-				'page' => 'pronamic_pay_mollie_mandates',
-				'id'   => $mollie_mandate_id,
-			),
-			\admin_url( 'admin.php' )
-		);
+		?>
+	</p>
 
-		echo '<br />';
+<?php endif; ?>
 
-		echo \wp_kses(
-			\sprintf(
-			/* translators: %s: Mollie customer ID anchor. */
+<?php if ( ! empty( $mollie_mandate_id ) ) : ?>
+
+	<dl>
+		<?php
+
+		echo \esc_html(
+			sprintf(
+				/* translators: %s: Mollie mandate ID */
 				\__( 'Mandate: %s', 'pronamic_ideal' ),
-				\sprintf(
-					'<a href="%s">%s</a>',
-					\esc_url( $mandate_url ),
-					\esc_html( $mollie_mandate_id )
-				)
-			),
-			array(
-				'a' => array(
-					'href' => true,
-				),
+				$mollie_mandate_id
 			)
 		);
-	}
 
-	?>
-</p>
+		?>
+	</dl>
+
+<?php endif; ?>
