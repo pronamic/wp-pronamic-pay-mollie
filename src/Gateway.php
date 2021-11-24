@@ -354,15 +354,16 @@ class Gateway extends Core_Gateway {
 				if ( ! empty( $mandate_id ) ) {
 					$request->set_mandate_id( $mandate_id );
 				}
+			}
+		}
 
-				if (
-					! $subscription->is_first_payment( $payment )
-						&&
-					! $subscription->is_manual_renewal_payment( $payment )
-				) {
-					$request->set_method( null );
-					$request->set_sequence_type( 'recurring' );
-				}
+		$sequence_type = $payment->get_meta( 'mollie_sequence_type' );
+
+		if ( ! empty( $sequence_type ) ) {
+			$request->set_sequence_type( $sequence_type );
+
+			if ( 'recurring' === $sequence_type ) {
+				$request->set_method( null );
 			}
 		}
 
