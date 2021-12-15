@@ -74,6 +74,7 @@ class Gateway extends Core_Gateway {
 		// Supported features.
 		$this->supports = array(
 			'payment_status_request',
+			'recurring_apple_pay',
 			'recurring_direct_debit',
 			'recurring_credit_card',
 			'recurring',
