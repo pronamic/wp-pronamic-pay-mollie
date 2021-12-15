@@ -503,7 +503,7 @@ class Gateway extends Core_Gateway {
 					$error->get_status(),
 					$error->get_title(),
 					$error->get_detail()
-				) 
+				)
 			);
 
 			$payment->save();
@@ -585,6 +585,17 @@ class Gateway extends Core_Gateway {
 
 		if ( null !== $method ) {
 			$payment_method = Methods::transform_gateway_method( $method );
+
+			// Use wallet method as payment method.
+			$mollie_payment_details = $mollie_payment->get_details();
+
+			if ( null !== $mollie_payment_details && isset( $mollie_payment_details->wallet ) ) {
+				$wallet_method = Methods::transform_gateway_method( $mollie_payment_details->wallet );
+
+				if ( null !== $wallet_method ) {
+					$payment_method = $wallet_method;
+				}
+			}
 
 			if ( null !== $payment_method ) {
 				$payment->set_payment_method( $payment_method );
