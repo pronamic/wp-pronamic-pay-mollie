@@ -308,7 +308,11 @@ class Gateway extends Core_Gateway {
 		$customer_id = $this->get_customer_id_for_payment( $payment );
 
 		if ( null === $customer_id ) {
-			$customer_id = $this->create_customer_for_payment( $payment );
+			$sequence_type = $payment->get_meta( 'mollie_sequence_type' );
+
+			if ( 'recurring' !== $sequence_type ) {
+				$customer_id = $this->create_customer_for_payment( $payment );
+			}
 		}
 
 		if ( null !== $customer_id ) {
