@@ -3,7 +3,7 @@
  * Mollie integration.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -19,7 +19,7 @@ use Pronamic\WordPress\Pay\Subscriptions\Subscription as CoreSubscription;
 /**
  * Title: Mollie integration
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2022 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -59,6 +59,7 @@ class Integration extends AbstractGatewayIntegration {
 				'provider'               => 'mollie',
 				'supports'               => array(
 					'payment_status_request',
+					'recurring_apple_pay',
 					'recurring_direct_debit',
 					'recurring_credit_card',
 					'recurring',
@@ -82,6 +83,13 @@ class Integration extends AbstractGatewayIntegration {
 		}
 
 		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
+
+		// Actions.
+		$function = array( $this, 'scheduled_payment_start' );
+
+		if ( ! \has_action( 'pronamic_pay_mollie_payment_start', $function ) ) {
+			\add_action( 'pronamic_pay_mollie_payment_start', $function, 10, 1 );
+		}
 
 		// Tables.
 		$this->register_tables();
@@ -272,13 +280,48 @@ class Integration extends AbstractGatewayIntegration {
 	}
 
 	/**
+	 * Start scheduled payment.
+	 *
+	 * @param int $payment_id Payment ID.
+	 * @return void
+	 * @throws \Exception Throws exception after four failed attempts.
+	 */
+	public function scheduled_payment_start( $payment_id ) {
+		// Check payment.
+		$payment = \get_pronamic_payment( $payment_id );
+
+		if ( null === $payment ) {
+			return;
+		}
+
+		// Check gateway.
+		$gateway = $payment->get_gateway();
+
+		if ( null === $gateway ) {
+			return;
+		}
+
+		// Attempt.
+		$attempt = (int) $payment->get_meta( 'mollie_create_payment_attempt' );
+
+		if ( $attempt > 4 ) {
+			throw new \Exception( \sprintf( 'Could not create Mollie payment for %s after %s attempts.', $payment_id, $attempt ) );
+		}
+
+		// Start payment.
+		$gateway->start( $payment );
+
+		$payment->save();
+	}
+
+	/**
 	 * Next payment delivery date.
 	 *
-	 * @param DateTime         $next_payment_delivery_date Next payment delivery date.
-	 * @param CoreSubscription $subscription               Subscription.
+	 * @param \DateTimeInterface $next_payment_delivery_date Next payment delivery date.
+	 * @param CoreSubscription   $subscription               Subscription.
 	 * @return DateTime
 	 */
-	public function next_payment_delivery_date( DateTime $next_payment_delivery_date, CoreSubscription $subscription ) {
+	public function next_payment_delivery_date( \DateTimeInterface $next_payment_delivery_date, CoreSubscription $subscription ) {
 		$config_id = $subscription->get_config_id();
 
 		if ( null === $config_id ) {
@@ -293,13 +336,13 @@ class Integration extends AbstractGatewayIntegration {
 		}
 
 		// Check direct debit payment method.
-		$method = $subscription->payment_method;
+		$payment_method = $subscription->get_payment_method();
 
-		if ( null === $method ) {
+		if ( null === $payment_method ) {
 			return $next_payment_delivery_date;
 		}
 
-		if ( ! PaymentMethods::is_direct_debit_method( $method ) ) {
+		if ( ! PaymentMethods::is_direct_debit_method( $payment_method ) ) {
 			return $next_payment_delivery_date;
 		}
 
@@ -323,24 +366,24 @@ class Integration extends AbstractGatewayIntegration {
 		 */
 		switch ( $day_of_week ) {
 			case 'Monday':
-				$next_payment_delivery_date->modify( '-3 days' );
+				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-3 days' );
 
 				break;
 			case 'Saturday':
-				$next_payment_delivery_date->modify( '-2 days' );
+				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-2 days' );
 
 				break;
 			case 'Sunday':
-				$next_payment_delivery_date->modify( '-3 days' );
+				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-3 days' );
 
 				break;
 			default:
-				$next_payment_delivery_date->modify( '-1 day' );
+				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-1 day' );
 
 				break;
 		}
 
-		$next_payment_delivery_date->setTime( 0, 0, 0 );
+		$next_payment_delivery_date = $next_payment_delivery_date->setTime( 0, 0, 0 );
 
 		return $next_payment_delivery_date;
 	}

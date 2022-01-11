@@ -3,7 +3,7 @@
  * Payment
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
@@ -75,6 +75,13 @@ class Payment extends BaseResource {
 	 * @var DateTimeInterface
 	 */
 	private $created_at;
+
+	/**
+	 * The date and time the payment will expire, in ISO 8601 format. This parameter is omitted if the payment can no longer expire.
+	 *
+	 * @var DateTimeInterface
+	 */
+	private $expires_at;
 
 	/**
 	 * The amount of the payment, e.g. {"currency":"EUR", "value":"100.00"} for a €100.00 payment.
@@ -300,6 +307,24 @@ class Payment extends BaseResource {
 	}
 
 	/**
+	 * Get expires at.
+	 *
+	 * @return DateTimeInterface
+	 */
+	public function get_expires_at() {
+		return $this->expires_at;
+	}
+
+	/**
+	 * Set expires at.
+	 *
+	 * @param DateTimeInterface $expires_at Expiry date.
+	 */
+	public function set_expires_at( DateTimeInterface $expires_at ) {
+		$this->expires_at = $expires_at;
+	}
+
+	/**
 	 * Get links.
 	 *
 	 * @return object
@@ -352,6 +377,10 @@ class Payment extends BaseResource {
 			$json->sequenceType,
 			$json->_links
 		);
+
+		if ( \property_exists( $json, 'expiresAt' ) ) {
+			$payment->set_expires_at( new \DateTimeImmutable( $json->expiresAt ) );
+		}
 
 		if ( \property_exists( $json, 'locale' ) ) {
 			$payment->set_locale( $json->locale );

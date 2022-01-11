@@ -35,7 +35,8 @@
 		"php": ">=5.6.20",
 		"justinrainbow/json-schema": "^5.2",
 		"pronamic/wp-http": "^1.0",
-		"wp-pay/core": "^3.0"
+		"woocommerce/action-scheduler": "^3.4",
+		"wp-pay/core": "^4.0"
 	},
 	"require-dev": {
 		"bamarni/composer-bin-plugin": "^1.4",
@@ -49,6 +50,12 @@
 		"wp-phpunit/wp-phpunit": "^5.8"
 	},
 	"scripts": {
+		"ci": [
+			"@phplint",
+			"@phpcs",
+			"@coverage",
+			"@phpstan"
+		],
 		"coveralls": "vendor/bin/php-coveralls -v",
 		"phpcbf": "vendor/bin/phpcbf",
 		"phpcs": "XDEBUG_MODE=off vendor/bin/phpcs -s -v",

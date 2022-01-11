@@ -3,7 +3,7 @@
  * Mollie gateway test.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -16,7 +16,6 @@ use Pronamic\WordPress\Http\Response;
 use Pronamic\WordPress\Http\Request;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Core\Recurring as Core_Recurring;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
@@ -264,10 +263,9 @@ class GatewayTest extends WP_UnitTestCase {
 		$customer->set_user_id( $user_id );
 
 		// New payment.
-		$payment                         = new Payment();
-		$payment->config_id              = 1;
-		$payment->recurring_type         = Core_Recurring::FIRST;
-		$payment->subscription_source_id = null;
+		$payment = new Payment();
+
+		$payment->config_id = 1;
 
 		$payment->set_customer( $customer );
 
@@ -287,17 +285,12 @@ class GatewayTest extends WP_UnitTestCase {
 
 		$payment->add_period( $subscription->new_period() );
 
-		$payment->subscription = $subscription;
-
 		pronamic_pay_plugin()->payments_data_store->create( $payment );
 
 		// Set customer ID meta.
 		$payment->set_meta( 'mollie_customer_id', $first_payment_customer_id );
 
-		$payment->subscription->set_meta( 'mollie_customer_id', $subscription_customer_id );
-
-		// Prevent Mollie API call for now.
-		$payment->recurring_type = Core_Recurring::RECURRING;
+		$subscription->set_meta( 'mollie_customer_id', $subscription_customer_id );
 
 		// Get customer ID for payment.
 		$this->factory->fake( 'https://api.mollie.com/v2/customers/cst_8wmqcHMN4U', __DIR__ . '/../http/api-mollie-com-v2-customers-cst_8wmqcHMN4U.http' );
@@ -360,14 +353,16 @@ class GatewayTest extends WP_UnitTestCase {
 		$customer = new Customer();
 		$customer->set_user_id( $user_id );
 
-		$payment->subscription = new Subscription();
-		$payment->subscription->set_id( 1 );
-		$payment->subscription->set_customer( $customer );
+		$subscription = new Subscription();
+		$subscription->set_id( 1 );
+		$subscription->set_customer( $customer );
 
 		$subscriptions_data_store = new SubscriptionsDataStoreCPT();
-		$subscriptions_data_store->update( $payment->subscription );
+		$subscriptions_data_store->update( $subscription );
 
-		$payment->subscription->set_meta( 'mollie_customer_id', $customer_id );
+		$subscription->set_meta( 'mollie_customer_id', $customer_id );
+
+		$payment->add_subscription( $subscription );
 
 		$this->gateway->copy_customer_id_to_wp_user( $payment );
 

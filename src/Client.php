@@ -3,7 +3,7 @@
  * Mollie client.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -18,7 +18,7 @@ use Pronamic\WordPress\Pay\Core\XML\Security;
 /**
  * Title: Mollie
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2022 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -145,10 +145,14 @@ class Client {
 	 * Create payment.
 	 *
 	 * @param PaymentRequest $request Payment request.
-	 * @return object
+	 * @return Payment
 	 */
 	public function create_payment( PaymentRequest $request ) {
-		return $this->send_request_to_endpoint( 'payments', 'POST', $request->get_array() );
+		$object = $this->send_request_to_endpoint( 'payments', 'POST', $request->get_array() );
+
+		$payment = Payment::from_json( $object );
+
+		return $payment;
 	}
 
 	/**

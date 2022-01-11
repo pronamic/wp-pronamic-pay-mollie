@@ -3,7 +3,7 @@
  * Mollie payment request.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -13,7 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 /**
  * Title: Mollie payment request
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2022 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -182,6 +182,25 @@ class PaymentRequest {
 	public function __construct( $amount, $description ) {
 		$this->amount      = $amount;
 		$this->description = $description;
+	}
+
+	/**
+	 * Get method.
+	 *
+	 * @return null|string
+	 */
+	public function get_method() {
+		return $this->method;
+	}
+
+	/**
+	 * Set method.
+	 *
+	 * @param null|string $method Method.
+	 * @return void
+	 */
+	public function set_method( $method ) {
+		$this->method = $method;
 	}
 
 	/**

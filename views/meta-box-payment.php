@@ -3,7 +3,7 @@
  * Payment meta box.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  *
@@ -20,6 +20,7 @@ if ( null === $payment ) {
 
 $mollie_payment_id  = $payment->get_transaction_id();
 $mollie_customer_id = $payment->get_meta( 'mollie_customer_id' );
+$mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 
 ?>
 <p>
@@ -50,7 +51,14 @@ $mollie_customer_id = $payment->get_meta( 'mollie_customer_id' );
 		)
 	);
 
-	if ( $mollie_customer_id ) {
+	?>
+</p>
+
+<?php if ( ! empty( $mollie_customer_id ) ) : ?>
+
+	<p>
+		<?php
+
 		$customer_url = \add_query_arg(
 			array(
 				'page' => 'pronamic_pay_mollie_customers',
@@ -58,8 +66,6 @@ $mollie_customer_id = $payment->get_meta( 'mollie_customer_id' );
 			),
 			\admin_url( 'admin.php' )
 		);
-
-		echo '<br />';
 
 		echo \wp_kses(
 			\sprintf(
@@ -77,7 +83,26 @@ $mollie_customer_id = $payment->get_meta( 'mollie_customer_id' );
 				),
 			)
 		);
-	}
 
-	?>
-</p>
+		?>
+	</p>
+
+<?php endif; ?>
+
+<?php if ( ! empty( $mollie_mandate_id ) ) : ?>
+
+	<dl>
+		<?php
+
+		echo \esc_html(
+			sprintf(
+				/* translators: %s: Mollie mandate ID */
+				\__( 'Mandate: %s', 'pronamic_ideal' ),
+				$mollie_mandate_id
+			)
+		);
+
+		?>
+	</dl>
+
+<?php endif; ?>

@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.0.0] - 2022-01-11
+### Changed
+- Updated to https://github.com/pronamic/wp-pay-core/releases/tag/4.0.0.
+- Added payment ID to the webhook URL.
+
 ## [3.1.0] - 2021-09-03
 - Added `pronamic_pay_mollie_payment_description` filter (with example).
 - Removed check for empty amount, `0` amount is allowed for credit card authorizations.
@@ -185,7 +190,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/3.1.0...HEAD
+[unreleased]: https://github.com/wp-pay-gateways/mollie/compare/4.0.0...HEAD
+[4.0.0]: https://github.com/wp-pay-gateways/mollie/compare/3.1.0...4.0.0
 [3.0.0]: https://github.com/wp-pay-gateways/mollie/compare/3.0.0...3.1.0
 [2.2.4]: https://github.com/wp-pay-gateways/mollie/compare/2.2.4...3.0.0
 [2.2.4]: https://github.com/wp-pay-gateways/mollie/compare/2.2.3...2.2.4

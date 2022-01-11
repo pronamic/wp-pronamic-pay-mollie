@@ -3,7 +3,7 @@
  * Mollie gateway.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -16,16 +16,16 @@ use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Gateways\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
-use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 
 /**
  * Title: Mollie
  * Description:
- * Copyright: 2005-2021 Pronamic
+ * Copyright: 2005-2022 Pronamic
  * Company: Pronamic
  *
  * @author  Remco Tolsma
@@ -74,6 +74,7 @@ class Gateway extends Core_Gateway {
 		// Supported features.
 		$this->supports = array(
 			'payment_status_request',
+			'recurring_apple_pay',
 			'recurring_direct_debit',
 			'recurring_credit_card',
 			'recurring',
@@ -233,10 +234,11 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Get webhook URL for Mollie.
 	 *
+	 * @param Payment $payment Payment.
 	 * @return string|null
 	 */
-	public function get_webhook_url() {
-		$url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook' );
+	public function get_webhook_url( Payment $payment ) {
+		$url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook/' . (string) $payment->get_id() );
 
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 
@@ -268,6 +270,7 @@ class Gateway extends Core_Gateway {
 	 * @see Core_Gateway::start()
 	 * @param Payment $payment Payment.
 	 * @return void
+	 * @throws Error Mollie error.
 	 * @throws \Exception Throws exception on error creating Mollie customer for payment.
 	 */
 	public function start( Payment $payment ) {
@@ -292,7 +295,7 @@ class Gateway extends Core_Gateway {
 		);
 
 		$request->redirect_url = $payment->get_return_url();
-		$request->webhook_url  = $this->get_webhook_url();
+		$request->webhook_url  = $this->get_webhook_url( $payment );
 
 		// Locale.
 		$customer = $payment->get_customer();
@@ -305,22 +308,75 @@ class Gateway extends Core_Gateway {
 		$customer_id = $this->get_customer_id_for_payment( $payment );
 
 		if ( null === $customer_id ) {
-			$customer_id = $this->create_customer_for_payment( $payment );
+			$sequence_type = $payment->get_meta( 'mollie_sequence_type' );
+
+			if ( 'recurring' !== $sequence_type ) {
+				$customer_id = $this->create_customer_for_payment( $payment );
+			}
 		}
 
 		if ( null !== $customer_id ) {
 			$request->customer_id = $customer_id;
+
+			// Set Mollie customer ID in subscription meta.
+			foreach ( $payment->get_subscriptions() as $subscription ) {
+				$mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
+
+				if ( empty( $mollie_customer_id ) ) {
+					$subscription->set_meta( 'mollie_customer_id', $customer_id );
+
+					$subscription->save();
+				}
+			}
 		}
 
-		// Payment method.
-		$payment_method = $payment->get_method();
+		/**
+		 * Payment method.
+		 *
+		 * Leap of faith if the WordPress payment method could not transform to a Mollie method?
+		 */
+		$payment_method = $payment->get_payment_method();
 
-		// Recurring payment method.
-		$subscription = $payment->get_subscription();
+		$request->set_method( Methods::transform( $payment_method, $payment_method ) );
 
-		$is_recurring_method = ( $subscription && PaymentMethods::is_recurring_method( (string) $payment_method ) );
+		/**
+		 * Sequence type.
+		 *
+		 * Recurring payments are created through the Payments API by providing a `sequenceType`.
+		 */
+		$subscriptions = $payment->get_subscriptions();
 
-		// Consumer bank details.
+		if ( \count( $subscriptions ) > 0 ) {
+			$first_method = PaymentMethods::get_first_payment_method( $payment_method );
+
+			$request->set_method( Methods::transform( $first_method, $first_method ) );
+
+			$request->set_sequence_type( 'first' );
+
+			foreach ( $subscriptions as $subscription ) {
+				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+				if ( ! empty( $mandate_id ) ) {
+					$request->set_mandate_id( $mandate_id );
+				}
+			}
+		}
+
+		$sequence_type = $payment->get_meta( 'mollie_sequence_type' );
+
+		if ( ! empty( $sequence_type ) ) {
+			$request->set_sequence_type( $sequence_type );
+
+			if ( 'recurring' === $sequence_type ) {
+				$request->set_method( null );
+			}
+		}
+
+		/**
+		 * Direct Debit.
+		 *
+		 * Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
+		 */
 		$consumer_bank_details = $payment->get_consumer_bank_details();
 
 		if ( PaymentMethods::DIRECT_DEBIT === $payment_method && null !== $consumer_bank_details ) {
@@ -346,63 +402,10 @@ class Gateway extends Core_Gateway {
 				}
 
 				// Charge immediately on-demand.
-				$request->set_sequence_type( Sequence::RECURRING );
+				$request->set_sequence_type( 'recurring' );
 				$request->set_mandate_id( (string) $mandate_id );
-
-				$is_recurring_method = true;
-
-				$payment->recurring = true;
 			}
 		}
-
-		if ( false === $is_recurring_method && null !== $payment_method ) {
-			// Always use 'direct debit mandate via iDEAL/Bancontact/Sofort' payment methods as recurring method.
-			$is_recurring_method = PaymentMethods::is_direct_debit_method( $payment_method );
-
-			// Check for non-recurring methods for subscription payments.
-			if ( false === $is_recurring_method && null !== $payment->get_periods() ) {
-				$direct_debit_methods = PaymentMethods::get_direct_debit_methods();
-
-				$is_recurring_method = \in_array( $payment_method, $direct_debit_methods, true );
-			}
-		}
-
-		if ( $is_recurring_method ) {
-			$request->sequence_type = $payment->get_recurring() ? Sequence::RECURRING : Sequence::FIRST;
-
-			if ( Sequence::FIRST === $request->sequence_type ) {
-				$payment_method = PaymentMethods::get_first_payment_method( $payment_method );
-			}
-
-			if ( Sequence::RECURRING === $request->sequence_type ) {
-				// Use mandate from subscription.
-				if ( $subscription && empty( $request->mandate_id ) ) {
-					$subscription_mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
-
-					if ( false !== $subscription_mandate_id ) {
-						$request->set_mandate_id( $subscription_mandate_id );
-					}
-				}
-
-				// Use credit card for recurring Apple Pay payments.
-				if ( PaymentMethods::APPLE_PAY === $payment_method ) {
-					$payment_method = PaymentMethods::CREDIT_CARD;
-				}
-
-				$direct_debit_methods = PaymentMethods::get_direct_debit_methods();
-
-				$recurring_method = \array_search( $payment_method, $direct_debit_methods, true );
-
-				if ( \is_string( $recurring_method ) ) {
-					$payment_method = $recurring_method;
-				}
-
-				$payment->set_action_url( $payment->get_return_url() );
-			}
-		}
-
-		// Leap of faith if the WordPress payment method could not transform to a Mollie method?
-		$request->method = Methods::transform( $payment_method, $payment_method );
 
 		/**
 		 * Metadata.
@@ -431,13 +434,13 @@ class Gateway extends Core_Gateway {
 
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
-			$request->issuer = $payment->get_issuer();
+			$request->issuer = $payment->get_meta( 'issuer' );
 		}
 
 		// Billing email.
-		$billing_email = $payment->get_email();
+		$billing_email = ( null === $customer ) ? null : $customer->get_email();
 
-		/**
+			/**
 		 * Filters the Mollie payment billing email used for bank transfer payment instructions.
 		 *
 		 * @since 2.2.0
@@ -461,88 +464,79 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Create payment.
-		$result = $this->client->create_payment( $request );
+		$attempt = (int) $payment->get_meta( 'mollie_create_payment_attempt' );
+		$attempt = empty( $attempt ) ? 1 : $attempt + 1;
 
-		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+		$payment->set_meta( 'mollie_create_payment_attempt', $attempt );
 
-		// Set transaction ID.
-		if ( isset( $result->id ) ) {
-			$payment->set_transaction_id( $result->id );
+		try {
+			$mollie_payment = $this->client->create_payment( $request );
+
+			$payment->delete_meta( 'mollie_create_payment_attempt' );
+		} catch ( Error $error ) {
+			if ( 'recurring' !== $request->get_sequence_type() ) {
+				throw $error;
+			}
+
+			if ( null === $request->get_mandate_id() ) {
+				throw $error;
+			}
+
+			/**
+			 * Only schedule retry for specific status codes.
+			 *
+			 * @link https://docs.mollie.com/overview/handling-errors
+			 */
+			if ( ! \in_array( $error->get_status(), array( 429, 502, 503 ), true ) ) {
+				throw $error;
+			}
+
+			\as_schedule_single_action(
+				\time() + $this->get_retry_seconds( $attempt ),
+				'pronamic_pay_mollie_payment_start',
+				array(
+					'payment_id' => $payment->get_id(),
+				),
+				'pronamic-pay-mollie'
+			);
+
+			// Add note.
+			$payment->add_note(
+				\sprintf(
+					'%s - %s - %s',
+					$error->get_status(),
+					$error->get_title(),
+					$error->get_detail()
+				)
+			);
+
+			$payment->save();
+
+			return;
 		}
 
-		// Set expiry date.
-		if ( isset( $result->expiresAt ) ) {
-			try {
-				$expires_at = new DateTime( $result->expiresAt );
-			} catch ( \Exception $e ) {
-				$expires_at = null;
-			}
+		// Update payment from Mollie payment.
+		$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+	}
 
-			$payment->set_expiry_date( $expires_at );
+	/**
+	 * Get retry seconds.
+	 *
+	 * @param int $attempt Number of attempts.
+	 * @return int
+	 */
+	private function get_retry_seconds( $attempt ) {
+		switch ( $attempt ) {
+			case 1:
+				return 5 * MINUTE_IN_SECONDS;
+			case 2:
+				return HOUR_IN_SECONDS;
+			case 3:
+				return 12 * HOUR_IN_SECONDS;
+			case 4:
+			default:
+				return DAY_IN_SECONDS;
 		}
-
-		// Set status.
-		if ( isset( $result->status ) ) {
-			$payment->set_status( Statuses::transform( $result->status ) );
-		}
-
-		// Set bank transfer recipient details.
-		if ( isset( $result->details ) ) {
-			$bank_transfer_recipient_details = $payment->get_bank_transfer_recipient_details();
-
-			if ( null === $bank_transfer_recipient_details ) {
-				$bank_transfer_recipient_details = new BankTransferDetails();
-
-				$payment->set_bank_transfer_recipient_details( $bank_transfer_recipient_details );
-			}
-
-			$bank_details = $bank_transfer_recipient_details->get_bank_account();
-
-			if ( null === $bank_details ) {
-				$bank_details = new BankAccountDetails();
-
-				$bank_transfer_recipient_details->set_bank_account( $bank_details );
-			}
-
-			$details = $result->details;
-
-			if ( isset( $details->bankName ) ) {
-				/**
-				 * Set `bankName` as bank details name, as result "Stichting Mollie Payments"
-				 * is not the name of a bank, but the account holder name.
-				 */
-				$bank_details->set_name( $details->bankName );
-			}
-
-			if ( isset( $details->bankAccount ) ) {
-				$bank_details->set_iban( $details->bankAccount );
-			}
-
-			if ( isset( $details->bankBic ) ) {
-				$bank_details->set_bic( $details->bankBic );
-			}
-
-			if ( isset( $details->transferReference ) ) {
-				$bank_transfer_recipient_details->set_reference( $details->transferReference );
-			}
-		}
-
-		// Handle links.
-		if ( isset( $result->_links ) ) {
-			$links = $result->_links;
-
-			// Action URL.
-			if ( isset( $links->checkout->href ) ) {
-				$payment->set_action_url( $links->checkout->href );
-			}
-
-			// Change payment state URL.
-			if ( isset( $links->changePaymentState->href ) ) {
-				$payment->set_meta( 'mollie_change_payment_state_url', $links->changePaymentState->href );
-			}
-		}
-
-		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 	}
 
 	/**
@@ -558,9 +552,79 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
+		// Update payment from Mollie payment.
 		$mollie_payment = $this->client->get_payment( $transaction_id );
 
-		$payment->set_status( Statuses::transform( $mollie_payment->get_status() ) );
+		$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+	}
+
+	/**
+	 * Update payment from Mollie payment.
+	 *
+	 * @param Payment       $payment        Payment.
+	 * @param MolliePayment $mollie_payment Mollie payment.
+	 * @return void
+	 */
+	public function update_payment_from_mollie_payment( Payment $payment, MolliePayment $mollie_payment ) {
+		/**
+		 * Transaction ID.
+		 */
+		$transaction_id = $mollie_payment->get_id();
+
+		$payment->set_transaction_id( $transaction_id );
+
+		/**
+		 * Status.
+		 */
+		$status = Statuses::transform( $mollie_payment->get_status() );
+
+		if ( null !== $status ) {
+			$payment->set_status( $status );
+		}
+
+		/**
+		 * Payment method.
+		 */
+		$method = $mollie_payment->get_method();
+
+		if ( null !== $method ) {
+			$payment_method = Methods::transform_gateway_method( $method );
+
+			// Use wallet method as payment method.
+			$mollie_payment_details = $mollie_payment->get_details();
+
+			if ( null !== $mollie_payment_details && isset( $mollie_payment_details->wallet ) ) {
+				$wallet_method = Methods::transform_gateway_method( $mollie_payment_details->wallet );
+
+				if ( null !== $wallet_method ) {
+					$payment_method = $wallet_method;
+				}
+			}
+
+			if ( null !== $payment_method ) {
+				$payment->set_payment_method( $payment_method );
+
+				// Update subscription payment method.
+				foreach ( $payment->get_subscriptions() as $subscription ) {
+					if ( null === $subscription->get_payment_method() ) {
+						$subscription->set_payment_method( $payment->get_payment_method() );
+
+						$subscription->save();
+					}
+				}
+			}
+		}
+
+		/**
+		 * Expiry date.
+		 */
+		$expires_at = $mollie_payment->get_expires_at();
+
+		if ( null !== $expires_at ) {
+			$expiry_date = DateTime::create_from_interface( $expires_at );
+
+			$payment->set_expiry_date( $expiry_date );
+		}
 
 		/**
 		 * Mollie profile.
@@ -594,13 +658,6 @@ class Gateway extends Core_Gateway {
 				)
 			);
 
-			// Meta.
-			$customer_id = $payment->get_meta( 'mollie_customer_id' );
-
-			if ( empty( $customer_id ) ) {
-				$payment->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
-			}
-
 			// Customer.
 			$customer = $payment->get_customer();
 
@@ -616,35 +673,61 @@ class Gateway extends Core_Gateway {
 					}
 				}
 			}
+		}
 
-			// Subscription.
-			$subscription = $payment->get_subscription();
+		/**
+		 * Customer ID.
+		 */
+		$mollie_customer_id = $mollie_payment->get_customer_id();
 
-			if ( null !== $subscription ) {
+		if ( null !== $mollie_customer_id ) {
+			$customer_id = $payment->get_meta( 'mollie_customer_id' );
+
+			if ( empty( $customer_id ) ) {
+				$payment->set_meta( 'mollie_customer_id', $mollie_customer_id );
+			}
+
+			foreach ( $payment->get_subscriptions() as $subscription ) {
 				$customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
 				if ( empty( $customer_id ) ) {
-					$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
+					$subscription->set_meta( 'mollie_customer_id', $mollie_customer_id );
 				}
+			}
+		}
 
-				// Update mandate in subscription meta.
-				$mollie_mandate_id = $mollie_payment->get_mandate_id();
+		/**
+		 * Mandate ID.
+		 */
+		$mollie_mandate_id = $mollie_payment->get_mandate_id();
 
-				if ( null !== $mollie_mandate_id ) {
-					$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+		if ( null !== $mollie_mandate_id ) {
+			$mandate_id = $payment->get_meta( 'mollie_mandate_id' );
 
-					// Only update if no mandate has been set yet or if payment succeeded.
-					if ( empty( $mandate_id ) || PaymentStatus::SUCCESS === $payment->get_status() ) {
-						$this->update_subscription_mandate( $subscription, $mollie_mandate_id, $payment->get_method() );
-					}
+			if ( empty( $mandate_id ) ) {
+				$payment->set_meta( 'mollie_mandate_id', $mollie_mandate_id );
+			}
+
+			foreach ( $payment->get_subscriptions() as $subscription ) {
+				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+
+				if ( empty( $mandate_id ) ) {
+					$subscription->set_meta( 'mollie_mandate_id', $mollie_mandate_id );
 				}
 			}
 		}
 
 		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+
+		/**
+		 * Details.
+		 */
 		$mollie_payment_details = $mollie_payment->get_details();
 
 		if ( null !== $mollie_payment_details ) {
+			/**
+			 * Consumer bank details.
+			 */
 			$consumer_bank_details = $payment->get_consumer_bank_details();
 
 			if ( null === $consumer_bank_details ) {
@@ -695,6 +778,45 @@ class Gateway extends Core_Gateway {
 				$consumer_bank_details->set_bic( $mollie_payment_details->consumerBic );
 			}
 
+			/**
+			 * Bank transfer recipient details.
+			 */
+			$bank_transfer_recipient_details = $payment->get_bank_transfer_recipient_details();
+
+			if ( null === $bank_transfer_recipient_details ) {
+				$bank_transfer_recipient_details = new BankTransferDetails();
+
+				$payment->set_bank_transfer_recipient_details( $bank_transfer_recipient_details );
+			}
+
+			$bank_details = $bank_transfer_recipient_details->get_bank_account();
+
+			if ( null === $bank_details ) {
+				$bank_details = new BankAccountDetails();
+
+				$bank_transfer_recipient_details->set_bank_account( $bank_details );
+			}
+
+			if ( isset( $mollie_payment_details->bankName ) ) {
+				/**
+				 * Set `bankName` as bank details name, as result "Stichting Mollie Payments"
+				 * is not the name of a bank, but the account holder name.
+				 */
+				$bank_details->set_name( $mollie_payment_details->bankName );
+			}
+
+			if ( isset( $mollie_payment_details->bankAccount ) ) {
+				$bank_details->set_iban( $mollie_payment_details->bankAccount );
+			}
+
+			if ( isset( $mollie_payment_details->bankBic ) ) {
+				$bank_details->set_bic( $mollie_payment_details->bankBic );
+			}
+
+			if ( isset( $mollie_payment_details->transferReference ) ) {
+				$bank_transfer_recipient_details->set_reference( $mollie_payment_details->transferReference );
+			}
+
 			/*
 			 * Failure reason.
 			 */
@@ -730,7 +852,15 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
+		/**
+		 * Links.
+		 */
 		$links = $mollie_payment->get_links();
+
+		// Action URL.
+		if ( \property_exists( $links, 'checkout' ) ) {
+			$payment->set_action_url( $links->checkout->href );
+		}
 
 		// Change payment state URL.
 		if ( \property_exists( $links, 'changePaymentState' ) ) {
@@ -739,6 +869,9 @@ class Gateway extends Core_Gateway {
 
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 
+		/**
+		 * Chargebacks.
+		 */
 		if ( $mollie_payment->has_chargebacks() ) {
 			$mollie_chargebacks = $this->client->get_payment_chargebacks(
 				$mollie_payment->get_id(),
@@ -750,7 +883,7 @@ class Gateway extends Core_Gateway {
 			if ( false !== $mollie_chargeback ) {
 				$subscriptions = array_filter(
 					$payment->get_subscriptions(),
-					function( $subscription ) {
+					function ( $subscription ) {
 						return SubscriptionStatus::ACTIVE === $subscription->get_status();
 					}
 				);
@@ -761,26 +894,33 @@ class Gateway extends Core_Gateway {
 
 						$subscription->add_note(
 							\sprintf(
-								/* translators: 1: Mollie chargeback ID, 2: Mollie payment ID */
+							/* translators: 1: Mollie chargeback ID, 2: Mollie payment ID */
 								\__( 'Subscription put on hold due to chargeback `%1$s` of payment `%2$s`.', 'pronamic_ideal' ),
 								\esc_html( $mollie_chargeback->get_id() ),
 								\esc_html( $mollie_payment->get_id() )
 							)
 						);
-
-						$subscription->save();
 					}
 				}
 			}
 		}
 
-		// Refunds.
+		/**
+		 * Refunds.
+		 */
 		$amount_refunded = $mollie_payment->get_amount_refunded();
 
 		if ( null !== $amount_refunded ) {
 			$refunded_amount = new Money( $amount_refunded->get_value(), $amount_refunded->get_currency() );
 
 			$payment->set_refunded_amount( $refunded_amount->get_value() > 0 ? $refunded_amount : null );
+		}
+
+		// Save.
+		$payment->save();
+
+		foreach ( $payment->get_subscriptions() as $subscription ) {
+			$subscription->save();
 		}
 	}
 
@@ -819,7 +959,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Update payment method.
-		$old_method = $subscription->payment_method;
+		$old_method = $subscription->get_payment_method();
 		$new_method = ( null === $payment_method && \property_exists( $mandate, 'method' ) ? Methods::transform_gateway_method( $mandate->method ) : $payment_method );
 
 		// `Direct Debit` is not a recurring method, use `Direct Debit (mandate via ...)` instead.
@@ -833,7 +973,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		if ( ! empty( $old_method ) && $old_method !== $new_method ) {
-			$subscription->payment_method = $new_method;
+			$subscription->set_payment_method( $new_method );
 
 			// Add note.
 			$note = \sprintf(
@@ -905,9 +1045,9 @@ class Gateway extends Core_Gateway {
 		$customer_ids = array();
 
 		// Customer ID from subscription meta.
-		$subscription = $payment->get_subscription();
+		$subscriptions = $payment->get_subscriptions();
 
-		if ( null !== $subscription ) {
+		foreach ( $subscriptions as $subscription ) {
 			$customer_id = $this->get_customer_id_for_subscription( $subscription );
 
 			if ( null !== $customer_id ) {
@@ -961,15 +1101,6 @@ class Gateway extends Core_Gateway {
 		$customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
 		if ( empty( $customer_id ) ) {
-			// Try to get (legacy) customer ID from first payment.
-			$first_payment = $subscription->get_first_payment();
-
-			if ( null !== $first_payment ) {
-				$customer_id = $first_payment->get_meta( 'mollie_customer_id' );
-			}
-		}
-
-		if ( empty( $customer_id ) ) {
 			return null;
 		}
 
@@ -1017,9 +1148,11 @@ class Gateway extends Core_Gateway {
 	 * @throws \Exception Throws exception when error in customer data store occurs.
 	 */
 	private function create_customer_for_payment( Payment $payment ) {
+		$customer = $payment->get_customer();
+
 		$mollie_customer = new Customer();
 		$mollie_customer->set_mode( $this->config->is_test_mode() ? 'test' : 'live' );
-		$mollie_customer->set_email( $payment->get_email() );
+		$mollie_customer->set_email( null === $customer ? null : $customer->get_email() );
 
 		$pronamic_customer = $payment->get_customer();
 
@@ -1069,10 +1202,12 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Store customer ID in subscription meta.
-		$subscription = $payment->get_subscription();
+		$subscriptions = $payment->get_subscriptions();
 
-		if ( null !== $subscription ) {
+		foreach ( $subscriptions as $subscription ) {
 			$subscription->set_meta( 'mollie_customer_id', $mollie_customer->get_id() );
+
+			$subscription->save();
 		}
 
 		return $mollie_customer->get_id();
@@ -1089,54 +1224,55 @@ class Gateway extends Core_Gateway {
 			return;
 		}
 
-		// Subscription.
-		$subscription = $payment->get_subscription();
+		// Subscriptions.
+		$subscriptions = $payment->get_subscriptions();
 
-		// Customer.
-		$customer = $payment->get_customer();
+		foreach ( $subscriptions as $subscription ) {
+			// Customer.
+			$customer = $payment->get_customer();
 
-		if ( null === $customer && null !== $subscription ) {
-			$customer = $subscription->get_customer();
+			if ( null === $customer ) {
+				$customer = $subscription->get_customer();
+			}
+
+			if ( null === $customer ) {
+				continue;
+			}
+
+			// WordPress user.
+			$user_id = $customer->get_user_id();
+
+			if ( null === $user_id ) {
+				continue;
+			}
+
+			$user = \get_user_by( 'id', $user_id );
+
+			if ( false === $user ) {
+				continue;
+			}
+
+			// Customer IDs.
+			$customer_ids = array(
+				// Payment.
+				$payment->get_meta( 'mollie_customer_id' ),
+
+				// Subscription.
+				$subscription->get_meta( 'mollie_customer_id' ),
+			);
+
+			// Connect.
+			$customer_ids = \array_filter( $customer_ids );
+			$customer_ids = \array_unique( $customer_ids );
+
+			foreach ( $customer_ids as $customer_id ) {
+				$customer = new Customer( $customer_id );
+
+				$this->customer_data_store->get_or_insert_customer( $customer );
+
+				$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
+			}
 		}
 
-		if ( null === $customer ) {
-			return;
-		}
-
-		// WordPress user.
-		$user_id = $customer->get_user_id();
-
-		if ( null === $user_id ) {
-			return;
-		}
-
-		$user = \get_user_by( 'id', $user_id );
-
-		if ( false === $user ) {
-			return;
-		}
-
-		// Customer IDs.
-		$customer_ids = array();
-
-		// Payment.
-		$customer_ids[] = $payment->get_meta( 'mollie_customer_id' );
-
-		// Subscription.
-		if ( null !== $subscription ) {
-			$customer_ids[] = $subscription->get_meta( 'mollie_customer_id' );
-		}
-
-		// Connect.
-		$customer_ids = \array_filter( $customer_ids );
-		$customer_ids = \array_unique( $customer_ids );
-
-		foreach ( $customer_ids as $customer_id ) {
-			$customer = new Customer( $customer_id );
-
-			$this->customer_data_store->get_or_insert_customer( $customer );
-
-			$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
-		}
 	}
 }

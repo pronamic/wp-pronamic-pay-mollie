@@ -9,3 +9,5 @@ parameters:
 		- src/
 	scanDirectories:
 		- vendor/wp-cli
+		- wp-content/plugins/action-scheduler
+	
