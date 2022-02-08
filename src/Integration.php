@@ -319,7 +319,7 @@ class Integration extends AbstractGatewayIntegration {
 	 *
 	 * @param \DateTimeInterface $next_payment_delivery_date Next payment delivery date.
 	 * @param CoreSubscription   $subscription               Subscription.
-	 * @return DateTime
+	 * @return \DateTimeInterface
 	 */
 	public function next_payment_delivery_date( \DateTimeInterface $next_payment_delivery_date, CoreSubscription $subscription ) {
 		$config_id = $subscription->get_config_id();
@@ -349,7 +349,7 @@ class Integration extends AbstractGatewayIntegration {
 		// Base delivery date on next payment date.
 		$next_payment_date = $subscription->get_next_payment_date();
 
-		if ( null === $next_payment_date ) {
+		if ( ! ( $next_payment_date instanceof \DateTimeImmutable ) ) {
 			return $next_payment_delivery_date;
 		}
 
