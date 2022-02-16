@@ -205,34 +205,6 @@ class Integration extends AbstractGatewayIntegration {
 	}
 
 	/**
-	 * Save post.
-	 *
-	 * @link https://developer.wordpress.org/reference/functions/get_post_meta/
-	 * @param int $post_id Post ID.
-	 * @return void
-	 */
-	public function save_post( $post_id ) {
-		$api_key = get_post_meta( $post_id, '_pronamic_gateway_mollie_api_key', true );
-
-		if ( ! is_string( $api_key ) ) {
-			return;
-		}
-
-		$api_key_prefix = substr( $api_key, 0, 4 );
-
-		switch ( $api_key_prefix ) {
-			case 'live':
-				update_post_meta( $post_id, '_pronamic_gateway_mode', Gateway::MODE_LIVE );
-
-				return;
-			case 'test':
-				update_post_meta( $post_id, '_pronamic_gateway_mode', Gateway::MODE_TEST );
-
-				return;
-		}
-	}
-
-	/**
 	 * Payment provider URL.
 	 *
 	 * @param string|null $url     Payment provider URL.
@@ -263,7 +235,6 @@ class Integration extends AbstractGatewayIntegration {
 
 		$config->id            = intval( $post_id );
 		$config->api_key       = $this->get_meta( $post_id, 'mollie_api_key' );
-		$config->mode          = $this->get_meta( $post_id, 'mode' );
 		$config->due_date_days = $this->get_meta( $post_id, 'mollie_due_date_days' );
 
 		return $config;

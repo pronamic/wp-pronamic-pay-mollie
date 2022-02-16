@@ -1276,6 +1276,14 @@ class Gateway extends Core_Gateway {
 				$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
 			}
 		}
+	}
 
+	/**
+	 * Get mode.
+	 * 
+	 * @return string
+	 */
+	public function get_mode() {
+		return $this->config->is_test_mode() ? 'test' : 'live';
 	}
 }
