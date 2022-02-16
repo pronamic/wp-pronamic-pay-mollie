@@ -193,21 +193,21 @@ class Payment extends BaseResource {
 	}
 
 	/**
+	 * Get sequence type.
+	 *
+	 * @return string
+	 */
+	public function get_sequence_type() {
+		return $this->sequence_type;
+	}
+
+	/**
 	 * Get profile ID.
 	 *
 	 * @return string
 	 */
 	public function get_profile_id() {
 		return $this->profile_id;
-	}
-
-	/**
-	 * Get customer ID.
-	 *
-	 * @return string|null
-	 */
-	public function get_customer_id() {
-		return $this->customer_id;
 	}
 
 	/**
@@ -227,6 +227,15 @@ class Payment extends BaseResource {
 	 */
 	public function set_locale( $locale ) {
 		$this->locale = $locale;
+	}
+
+	/**
+	 * Get customer ID.
+	 *
+	 * @return string|null
+	 */
+	public function get_customer_id() {
+		return $this->customer_id;
 	}
 
 	/**
@@ -319,6 +328,7 @@ class Payment extends BaseResource {
 	 * Set expires at.
 	 *
 	 * @param DateTimeInterface $expires_at Expiry date.
+	 * @return void
 	 */
 	public function set_expires_at( DateTimeInterface $expires_at ) {
 		$this->expires_at = $expires_at;

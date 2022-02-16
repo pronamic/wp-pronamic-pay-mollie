@@ -19,6 +19,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Gateways\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 
@@ -708,10 +709,12 @@ class Gateway extends Core_Gateway {
 				$payment->set_meta( 'mollie_mandate_id', $mollie_mandate_id );
 			}
 
+			$is_first_and_successful = ( 'first' === $mollie_payment->get_sequence_type() && PaymentStatus::SUCCESS === $payment->get_status() );
+
 			foreach ( $payment->get_subscriptions() as $subscription ) {
 				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
-				if ( empty( $mandate_id ) ) {
+				if ( empty( $mandate_id ) || $is_first_and_successful ) {
 					$subscription->set_meta( 'mollie_mandate_id', $mollie_mandate_id );
 				}
 			}

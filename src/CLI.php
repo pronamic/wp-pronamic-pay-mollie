@@ -351,7 +351,7 @@ class CLI {
 				\WP_CLI::log(
 					\sprintf(
 						'Number Payments: %s, Number Filtered Payments: %s, API URL: %s.',
-						\count( $response->_embedded->payments ),
+						\property_exists( $response, '_embedded' ) ? \count( $response->_embedded->payments ) : 0,
 						\count( $payments ),
 						$api_url
 					)
@@ -410,6 +410,12 @@ class CLI {
 			return;
 		}
 
+		if ( empty( $args ) ) {
+			\WP_CLI::error( 'This command requires a transaction ID to cancel payments' );
+
+			return;
+		}
+
 		$client = new Client( $api_key );
 
 		foreach ( $args as $id ) {
@@ -434,11 +440,11 @@ class CLI {
 			\WP_CLI::log(
 				\sprintf(
 					'- status = %s, createdAt = %s, canceledAt = %s',
-					$response->status,
+					\property_exists( $response, 'status' ) ? $response->status : '',
 					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie name.
-					$response->createdAt,
+					\property_exists( $response, 'createdAt' ) ? $response->createdAt : '',
 					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie name.
-					$response->canceledAt
+					\property_exists( $response, 'canceledAt' ) ? $response->canceledAt : ''
 				)
 			);
 
