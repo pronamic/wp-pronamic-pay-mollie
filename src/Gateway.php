@@ -105,26 +105,11 @@ class Gateway extends Core_Gateway {
 	public function get_issuers() {
 		$groups = array();
 
-		try {
-			$result = $this->client->get_issuers();
+		$result = $this->client->get_issuers();
 
-			$groups[] = array(
-				'options' => $result,
-			);
-		} catch ( Error $e ) {
-			// Catch Mollie error.
-			$error = new \WP_Error(
-				'mollie_error',
-				sprintf( '%1$s (%2$s) - %3$s', $e->get_title(), $e->getCode(), $e->get_detail() )
-			);
-
-			$this->set_error( $error );
-		} catch ( \Exception $e ) {
-			// Catch exceptions.
-			$error = new \WP_Error( 'mollie_error', $e->getMessage() );
-
-			$this->set_error( $error );
-		}
+		$groups[] = array(
+			'options' => $result,
+		);
 
 		return $groups;
 	}
@@ -145,26 +130,7 @@ class Gateway extends Core_Gateway {
 
 		foreach ( $sequence_types as $sequence_type ) {
 			// Get active payment methods for Mollie account.
-			try {
-				$result = $this->client->get_payment_methods( $sequence_type );
-			} catch ( Error $e ) {
-				// Catch Mollie error.
-				$error = new \WP_Error(
-					'mollie_error',
-					sprintf( '%1$s (%2$s) - %3$s', $e->get_title(), $e->getCode(), $e->get_detail() )
-				);
-
-				$this->set_error( $error );
-
-				break;
-			} catch ( \Exception $e ) {
-				// Catch exceptions.
-				$error = new \WP_Error( 'mollie_error', $e->getMessage() );
-
-				$this->set_error( $error );
-
-				break;
-			}
+			$result = $this->client->get_payment_methods( $sequence_type );
 
 			if ( Sequence::FIRST === $sequence_type ) {
 				foreach ( $result as $method => $title ) {
