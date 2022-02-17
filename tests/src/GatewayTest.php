@@ -122,11 +122,6 @@ class GatewayTest extends WP_UnitTestCase {
 			$this->assertInternalType( 'array', $issuers[0] );
 			$this->assertArrayHasKey( 'options', $issuers[0] );
 		}
-
-		// Check gateway error if issuers is empty.
-		if ( empty( $issuers ) ) {
-			$this->assertInstanceOf( 'WP_Error', $this->gateway->error );
-		}
 	}
 
 	/**
