@@ -933,16 +933,6 @@ class Gateway extends Core_Gateway {
 		$old_method = $subscription->get_payment_method();
 		$new_method = ( null === $payment_method && \property_exists( $mandate, 'method' ) ? Methods::transform_gateway_method( $mandate->method ) : $payment_method );
 
-		// `Direct Debit` is not a recurring method, use `Direct Debit (mandate via ...)` instead.
-		if ( PaymentMethods::DIRECT_DEBIT === $new_method ) {
-			$new_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
-
-			// Use `Direct Debit (mandate via Bancontact)` if consumer account starts with `BE`.
-			if ( \property_exists( $mandate, 'details' ) && 'BE' === \substr( $mandate->details->consumerAccount, 0, 2 ) ) {
-				$new_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
-			}
-		}
-
 		if ( ! empty( $old_method ) && $old_method !== $new_method ) {
 			$subscription->set_payment_method( $new_method );
 
