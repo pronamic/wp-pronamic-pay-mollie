@@ -683,7 +683,7 @@ class Gateway extends Core_Gateway {
 				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
 				if ( empty( $mandate_id ) || $is_first_and_successful ) {
-					$subscription->set_meta( 'mollie_mandate_id', $mollie_mandate_id );
+					$this->update_subscription_mandate( $subscription, $mollie_mandate_id );
 				}
 			}
 		}
@@ -920,7 +920,7 @@ class Gateway extends Core_Gateway {
 
 		if ( ! empty( $old_mandate_id ) && $old_mandate_id !== $mandate_id ) {
 			$note = \sprintf(
-			/* translators: 1: old mandate ID, 2: new mandate ID */
+				/* translators: 1: old mandate ID, 2: new mandate ID */
 				\__( 'Mandate for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
 				\esc_html( $old_mandate_id ),
 				\esc_html( $mandate_id )
