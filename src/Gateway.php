@@ -315,11 +315,11 @@ class Gateway extends Core_Gateway {
 		 */
 		$subscriptions = $payment->get_subscriptions();
 
-		if ( \count( $subscriptions ) > 0 ) {
-			$first_method = PaymentMethods::get_first_payment_method( $payment_method );
-
-			$request->set_method( Methods::transform( $first_method, $first_method ) );
-
+		if (
+			\count( $subscriptions ) > 0
+				||
+			PaymentMethods::is_direct_debit_method( $payment_method )
+		) {
 			$request->set_sequence_type( 'first' );
 
 			foreach ( $subscriptions as $subscription ) {
@@ -335,10 +335,16 @@ class Gateway extends Core_Gateway {
 
 		if ( ! empty( $sequence_type ) ) {
 			$request->set_sequence_type( $sequence_type );
+		}
 
-			if ( 'recurring' === $sequence_type ) {
-				$request->set_method( null );
-			}
+		if ( 'recurring' === $request->get_sequence_type() ) {
+			$request->set_method( null );
+		}
+
+		if ( 'first' === $request->get_sequence_type() ) {
+			$first_method = PaymentMethods::get_first_payment_method( $payment_method );
+
+			$request->set_method( Methods::transform( $first_method, $first_method ) );
 		}
 
 		/**
