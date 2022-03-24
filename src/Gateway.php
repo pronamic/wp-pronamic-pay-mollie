@@ -318,15 +318,7 @@ class Gateway extends Core_Gateway {
 		if (
 			\count( $subscriptions ) > 0
 				||
-			\in_array(
-				$payment_method,
-				array(
-					PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-					PaymentMethods::DIRECT_DEBIT_IDEAL,
-					PaymentMethods::DIRECT_DEBIT_SOFORT,
-				),
-				true
-			)
+			PaymentMethods::is_direct_debit_method( $payment_method )
 		) {
 			$request->set_sequence_type( 'first' );
 
