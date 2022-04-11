@@ -68,6 +68,8 @@ class Gateway extends Core_Gateway {
 	 * @param Config $config Config.
 	 */
 	public function __construct( Config $config ) {
+		$this->config = $config;
+
 		parent::__construct( $config );
 
 		$this->set_method( self::METHOD_HTTP_REDIRECT );
@@ -105,26 +107,11 @@ class Gateway extends Core_Gateway {
 	public function get_issuers() {
 		$groups = array();
 
-		try {
-			$result = $this->client->get_issuers();
+		$result = $this->client->get_issuers();
 
-			$groups[] = array(
-				'options' => $result,
-			);
-		} catch ( Error $e ) {
-			// Catch Mollie error.
-			$error = new \WP_Error(
-				'mollie_error',
-				sprintf( '%1$s (%2$s) - %3$s', $e->get_title(), $e->getCode(), $e->get_detail() )
-			);
-
-			$this->set_error( $error );
-		} catch ( \Exception $e ) {
-			// Catch exceptions.
-			$error = new \WP_Error( 'mollie_error', $e->getMessage() );
-
-			$this->set_error( $error );
-		}
+		$groups[] = array(
+			'options' => $result,
+		);
 
 		return $groups;
 	}
@@ -145,26 +132,7 @@ class Gateway extends Core_Gateway {
 
 		foreach ( $sequence_types as $sequence_type ) {
 			// Get active payment methods for Mollie account.
-			try {
-				$result = $this->client->get_payment_methods( $sequence_type );
-			} catch ( Error $e ) {
-				// Catch Mollie error.
-				$error = new \WP_Error(
-					'mollie_error',
-					sprintf( '%1$s (%2$s) - %3$s', $e->get_title(), $e->getCode(), $e->get_detail() )
-				);
-
-				$this->set_error( $error );
-
-				break;
-			} catch ( \Exception $e ) {
-				// Catch exceptions.
-				$error = new \WP_Error( 'mollie_error', $e->getMessage() );
-
-				$this->set_error( $error );
-
-				break;
-			}
+			$result = $this->client->get_payment_methods( $sequence_type );
 
 			if ( Sequence::FIRST === $sequence_type ) {
 				foreach ( $result as $method => $title ) {
@@ -347,11 +315,11 @@ class Gateway extends Core_Gateway {
 		 */
 		$subscriptions = $payment->get_subscriptions();
 
-		if ( \count( $subscriptions ) > 0 ) {
-			$first_method = PaymentMethods::get_first_payment_method( $payment_method );
-
-			$request->set_method( Methods::transform( $first_method, $first_method ) );
-
+		if (
+			\count( $subscriptions ) > 0
+				||
+			PaymentMethods::is_direct_debit_method( $payment_method )
+		) {
 			$request->set_sequence_type( 'first' );
 
 			foreach ( $subscriptions as $subscription ) {
@@ -367,10 +335,16 @@ class Gateway extends Core_Gateway {
 
 		if ( ! empty( $sequence_type ) ) {
 			$request->set_sequence_type( $sequence_type );
+		}
 
-			if ( 'recurring' === $sequence_type ) {
-				$request->set_method( null );
-			}
+		if ( 'recurring' === $request->get_sequence_type() ) {
+			$request->set_method( null );
+		}
+
+		if ( 'first' === $request->get_sequence_type() ) {
+			$first_method = PaymentMethods::get_first_payment_method( $payment_method );
+
+			$request->set_method( Methods::transform( $first_method, $first_method ) );
 		}
 
 		/**
@@ -715,7 +689,7 @@ class Gateway extends Core_Gateway {
 				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
 				if ( empty( $mandate_id ) || $is_first_and_successful ) {
-					$subscription->set_meta( 'mollie_mandate_id', $mollie_mandate_id );
+					$this->update_subscription_mandate( $subscription, $mollie_mandate_id );
 				}
 			}
 		}
@@ -952,7 +926,7 @@ class Gateway extends Core_Gateway {
 
 		if ( ! empty( $old_mandate_id ) && $old_mandate_id !== $mandate_id ) {
 			$note = \sprintf(
-			/* translators: 1: old mandate ID, 2: new mandate ID */
+				/* translators: 1: old mandate ID, 2: new mandate ID */
 				\__( 'Mandate for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
 				\esc_html( $old_mandate_id ),
 				\esc_html( $mandate_id )
@@ -964,16 +938,6 @@ class Gateway extends Core_Gateway {
 		// Update payment method.
 		$old_method = $subscription->get_payment_method();
 		$new_method = ( null === $payment_method && \property_exists( $mandate, 'method' ) ? Methods::transform_gateway_method( $mandate->method ) : $payment_method );
-
-		// `Direct Debit` is not a recurring method, use `Direct Debit (mandate via ...)` instead.
-		if ( PaymentMethods::DIRECT_DEBIT === $new_method ) {
-			$new_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
-
-			// Use `Direct Debit (mandate via Bancontact)` if consumer account starts with `BE`.
-			if ( \property_exists( $mandate, 'details' ) && 'BE' === \substr( $mandate->details->consumerAccount, 0, 2 ) ) {
-				$new_method = PaymentMethods::DIRECT_DEBIT_BANCONTACT;
-			}
-		}
 
 		if ( ! empty( $old_method ) && $old_method !== $new_method ) {
 			$subscription->set_payment_method( $new_method );
@@ -1276,6 +1240,14 @@ class Gateway extends Core_Gateway {
 				$this->customer_data_store->connect_mollie_customer_to_wp_user( $customer, $user );
 			}
 		}
+	}
 
+	/**
+	 * Get mode.
+	 * 
+	 * @return string
+	 */
+	public function get_mode() {
+		return $this->config->is_test_mode() ? 'test' : 'live';
 	}
 }
