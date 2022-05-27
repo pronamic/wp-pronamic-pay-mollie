@@ -70,9 +70,9 @@ class Chargeback extends BaseResource {
 
 		$validator->validate(
 			$json,
-			(object) array(
+			(object) [
 				'$ref' => 'file://' . realpath( __DIR__ . '/../json-schemas/chargeback.json' ),
-			),
+			],
 			\JsonSchema\Constraints\Constraint::CHECK_MODE_EXCEPTIONS
 		);
 

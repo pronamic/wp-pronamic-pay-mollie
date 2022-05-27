@@ -30,7 +30,7 @@ class CustomerDataStore {
 	 * @return int
 	 * @throws \Exception Throws exception if Mollie customer ID could not be retrieved from existing customer.
 	 */
-	public function get_or_insert_customer( Customer $customer, $data = array(), $format = array() ) {
+	public function get_or_insert_customer( Customer $customer, $data = [], $format = [] ) {
 		$customer_data = $this->get_customer( $customer );
 
 		if ( null !== $customer_data ) {
@@ -88,7 +88,7 @@ class CustomerDataStore {
 	 * @return int
 	 * @throws \Exception Throws exception on error.
 	 */
-	public function insert_customer( Customer $customer, $data = array(), $format = array() ) {
+	public function insert_customer( Customer $customer, $data = [], $format = [] ) {
 		global $wpdb;
 
 		$mollie_id = $customer->get_id();
@@ -136,7 +136,7 @@ class CustomerDataStore {
 	 * @return int The number of rows updated.
 	 * @throws \Exception Throws exception on error.
 	 */
-	public function update_customer( Customer $customer, $data = array(), $format = array() ) {
+	public function update_customer( Customer $customer, $data = [], $format = [] ) {
 		global $wpdb;
 
 		$mollie_id = $customer->get_id();
@@ -154,13 +154,13 @@ class CustomerDataStore {
 		$result = $wpdb->update(
 			$wpdb->pronamic_pay_mollie_customers,
 			$data,
-			array(
+			[
 				'mollie_id' => $mollie_id,
-			),
+			],
 			$format,
-			array(
+			[
 				'mollie_id' => '%s',
-			)
+			]
 		);
 
 		if ( false === $result ) {
@@ -185,7 +185,7 @@ class CustomerDataStore {
 	 * @return int
 	 * @throws \Exception Throws exception if unable to update existing customer.
 	 */
-	public function save_customer( Customer $customer, $data = array(), $format = array() ) {
+	public function save_customer( Customer $customer, $data = [], $format = [] ) {
 		$customer_data = $this->get_customer( $customer );
 
 		if ( null !== $customer_data ) {

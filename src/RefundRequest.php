@@ -108,11 +108,11 @@ class RefundRequest {
 	 * @return array<string,null|string|object>
 	 */
 	public function get_array() {
-		$array = array(
+		$array = [
 			'amount'      => $this->amount->get_json(),
 			'description' => $this->description,
 			'metadata'    => $this->metadata,
-		);
+		];
 
 		/*
 		 * Array filter will remove values NULL, FALSE and empty strings ('')

@@ -39,7 +39,7 @@ class Install {
 	public function __construct( Integration $integration ) {
 		$this->integration = $integration;
 
-		add_action( 'init', array( $this, 'check_version' ), 5 );
+		add_action( 'init', [ $this, 'check_version' ], 5 );
 	}
 
 	/**
@@ -185,8 +185,8 @@ class Install {
 		 * @link https://core.trac.wordpress.org/ticket/19207
 		 * @link https://dev.mysql.com/doc/refman/5.6/en/create-table-foreign-keys.html
 		 */
-		$data = array(
-			(object) array(
+		$data = [
+			(object) [
 				'table' => $wpdb->pronamic_pay_mollie_profiles,
 				'name'  => 'fk_profile_organization_id',
 				'query' => "
@@ -198,8 +198,8 @@ class Install {
 					ON UPDATE RESTRICT
 					;
 				",
-			),
-			(object) array(
+			],
+			(object) [
 				'table' => $wpdb->pronamic_pay_mollie_customers,
 				'name'  => 'fk_customer_organization_id',
 				'query' => "
@@ -211,8 +211,8 @@ class Install {
 					ON UPDATE RESTRICT
 					;
 				",
-			),
-			(object) array(
+			],
+			(object) [
 				'table' => $wpdb->pronamic_pay_mollie_customers,
 				'name'  => 'fk_customer_profile_id',
 				'query' => "
@@ -224,8 +224,8 @@ class Install {
 					ON UPDATE RESTRICT
 					;
 				",
-			),
-			(object) array(
+			],
+			(object) [
 				'table' => $wpdb->pronamic_pay_mollie_customer_users,
 				'name'  => 'fk_customer_id',
 				'query' => "
@@ -237,8 +237,8 @@ class Install {
 					ON UPDATE RESTRICT
 					;
 				",
-			),
-			(object) array(
+			],
+			(object) [
 				'table' => $wpdb->pronamic_pay_mollie_customer_users,
 				'name'  => 'fk_customer_user_id',
 				'query' => "
@@ -250,8 +250,8 @@ class Install {
 					ON UPDATE CASCADE
 					;
 				",
-			),
-		);
+			],
+		];
 
 		foreach ( $data as $item ) {
 			try {

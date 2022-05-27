@@ -18,9 +18,9 @@ if ( ! isset( $user ) ) {
 }
 
 $customer_query = new CustomerQuery(
-	array(
+	[
 		'user_id' => $user->ID,
-	)
+	]
 );
 
 $customers = $customer_query->get_customers();
@@ -65,10 +65,10 @@ if ( empty( $customers ) ) {
 									<?php
 
 									$url = \add_query_arg(
-										array(
+										[
 											'page' => 'pronamic_pay_mollie_customers',
 											'id'   => $customer->mollie_id,
-										),
+										],
 										\admin_url( 'admin.php' )
 									);
 

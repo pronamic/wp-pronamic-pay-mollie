@@ -44,23 +44,23 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function method_matrix_provider() {
-		return array(
-			array( PaymentMethods::BANCONTACT, Methods::BANCONTACT ),
-			array( PaymentMethods::BANK_TRANSFER, Methods::BANKTRANSFER ),
-			array( PaymentMethods::CREDIT_CARD, Methods::CREDITCARD ),
-			array( PaymentMethods::DIRECT_DEBIT, Methods::DIRECT_DEBIT ),
-			array( PaymentMethods::DIRECT_DEBIT_IDEAL, Methods::DIRECT_DEBIT ),
-			array( PaymentMethods::SOFORT, Methods::SOFORT ),
-			array( PaymentMethods::IDEAL, Methods::IDEAL ),
-			array( PaymentMethods::KBC, Methods::KBC ),
-			array( PaymentMethods::BELFIUS, Methods::BELFIUS ),
-			array( 'not existing payment method', null ),
-			array( 'not existing payment method', 'test', 'test' ),
-			array( null, null ),
-			array( 0, null ),
-			array( false, null ),
-			array( new \stdClass(), null ),
-		);
+		return [
+			[ PaymentMethods::BANCONTACT, Methods::BANCONTACT ],
+			[ PaymentMethods::BANK_TRANSFER, Methods::BANKTRANSFER ],
+			[ PaymentMethods::CREDIT_CARD, Methods::CREDITCARD ],
+			[ PaymentMethods::DIRECT_DEBIT, Methods::DIRECT_DEBIT ],
+			[ PaymentMethods::DIRECT_DEBIT_IDEAL, Methods::DIRECT_DEBIT ],
+			[ PaymentMethods::SOFORT, Methods::SOFORT ],
+			[ PaymentMethods::IDEAL, Methods::IDEAL ],
+			[ PaymentMethods::KBC, Methods::KBC ],
+			[ PaymentMethods::BELFIUS, Methods::BELFIUS ],
+			[ 'not existing payment method', null ],
+			[ 'not existing payment method', 'test', 'test' ],
+			[ null, null ],
+			[ 0, null ],
+			[ false, null ],
+			[ new \stdClass(), null ],
+		];
 	}
 
 	/**
@@ -83,21 +83,21 @@ class MethodsTest extends \PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function transform_gateway_method_matrix_provider() {
-		return array(
-			array( Methods::BANCONTACT, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT ),
-			array( Methods::BANKTRANSFER, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANK_TRANSFER ),
-			array( Methods::CREDITCARD, \Pronamic\WordPress\Pay\Core\PaymentMethods::CREDIT_CARD ),
-			array( Methods::DIRECT_DEBIT, \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT ),
-			array( Methods::PAYPAL, \Pronamic\WordPress\Pay\Core\PaymentMethods::PAYPAL ),
-			array( Methods::SOFORT, \Pronamic\WordPress\Pay\Core\PaymentMethods::SOFORT ),
-			array( Methods::IDEAL, \Pronamic\WordPress\Pay\Core\PaymentMethods::IDEAL ),
-			array( Methods::KBC, \Pronamic\WordPress\Pay\Core\PaymentMethods::KBC ),
-			array( Methods::BELFIUS, \Pronamic\WordPress\Pay\Core\PaymentMethods::BELFIUS ),
-			array( 'not existing payment method', null ),
-			array( null, null ),
-			array( 0, null ),
-			array( false, null ),
-			array( new \stdClass(), null ),
-		);
+		return [
+			[ Methods::BANCONTACT, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT ],
+			[ Methods::BANKTRANSFER, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANK_TRANSFER ],
+			[ Methods::CREDITCARD, \Pronamic\WordPress\Pay\Core\PaymentMethods::CREDIT_CARD ],
+			[ Methods::DIRECT_DEBIT, \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT ],
+			[ Methods::PAYPAL, \Pronamic\WordPress\Pay\Core\PaymentMethods::PAYPAL ],
+			[ Methods::SOFORT, \Pronamic\WordPress\Pay\Core\PaymentMethods::SOFORT ],
+			[ Methods::IDEAL, \Pronamic\WordPress\Pay\Core\PaymentMethods::IDEAL ],
+			[ Methods::KBC, \Pronamic\WordPress\Pay\Core\PaymentMethods::KBC ],
+			[ Methods::BELFIUS, \Pronamic\WordPress\Pay\Core\PaymentMethods::BELFIUS ],
+			[ 'not existing payment method', null ],
+			[ null, null ],
+			[ 0, null ],
+			[ false, null ],
+			[ new \stdClass(), null ],
+		];
 	}
 }

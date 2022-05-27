@@ -30,7 +30,7 @@ class ProfileDataStore {
 	 * @return int
 	 * @throws \Exception Throws exception if Mollie profile ID could not be retrieved from existing profile.
 	 */
-	public function get_or_insert_profile( Profile $profile, $data = array(), $format = array() ) {
+	public function get_or_insert_profile( Profile $profile, $data = [], $format = [] ) {
 		$profile_data = $this->get_profile( $profile );
 
 		if ( null !== $profile_data ) {
@@ -88,7 +88,7 @@ class ProfileDataStore {
 	 * @return int
 	 * @throws \Exception Throws exception on error.
 	 */
-	public function insert_profile( Profile $profile, $data = array(), $format = array() ) {
+	public function insert_profile( Profile $profile, $data = [], $format = [] ) {
 		global $wpdb;
 
 		$mollie_id = $profile->get_id();
@@ -136,7 +136,7 @@ class ProfileDataStore {
 	 * @return int The number of rows updated.
 	 * @throws \Exception Throws exception on error.
 	 */
-	public function update_profile( Profile $profile, $data = array(), $format = array() ) {
+	public function update_profile( Profile $profile, $data = [], $format = [] ) {
 		global $wpdb;
 
 		$mollie_id = $profile->get_id();
@@ -154,13 +154,13 @@ class ProfileDataStore {
 		$result = $wpdb->update(
 			$wpdb->pronamic_pay_mollie_profiles,
 			$data,
-			array(
+			[
 				'mollie_id' => $mollie_id,
-			),
+			],
 			$format,
-			array(
+			[
 				'mollie_id' => '%s',
-			)
+			]
 		);
 
 		if ( false === $result ) {
@@ -185,7 +185,7 @@ class ProfileDataStore {
 	 * @return int
 	 * @throws \Exception Throws exception if unable to update existing profile.
 	 */
-	public function save_profile( Profile $profile, $data = array(), $format = array() ) {
+	public function save_profile( Profile $profile, $data = [], $format = [] ) {
 		$profile_data = $this->get_profile( $profile );
 
 		if ( null !== $profile_data ) {

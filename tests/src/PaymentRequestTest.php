@@ -51,7 +51,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function test_payment_request() {
 		$this->assertEquals(
-			array(
+			[
 				'amount'       => $this->request->amount->get_json(),
 				'description'  => 'Test',
 				'redirectUrl'  => 'https://example.com/mollie-redirect/',
@@ -62,7 +62,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 				'issuer'       => 'ideal_INGBNL2A',
 				'customerId'   => 'cst_8wmqcHMN4U',
 				'sequenceType' => 'first',
-			),
+			],
 			$this->request->get_array()
 		);
 	}
@@ -78,7 +78,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 		$this->request->set_due_date( $due_date );
 
 		$this->assertEquals(
-			array(
+			[
 				'amount'       => $this->request->amount->get_json(),
 				'description'  => 'Test',
 				'redirectUrl'  => 'https://example.com/mollie-redirect/',
@@ -90,7 +90,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 				'dueDate'      => $due_date->format( 'Y-m-d' ),
 				'customerId'   => 'cst_8wmqcHMN4U',
 				'sequenceType' => 'first',
-			),
+			],
 			$this->request->get_array()
 		);
 	}
@@ -112,11 +112,11 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( 'john@example.com', $request->get_billing_email() );
 
 		$this->assertEquals(
-			array(
+			[
 				'amount'       => $request->amount->get_json(),
 				'description'  => 'Test',
 				'billingEmail' => 'john@example.com',
-			),
+			],
 			$request->get_array()
 		);
 	}
@@ -132,22 +132,22 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 			'Test'
 		);
 
-		$metadata = (object) array(
+		$metadata = (object) [
 			'vat_number'   => 'NL123456789B01',
 			'edd_order_id' => 1234,
 			'gf_entry_id'  => 5678,
-		);
+		];
 
 		$request->set_metadata( $metadata );
 
 		$this->assertEquals( $metadata, $request->get_metadata() );
 
 		$this->assertEquals(
-			array(
+			[
 				'amount'      => $request->amount->get_json(),
 				'description' => 'Test',
 				'metadata'    => $metadata,
-			),
+			],
 			$request->get_array()
 		);
 	}

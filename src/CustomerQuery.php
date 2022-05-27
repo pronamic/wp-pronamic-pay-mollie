@@ -33,13 +33,13 @@ class CustomerQuery {
 	 *
 	 * @param array<string, int> $args Query arguments.
 	 */
-	public function __construct( $args = array() ) {
+	public function __construct( $args = [] ) {
 		$this->args = \wp_parse_args(
 			$args,
-			array(
+			[
 				'user_id'         => null,
 				'organization_id' => null,
-			)
+			]
 		);
 	}
 

@@ -72,10 +72,10 @@ class Amount {
 	 * @return object
 	 */
 	public function get_json() {
-		return (object) array(
+		return (object) [
 			'currency' => $this->get_currency(),
 			'value'    => $this->get_value(),
-		);
+		];
 	}
 
 	/**
@@ -120,9 +120,9 @@ class Amount {
 
 		$validator->validate(
 			$json,
-			(object) array(
+			(object) [
 				'$ref' => 'file://' . realpath( __DIR__ . '/../json-schemas/amount.json' ),
-			),
+			],
 			Constraint::CHECK_MODE_EXCEPTIONS
 		);
 

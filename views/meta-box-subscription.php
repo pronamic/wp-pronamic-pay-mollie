@@ -24,10 +24,10 @@ $mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 	<?php
 
 	$customer_url = \add_query_arg(
-		array(
+		[
 			'page' => 'pronamic_pay_mollie_customers',
 			'id'   => $mollie_customer_id,
-		),
+		],
 		\admin_url( 'admin.php' )
 	);
 
@@ -41,11 +41,11 @@ $mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 				\esc_html( (string) $mollie_customer_id )
 			)
 		),
-		array(
-			'a' => array(
+		[
+			'a' => [
 				'href' => true,
-			),
-		)
+			],
+		]
 	);
 
 	?>

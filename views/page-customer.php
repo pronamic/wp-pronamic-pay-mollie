@@ -102,9 +102,9 @@ $users = $wpdb->get_results(
 				$mollie_customer_id
 			)
 		),
-		array(
-			'code' => array(),
-		)
+		[
+			'code' => [],
+		]
 	);
 
 	?>

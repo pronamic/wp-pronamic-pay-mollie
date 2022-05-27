@@ -139,7 +139,7 @@ class Methods {
 	 *
 	 * @var array<string>
 	 */
-	private static $map = array(
+	private static $map = [
 		PaymentMethods::APPLE_PAY               => self::APPLE_PAY,
 		PaymentMethods::BANCONTACT              => self::BANCONTACT,
 		PaymentMethods::BANK_TRANSFER           => self::BANKTRANSFER,
@@ -156,7 +156,7 @@ class Methods {
 		PaymentMethods::IDEAL                   => self::IDEAL,
 		PaymentMethods::KBC                     => self::KBC,
 		PaymentMethods::BELFIUS                 => self::BELFIUS,
-	);
+	];
 
 	/**
 	 * Transform WordPress payment method to Mollie method.

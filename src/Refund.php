@@ -153,9 +153,9 @@ class Refund extends BaseResource {
 
 		$validator->validate(
 			$json,
-			(object) array(
+			(object) [
 				'$ref' => 'file://' . realpath( __DIR__ . '/../json-schemas/refund.json' ),
-			),
+			],
 			\JsonSchema\Constraints\Constraint::CHECK_MODE_EXCEPTIONS
 		);
 

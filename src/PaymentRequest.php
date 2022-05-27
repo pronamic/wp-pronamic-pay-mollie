@@ -329,7 +329,7 @@ class PaymentRequest {
 			$due_date = $due_date->format( 'Y-m-d' );
 		}
 
-		$array = array(
+		$array = [
 			'amount'          => $this->amount->get_json(),
 			'description'     => $this->description,
 			'method'          => $this->method,
@@ -345,7 +345,7 @@ class PaymentRequest {
 			'sequenceType'    => $this->sequence_type,
 			'customerId'      => $this->customer_id,
 			'mandateId'       => $this->mandate_id,
-		);
+		];
 
 		/*
 		 * Array filter will remove values NULL, FALSE and empty strings ('')

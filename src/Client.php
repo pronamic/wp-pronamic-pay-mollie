@@ -59,17 +59,17 @@ class Client {
 	 * @throws Error Throws Error when Mollie error occurs.
 	 * @throws \Exception Throws exception when error occurs.
 	 */
-	public function send_request( $url, $method = 'GET', array $data = array() ) {
+	public function send_request( $url, $method = 'GET', array $data = [] ) {
 		// Request.
 		$response = Http::request(
 			$url,
-			array(
+			[
 				'method'  => $method,
-				'headers' => array(
+				'headers' => [
 					'Authorization' => 'Bearer ' . $this->api_key,
-				),
+				],
 				'body'    => $data,
-			)
+			]
 		);
 
 		$data = $response->json();
@@ -116,7 +116,7 @@ class Client {
 	 * @param array<string, string|object|null> $data     Request data.
 	 * @return object
 	 */
-	public function send_request_to_endpoint( $endpoint, $method = 'GET', array $data = array() ) {
+	public function send_request_to_endpoint( $endpoint, $method = 'GET', array $data = [] ) {
 		return $this->send_request( $this->get_url( $endpoint ), $method, $data );
 	}
 
@@ -172,7 +172,7 @@ class Client {
 	 * @return Payment
 	 * @throws \InvalidArgumentException Throws exception on empty payment ID argument.
 	 */
-	public function get_payment( $payment_id, $parameters = array() ) {
+	public function get_payment( $payment_id, $parameters = [] ) {
 		if ( empty( $payment_id ) ) {
 			throw new \InvalidArgumentException( 'Mollie payment ID can not be empty string.' );
 		}
@@ -192,7 +192,7 @@ class Client {
 	public function get_issuers() {
 		$response = $this->send_request_to_endpoint( 'methods/ideal?include=issuers', 'GET' );
 
-		$issuers = array();
+		$issuers = [];
 
 		if ( isset( $response->issuers ) ) {
 			foreach ( $response->issuers as $issuer ) {
@@ -219,9 +219,9 @@ class Client {
 	 * @throws \Exception Throws exception for methods on failed request or invalid response.
 	 */
 	public function get_payment_methods( $sequence_type = '' ) {
-		$data = array(
+		$data = [
 			'includeWallets' => Methods::APPLE_PAY,
-		);
+		];
 
 		if ( '' !== $sequence_type ) {
 			$data['sequenceType'] = $sequence_type;
@@ -229,7 +229,7 @@ class Client {
 
 		$response = $this->send_request_to_endpoint( 'methods', 'GET', $data );
 
-		$payment_methods = array();
+		$payment_methods = [];
 
 		if ( ! isset( $response->_embedded ) ) {
 			throw new \Exception( 'No embedded data in Mollie response.' );
@@ -311,11 +311,11 @@ class Client {
 		$response = $this->send_request_to_endpoint(
 			'customers/' . $customer_id . '/mandates',
 			'POST',
-			array(
+			[
 				'method'          => Methods::DIRECT_DEBIT,
 				'consumerName'    => $consumer_bank_details->get_name(),
 				'consumerAccount' => $consumer_bank_details->get_iban(),
-			)
+			]
 		);
 
 		return $response;
@@ -435,7 +435,7 @@ class Client {
 			}
 
 			if ( ! isset( $valid_mandates ) ) {
-				$valid_mandates = array();
+				$valid_mandates = [];
 			}
 
 			// @codingStandardsIgnoreStart
@@ -481,7 +481,7 @@ class Client {
 	public function get_payment_chargebacks( $payment_id, $parameters ) {
 		$object = $this->send_request_to_endpoint( 'payments/' . $payment_id . '/chargebacks', 'GET', $parameters );
 
-		$chargebacks = array();
+		$chargebacks = [];
 
 		if ( \property_exists( $object, '_embedded' ) && \property_exists( $object->_embedded, 'chargebacks' ) ) {
 			foreach ( $object->_embedded->chargebacks as $chargeback_object ) {
