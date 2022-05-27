@@ -849,6 +849,14 @@ class Gateway extends Core_Gateway {
 		/**
 		 * Chargebacks.
 		 */
+		$amount_charged_back = $mollie_payment->get_amount_charged_back();
+
+		if ( null !== $amount_charged_back ) {
+			$charged_back_amount = new Money( $amount_charged_back->get_value(), $amount_charged_back->get_currency() );
+
+			$payment->set_charged_back_amount( $charged_back_amount->get_value() > 0 ? $charged_back_amount : null );
+		}
+
 		if ( $mollie_payment->has_chargebacks() ) {
 			$mollie_chargebacks = $this->client->get_payment_chargebacks(
 				$mollie_payment->get_id(),
