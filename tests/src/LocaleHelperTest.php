@@ -42,26 +42,26 @@ class LocaleHelperTest extends \PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function locale_matrix_provider() {
-		return array(
+		return [
 			// English.
-			array( 'en_US', Locales::EN_US ),
-			array( 'en_us', Locales::EN_US ),
-			array( 'en_GB', null ),
-			array( 'EN', null ),
-			array( 'en', null ),
+			[ 'en_US', Locales::EN_US ],
+			[ 'en_us', Locales::EN_US ],
+			[ 'en_GB', null ],
+			[ 'EN', null ],
+			[ 'en', null ],
 
 			// Dutch.
-			array( 'nl_NL', Locales::NL_NL ),
-			array( 'NL', null ),
-			array( 'nl', null ),
+			[ 'nl_NL', Locales::NL_NL ],
+			[ 'NL', null ],
+			[ 'nl', null ],
 
 			// Frisian.
-			array( 'FY', null ),
-			array( 'fy', null ),
+			[ 'FY', null ],
+			[ 'fy', null ],
 
 			// Other.
-			array( 'not existing locale', null ),
-			array( null, null ),
-		);
+			[ 'not existing locale', null ],
+			[ null, null ],
+		];
 	}
 }

@@ -75,7 +75,7 @@ class Gateway extends Core_Gateway {
 		$this->set_method( self::METHOD_HTTP_REDIRECT );
 
 		// Supported features.
-		$this->supports = array(
+		$this->supports = [
 			'payment_status_request',
 			'recurring_apple_pay',
 			'recurring_direct_debit',
@@ -85,7 +85,7 @@ class Gateway extends Core_Gateway {
 			'webhook',
 			'webhook_log',
 			'webhook_no_config',
-		);
+		];
 
 		// Client.
 		$this->client = new Client( (string) $config->api_key );
@@ -95,7 +95,7 @@ class Gateway extends Core_Gateway {
 		$this->customer_data_store = new CustomerDataStore();
 
 		// Actions.
-		add_action( 'pronamic_payment_status_update', array( $this, 'copy_customer_id_to_wp_user' ), 99, 1 );
+		add_action( 'pronamic_payment_status_update', [ $this, 'copy_customer_id_to_wp_user' ], 99, 1 );
 	}
 
 	/**
@@ -105,13 +105,13 @@ class Gateway extends Core_Gateway {
 	 * @return array<int, array<string, array<string>>>
 	 */
 	public function get_issuers() {
-		$groups = array();
+		$groups = [];
 
 		$result = $this->client->get_issuers();
 
-		$groups[] = array(
+		$groups[] = [
 			'options' => $result,
-		);
+		];
 
 		return $groups;
 	}
@@ -123,12 +123,12 @@ class Gateway extends Core_Gateway {
 	 * @return array<int, string>
 	 */
 	public function get_available_payment_methods() {
-		$payment_methods = array();
+		$payment_methods = [];
 
 		// Set sequence types to get payment methods for.
-		$sequence_types = array( Sequence::ONE_OFF, Sequence::RECURRING, Sequence::FIRST );
+		$sequence_types = [ Sequence::ONE_OFF, Sequence::RECURRING, Sequence::FIRST ];
 
-		$results = array();
+		$results = [];
 
 		foreach ( $sequence_types as $sequence_type ) {
 			// Get active payment methods for Mollie account.
@@ -180,7 +180,7 @@ class Gateway extends Core_Gateway {
 	 * @return array<string>
 	 */
 	public function get_supported_payment_methods() {
-		return array(
+		return [
 			PaymentMethods::APPLE_PAY,
 			PaymentMethods::BANCONTACT,
 			PaymentMethods::BANK_TRANSFER,
@@ -197,7 +197,7 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::PAYPAL,
 			PaymentMethods::PRZELEWY24,
 			PaymentMethods::SOFORT,
-		);
+		];
 	}
 
 	/**
@@ -462,16 +462,16 @@ class Gateway extends Core_Gateway {
 			 *
 			 * @link https://docs.mollie.com/overview/handling-errors
 			 */
-			if ( ! \in_array( $error->get_status(), array( 429, 502, 503 ), true ) ) {
+			if ( ! \in_array( $error->get_status(), [ 429, 502, 503 ], true ) ) {
 				throw $error;
 			}
 
 			\as_schedule_single_action(
 				\time() + $this->get_retry_seconds( $attempt ),
 				'pronamic_pay_mollie_payment_start',
-				array(
+				[
 					'payment_id' => $payment->get_id(),
-				),
+				],
 				'pronamic-pay-mollie'
 			);
 
@@ -625,12 +625,12 @@ class Gateway extends Core_Gateway {
 
 			$customer_internal_id = $this->customer_data_store->get_or_insert_customer(
 				$mollie_customer,
-				array(
+				[
 					'profile_id' => $profile_internal_id,
-				),
-				array(
+				],
+				[
 					'profile_id' => '%s',
-				)
+				]
 			);
 
 			// Customer.
@@ -849,10 +849,18 @@ class Gateway extends Core_Gateway {
 		/**
 		 * Chargebacks.
 		 */
+		$amount_charged_back = $mollie_payment->get_amount_charged_back();
+
+		if ( null !== $amount_charged_back ) {
+			$charged_back_amount = new Money( $amount_charged_back->get_value(), $amount_charged_back->get_currency() );
+
+			$payment->set_charged_back_amount( $charged_back_amount->get_value() > 0 ? $charged_back_amount : null );
+		}
+
 		if ( $mollie_payment->has_chargebacks() ) {
 			$mollie_chargebacks = $this->client->get_payment_chargebacks(
 				$mollie_payment->get_id(),
-				array( 'limit' => 1 )
+				[ 'limit' => 1 ]
 			);
 
 			$mollie_chargeback = \reset( $mollie_chargebacks );
@@ -972,9 +980,9 @@ class Gateway extends Core_Gateway {
 
 		if ( null !== $payment ) {
 			$request->set_metadata(
-				array(
+				[
 					'pronamic_payment_id' => $payment->get_id(),
-				)
+				]
 			);
 		}
 
@@ -1009,7 +1017,7 @@ class Gateway extends Core_Gateway {
 	 * @return array<string>
 	 */
 	private function get_customer_ids_for_payment( Payment $payment ) {
-		$customer_ids = array();
+		$customer_ids = [];
 
 		// Customer ID from subscription meta.
 		$subscriptions = $payment->get_subscriptions();
@@ -1046,9 +1054,9 @@ class Gateway extends Core_Gateway {
 	 */
 	public function get_customer_ids_for_user( $user_id ) {
 		$customer_query = new CustomerQuery(
-			array(
+			[
 				'user_id' => $user_id,
-			)
+			]
 		);
 
 		$customers = $customer_query->get_customers();
@@ -1220,13 +1228,13 @@ class Gateway extends Core_Gateway {
 			}
 
 			// Customer IDs.
-			$customer_ids = array(
+			$customer_ids = [
 				// Payment.
 				$payment->get_meta( 'mollie_customer_id' ),
 
 				// Subscription.
 				$subscription->get_meta( 'mollie_customer_id' ),
-			);
+			];
 
 			// Connect.
 			$customer_ids = \array_filter( $customer_ids );

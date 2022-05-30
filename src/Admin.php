@@ -28,20 +28,20 @@ class Admin {
 		/**
 		 * Initialize.
 		 */
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', [ $this, 'admin_init' ] );
 
 		/**
 		 * Menu.
 		 *
 		 * @link https://metabox.io/create-hidden-admin-page/
 		 */
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
 
 		/**
 		 * Meta boxes.
 		 */
-		add_action( 'add_meta_boxes', array( $this, 'add_payment_meta_box' ), 10, 2 );
-		add_action( 'add_meta_boxes', array( $this, 'add_subscription_meta_box' ), 10, 2 );
+		add_action( 'add_meta_boxes', [ $this, 'add_payment_meta_box' ], 10, 2 );
+		add_action( 'add_meta_boxes', [ $this, 'add_subscription_meta_box' ], 10, 2 );
 	}
 
 	/**
@@ -54,7 +54,7 @@ class Admin {
 			return;
 		}
 
-		$function = array( __CLASS__, 'user_profile' );
+		$function = [ __CLASS__, 'user_profile' ];
 
 		if ( ! has_action( 'show_user_profile', $function ) ) {
 			add_action( 'show_user_profile', $function );
@@ -143,7 +143,7 @@ class Admin {
 			__( 'Mollie', 'pronamic_ideal' ),
 			'manage_options',
 			'pronamic_pay_mollie',
-			array( $this, 'page_mollie' ),
+			[ $this, 'page_mollie' ],
 			$menu_icon_url
 		);
 
@@ -153,7 +153,7 @@ class Admin {
 			__( 'Profiles', 'pronamic_ideal' ),
 			'manage_options',
 			'pronamic_pay_mollie_profiles',
-			array( $this, 'page_mollie_profiles' )
+			[ $this, 'page_mollie_profiles' ]
 		);
 
 		add_submenu_page(
@@ -162,7 +162,7 @@ class Admin {
 			__( 'Customers', 'pronamic_ideal' ),
 			'manage_options',
 			'pronamic_pay_mollie_customers',
-			array( $this, 'page_mollie_customers' )
+			[ $this, 'page_mollie_customers' ]
 		);
 
 		add_submenu_page(
@@ -171,7 +171,7 @@ class Admin {
 			__( 'Payments', 'pronamic_ideal' ),
 			'manage_options',
 			'pronamic_pay_mollie_payments',
-			array( $this, 'page_mollie_payments' )
+			[ $this, 'page_mollie_payments' ]
 		);
 
 		/**

@@ -31,9 +31,9 @@ if ( null !== $payment ) {
 	 */
 	$mollie_payment = $client->get_payment(
 		$mollie_payment_id,
-		array(
+		[
 			'embed' => 'chargebacks,refunds',
-		)
+		]
 	);
 
 	/**
@@ -68,9 +68,9 @@ if ( null !== $payment ) {
 				$mollie_payment_id
 			)
 		),
-		array(
-			'code' => array(),
-		)
+		[
+			'code' => [],
+		]
 	);
 
 	?>

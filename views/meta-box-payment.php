@@ -27,10 +27,10 @@ $mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 	<?php
 
 	$payment_url = \add_query_arg(
-		array(
+		[
 			'page' => 'pronamic_pay_mollie_payments',
 			'id'   => $mollie_payment_id,
-		),
+		],
 		\admin_url( 'admin.php' )
 	);
 
@@ -44,11 +44,11 @@ $mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 				\esc_html( (string) $mollie_payment_id )
 			)
 		),
-		array(
-			'a' => array(
+		[
+			'a' => [
 				'href' => true,
-			),
-		)
+			],
+		]
 	);
 
 	?>
@@ -60,10 +60,10 @@ $mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 		<?php
 
 		$customer_url = \add_query_arg(
-			array(
+			[
 				'page' => 'pronamic_pay_mollie_customers',
 				'id'   => $mollie_customer_id,
-			),
+			],
 			\admin_url( 'admin.php' )
 		);
 
@@ -77,11 +77,11 @@ $mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 					\esc_html( $mollie_customer_id )
 				)
 			),
-			array(
-				'a' => array(
+			[
+				'a' => [
 					'href' => true,
-				),
-			)
+				],
+			]
 		);
 
 		?>

@@ -43,9 +43,9 @@ class AmountTransformerTest extends \PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function amount_provider() {
-		return array(
-			array( new Money( 100, 'EUR' ), 'EUR 100.00' ),
-			array( new Money( 5, 'BHD' ), 'BHD 5.000' ),
-		);
+		return [
+			[ new Money( 100, 'EUR' ), 'EUR 100.00' ],
+			[ new Money( 5, 'BHD' ), 'BHD 5.000' ],
+		];
 	}
 }

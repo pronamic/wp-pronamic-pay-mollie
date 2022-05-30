@@ -37,7 +37,7 @@ class LocaleHelper {
 		 *
 		 * @var array<int, string>
 		 */
-		$supported = array(
+		$supported = [
 			Locales::EN_US,
 			Locales::NL_NL,
 			Locales::NL_BE,
@@ -59,7 +59,7 @@ class LocaleHelper {
 			Locales::PL_PL,
 			Locales::LV_LV,
 			Locales::LT_LT,
-		);
+		];
 
 		// Lowercase.
 		$locale = \strtolower( $locale );

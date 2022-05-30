@@ -164,11 +164,11 @@ class Customer {
 	 * @return array<string>
 	 */
 	public function get_array() {
-		$array = array(
+		$array = [
 			'name'   => $this->get_name(),
 			'email'  => $this->get_email(),
 			'locale' => $this->get_locale(),
-		);
+		];
 
 		/*
 		 * Array filter will remove values NULL, FALSE and empty strings ('')

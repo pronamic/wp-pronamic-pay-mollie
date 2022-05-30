@@ -143,6 +143,13 @@ class Payment extends BaseResource {
 	private $amount_refunded;
 
 	/**
+	 * Amount charged back.
+	 *
+	 * @var Amount|null
+	 */
+	private $amount_charged_back;
+
+	/**
 	 * Construct payment.
 	 *
 	 * @param string            $id            Identifier.
@@ -316,6 +323,25 @@ class Payment extends BaseResource {
 	}
 
 	/**
+	 * Get amount charged back.
+	 *
+	 * @return Amount|null
+	 */
+	public function get_amount_charged_back() {
+		return $this->amount_charged_back;
+	}
+
+	/**
+	 * Set amount charged back.
+	 *
+	 * @param Amount|null $amount_charged_back Amount charged back.
+	 * @return void
+	 */
+	public function set_amount_charged_back( Amount $amount_charged_back = null ) {
+		$this->amount_charged_back = $amount_charged_back;
+	}
+
+	/**
 	 * Get expires at.
 	 *
 	 * @return DateTimeInterface
@@ -366,9 +392,9 @@ class Payment extends BaseResource {
 
 		$validator->validate(
 			$json,
-			(object) array(
+			(object) [
 				'$ref' => 'file://' . realpath( __DIR__ . '/../json-schemas/payment.json' ),
-			),
+			],
 			\JsonSchema\Constraints\Constraint::CHECK_MODE_EXCEPTIONS
 		);
 
@@ -412,6 +438,12 @@ class Payment extends BaseResource {
 			$refunded_amount = Amount::from_json( $json->amountRefunded );
 
 			$payment->set_amount_refunded( $refunded_amount );
+		}
+
+		if ( \property_exists( $json, 'amountChargedBack' ) ) {
+			$charged_back_amount = Amount::from_json( $json->amountChargedBack );
+
+			$payment->set_amount_charged_back( $charged_back_amount );
 		}
 
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.

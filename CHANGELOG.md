@@ -7,6 +7,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.2.0] - 2022-05-30
+### Added
+- Added payment charged back amount ([pronamic/wp-pronamic-pay#165](https://github.com/pronamic/wp-pronamic-pay/issues/165), [pronamic/wp-pronamic-pay#170](https://github.com/pronamic/wp-pronamic-pay/issues/170)).
+
 ## [4.1.0] - 2022-04-11
 - No longer store gateway mode in meta.
 - No longer catch exception, should be handled downstream.
@@ -197,7 +201,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.1.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.2.0...HEAD
+[4.2.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.1.0...4.2.0
 [4.1.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/wp-pay-gateways/mollie/compare/3.1.0...4.0.0

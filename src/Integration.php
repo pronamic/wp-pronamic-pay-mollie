@@ -46,10 +46,10 @@ class Integration extends AbstractGatewayIntegration {
 	 *
 	 * @param array<string, array> $args Arguments.
 	 */
-	public function __construct( $args = array() ) {
+	public function __construct( $args = [] ) {
 		$args = wp_parse_args(
 			$args,
-			array(
+			[
 				'id'                     => 'mollie',
 				'name'                   => 'Mollie',
 				'version'                => '2.1.0',
@@ -57,7 +57,7 @@ class Integration extends AbstractGatewayIntegration {
 				'product_url'            => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
 				'dashboard_url'          => 'https://www.mollie.com/dashboard/',
 				'provider'               => 'mollie',
-				'supports'               => array(
+				'supports'               => [
 					'payment_status_request',
 					'recurring_apple_pay',
 					'recurring_direct_debit',
@@ -67,25 +67,25 @@ class Integration extends AbstractGatewayIntegration {
 					'webhook',
 					'webhook_log',
 					'webhook_no_config',
-				),
+				],
 				'version_option_name'    => 'pronamic_pay_mollie_version',
 				'db_version_option_name' => 'pronamic_pay_mollie_db_version',
-			)
+			]
 		);
 
 		parent::__construct( $args );
 
 		// Filters.
-		$function = array( $this, 'next_payment_delivery_date' );
+		$function = [ $this, 'next_payment_delivery_date' ];
 
 		if ( ! \has_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function ) ) {
 			\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function, 10, 2 );
 		}
 
-		add_filter( 'pronamic_payment_provider_url_mollie', array( $this, 'payment_provider_url' ), 10, 2 );
+		add_filter( 'pronamic_payment_provider_url_mollie', [ $this, 'payment_provider_url' ], 10, 2 );
 
 		// Actions.
-		$function = array( $this, 'scheduled_payment_start' );
+		$function = [ $this, 'scheduled_payment_start' ];
 
 		if ( ! \has_action( 'pronamic_pay_mollie_payment_start', $function ) ) {
 			\add_action( 'pronamic_pay_mollie_payment_start', $function, 10, 1 );
@@ -157,21 +157,21 @@ class Integration extends AbstractGatewayIntegration {
 	 * @return array<int, array<string, callable|int|string|bool|array<int|string,int|string>>>
 	 */
 	public function get_settings_fields() {
-		$fields = array();
+		$fields = [];
 
 		// API Key.
-		$fields[] = array(
+		$fields[] = [
 			'section'  => 'general',
 			'filter'   => FILTER_SANITIZE_STRING,
 			'meta_key' => '_pronamic_gateway_mollie_api_key',
 			'title'    => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
 			'type'     => 'text',
-			'classes'  => array( 'regular-text', 'code' ),
+			'classes'  => [ 'regular-text', 'code' ],
 			'tooltip'  => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
-		);
+		];
 
 		// Due date days.
-		$fields[] = array(
+		$fields[] = [
 			'section'     => 'advanced',
 			'filter'      => \FILTER_SANITIZE_NUMBER_INT,
 			'meta_key'    => '_pronamic_gateway_mollie_due_date_days',
@@ -179,7 +179,7 @@ class Integration extends AbstractGatewayIntegration {
 			'type'        => 'number',
 			'min'         => 1,
 			'max'         => 100,
-			'classes'     => array( 'regular-text' ),
+			'classes'     => [ 'regular-text' ],
 			'tooltip'     => __( 'Number of days after which a bank transfer payment expires.', 'pronamic_ideal' ),
 			'description' => sprintf(
 				/* translators: 1: <code>1</code>, 2: <code>100</code>, 3: <code>12</code> */
@@ -188,18 +188,18 @@ class Integration extends AbstractGatewayIntegration {
 				sprintf( '<code>%s</code>', '100' ),
 				sprintf( '<code>%s</code>', '12' )
 			),
-		);
+		];
 
 		// Webhook.
-		$fields[] = array(
+		$fields[] = [
 			'section'  => 'feedback',
 			'title'    => __( 'Webhook URL', 'pronamic_ideal' ),
 			'type'     => 'text',
-			'classes'  => array( 'large-text', 'code' ),
+			'classes'  => [ 'large-text', 'code' ],
 			'value'    => rest_url( self::REST_ROUTE_NAMESPACE . '/webhook' ),
 			'readonly' => true,
 			'tooltip'  => __( 'The Webhook URL as sent with each transaction to receive automatic payment status updates on.', 'pronamic_ideal' ),
-		);
+		];
 
 		return $fields;
 	}

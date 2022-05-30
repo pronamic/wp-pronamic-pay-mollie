@@ -70,7 +70,7 @@ class IntegrationTest extends WP_UnitTestCase {
 			$this->integration->get_id()
 		);
 
-		if ( ! has_filter( $filter, array( $this->integration, 'payment_provider_url' ) ) ) {
+		if ( ! has_filter( $filter, [ $this->integration, 'payment_provider_url' ] ) ) {
 			return;
 		}
 

@@ -45,9 +45,9 @@ class CLI {
 			function( $args, $assoc_args ) {
 				$this->wp_cli_organizations_synchronize( $args, $assoc_args );
 			},
-			array(
+			[
 				'shortdesc' => 'Synchronize Mollie organizations to WordPress (not implemented yet).',
-			)
+			]
 		);
 
 		\WP_CLI::add_command(
@@ -55,9 +55,9 @@ class CLI {
 			function( $args, $assoc_args ) {
 				$this->wp_cli_customers_synchronize( $args, $assoc_args );
 			},
-			array(
+			[
 				'shortdesc' => 'Synchronize Mollie customers to WordPress.',
-			)
+			]
 		);
 
 		\WP_CLI::add_command(
@@ -65,9 +65,9 @@ class CLI {
 			function( $args, $assoc_args ) {
 				$this->wp_cli_customers_connect_wp_users( $args, $assoc_args );
 			},
-			array(
+			[
 				'shortdesc' => 'Connect Mollie customers to WordPress users by email.',
-			)
+			]
 		);
 
 		\WP_CLI::add_command(
@@ -75,9 +75,9 @@ class CLI {
 			function( $args, $assoc_args ) {
 				$this->wp_cli_payments( $args, $assoc_args );
 			},
-			array(
+			[
 				'shortdesc' => 'Mollie payments.',
-			)
+			]
 		);
 
 		\WP_CLI::add_command(
@@ -85,9 +85,9 @@ class CLI {
 			function( $args, $assoc_args ) {
 				$this->wp_cli_payments_cancel( $args, $assoc_args );
 			},
-			array(
+			[
 				'shortdesc' => 'Cancel Mollie payments.',
-			)
+			]
 		);
 
 		// Data Stores.
@@ -120,22 +120,22 @@ class CLI {
 		global $wpdb;
 
 		$query = new \WP_Query(
-			array(
+			[
 				'post_type'   => 'pronamic_gateway',
 				'post_status' => 'publish',
 				'nopaging'    => true,
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Slow query allowed on CLI.
-				'meta_query'  => array(
-					array(
+				'meta_query'  => [
+					[
 						'key'   => '_pronamic_gateway_id',
 						'value' => 'mollie',
-					),
-					array(
+					],
+					[
 						'key'     => '_pronamic_gateway_mollie_api_key',
 						'compare' => 'EXISTS',
-					),
-				),
-			)
+					],
+				],
+			]
 		);
 
 		if ( $query->have_posts() ) {
@@ -150,22 +150,22 @@ class CLI {
 
 				$client = new Client( $api_key );
 
-				$urls = array(
+				$urls = [
 					'https://api.mollie.com/v2/customers?limit=250',
-				);
+				];
 
 				$profile = Profile::from_object( $client->get_current_profile() );
 
 				$profile_id = $this->profile_data_store->save_profile(
 					$profile,
-					array(
+					[
 						'api_key_live' => ( 'live_' === substr( $api_key, 0, 5 ) ) ? $api_key : null,
 						'api_key_test' => ( 'test_' === substr( $api_key, 0, 5 ) ) ? $api_key : null,
-					),
-					array(
+					],
+					[
 						'api_key_live' => '%s',
 						'api_key_test' => '%s',
-					)
+					]
 				);
 
 				while ( ! empty( $urls ) ) {
@@ -188,13 +188,13 @@ class CLI {
 						\WP_CLI\Utils\format_items(
 							'table',
 							$response->_embedded->customers,
-							array(
+							[
 								'id',
 								'mode',
 								'name',
 								'email',
 								'locale',
-							)
+							]
 						);
 
 						foreach ( $response->_embedded->customers as $object ) {
@@ -202,12 +202,12 @@ class CLI {
 
 							$customer_id = $this->customer_data_store->save_customer(
 								$customer,
-								array(
+								[
 									'profile_id' => $profile_id,
-								),
-								array(
+								],
+								[
 									'profile_id' => '%d',
-								)
+								]
 							);
 						}
 					}
@@ -281,13 +281,13 @@ class CLI {
 	public function wp_cli_payments( $args, $assoc_args ) {
 		$assoc_args = \wp_parse_args(
 			$assoc_args,
-			array(
+			[
 				'api_key' => null,
 				'api_url' => 'https://api.mollie.com/v2/payments',
 				'from'    => null,
 				'limit'   => 250,
 				'format'  => 'table',
-			)
+			]
 		);
 
 		$api_key = $assoc_args['api_key'];
@@ -304,7 +304,7 @@ class CLI {
 
 		$client = new Client( $api_key );
 
-		$payments = array();
+		$payments = [];
 
 		$api_url = $assoc_args['api_url'];
 
@@ -374,13 +374,13 @@ class CLI {
 		\WP_CLI\Utils\format_items(
 			$format,
 			$data,
-			array(
+			[
 				'id',
 				'createdAt',
 				'mode',
 				'description',
 				'method',
-			)
+			]
 		);
 	}
 
@@ -397,9 +397,9 @@ class CLI {
 	public function wp_cli_payments_cancel( $args, $assoc_args ) {
 		$assoc_args = \wp_parse_args(
 			$assoc_args,
-			array(
+			[
 				'api_key' => null,
-			)
+			]
 		);
 
 		$api_key = $assoc_args['api_key'];

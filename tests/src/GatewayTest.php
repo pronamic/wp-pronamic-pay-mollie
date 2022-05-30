@@ -72,10 +72,10 @@ class GatewayTest extends WP_UnitTestCase {
 		);
 
 		$this->set_gateway(
-			array(
+			[
 				'id'   => $this->config_id,
 				'mode' => Gateway::MODE_TEST,
-			)
+			]
 		);
 	}
 
@@ -84,7 +84,7 @@ class GatewayTest extends WP_UnitTestCase {
 	 *
 	 * @param array $args Config settings arguments.
 	 */
-	private function set_gateway( $args = array() ) {
+	private function set_gateway( $args = [] ) {
 		$config = new Config();
 
 		foreach ( $args as $key => $value ) {
@@ -219,12 +219,12 @@ class GatewayTest extends WP_UnitTestCase {
 
 		remove_filter( 'home_url', $filter_home_url );
 
-		return array(
-			array( $home_url, $webhook_url ),
-			array( 'https://localhost/', null ),
-			array( 'https://example.dev/', null ),
-			array( 'https://example.local/', null ),
-		);
+		return [
+			[ $home_url, $webhook_url ],
+			[ 'https://localhost/', null ],
+			[ 'https://example.dev/', null ],
+			[ 'https://example.local/', null ],
+		];
 	}
 
 	/**
@@ -293,18 +293,18 @@ class GatewayTest extends WP_UnitTestCase {
 		$cst_subscription = sprintf( '%s_subscription', $customer_id );
 		$cst_first        = sprintf( '%s_first', $customer_id );
 
-		return array(
-			array( null, null, null, false ),
-			array( true, null, null, false ),
-			array( false, null, null, false ),
-			array( 0, null, null, false ),
-			array( 10, null, null, false ),
-			array( 1, null, null, false ),
-			array( 1, null, $cst_first, $cst_first ),
-			array( 1, $cst_subscription, null, $cst_subscription ),
-			array( 1, $cst_subscription, $cst_first, $cst_subscription ),
-			array( '1', $cst_subscription, $cst_first, $cst_subscription ),
-		);
+		return [
+			[ null, null, null, false ],
+			[ true, null, null, false ],
+			[ false, null, null, false ],
+			[ 0, null, null, false ],
+			[ 10, null, null, false ],
+			[ 1, null, null, false ],
+			[ 1, null, $cst_first, $cst_first ],
+			[ 1, $cst_subscription, null, $cst_subscription ],
+			[ 1, $cst_subscription, $cst_first, $cst_subscription ],
+			[ '1', $cst_subscription, $cst_first, $cst_subscription ],
+		];
 	}
 
 	/**
@@ -320,10 +320,10 @@ class GatewayTest extends WP_UnitTestCase {
 	public function test_copy_customer_id_to_wp_user( $config_id, $user_id, $customer_id, $expected ) {
 		if ( $this->config_id !== $config_id ) {
 			$this->set_gateway(
-				array(
+				[
 					'id'   => $config_id,
 					'mode' => Gateway::MODE_TEST,
-				)
+				]
 			);
 		}
 
@@ -363,33 +363,33 @@ class GatewayTest extends WP_UnitTestCase {
 	 * @return array
 	 */
 	public function provider_copy_customer_id_to_wp_user() {
-		return array(
+		return [
 			// Config ID not equal to payment config ID.
-			array( 0, 1, 'cst_8wmqcHMN4U', null ),
+			[ 0, 1, 'cst_8wmqcHMN4U', null ],
 
 			// Valid WordPress user ID and Mollie customer ID.
-			array( 1, 1, 'cst_8wmqcHMN4U', 'cst_8wmqcHMN4U' ),
+			[ 1, 1, 'cst_8wmqcHMN4U', 'cst_8wmqcHMN4U' ],
 
 			// Invalid WordPress user ID and Mollie customer ID.
-			array( 1, 0, 0, false ),
-			array( 1, null, null, false ),
-			array( 1, true, true, false ),
-			array( 1, false, false, false ),
-			array( 1, '', '', false ),
+			[ 1, 0, 0, false ],
+			[ 1, null, null, false ],
+			[ 1, true, true, false ],
+			[ 1, false, false, false ],
+			[ 1, '', '', false ],
 
 			// Valid WordPress user ID and invalid Mollie customer ID.
-			array( 1, 1, 0, false ),
-			array( 1, 1, null, false ),
-			array( 1, 1, true, false ),
-			array( 1, 1, false, false ),
-			array( 1, 1, '', false ),
+			[ 1, 1, 0, false ],
+			[ 1, 1, null, false ],
+			[ 1, 1, true, false ],
+			[ 1, 1, false, false ],
+			[ 1, 1, '', false ],
 
 			// Invalid WordPress user ID and valid Mollie customer ID.
-			array( 1, 0, 'cst_8wmqcHMN4U', false ),
-			array( 1, null, 'cst_8wmqcHMN4U', false ),
-			array( 1, true, 'cst_8wmqcHMN4U', false ),
-			array( 1, false, 'cst_8wmqcHMN4U', false ),
-			array( 1, '', 'cst_8wmqcHMN4U', false ),
-		);
+			[ 1, 0, 'cst_8wmqcHMN4U', false ],
+			[ 1, null, 'cst_8wmqcHMN4U', false ],
+			[ 1, true, 'cst_8wmqcHMN4U', false ],
+			[ 1, false, 'cst_8wmqcHMN4U', false ],
+			[ 1, '', 'cst_8wmqcHMN4U', false ],
+		];
 	}
 }

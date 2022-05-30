@@ -44,14 +44,14 @@ class StatusesTest extends \PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function status_matrix_provider() {
-		return array(
-			array( Statuses::AUTHORIZED, null ),
-			array( Statuses::OPEN, PaymentStatus::OPEN ),
-			array( Statuses::CANCELED, PaymentStatus::CANCELLED ),
-			array( Statuses::PAID, PaymentStatus::SUCCESS ),
-			array( Statuses::EXPIRED, PaymentStatus::EXPIRED ),
-			array( Statuses::FAILED, PaymentStatus::FAILURE ),
-			array( 'not existing status', null ),
-		);
+		return [
+			[ Statuses::AUTHORIZED, null ],
+			[ Statuses::OPEN, PaymentStatus::OPEN ],
+			[ Statuses::CANCELED, PaymentStatus::CANCELLED ],
+			[ Statuses::PAID, PaymentStatus::SUCCESS ],
+			[ Statuses::EXPIRED, PaymentStatus::EXPIRED ],
+			[ Statuses::FAILED, PaymentStatus::FAILURE ],
+			[ 'not existing status', null ],
+		];
 	}
 }

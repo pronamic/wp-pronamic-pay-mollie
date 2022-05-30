@@ -30,9 +30,9 @@ class WebhookController {
 	 * @return void
 	 */
 	public function setup() {
-		add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
+		add_action( 'rest_api_init', [ $this, 'rest_api_init' ] );
 
-		add_action( 'wp_loaded', array( $this, 'wp_loaded' ) );
+		add_action( 'wp_loaded', [ $this, 'wp_loaded' ] );
 	}
 
 	/**
@@ -48,40 +48,40 @@ class WebhookController {
 		\register_rest_route(
 			Integration::REST_ROUTE_NAMESPACE,
 			'/webhook',
-			array(
+			[
 				'methods'             => 'POST',
-				'callback'            => array( $this, 'rest_api_mollie_webhook' ),
-				'args'                => array(
-					'id' => array(
+				'callback'            => [ $this, 'rest_api_mollie_webhook' ],
+				'args'                => [
+					'id' => [
 						'description' => \__( 'Mollie transaction ID.', 'pronamic_ideal' ),
 						'type'        => 'string',
 						'required'    => true,
-					),
-				),
+					],
+				],
 				'permission_callback' => '__return_true',
-			)
+			]
 		);
 
 		\register_rest_route(
 			Integration::REST_ROUTE_NAMESPACE,
 			'/webhook/(?P<payment_id>\d+)',
-			array(
+			[
 				'methods'             => 'POST',
-				'callback'            => array( $this, 'rest_api_mollie_webhook_payment' ),
-				'args'                => array(
-					'payment_id' => array(
+				'callback'            => [ $this, 'rest_api_mollie_webhook_payment' ],
+				'args'                => [
+					'payment_id' => [
 						'description' => \__( 'Payment ID.', 'pronamic_ideal' ),
 						'type'        => 'string',
 						'required'    => true,
-					),
-					'id'         => array(
+					],
+					'id'         => [
 						'description' => \__( 'Mollie transaction ID.', 'pronamic_ideal' ),
 						'type'        => 'string',
 						'required'    => true,
-					),
-				),
+					],
+				],
 				'permission_callback' => '__return_true',
-			)
+			]
 		);
 	}
 
@@ -122,10 +122,10 @@ class WebhookController {
 		 * @link https://developer.wordpress.org/reference/functions/wp_send_json_success/
 		 */
 		$response = new WP_REST_Response(
-			array(
+			[
 				'success' => true,
 				'id'      => $id,
-			)
+			]
 		);
 
 		$response->add_link( 'self', rest_url( $request->get_route() ) );
