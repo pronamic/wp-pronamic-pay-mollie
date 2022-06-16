@@ -87,6 +87,27 @@ class Methods {
 	const GIROPAY = 'giropay';
 
 	/**
+	 * Constant for the Klarna - Pay Later method.
+	 *
+	 * @var string
+	 */
+	const KLARNA_PAY_LATER = 'klarnapaylater';
+
+	/**
+	 * Constant for the Klarna - Pay Now method.
+	 *
+	 * @var string
+	 */
+	const KLARNA_PAY_NOW = 'klarnapaynow';
+
+	/**
+	 * Constant for the Klarna - Slice It method.
+	 *
+	 * @var string
+	 */
+	const KLARNA_SLICE_IT = 'klarnasliceit';
+
+	/**
 	 * Constant for the PayPal method.
 	 *
 	 * @var string
@@ -150,6 +171,9 @@ class Methods {
 		PaymentMethods::DIRECT_DEBIT_SOFORT     => self::DIRECT_DEBIT,
 		PaymentMethods::EPS                     => self::EPS,
 		PaymentMethods::GIROPAY                 => self::GIROPAY,
+		PaymentMethods::KLARNA_PAY_LATER        => self::KLARNA_PAY_LATER,
+		PaymentMethods::KLARNA_PAY_NOW          => self::KLARNA_PAY_NOW,
+		PaymentMethods::KLARNA_PAY_OVER_TIME    => self::KLARNA_SLICE_IT,
 		PaymentMethods::PAYPAL                  => self::PAYPAL,
 		PaymentMethods::PRZELEWY24              => self::PRZELEWY24,
 		PaymentMethods::SOFORT                  => self::SOFORT,
