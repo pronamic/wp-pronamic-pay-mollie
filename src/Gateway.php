@@ -212,16 +212,28 @@ class Gateway extends Core_Gateway {
 	 * @return string|null
 	 */
 	public function get_webhook_url( Payment $payment ) {
-		$path = [
-			Integration::REST_ROUTE_NAMESPACE,
-			'webhook',
-			$this->should_create_order_for_payment( $payment ) ? 'order' : null,
-			$payment->get_id(),
-		];
+		$resource = $this->get_resource_for_payment( $payment );
 
-		$path = \array_filter( $path );
+		switch ( $resource ) {
+			case ResourceType::ORDERS:
+				$path = '<namespace>/webhook/order/<payment_id>';
+				break;
+			case ResourceType::PAYMENTS:
+				$path = '<namespace>/webhook/<payment_id>';
+				break;
+			default:
+				throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
+		}
 
-		$url = \rest_url( \implode( '/', $path ) );
+		$path = \strtr(
+			$path,
+			[
+				'<namespace>'  => Integration::REST_ROUTE_NAMESPACE,
+				'<payment_id>' => $payment->get_id(),
+			]
+		);
+
+		$url = \rest_url( $path );
 
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 
@@ -281,7 +293,9 @@ class Gateway extends Core_Gateway {
 			$description
 		);
 
-		if ( $this->should_create_order_for_payment( $payment ) ) {
+		$resource = $this->get_resource_for_payment( $payment );
+
+		if ( ResourceType::ORDERS === $resource ) {
 			$request = new OrderRequest(
 				$amount,
 				$payment->get_source_id(),
@@ -620,14 +634,14 @@ class Gateway extends Core_Gateway {
 	 * Determine if an order should be created for the payment.
 	 *
 	 * @param Payment $payment Payment.
-	 * @return bool
+	 * @return string
 	 */
-	public function should_create_order_for_payment( Payment $payment ) : bool {
-		if ( 'memberpress' !== $payment->get_source() ) {
-			return false;
-		}
+	private function get_resource_for_payment( Payment $payment ) : string {
+		$resource = ResourceType::PAYMENTS;
 
-		return \in_array(
+		$is_memberpress = ( 'memberpress' !== $payment->get_source() );
+
+		$is_klarna = \in_array(
 			$payment->get_payment_method(),
 			[
 				PaymentMethods::KLARNA_PAY_NOW,
@@ -636,6 +650,22 @@ class Gateway extends Core_Gateway {
 			],
 			true
 		);
+
+		if ( $is_memberpress && $is_klarna ) {
+			$resource = ResourceType::ORDERS;
+		}
+
+		/**
+		 * Filters the resource to use for the payment.
+		 *
+		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#parameters
+		 * @since 4.0.0
+		 * @param string  $resource Resource.
+		 * @param Payment $payment  Payment.
+		 */
+		$resource = \apply_filters( 'pronamic_pay_mollie_resource_for_payment', $resource, $payment );
+
+		return $resource;
 	}
 
 	/**
