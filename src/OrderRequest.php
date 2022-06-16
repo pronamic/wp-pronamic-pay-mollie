@@ -152,16 +152,6 @@ class OrderRequest {
 	public ?DateTimeInterface $expires_at = null;
 
 	/**
-	 * For digital goods, you must make sure to apply the VAT rate from your customer’s country
-	 * in most jurisdictions. Use this parameter to restrict the payment methods available to
-	 * your customer to methods from the billing country only.
-	 *
-	 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
-	 * @var bool|null
-	 */
-	public ?bool $shopper_country_must_match_billing_country = null;
-
-	/**
 	 * Create Mollie payment request object.
 	 *
 	 * @param Amount      $amount       The amount that you want to charge.
