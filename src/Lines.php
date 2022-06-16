@@ -212,7 +212,7 @@ class Lines implements Countable, IteratorAggregate {
 				throw new \InvalidArgumentException( 'Payment line VAT amount is required.' );
 			}
 
-			$tax_percentage =  $payment_line->get_tax_percentage();
+			$tax_percentage = $payment_line->get_tax_percentage();
 
 			if ( null === $tax_percentage ) {
 				throw new \InvalidArgumentException( 'Payment line VAT rate is required.' );
