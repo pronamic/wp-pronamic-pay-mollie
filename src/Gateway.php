@@ -212,7 +212,16 @@ class Gateway extends Core_Gateway {
 	 * @return string|null
 	 */
 	public function get_webhook_url( Payment $payment ) {
-		$url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook/' . (string) $payment->get_id() );
+		$path = [
+			Integration::REST_ROUTE_NAMESPACE,
+			'webhook',
+			$this->should_create_order_for_payment( $payment ) ? 'order' : null,
+			$payment->get_id(),
+		];
+
+		$path = \array_filter( $path );
+
+		$url = \rest_url( \implode( '/', $path ) );
 
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 
@@ -263,20 +272,28 @@ class Gateway extends Core_Gateway {
 		 */
 		$description = \apply_filters( 'pronamic_pay_mollie_payment_description', $description, $payment );
 
+		$amount = AmountTransformer::transform( $payment->get_total_amount() );
+
+		$customer = $payment->get_customer();
+
 		$request = new PaymentRequest(
-			AmountTransformer::transform( $payment->get_total_amount() ),
+			$amount,
 			$description
 		);
+
+		if ( $this->should_create_order_for_payment( $payment ) ) {
+			$request = new OrderRequest(
+				$amount,
+				$payment->get_source_id(),
+				Lines::from_wp_payment_lines( $payment->get_lines() ),
+				LocaleHelper::transform( $customer->get_locale() )
+			);
+		}
 
 		$request->redirect_url = $payment->get_return_url();
 		$request->webhook_url  = $this->get_webhook_url( $payment );
 
-		// Locale.
-		$customer = $payment->get_customer();
-
-		if ( null !== $customer ) {
-			$request->locale = LocaleHelper::transform( $customer->get_locale() );
-		}
+		$params = [];
 
 		// Customer ID.
 		$customer_id = $this->get_customer_id_for_payment( $payment );
@@ -290,7 +307,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		if ( null !== $customer_id ) {
-			$request->customer_id = $customer_id;
+			$params['customer_id'] = $customer_id;
 
 			// Set Mollie customer ID in subscription meta.
 			foreach ( $payment->get_subscriptions() as $subscription ) {
@@ -325,7 +342,7 @@ class Gateway extends Core_Gateway {
 				||
 			PaymentMethods::is_direct_debit_method( $payment_method )
 		) {
-			$request->set_sequence_type( 'first' );
+			$params['sequence_type'] = 'first';
 
 			foreach ( $subscriptions as $subscription ) {
 				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
@@ -339,14 +356,16 @@ class Gateway extends Core_Gateway {
 		$sequence_type = $payment->get_meta( 'mollie_sequence_type' );
 
 		if ( ! empty( $sequence_type ) ) {
-			$request->set_sequence_type( $sequence_type );
+			$params['sequence_type'] = $sequence_type;
 		}
 
-		if ( 'recurring' === $request->get_sequence_type() ) {
+		$sequence_type = \array_key_exists( 'sequence_type', $params ) ? $params['sequence_type'] : null;
+
+		if ( 'recurring' === $sequence_type ) {
 			$request->set_method( null );
 		}
 
-		if ( 'first' === $request->get_sequence_type() ) {
+		if ( 'first' === $sequence_type ) {
 			$first_method = PaymentMethods::get_first_payment_method( $payment_method );
 
 			$request->set_method( Methods::transform( $first_method, $first_method ) );
@@ -363,8 +382,8 @@ class Gateway extends Core_Gateway {
 			$consumer_name = $consumer_bank_details->get_name();
 			$consumer_iban = $consumer_bank_details->get_iban();
 
-			$request->consumer_name    = $consumer_name;
-			$request->consumer_account = $consumer_iban;
+			$params['consumer_name']    = $consumer_name;
+			$params['consumer_account'] = $consumer_iban;
 
 			// Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
 			if ( null !== $customer_id ) {
@@ -382,8 +401,8 @@ class Gateway extends Core_Gateway {
 				}
 
 				// Charge immediately on-demand.
-				$request->set_sequence_type( 'recurring' );
-				$request->set_mandate_id( (string) $mandate_id );
+				$params['sequence_type'] = 'recurring';
+				$params['mandate_id']    = (string) $mandate_id;
 			}
 		}
 
@@ -414,33 +433,117 @@ class Gateway extends Core_Gateway {
 
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
-			$request->issuer = $payment->get_meta( 'issuer' );
+			$params['issuer'] = $payment->get_meta( 'issuer' );
 		}
 
-		// Billing email.
-		$billing_email = ( null === $customer ) ? null : $customer->get_email();
-
-			/**
-		 * Filters the Mollie payment billing email used for bank transfer payment instructions.
-		 *
-		 * @since 2.2.0
-		 *
-		 * @param string|null $billing_email Billing email.
-		 * @param Payment     $payment       Payment.
-		 */
-		$billing_email = \apply_filters( 'pronamic_pay_mollie_payment_billing_email', $billing_email, $payment );
-
-		$request->set_billing_email( $billing_email );
-
-		// Due date.
-		if ( ! empty( $this->config->due_date_days ) ) {
-			try {
-				$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
-			} catch ( \Exception $e ) {
-				$due_date = null;
+		// Parameters for payments.
+		if ( $request instanceof PaymentRequest ) {
+			if ( \array_key_exists( 'customer_id', $params ) ) {
+				$request->customer_id = $params['customer_id'];
 			}
 
-			$request->set_due_date( $due_date );
+			if ( \array_key_exists( 'sequence_type', $params ) ) {
+				$request->set_sequence_type( $params['sequence_type'] );
+			}
+
+			if ( \array_key_exists( 'mandate_id', $params ) ) {
+				$request->set_mandate_id( $params['mandate_id'] );
+			}
+
+			if ( \array_key_exists( 'consumer_name', $params ) ) {
+				$request->consumer_name = $params['consumer_name'];
+			}
+
+			if ( \array_key_exists( 'consumer_account', $params ) ) {
+				$request->consumer_account = $params['consumer_account'];
+			}
+
+			if ( \array_key_exists( 'issuer', $params ) ) {
+				$request->issuer = $params['issuer'];
+			}
+
+			// Locale.
+			if ( null !== $customer ) {
+				$request->locale = LocaleHelper::transform( $customer->get_locale() );
+			}
+
+			// Billing email.
+			$billing_email = ( null === $customer ) ? null : $customer->get_email();
+
+			/**
+			 * Filters the Mollie payment billing email used for bank transfer payment instructions.
+			 *
+			 * @since 2.2.0
+			 *
+			 * @param string|null $billing_email Billing email.
+			 * @param Payment     $payment       Payment.
+			 */
+			$billing_email = \apply_filters( 'pronamic_pay_mollie_payment_billing_email', $billing_email, $payment );
+
+			$request->set_billing_email( $billing_email );
+
+			// Due date.
+			if ( ! empty( $this->config->due_date_days ) ) {
+				try {
+					$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
+				} catch ( \Exception $e ) {
+					$due_date = null;
+				}
+
+				$request->set_due_date( $due_date );
+			}
+		}
+
+		// Parameters for orders.
+		if ( $request instanceof OrderRequest ) {
+			/**
+			 * Payment-specific parameters.
+			 *
+			 * @link https://docs.mollie.com/reference/v2/orders-api/create-order#payment-specific-parameters
+			 */
+			$payment_params = [];
+
+			$map = [
+				'apple_pay_payment_token' => 'applePayPaymentToken',
+				'card_token'              => 'cardToken',
+				'consumer_account'        => 'consumerAccount',
+				'customer_id'             => 'customerId',
+				'customer_reference'      => 'customerReference',
+				'extra_merchant_data'     => 'extraMerchantData',
+				'issuer'                  => 'issuer',
+				'mandate_id'              => 'mandateId',
+				'sequence_type'           => 'sequenceType',
+				'voucher_number'          => 'voucherNumber',
+				'voucher_pin'             => 'voucherPin',
+				'webhook_url'             => 'webhookUrl',
+			];
+
+			foreach ( $params as $key => $value ) {
+				if ( ! \array_key_exists( $key, $map ) ) {
+					continue;
+				}
+
+				$param_name = $map[ $key ];
+
+				$payment_params[ $param_name ] = $value;
+			}
+
+			$request->set_payment( $payment_params );
+
+			// Billing address.
+			$billing_address = $payment->get_billing_address();
+
+			$request->set_billing_address( null === $billing_address ? null : Address::from_wp_address( $billing_address ) );
+
+			// Shipping address.
+			$shipping_address = $payment->get_shipping_address();
+
+			$request->set_shipping_address( null === $shipping_address ? null : Address::from_wp_address( $shipping_address ) );
+
+			// Consumer date of birth.
+			$consumer_date_of_birth = null === $customer ? null : $customer->get_birth_date();
+
+			$request->set_consumer_date_of_birth( $consumer_date_of_birth );
 		}
 
 		// Create payment.
@@ -450,15 +553,29 @@ class Gateway extends Core_Gateway {
 		$payment->set_meta( 'mollie_create_payment_attempt', $attempt );
 
 		try {
-			$mollie_payment = $this->client->create_payment( $request );
+			$mollie_payment = null;
+
+			if ( $request instanceof OrderRequest ) {
+				$mollie_order = $this->client->create_order( $request );
+
+				$payment->set_meta( 'mollie_order_id', $mollie_order->get_id() );
+
+				$order_payments = $mollie_order->get_payments();
+
+				$mollie_payment = reset( $order_payments );
+			}
+
+			if ( null === $mollie_payment ) {
+				$mollie_payment = $this->client->create_payment( $request );
+			}
 
 			$payment->delete_meta( 'mollie_create_payment_attempt' );
 		} catch ( Error $error ) {
-			if ( 'recurring' !== $request->get_sequence_type() ) {
+			if ( 'recurring' !== $sequence_type ) {
 				throw $error;
 			}
 
-			if ( null === $request->get_mandate_id() ) {
+			if ( ! \array_key_exists( 'mandate_id', $params ) || null === $params['mandate_id'] ) {
 				throw $error;
 			}
 
@@ -497,6 +614,28 @@ class Gateway extends Core_Gateway {
 
 		// Update payment from Mollie payment.
 		$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+	}
+
+	/**
+	 * Determine if an order should be created for the payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return bool
+	 */
+	public function should_create_order_for_payment( Payment $payment ) : bool {
+		if ( 'memberpress' !== $payment->get_source() ) {
+			return false;
+		}
+
+		return \in_array(
+			$payment->get_payment_method(),
+			[
+				PaymentMethods::KLARNA_PAY_NOW,
+				PaymentMethods::KLARNA_PAY_LATER,
+				PaymentMethods::KLARNA_PAY_OVER_TIME,
+			],
+			true
+		);
 	}
 
 	/**

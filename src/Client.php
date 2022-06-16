@@ -142,6 +142,20 @@ class Client {
 	}
 
 	/**
+	 * Create order.
+	 *
+	 * @param OrderRequest $request Order request.
+	 * @return Order
+	 */
+	public function create_order( OrderRequest $request ) {
+		$object = $this->send_request_to_endpoint( 'orders?embed=payments', 'POST', $request->get_array() );
+
+		$order = Order::from_json( $object );
+
+		return $order;
+	}
+
+	/**
 	 * Create payment.
 	 *
 	 * @param PaymentRequest $request Payment request.
