@@ -363,44 +363,25 @@ class OrderRequest {
 	}
 
 	/**
-	 * Get shopper country must match billing country.
-	 *
-	 * @return bool|null
-	 */
-	public function get_shopper_country_must_match_billing_country() : ?bool {
-		return $this->shopper_country_must_match_billing_country;
-	}
-
-	/**
-	 * Set shopper country must match billing country.
-	 *
-	 * @param bool|null $shopper_country_must_match_billing_country Shopper country must match billing country.
-	 */
-	public function set_shopper_country_must_match_billing_country( ?bool $shopper_country_must_match_billing_country ) : void {
-		$this->shopper_country_must_match_billing_country = $shopper_country_must_match_billing_country;
-	}
-
-	/**
 	 * Get array of this Mollie payment request object.
 	 *
 	 * @return array<string,null|string|object>
 	 */
 	public function get_array() {
 		$array = [
-			'amount'                                => $this->amount->get_json(),
-			'orderNumber'                           => $this->order_number,
-			'lines'                                 => $this->lines->get_json(),
-			'locale'                                => $this->locale,
-			'billingAddress'                        => $this->billing_address->get_json(),
-			'shippingAddress'                       => null === $this->shipping_address ? null : $this->shipping_address->get_json(),
-			'consumerDateOfBirth'                   => null === $this->consumer_date_of_birth ? null : $this->consumer_date_of_birth->format( 'Y-m-d' ),
-			'redirectUrl'                           => $this->redirect_url,
-			'webhookUrl'                            => $this->webhook_url,
-			'method'                                => $this->method,
-			'payment'                               => $this->payment,
-			'metadata'                              => $this->metadata,
-			'expiresAt'                             => null === $this->expires_at ? null : $this->expires_at->format( 'Y-m-d' ),
-			'shopperCountryMustMatchBillingCountry' => $this->shopper_country_must_match_billing_country,
+			'amount'              => $this->amount->get_json(),
+			'orderNumber'         => $this->order_number,
+			'lines'               => $this->lines->get_json(),
+			'locale'              => $this->locale,
+			'billingAddress'      => $this->billing_address->get_json(),
+			'shippingAddress'     => null === $this->shipping_address ? null : $this->shipping_address->get_json(),
+			'consumerDateOfBirth' => null === $this->consumer_date_of_birth ? null : $this->consumer_date_of_birth->format( 'Y-m-d' ),
+			'redirectUrl'         => $this->redirect_url,
+			'webhookUrl'          => $this->webhook_url,
+			'method'              => $this->method,
+			'payment'             => $this->payment,
+			'metadata'            => $this->metadata,
+			'expiresAt'           => null === $this->expires_at ? null : $this->expires_at->format( 'Y-m-d' ),
 		];
 
 		/*
