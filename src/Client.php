@@ -214,13 +214,14 @@ class Client {
 	 * Get payment methods
 	 *
 	 * @param string $sequence_type Sequence type.
-	 *
+	 * @param string $resource      Resource type to query, e.g. `payments`, `orders`.
 	 * @return array<string>
 	 * @throws \Exception Throws exception for methods on failed request or invalid response.
 	 */
-	public function get_payment_methods( $sequence_type = '' ) {
+	public function get_payment_methods( $sequence_type = '', $resource = 'payments' ) {
 		$data = [
 			'includeWallets' => Methods::APPLE_PAY,
+			'resource'       => $resource,
 		];
 
 		if ( '' !== $sequence_type ) {
