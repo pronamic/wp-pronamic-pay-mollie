@@ -31,6 +31,8 @@ class PaymentRequestTest extends WP_UnitTestCase {
 	 * Setup.
 	 */
 	public function set_up() {
+		parent::set_up();
+
 		$request = new PaymentRequest(
 			new Amount( 'EUR', '100.00' ),
 			'Test'

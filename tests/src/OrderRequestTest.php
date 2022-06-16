@@ -31,6 +31,8 @@ class OrderRequestTest extends WP_UnitTestCase {
 	 * Setup.
 	 */
 	public function set_up() {
+		parent::set_up();
+
 		$lines = new Lines();
 
 		$lines->new_line(

@@ -31,6 +31,8 @@ class IntegrationTest extends WP_UnitTestCase {
 	 * Setup.
 	 */
 	public function set_up() {
+		parent::set_up();
+
 		$this->integration = new Integration();
 	}
 
