@@ -1,0 +1,64 @@
+{
+	"$id": "https://github.com/wp-pronamic-pay-mollie/blob/master/json-schemas/address.json",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Mollie address.",
+	"type": "object",
+	"properties": {
+		"organizationName": {
+			"description": "The person’s organization.",
+			"type": "string"
+		},
+		"title":  {
+			"description": "The title of the person, for example Mr. or Mrs.",
+			"type": "string"
+		},
+		"givenName":  {
+			"description": "The given name (first name) of the person.",
+			"type": "string"
+		},
+		"familyName":  {
+			"description": "The family name (surname) of the person.",
+			"type": "string"
+		},
+		"email":  {
+			"description": "The email address of the person.",
+			"type": "string"
+		},
+		"phone":  {
+			"description": "The phone number of the person.",
+			"type": "string"
+		},
+		"streetAndNumber":  {
+			"description": "Street and number.",
+			"type": "string"
+		},
+		"streetAdditional":  {
+			"description": "Additional street details.",
+			"type": "string"
+		},
+		"postalCode":  {
+			"description": "Postal code.",
+			"type": "string"
+		},
+		"city":  {
+			"description": "City.",
+			"type": "string"
+		},
+		"region":  {
+			"description": "Region (province/state).",
+			"type": "string"
+		},
+		"country":  {
+			"description": "The country of the address in ISO 3166-1 alpha-2 format.",
+			"type": "string"
+		}
+	},
+	"required": [
+		"givenName",
+		"familyName",
+		"email",
+		"streetAndNumber",
+		"city",
+		"country"
+	]
+}
