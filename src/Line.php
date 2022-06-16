@@ -407,26 +407,4 @@ class Line {
 
 		return (object) $properties;
 	}
-
-	/**
-	 * Create string representation of the payment line.
-	 *
-	 * @return string
-	 */
-	public function __toString() {
-		$parts = [
-			$this->id,
-			$this->quantity,
-		];
-
-		$parts = array_map( 'strval', $parts );
-
-		$parts = array_map( 'trim', $parts );
-
-		$parts = array_filter( $parts );
-
-		$string = implode( ' - ', $parts );
-
-		return $string;
-	}
 }

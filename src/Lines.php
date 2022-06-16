@@ -241,17 +241,4 @@ class Lines implements Countable, IteratorAggregate {
 
 		return $lines;
 	}
-
-	/**
-	 * Create string representation of the lines.
-	 *
-	 * @return string
-	 */
-	public function __toString() {
-		$pieces = array_map( 'strval', $this->lines );
-
-		$string = implode( PHP_EOL, $pieces );
-
-		return $string;
-	}
 }

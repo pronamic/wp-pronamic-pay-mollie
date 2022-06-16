@@ -142,13 +142,4 @@ class Amount implements JsonSerializable {
 			'value'    => $this->value,
 		];
 	}
-
-	/**
-	 * Create string representation of amount.
-	 *
-	 * @return string
-	 */
-	public function __toString() {
-		return sprintf( '%1$s %2$s', $this->get_currency(), $this->get_value() );
-	}
 }
