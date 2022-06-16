@@ -334,74 +334,48 @@ class Line {
 			throw new InvalidArgumentException( 'JSON value must be an object.' );
 		}
 
-		if ( ! property_exists( $json, 'name' ) ) {
-			throw new InvalidArgumentException( 'Object must contain `name` property.' );
-		}
-
-		if ( ! property_exists( $json, 'quantity' ) ) {
-			throw new InvalidArgumentException( 'Object must contain `quantity` property.' );
-		}
-
-		if ( ! property_exists( $json, 'unitPrice' ) ) {
-			throw new InvalidArgumentException( 'Object must contain `unitPrice` property.' );
-		}
-
-		if ( ! property_exists( $json, 'totalAmount' ) ) {
-			throw new InvalidArgumentException( 'Object must contain `totalAmount` property.' );
-		}
-
-		if ( ! property_exists( $json, 'vatRate' ) ) {
-			throw new InvalidArgumentException( 'Object must contain `vatRate` property.' );
-		}
-
-		if ( ! property_exists( $json, 'vatAmount' ) ) {
-			throw new InvalidArgumentException( 'Object must contain `vatAmount` property.' );
-		}
-
-		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+		$object_access = new ObjectAccess( $json );
 
 		$line = new self(
-			$json->name,
-			$json->quantity,
-			Amount::from_json( $json->unitPrice ),
-			Amount::from_json( $json->totalAmount ),
-			$json->vatRate,
-			Amount::from_json( $json->vatAmount ),
+			$object_access->get_property( 'name' ),
+			$object_access->get_property( 'quantity' ),
+			Amount::from_json( $object_access->get_property( 'unitPrice' ) ),
+			Amount::from_json( $object_access->get_property( 'totalAmount' ) ),
+			$object_access->get_property( 'vatRate' ),
+			Amount::from_json( $object_access->get_property( 'vatAmount' ) ),
 		);
 
-		if ( property_exists( $json, 'id' ) ) {
-			$line->set_id( $json->id );
+		if ( $object_access->has_property( 'id' ) ) {
+			$line->set_id( $object_access->get_property( 'id' ) );
 		}
 
-		if ( property_exists( $json, 'type' ) ) {
-			$line->set_type( $json->type );
+		if ( $object_access->has_property( 'type' ) ) {
+			$line->set_type( $object_access->get_property( 'type' ) );
 		}
 
-		if ( property_exists( $json, 'category' ) ) {
-			$line->set_category( $json->category );
+		if ( $object_access->has_property( 'category' ) ) {
+			$line->set_category( $object_access->get_property( 'category' ) );
 		}
 
-		if ( isset( $json->discountAmount ) ) {
-			$line->set_discount_amount( Amount::from_json( $json->discountAmount ) );
+		if ( $object_access->has_property( 'discountAmount' ) ) {
+			$line->set_discount_amount( Amount::from_json( $object_access->get_property( 'discountAmount' ) ) );
 		}
 
-		if ( property_exists( $json, 'sku' ) ) {
-			$line->set_sku( $json->sku );
+		if ( $object_access->has_property( 'sku' ) ) {
+			$line->set_sku( $object_access->get_property( 'sku' ) );
 		}
 
-		if ( property_exists( $json, 'imageUrl' ) ) {
-			$line->set_image_url( $json->imageUrl );
+		if ( $object_access->has_property( 'imageUrl' ) ) {
+			$line->set_image_url( $object_access->get_property( 'imageUrl' ) );
 		}
 
-		if ( property_exists( $json, 'productUrl' ) ) {
-			$line->set_product_url( $json->productUrl );
+		if ( $object_access->has_property( 'productUrl' ) ) {
+			$line->set_product_url( $object_access->get_property( 'productUrl' ) );
 		}
 
-		if ( property_exists( $json, 'metadata' ) ) {
-			$line->set_metadata( $json->metadata );
+		if ( $object_access->has_property( 'metadata' ) ) {
+			$line->set_metadata( $object_access->get_property( 'metadata' ) );
 		}
-
-		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 
 		return $line;
 	}
