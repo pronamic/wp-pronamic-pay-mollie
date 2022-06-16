@@ -10,7 +10,6 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\AbstractGatewayIntegration;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -247,7 +246,11 @@ class Integration extends AbstractGatewayIntegration {
 	 * @return Gateway
 	 */
 	public function get_gateway( $post_id ) {
-		return new Gateway( $this->get_config( $post_id ) );
+		$gateway = new Gateway( $this->get_config( $post_id ) );
+
+		$gateway->set_mode( $gateway->get_mode() );
+
+		return $gateway;
 	}
 
 	/**

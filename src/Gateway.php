@@ -1252,7 +1252,7 @@ class Gateway extends Core_Gateway {
 
 	/**
 	 * Get mode.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_mode() {
