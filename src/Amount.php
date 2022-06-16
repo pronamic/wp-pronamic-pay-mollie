@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use InvalidArgumentException;
+use JsonSerializable;
 use stdClass;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
@@ -22,7 +23,7 @@ use JsonSchema\Validator;
  * @version 2.1.0
  * @since   2.1.0
  */
-class Amount {
+class Amount implements JsonSerializable {
 	/**
 	 * Currency.
 	 *
@@ -127,6 +128,19 @@ class Amount {
 		);
 
 		return self::from_object( $json );
+	}
+
+	/**
+	 * JSON serialize.
+	 *
+	 * @link https://www.php.net/manual/en/jsonserializable.jsonserialize.php
+	 * @return object
+	 */
+	public function jsonSerialize() {
+		return (object) [
+			'currency' => $this->currency,
+			'value'    => $this->value,
+		];
 	}
 
 	/**
