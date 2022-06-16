@@ -49,10 +49,12 @@ class GatewayTest extends WP_UnitTestCase {
 	/**
 	 * Setup gateway test.
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		$this->factory = new Factory();
+
+		$this->factory->fake( 'https://api.mollie.com/v2/methods/ideal?include=issuers', __DIR__ . '/../http/api-mollie-com-v2-methods-ideal.http' );
 
 		$this->factory->fake(
 			'https://api.mollie.com/v2/methods',
@@ -104,7 +106,7 @@ class GatewayTest extends WP_UnitTestCase {
 	public function test_get_issuers_type() {
 		$issuers = $this->gateway->get_issuers();
 
-		$this->assertInternalType( 'array', $issuers );
+		$this->assertIsArray( $issuers );
 	}
 
 	/**
@@ -115,11 +117,11 @@ class GatewayTest extends WP_UnitTestCase {
 	public function test_get_issuers_structure() {
 		$issuers = $this->gateway->get_issuers();
 
-		$this->assertInternalType( 'array', $issuers );
+		$this->assertIsArray( $issuers );
 
 		// Check issuers array structure.
 		if ( ! empty( $issuers ) ) {
-			$this->assertInternalType( 'array', $issuers[0] );
+			$this->assertIsArray( $issuers[0] );
 			$this->assertArrayHasKey( 'options', $issuers[0] );
 		}
 	}
@@ -131,7 +133,7 @@ class GatewayTest extends WP_UnitTestCase {
 		$supported = $this->gateway->get_supported_payment_methods();
 
 		// Assert payment methods array type.
-		$this->assertInternalType( 'array', $supported );
+		$this->assertIsArray( $supported );
 	}
 
 	/**
@@ -159,7 +161,7 @@ class GatewayTest extends WP_UnitTestCase {
 	public function test_get_available_payment_methods_type() {
 		$available = $this->gateway->get_available_payment_methods();
 
-		$this->assertInternalType( 'array', $available );
+		$this->assertIsArray( $available );
 	}
 
 	/**
@@ -195,7 +197,11 @@ class GatewayTest extends WP_UnitTestCase {
 
 		add_filter( 'home_url', $filter_home_url );
 
-		$this->assertEquals( $expected, $this->gateway->get_webhook_url() );
+		$payment = new Payment();
+
+		$payment->set_id( 1 );
+
+		$this->assertEquals( $expected, $this->gateway->get_webhook_url( $payment ) );
 
 		remove_filter( 'home_url', $filter_home_url );
 	}
@@ -215,7 +221,22 @@ class GatewayTest extends WP_UnitTestCase {
 
 		add_filter( 'home_url', $filter_home_url );
 
-		$webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook' );
+		$payment = new Payment();
+
+		$payment->set_id( 1 );
+
+		$this->set_up();
+
+		$path = [
+			Integration::REST_ROUTE_NAMESPACE,
+			'webhook',
+			$this->gateway->should_create_order_for_payment( $payment ) ? 'order' : null,
+			$payment->get_id(),
+		];
+
+		$path = \array_filter( $path );
+
+		$webhook_url = \rest_url( \implode( '/', $path ) );
 
 		remove_filter( 'home_url', $filter_home_url );
 
@@ -350,7 +371,7 @@ class GatewayTest extends WP_UnitTestCase {
 		// Get customer ID from user meta.
 		$user_customer_ids = $this->gateway->get_customer_ids_for_user( $user_id );
 
-		$this->assertInternalType( 'array', $user_customer_ids );
+		$this->assertIsArray( $user_customer_ids );
 
 		if ( is_string( $expected ) ) {
 			$this->assertContains( $expected, $user_customer_ids );

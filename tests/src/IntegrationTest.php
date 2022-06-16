@@ -30,7 +30,7 @@ class IntegrationTest extends WP_UnitTestCase {
 	/**
 	 * Setup.
 	 */
-	public function setUp() {
+	public function set_up() {
 		$this->integration = new Integration();
 	}
 
@@ -58,7 +58,7 @@ class IntegrationTest extends WP_UnitTestCase {
 	public function test_get_settings() {
 		$settings = $this->integration->get_settings();
 
-		$this->assertInternalType( 'array', $settings );
+		$this->assertIsArray( $settings );
 	}
 
 	/**
@@ -111,6 +111,6 @@ class IntegrationTest extends WP_UnitTestCase {
 	 * Test settings.
 	 */
 	public function test_settings() {
-		$this->assertInternalType( 'array', $this->integration->get_settings_fields() );
+		$this->assertIsArray( $this->integration->get_settings_fields() );
 	}
 }

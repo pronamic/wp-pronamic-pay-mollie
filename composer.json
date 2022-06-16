@@ -49,11 +49,11 @@
 		"overtrue/phplint": "^2.3",
 		"php-coveralls/php-coveralls": "^2.4",
 		"phpmd/phpmd": "^2.7",
-		"phpunit/phpunit": "^5.7 || ^6.0",
 		"pronamic/wp-coding-standards": "^1.0",
-		"roots/wordpress": "^5.8",
+		"roots/wordpress": "^5.9",
 		"wp-cli/wp-cli": "^2.3",
-		"wp-phpunit/wp-phpunit": "^5.8"
+		"wp-phpunit/wp-phpunit": "^6.0",
+		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"scripts": {
 		"ci": [

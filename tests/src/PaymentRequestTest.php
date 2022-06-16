@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use WP_UnitTestCase;
+
 /**
  * Payment request test
  *
@@ -17,7 +19,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @version 2.1.4
  * @since   1.0.0
  */
-class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
+class PaymentRequestTest extends WP_UnitTestCase {
 	/**
 	 * Payment request.
 	 *
@@ -28,7 +30,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Setup.
 	 */
-	public function setUp() {
+	public function set_up() {
 		$request = new PaymentRequest(
 			new Amount( 'EUR', '100.00' ),
 			'Test'
