@@ -65,9 +65,9 @@ class OrderRequestTest extends WP_UnitTestCase {
 
 		$request->set_billing_address( $billing_address );
 
-		$request->redirect_url  = 'https://example.com/mollie-redirect/';
-		$request->webhook_url   = 'https://example.com/mollie-webhook/';
-		$request->method        = Methods::KLARNA_PAY_LATER;
+		$request->redirect_url = 'https://example.com/mollie-redirect/';
+		$request->webhook_url  = 'https://example.com/mollie-webhook/';
+		$request->method       = Methods::KLARNA_PAY_LATER;
 
 		$this->request = $request;
 	}
