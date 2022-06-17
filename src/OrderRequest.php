@@ -136,15 +136,6 @@ class OrderRequest {
 	private $metadata;
 
 	/**
-	 * The date the order should expire in `YYYY-MM-DD` format. The minimum date is tomorrow
-	 * and the maximum date is 100 days after tomorrow.
-	 *
-	 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
-	 * @var DateTimeInterface|null
-	 */
-	public ?DateTimeInterface $expires_at = null;
-
-	/**
 	 * Create Mollie payment request object.
 	 *
 	 * @param Amount      $amount       The amount that you want to charge.
@@ -328,24 +319,6 @@ class OrderRequest {
 	}
 
 	/**
-	 * Get expires at.
-	 *
-	 * @return DateTimeInterface|null
-	 */
-	public function get_expires_at() : ?string {
-		return $this->expires_at;
-	}
-
-	/**
-	 * Set expires at.
-	 *
-	 * @param DateTimeInterface|null $expires_at Expires at.
-	 */
-	public function set_expires_at( ?DateTimeInterface $expires_at ) : void {
-		$this->expires_at = $expires_at;
-	}
-
-	/**
 	 * Get array of this Mollie payment request object.
 	 *
 	 * @return array<string, mixed>
@@ -364,7 +337,6 @@ class OrderRequest {
 			'method'              => $this->method,
 			'payment'             => $this->payment,
 			'metadata'            => $this->metadata,
-			'expiresAt'           => null === $this->expires_at ? null : $this->expires_at->format( 'Y-m-d' ),
 		];
 
 		/*
