@@ -12,10 +12,16 @@
 		"id": {
 			"description": "The order’s unique identifier.",
 			"type": "string"
+		},
+		"status": {
+			"description": "The status of the order.",
+			"type": "string",
+			"enum": [ "created", "paid", "authorized", "canceled", "shipping", "completed", "expired" ]
 		}
 	},
 	"required": [
 		"resource",
-		"id"
+		"id",
+		"status"
 	]
 }

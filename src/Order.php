@@ -22,6 +22,13 @@ class Order extends BaseResource {
 	private ?array $payments;
 
 	/**
+	 * Status.
+	 *
+	 * @var string
+	 */
+	private string $status;
+
+	/**
 	 * Get embedded payments.
 	 *
 	 * @return Payment[]|null
@@ -37,6 +44,15 @@ class Order extends BaseResource {
 	 */
 	public function set_payments( ?array $payments ) : void {
 		$this->payments = $payments;
+	}
+
+	/**
+	 * Get status.
+	 *
+	 * @return string
+	 */
+	public function get_status() : string {
+		return $this->status;
 	}
 
 	/**
@@ -61,6 +77,8 @@ class Order extends BaseResource {
 		$object_access = new ObjectAccess( $json );
 
 		$order = new Order( $object_access->get_property( 'id' ) );
+
+		$order->status = $object_access->get_property( 'status' );
 
 		if ( property_exists( $json, '_embedded' ) ) {
 			if ( property_exists( $json->_embedded, 'payments' ) ) {

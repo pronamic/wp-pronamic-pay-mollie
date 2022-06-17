@@ -177,6 +177,19 @@ class Client {
 	}
 
 	/**
+	 * Get order.
+	 *
+	 * @return Order
+	 */
+	public function get_order( string $order_id ) : Order {
+		$response = $this->send_request_to_endpoint( 'orders/' . $order_id . '?embed=payments', 'GET' );
+
+		$order = Order::from_json( $response );
+
+		return $order;
+	}
+
+	/**
 	 * Get payments.
 	 *
 	 * @return bool|object
