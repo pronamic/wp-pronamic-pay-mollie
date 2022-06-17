@@ -19,7 +19,7 @@ class Order extends BaseResource {
 	 *
 	 * @var Payment[]|null
 	 */
-	private array $payments;
+	private ?array $payments;
 
 	/**
 	 * Get embedded payments.
@@ -33,7 +33,7 @@ class Order extends BaseResource {
 	/**
 	 * Set embedded payments.
 	 *
-	 * @param array|null $payments Payments.
+	 * @param Payment[]|null $payments Payments.
 	 */
 	public function set_payments( ?array $payments ) : void {
 		$this->payments = $payments;
@@ -44,7 +44,7 @@ class Order extends BaseResource {
 	 *
 	 * @link https://docs.mollie.com/reference/v2/orders-api/get-order
 	 * @param object $json JSON object.
-	 * @return Payment
+	 * @return Order
 	 * @throws \JsonSchema\Exception\ValidationException Throws JSON schema validation exception when JSON is invalid.
 	 */
 	public static function from_json( $json ) {

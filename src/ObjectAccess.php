@@ -15,6 +15,13 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  */
 class ObjectAccess {
 	/**
+	 * Object.
+	 *
+	 * @var object Object.
+	 */
+	private $object;
+
+	/**
 	 * Construct object access.
 	 *
 	 * @param object $object Object.
