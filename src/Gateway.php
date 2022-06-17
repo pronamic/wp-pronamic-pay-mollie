@@ -210,6 +210,7 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param Payment $payment Payment.
 	 * @return string|null
+	 * @throws \Exception Throws exception when resource to use for payment is unknown.
 	 */
 	public function get_webhook_url( Payment $payment ) {
 		$resource = $this->get_resource_for_payment( $payment );
