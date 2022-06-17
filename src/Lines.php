@@ -98,10 +98,6 @@ class Lines {
 		$lines = new self();
 
 		foreach ( $payment_lines as $payment_line ) {
-			if ( $payment_line->get_total_amount()->get_number()->is_zero() ) {
-				continue;
-			}
-
 			$total_amount = $payment_line->get_total_amount();
 
 			$unit_price = $payment_line->get_unit_price();
