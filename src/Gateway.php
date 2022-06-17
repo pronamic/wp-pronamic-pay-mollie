@@ -270,7 +270,7 @@ class Gateway extends Core_Gateway {
 
 				break;
 			case ResourceType::PAYMENTS:
-				$this->start_order( $payment );
+				$this->start_payment( $payment );
 
 				break;
 			default:
