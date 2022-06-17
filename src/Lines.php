@@ -68,7 +68,7 @@ class Lines {
 	/**
 	 * Get JSON.
 	 *
-	 * @return object
+	 * @return array<object>
 	 */
 	public function get_json() {
 		$objects = array_map(
@@ -84,7 +84,7 @@ class Lines {
 			$this->lines
 		);
 
-		return (object) $objects;
+		return $objects;
 	}
 
 	/**
