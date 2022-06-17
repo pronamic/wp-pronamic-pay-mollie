@@ -348,7 +348,7 @@ class OrderRequest {
 	/**
 	 * Get array of this Mollie payment request object.
 	 *
-	 * @return array<string,null|string|object>
+	 * @return array<string, mixed>
 	 */
 	public function get_array() {
 		$array = [
@@ -356,7 +356,7 @@ class OrderRequest {
 			'orderNumber'         => $this->order_number,
 			'lines'               => $this->lines->get_json(),
 			'locale'              => $this->locale,
-			'billingAddress'      => $this->billing_address->get_json(),
+			'billingAddress'      => null === $this->billing_address ? null : $this->billing_address->get_json(),
 			'shippingAddress'     => null === $this->shipping_address ? null : $this->shipping_address->get_json(),
 			'consumerDateOfBirth' => null === $this->consumer_date_of_birth ? null : $this->consumer_date_of_birth->format( 'Y-m-d' ),
 			'redirectUrl'         => $this->redirect_url,
