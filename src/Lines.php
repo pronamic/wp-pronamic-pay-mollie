@@ -118,9 +118,21 @@ class Lines {
 				throw new \InvalidArgumentException( 'Payment line VAT rate is required.' );
 			}
 
+			$name = $payment_line->get_name();
+
+			if ( null === $name ) {
+				throw new \InvalidArgumentException( 'Payment line name is required.' );
+			}
+
+			$quantity = $payment_line->get_quantity();
+
+			if ( null === $quantity ) {
+				throw new \InvalidArgumentException( 'Payment line quantity is required.' );
+			}
+
 			$line = $lines->new_line(
-				$payment_line->get_name(),
-				$payment_line->get_quantity(),
+				$name,
+				$quantity,
 				AmountTransformer::transform( $unit_price ),
 				AmountTransformer::transform( $total_amount ),
 				\number_format( $tax_percentage, 2, '.', '' ),
