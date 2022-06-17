@@ -19,7 +19,7 @@ class Lines {
 	/**
 	 * The lines.
 	 *
-	 * @var array
+	 * @var Line[]
 	 */
 	private array $lines;
 
