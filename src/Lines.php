@@ -127,59 +127,6 @@ class Lines implements Countable, IteratorAggregate {
 	}
 
 	/**
-	 * Create lines from object.
-	 *
-	 * @param array $items Lines.
-	 *
-	 * @return Lines
-	 * @throws InvalidArgumentException Throws invalid argument exception when object does not contain the required properties.
-	 */
-	public static function from_array( array $items ) : Lines {
-		$lines = new self();
-
-		array_map(
-			/**
-			 * Get JSON for line.
-			 *
-			 * @param object $line Line.
-			 */
-			function( object $line ) use ( $lines ) {
-				$validator = new Validator();
-
-				$validator->validate(
-					$line,
-					(object) [
-						'$ref' => 'file://' . realpath( __DIR__ . '/../json-schemas/line.json' ),
-					],
-					Constraint::CHECK_MODE_EXCEPTIONS
-				);
-
-				$lines->add_line( Line::from_json( $line ) );
-			},
-			$items
-		);
-
-		return $lines;
-	}
-
-	/**
-	 * Create amount from JSON string.
-	 *
-	 * @param object $json JSON object.
-	 *
-	 * @return Amount
-	 *
-	 * @throws InvalidArgumentException Throws invalid argument exception when input JSON is not an object.
-	 */
-	public static function from_json( $json ) {
-		if ( ! \is_array( $json ) ) {
-			throw new InvalidArgumentException( 'JSON value must be an array.' );
-		}
-
-		return self::from_array( $json );
-	}
-
-	/**
 	 * Create lines from WordPress Pay core payment lines.
 	 *
 	 * @param PaymentLines $payment_lines Payment lines.
