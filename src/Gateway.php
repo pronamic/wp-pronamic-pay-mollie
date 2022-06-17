@@ -210,10 +210,10 @@ class Gateway extends Core_Gateway {
 
 		switch ( $resource ) {
 			case ResourceType::ORDERS:
-				$path = '<namespace>/webhook/order/<payment_id>';
+				$path = '<namespace>/orders/webhook/<payment_id>';
 				break;
 			case ResourceType::PAYMENTS:
-				$path = '<namespace>/webhook/<payment_id>';
+				$path = '<namespace>/payments/webhook/<payment_id>';
 				break;
 			default:
 				throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
