@@ -1,8 +1,6 @@
-includes:
-	- vendor-bin/phpstan/vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
 	customRulesetUsed: false
-	level: max
+	level: 8
 	bootstrapFiles:
 		- tests/phpstan/bootstrap.php
 	paths:
@@ -10,5 +8,3 @@ parameters:
 	scanDirectories:
 		- vendor/wp-cli
 		- wp-content/plugins/action-scheduler
-	ignoreErrors:
-		- '#^Function apply_filters invoked with \d parameters, 2 required\.$#'
