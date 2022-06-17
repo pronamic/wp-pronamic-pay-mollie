@@ -151,48 +151,12 @@ class OrderRequest {
 	}
 
 	/**
-	 * Get amount.
-	 *
-	 * @return Amount
-	 */
-	public function get_amount() : Amount {
-		return $this->amount;
-	}
-
-	/**
-	 * Get lines.
-	 *
-	 * @return Line[]
-	 */
-	public function get_lines() {
-		return $this->lines;
-	}
-
-	/**
-	 * Get billing address.
-	 *
-	 * @return Address|null
-	 */
-	public function get_billing_address() : ?Address {
-		return $this->billing_address;
-	}
-
-	/**
 	 * Set billing address.
 	 *
 	 * @param Address|null $billing_address Billing address.
 	 */
 	public function set_billing_address( ?Address $billing_address ) : void {
 		$this->billing_address = $billing_address;
-	}
-
-	/**
-	 * Get shipping address.
-	 *
-	 * @return Address|null
-	 */
-	public function get_shipping_address() : ?Address {
-		return $this->shipping_address;
 	}
 
 	/**
@@ -205,30 +169,12 @@ class OrderRequest {
 	}
 
 	/**
-	 * Get consumer date of birth.
-	 *
-	 * @return DateTimeInterface|null
-	 */
-	public function get_consumer_date_of_birth() : ?DateTimeInterface {
-		return $this->consumer_date_of_birth;
-	}
-
-	/**
 	 * Set consumer date of birth.
 	 *
 	 * @param DateTimeInterface|null $consumer_date_of_birth Consumer date of birth.
 	 */
 	public function set_consumer_date_of_birth( ?DateTimeInterface $consumer_date_of_birth ) : void {
 		$this->consumer_date_of_birth = $consumer_date_of_birth;
-	}
-
-	/**
-	 * Get redirect URL.
-	 *
-	 * @return string|null
-	 */
-	public function get_redirect_url() : ?string {
-		return $this->redirect_url;
 	}
 
 	/**
@@ -241,30 +187,12 @@ class OrderRequest {
 	}
 
 	/**
-	 * Get webhook URL.
-	 *
-	 * @return string|null
-	 */
-	public function get_webhook_url() : ?string {
-		return $this->webhook_url;
-	}
-
-	/**
 	 * Set webhook URL.
 	 *
 	 * @param string|null $webhook_url Webhook URL.
 	 */
 	public function set_webhook_url( ?string $webhook_url ) : void {
 		$this->webhook_url = $webhook_url;
-	}
-
-	/**
-	 * Get method.
-	 *
-	 * @return array|string|null
-	 */
-	public function get_method() {
-		return $this->method;
 	}
 
 	/**
@@ -277,15 +205,6 @@ class OrderRequest {
 	}
 
 	/**
-	 * Get payment.
-	 *
-	 * @return array|null
-	 */
-	public function get_payment() : ?array {
-		return $this->payment;
-	}
-
-	/**
 	 * Set payment.
 	 *
 	 * @param array|null $payment Payment specific parameters.
@@ -293,17 +212,6 @@ class OrderRequest {
 	 */
 	public function set_payment( ?array $payment ) : void {
 		$this->payment = $payment;
-	}
-
-	/**
-	 * Get metadata.
-	 *
-	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
-	 * @link https://en.wikipedia.org/wiki/Metadata
-	 * @return mixed
-	 */
-	public function get_metadata() {
-		return $this->metadata;
 	}
 
 	/**
