@@ -163,6 +163,20 @@ class Client {
 	}
 
 	/**
+	 * Create shipment for an order.
+	 *
+	 * @param string $order_id Order ID.
+	 * @return Shipment
+	 */
+	public function create_shipment( $order_id ) {
+		$response = $this->send_request_to_endpoint( 'orders/' . $order_id . '/shipments', 'POST' );
+
+		$shipment = Shipment::from_json( $response );
+
+		return $shipment;
+	}
+
+	/**
 	 * Get payments.
 	 *
 	 * @return bool|object
