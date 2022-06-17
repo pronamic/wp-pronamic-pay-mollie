@@ -12,13 +12,12 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use InvalidArgumentException;
 use Pronamic\WordPress\Pay\Address as Core_Address;
-use Pronamic\WordPress\Pay\Core\Util;
 
 /**
  * Address class
  *
  * @link https://docs.mollie.com/reference/v2/orders-api/create-order
- * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#payment-method-specific-parameters
+ * @link https://docs.mollie.com/overview/common-data-types#address-object
  */
 class Address {
 	/**
