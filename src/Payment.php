@@ -13,11 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use DateTimeInterface;
 
 /**
- * Payment
- *
- * @author  Remco Tolsma
- * @version 2.2.2
- * @since   2.1.0
+ * Payment class
  */
 class Payment extends BaseResource {
 	/**

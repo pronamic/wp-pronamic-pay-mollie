@@ -15,13 +15,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 /**
- * Webhook controller
+ * Webhook controller class
  *
  * @link https://docs.mollie.com/guides/webhooks
- *
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
  */
 class WebhookController {
 	/**

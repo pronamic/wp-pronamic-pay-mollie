@@ -24,14 +24,7 @@ use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 
 /**
- * Title: Mollie
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Remco Tolsma
- * @version 2.1.4
- * @since   1.1.0
+ * Gateway class
  */
 class Gateway extends Core_Gateway {
 	/**

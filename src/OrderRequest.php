@@ -13,14 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use DateTimeInterface;
 
 /**
- * Title: Mollie order request
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Reüel van der Steege
- * @version 4.3.0
- * @since   4.3.0
+ * Order request class
  */
 class OrderRequest {
 	/**

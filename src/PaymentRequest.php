@@ -11,14 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Title: Mollie payment request
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Remco Tolsma
- * @version 2.1.4
- * @since   1.0.0
+ * Payment request class
  */
 class PaymentRequest {
 	/**

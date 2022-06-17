@@ -17,14 +17,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription as CoreSubscription;
 
 /**
- * Title: Mollie integration
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Remco Tolsma
- * @version 2.1.4
- * @since   1.0.0
+ * Integration class
  */
 class Integration extends AbstractGatewayIntegration {
 	/**

@@ -17,11 +17,7 @@ use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 
 /**
- * Amount
- *
- * @author  Reüel van der Steege
- * @version 2.1.0
- * @since   2.1.0
+ * Amount class
  */
 class Amount implements JsonSerializable {
 	/**

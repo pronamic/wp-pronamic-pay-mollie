@@ -10,8 +10,6 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use DateTimeInterface;
-
 /**
  * Order class
  */

@@ -15,13 +15,6 @@ use Pronamic\WordPress\Pay\Address as Core_Address;
 use Pronamic\WordPress\Pay\Core\Util;
 
 /**
- * Address
- *
- * @author  Reüel van der Steege
- * @version 4.3.0
- * @since   4.3.0
- */
-/**
  * Address class
  *
  * @link https://docs.mollie.com/reference/v2/orders-api/create-order

@@ -11,14 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Title: Mollie resource
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Reüel van der Steege
- * @version 4.3.0
- * @since   4.3.0
+ * Resource type class
  */
 class ResourceType {
 	/**

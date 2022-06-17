@@ -13,14 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
- * Title: Mollie methods
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Remco Tolsma
- * @version 2.0.9
- * @since   1.0.0
+ * Methods class
  */
 class Methods {
 	/**

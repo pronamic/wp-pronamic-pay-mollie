@@ -10,24 +10,12 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use ArrayIterator;
-use Countable;
-use InvalidArgumentException;
-use IteratorAggregate;
-use JsonSchema\Constraints\Constraint;
-use JsonSchema\Validator;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
-use Traversable;
 
 /**
- * Lines
- *
- * @author     Reüel van der Steege
- * @version    4.3.0
- * @since      4.3.0
- * @implements \IteratorAggregate<int, Line>
+ * Lines class
  */
-class Lines implements Countable, IteratorAggregate {
+class Lines {
 	/**
 	 * The lines.
 	 *
@@ -40,24 +28,6 @@ class Lines implements Countable, IteratorAggregate {
 	 */
 	public function __construct() {
 		$this->lines = [];
-	}
-
-	/**
-	 * Get iterator.
-	 *
-	 * @return ArrayIterator<int, Line>
-	 */
-	public function getIterator() : Traversable {
-		return new ArrayIterator( $this->lines );
-	}
-
-	/**
-	 * Get array.
-	 *
-	 * @return array<int, Line>
-	 */
-	public function get_array() : array {
-		return $this->lines;
 	}
 
 	/**
@@ -93,15 +63,6 @@ class Lines implements Countable, IteratorAggregate {
 		$this->add_line( $line );
 
 		return $line;
-	}
-
-	/**
-	 * Count lines.
-	 *
-	 * @return int
-	 */
-	public function count() : int {
-		return count( $this->lines );
 	}
 
 	/**

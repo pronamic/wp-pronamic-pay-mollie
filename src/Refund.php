@@ -13,11 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use DateTimeInterface;
 
 /**
- * Refund
- *
- * @author  Reüel van der Steege
- * @version 2.3.0
- * @since   2.3.0
+ * Refund class
  */
 class Refund extends BaseResource {
 	/**

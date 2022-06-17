@@ -10,14 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use InvalidArgumentException;
-
 /**
- * Line.
- *
- * @author  Reüel van der Steege
- * @version 4.3.0
- * @since   4.3.0
+ * Line class
  */
 class Line {
 	/**
@@ -121,13 +115,6 @@ class Line {
 	private $product_url;
 
 	/**
-	 * Metadata
-	 *
-	 * @var string|object|null
-	 */
-	private $metadata;
-
-	/**
 	 * Line constructor.
 	 *
 	 * @param string $name         Description of the order line.
@@ -163,26 +150,12 @@ class Line {
 	}
 
 	/**
-	 * Get type.
-	 */
-	public function get_type(): ?string {
-		return $this->type;
-	}
-
-	/**
 	 * Set type.
 	 *
 	 * @param string|null $type Type.
 	 */
 	public function set_type( ?string $type ) : void {
 		$this->type = $type;
-	}
-
-	/**
-	 * Get category.
-	 */
-	public function get_category() : ?string {
-		return $this->category;
 	}
 
 	/**
@@ -195,74 +168,12 @@ class Line {
 	}
 
 	/**
-	 * Get name.
-	 */
-	public function get_name() : string {
-		return $this->name;
-	}
-
-	/**
-	 * Get quantity.
-	 */
-	public function get_quantity() : int {
-		return $this->quantity;
-	}
-
-	/**
-	 * Get unit price.
-	 */
-	public function get_unit_price() : Amount {
-		return $this->unit_price;
-	}
-
-	/**
-	 * Get discount amount, should not contain any tax.
-	 */
-	public function get_discount_amount() : Amount {
-		return $this->discount_amount;
-	}
-
-	/**
 	 * Set discount amount, should not contain any tax.
 	 *
 	 * @param Amount|null $discount_amount Discount amount.
 	 */
 	public function set_discount_amount( ?Amount $discount_amount = null ) : void {
 		$this->discount_amount = $discount_amount;
-	}
-
-	/**
-	 * Get total amount.
-	 *
-	 * @return Amount
-	 */
-	public function get_total_amount() : Amount {
-		return $this->total_amount;
-	}
-
-	/**
-	 * Get VAT rate.
-	 *
-	 * @return string
-	 */
-	public function get_vat_rate() : string {
-		return $this->vat_rate;
-	}
-
-	/**
-	 * Get value-added tax amount.
-	 *
-	 * @return Amount
-	 */
-	public function get_vat_amount() : Amount {
-		return $this->vat_amount;
-	}
-
-	/**
-	 * Get the SKU of this payment line.
-	 */
-	public function get_sku() : ?string {
-		return $this->sku;
 	}
 
 	/**
@@ -275,13 +186,6 @@ class Line {
 	}
 
 	/**
-	 * Get image URL.
-	 */
-	public function get_image_url() : ?string {
-		return $this->image_url;
-	}
-
-	/**
 	 * Set image URL.
 	 *
 	 * @param string|null $image_url Image url.
@@ -291,93 +195,12 @@ class Line {
 	}
 
 	/**
-	 * Get product URL.
-	 */
-	public function get_product_url() : ?string {
-		return $this->product_url;
-	}
-
-	/**
 	 * Set product URL.
 	 *
 	 * @param string|null $product_url Product URL.
 	 */
 	public function set_product_url( ?string $product_url = null ) : void {
 		$this->product_url = $product_url;
-	}
-
-	/**
-	 * Get metadata.
-	 */
-	public function get_metadata() {
-		return $this->metadata;
-	}
-
-	/**
-	 * Set metadata.
-	 *
-	 * @param string|object|null $metadata Metadata.
-	 */
-	public function set_metadata( $metadata = null ) : void {
-		$this->metadata = $metadata;
-	}
-
-	/**
-	 * Create payment line from object.
-	 *
-	 * @param mixed $json JSON.
-	 * @return Line
-	 * @throws InvalidArgumentException Throws invalid argument exception when JSON is not an object.
-	 */
-	public static function from_json( $json ) : Line {
-		if ( ! is_object( $json ) ) {
-			throw new InvalidArgumentException( 'JSON value must be an object.' );
-		}
-
-		$object_access = new ObjectAccess( $json );
-
-		$line = new self(
-			$object_access->get_property( 'name' ),
-			$object_access->get_property( 'quantity' ),
-			Amount::from_json( $object_access->get_property( 'unitPrice' ) ),
-			Amount::from_json( $object_access->get_property( 'totalAmount' ) ),
-			$object_access->get_property( 'vatRate' ),
-			Amount::from_json( $object_access->get_property( 'vatAmount' ) ),
-		);
-
-		if ( $object_access->has_property( 'id' ) ) {
-			$line->set_id( $object_access->get_property( 'id' ) );
-		}
-
-		if ( $object_access->has_property( 'type' ) ) {
-			$line->set_type( $object_access->get_property( 'type' ) );
-		}
-
-		if ( $object_access->has_property( 'category' ) ) {
-			$line->set_category( $object_access->get_property( 'category' ) );
-		}
-
-		if ( $object_access->has_property( 'discountAmount' ) ) {
-			$line->set_discount_amount( Amount::from_json( $object_access->get_property( 'discountAmount' ) ) );
-		}
-
-		if ( $object_access->has_property( 'sku' ) ) {
-			$line->set_sku( $object_access->get_property( 'sku' ) );
-		}
-
-		if ( $object_access->has_property( 'imageUrl' ) ) {
-			$line->set_image_url( $object_access->get_property( 'imageUrl' ) );
-		}
-
-		if ( $object_access->has_property( 'productUrl' ) ) {
-			$line->set_product_url( $object_access->get_property( 'productUrl' ) );
-		}
-
-		if ( $object_access->has_property( 'metadata' ) ) {
-			$line->set_metadata( $object_access->get_property( 'metadata' ) );
-		}
-
-		return $line;
 	}
 
 	/**
@@ -400,7 +223,6 @@ class Line {
 			'sku'            => $this->sku,
 			'imageUrl'       => $this->image_url,
 			'productUrl'     => $this->product_url,
-			'metadata'       => $this->metadata,
 		];
 
 		$properties = array_filter( $properties );

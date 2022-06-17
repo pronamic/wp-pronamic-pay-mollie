@@ -11,12 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Mollie profile.
- *
- * @link    https://docs.mollie.com/reference/v2/profiles-api/create-profile
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
+ * Profile class
  */
 class Profile {
 	/**

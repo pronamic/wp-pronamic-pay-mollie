@@ -11,12 +11,9 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Mollie customer
+ * Customer class
  *
- * @link    https://docs.mollie.com/reference/v2/customers-api/create-customer
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
+ * @link https://docs.mollie.com/reference/v2/customers-api/create-customer
  */
 class Customer {
 	/**

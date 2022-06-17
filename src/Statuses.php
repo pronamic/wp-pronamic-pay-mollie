@@ -13,16 +13,9 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 
 /**
- * Title: Mollie statuses constants
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
+ * Statuses class
  *
  * @link https://docs.mollie.com/payments/status-changes
- *
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   1.0.0
  */
 class Statuses {
 	/**

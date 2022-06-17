@@ -11,14 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Title: Mollie refund request
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Reüel van der Steege
- * @version 2.3.0
- * @since   2.3.0
+ * Refund request class
  */
 class RefundRequest {
 	/**

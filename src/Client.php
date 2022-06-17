@@ -16,14 +16,7 @@ use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Core\XML\Security;
 
 /**
- * Title: Mollie
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Remco Tolsma
- * @version 2.1.4
- * @since   1.0.0
+ * Client class
  */
 class Client {
 	/**

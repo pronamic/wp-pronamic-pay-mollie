@@ -13,11 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use DateTimeInterface;
 
 /**
- * Chargeback
- *
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
+ * Chargeback class
  */
 class Chargeback extends BaseResource {
 	/**

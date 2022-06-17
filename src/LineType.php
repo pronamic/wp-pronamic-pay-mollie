@@ -13,20 +13,9 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 
 /**
- * Line type
+ * Line type class
  *
- * @author  Reüel van der Steege
- * @version 4.3.0
- * @since   4.3.0
- */
-
-/**
- * Payment line type.
- *
- * @link    https://docs.mollie.com/reference/v2/orders-api/create-order
- * @author  Reüel van der Steege
- * @version 4.3.0
- * @since   4.3.0
+ * @link https://docs.mollie.com/reference/v2/orders-api/create-order
  */
 class LineType {
 	/**
