@@ -107,7 +107,7 @@ class OrderRequest {
 	 * integrate the payment method selection into your website.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
-	 * @var string|array|null
+	 * @var string|array<string>|null
 	 */
 	public $method;
 
@@ -120,7 +120,7 @@ class OrderRequest {
 	 *
 	 * @link https://docs.mollie.com/reference/v2/orders-api/create-order#payment-parameters
 	 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
-	 * @var array|null
+	 * @var array<string, string>|null
 	 */
 	public ?array $payment = null;
 
@@ -131,17 +131,17 @@ class OrderRequest {
 	 *
 	 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
 	 * @link https://en.wikipedia.org/wiki/Metadata
-	 * @var mixed|null
+	 * @var object|string|null
 	 */
 	private $metadata;
 
 	/**
 	 * Create Mollie payment request object.
 	 *
-	 * @param Amount      $amount       The amount that you want to charge.
-	 * @param string      $order_number The order number.
-	 * @param Lines       $lines        The lines in the order.
-	 * @param string|null $locale       Locale.
+	 * @param Amount $amount       The amount that you want to charge.
+	 * @param string $order_number The order number.
+	 * @param Lines  $lines        The lines in the order.
+	 * @param string $locale       Locale.
 	 */
 	public function __construct( Amount $amount, string $order_number, Lines $lines, string $locale ) {
 		$this->amount       = $amount;
@@ -198,7 +198,7 @@ class OrderRequest {
 	/**
 	 * Set method.
 	 *
-	 * @param array|string|null $method Method.
+	 * @param array<string>|string|null $method Method.
 	 */
 	public function set_method( $method ) : void {
 		$this->method = $method;
@@ -207,7 +207,7 @@ class OrderRequest {
 	/**
 	 * Set payment.
 	 *
-	 * @param array|null $payment Payment specific parameters.
+	 * @param array<string, string>|null $payment Payment specific parameters.
 	 * @link https://docs.mollie.com/reference/v2/orders-api/create-order#payment-specific-parameters
 	 */
 	public function set_payment( ?array $payment ) : void {
@@ -222,7 +222,7 @@ class OrderRequest {
 	 * @param mixed $metadata Metadata.
 	 * @return void
 	 */
-	public function set_metadata( $metadata = null ) {
+	public function set_metadata( $metadata = null ) : void {
 		$this->metadata = $metadata;
 	}
 
@@ -242,8 +242,8 @@ class OrderRequest {
 			'consumerDateOfBirth' => null === $this->consumer_date_of_birth ? null : $this->consumer_date_of_birth->format( 'Y-m-d' ),
 			'redirectUrl'         => $this->redirect_url,
 			'webhookUrl'          => $this->webhook_url,
-			'method'              => $this->method,
-			'payment'             => $this->payment,
+			'method'              => \is_array( $this->method ) ? (object) $this->method : $this->method,
+			'payment'             => null === $this->payment ? null : (object) $this->payment,
 			'metadata'            => $this->metadata,
 		];
 
