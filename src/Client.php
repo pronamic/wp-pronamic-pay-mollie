@@ -179,6 +179,7 @@ class Client {
 	/**
 	 * Get order.
 	 *
+	 * @param string $order_id Order ID.
 	 * @return Order
 	 */
 	public function get_order( string $order_id ) : Order {
