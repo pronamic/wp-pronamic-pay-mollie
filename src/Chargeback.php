@@ -72,11 +72,12 @@ class Chargeback extends BaseResource {
 			\JsonSchema\Constraints\Constraint::CHECK_MODE_EXCEPTIONS
 		);
 
+		$object_access = new ObjectAccess( $json );
+
 		$chargeback = new Chargeback(
-			$json->id,
-			Amount::from_json( $json->amount ),
-			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
-			new \DateTimeImmutable( $json->createdAt )
+			$object_access->get_property( 'id' ),
+			Amount::from_json( $object_access->get_property( 'amount' ) ),
+			new \DateTimeImmutable( $object_access->get_property( 'createdAt' ) )
 		);
 
 		return $chargeback;
