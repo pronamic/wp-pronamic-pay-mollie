@@ -102,16 +102,12 @@ class Lines {
 				continue;
 			}
 
+			$total_amount = $payment_line->get_total_amount();
+
 			$unit_price = $payment_line->get_unit_price();
 
 			if ( null === $unit_price ) {
 				throw new \InvalidArgumentException( 'Payment line unit price is required.' );
-			}
-
-			$total_amount = $payment_line->get_total_amount();
-
-			if ( null === $total_amount ) {
-				throw new \InvalidArgumentException( 'Payment line total amount is required.' );
 			}
 
 			$vat_amount = $payment_line->get_tax_amount();
