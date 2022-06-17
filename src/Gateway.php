@@ -598,6 +598,8 @@ class Gateway extends Core_Gateway {
 		$order_request->set_shipping_address( null === $shipping_address ? null : Address::from_wp_address( $shipping_address ) );
 
 		// Consumer date of birth.
+		$customer = $payment->get_customer();
+
 		$consumer_date_of_birth = null === $customer ? null : $customer->get_birth_date();
 
 		$order_request->set_consumer_date_of_birth( $consumer_date_of_birth );
