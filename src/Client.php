@@ -312,8 +312,7 @@ class Client {
 	 * @param string             $customer_id           Customer ID.
 	 * @param BankAccountDetails $consumer_bank_details Consumer bank details.
 	 * @return object
-	 * @throws Error Throws Error when Mollie error occurs.
-	 * @since unreleased
+	 * @throws \Exception Throws exception when mandate creation failed.
 	 */
 	public function create_mandate( $customer_id, BankAccountDetails $consumer_bank_details ) {
 		$response = $this->send_request_to_endpoint(
@@ -325,6 +324,10 @@ class Client {
 				'consumerAccount' => $consumer_bank_details->get_iban(),
 			]
 		);
+
+		if ( ! \property_exists( $response, 'id' ) ) {
+			throw new \Exception( 'Missing mandate ID.' );
+		}
 
 		return $response;
 	}
