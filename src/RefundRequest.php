@@ -47,7 +47,7 @@ class RefundRequest {
 	 * Construct Mollie refund request object.
 	 *
 	 * @param Amount $amount The amount that you want to refund.
-	 * @retrun void
+	 * @return void
 	 */
 	public function __construct( $amount ) {
 		$this->amount = $amount;

@@ -199,7 +199,6 @@ class Address {
 		return $object;
 	}
 
-
 	/**
 	 * Filter null.
 	 *
