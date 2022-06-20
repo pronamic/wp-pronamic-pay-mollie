@@ -33,8 +33,6 @@ class AmountTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals( 'EUR', $amount->get_currency() );
 		$this->assertEquals( '100.00', $amount->get_value() );
-
-		$this->assertEquals( 'EUR 100.00', (string) $amount );
 	}
 
 	/**

@@ -190,16 +190,12 @@ class GatewayTest extends WP_UnitTestCase {
 	 *
 	 * @dataProvider webhook_url_provider
 	 */
-	public function test_webhook_url( $home_url, $expected ) {
+	public function test_webhook_url( $home_url, Payment $payment, $expected ) {
 		$filter_home_url = function( $url ) use ( $home_url ) {
 			return $home_url;
 		};
 
 		add_filter( 'home_url', $filter_home_url );
-
-		$payment = new Payment();
-
-		$payment->set_id( 1 );
 
 		$this->assertEquals( $expected, $this->gateway->get_webhook_url( $payment ) );
 
@@ -221,30 +217,30 @@ class GatewayTest extends WP_UnitTestCase {
 
 		add_filter( 'home_url', $filter_home_url );
 
+		// Payments resource.
 		$payment = new Payment();
 
 		$payment->set_id( 1 );
 
-		$this->set_up();
+		$payments_webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE. '/payments/webhook/1' );
 
-		$path = [
-			Integration::REST_ROUTE_NAMESPACE,
-			'webhook',
-			$this->gateway->should_create_order_for_payment( $payment ) ? 'order' : null,
-			$payment->get_id(),
-		];
+		// Orders resource.
+		$order_payment = new Payment();
 
-		$path = \array_filter( $path );
+		$order_payment->set_id( 1 );
+		$order_payment->set_payment_method( PaymentMethods::KLARNA_PAY_LATER );
+		$order_payment->set_source( 'memberpress_transaction' );
 
-		$webhook_url = \rest_url( \implode( '/', $path ) );
+		$order_payment_webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE. '/orders/webhook/1' );
 
 		remove_filter( 'home_url', $filter_home_url );
 
 		return [
-			[ $home_url, $webhook_url ],
-			[ 'https://localhost/', null ],
-			[ 'https://example.dev/', null ],
-			[ 'https://example.local/', null ],
+			[ $home_url, $order_payment, $order_payment_webhook_url ],
+			[ $home_url, $payment, $payments_webhook_url ],
+			[ 'https://localhost/', $payment, null ],
+			[ 'https://example.dev/', $payment, null ],
+			[ 'https://example.local/', $payment, null ],
 		];
 	}
 

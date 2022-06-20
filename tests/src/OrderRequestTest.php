@@ -10,7 +10,9 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use WP_UnitTestCase;
+use Pronamic\WordPress\Pay\Address as Core_Address;
+use Pronamic\WordPress\Pay\ContactName;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
  * Order request test
@@ -19,7 +21,7 @@ use WP_UnitTestCase;
  * @version 4.3.0
  * @since   4.3.0
  */
-class OrderRequestTest extends WP_UnitTestCase {
+class OrderRequestTest extends TestCase {
 	/**
 	 * Order request.
 	 *
@@ -30,7 +32,7 @@ class OrderRequestTest extends WP_UnitTestCase {
 	/**
 	 * Setup.
 	 */
-	public function set_up() {
+	public function set_up() : void {
 		parent::set_up();
 
 		$lines = new Lines();
@@ -51,21 +53,24 @@ class OrderRequestTest extends WP_UnitTestCase {
 			'nl_NL'
 		);
 
-		$billing_address = new Address(
-			'Remco',
-			'Tolsma',
-			'info@pronamic.nl',
-			'Burgemeester Wuiteweg 39b',
-			'Drachten',
-			'NL'
-		);
+		$billing_address = new Core_Address();
 
-		$billing_address->set_organization_name( 'Pronamic' );
+		$name = new ContactName();
+
+		$name->set_first_name( 'Remco' );
+		$name->set_last_name( 'Tolsma' );
+
+		$billing_address->set_name( $name );
+		$billing_address->set_company_name( 'Pronamic' );
+		$billing_address->set_email( 'info@pronamic.nl' );
+		$billing_address->set_line_1( 'Burgemeester Wuiteweg 39b' );
+		$billing_address->set_city( 'Drachten' );
+		$billing_address->set_country_code( 'NL' );
 		$billing_address->set_postal_code( '9203 KA' );
 		$billing_address->set_region( 'Friesland' );
 		$billing_address->set_phone( '085 40 11 580' );
 
-		$request->set_billing_address( $billing_address );
+		$request->set_billing_address( Address::from_wp_address( $billing_address ) );
 
 		$request->redirect_url = 'https://example.com/mollie-redirect/';
 		$request->webhook_url  = 'https://example.com/mollie-webhook/';
@@ -76,15 +81,49 @@ class OrderRequestTest extends WP_UnitTestCase {
 
 	/**
 	 * Test order request.
+	 *
+	 * @return void
 	 */
 	public function test_order_request() {
 		$this->assertEquals(
 			[
-				'amount'         => $this->request->get_amount()->get_json(),
+				'amount'         => (object) [
+					'currency' => 'EUR',
+					'value'    => '121.00',
+				],
 				'orderNumber'    => '12345',
-				'lines'          => $this->request->get_lines()->get_json(),
+				'lines'          => [
+					(object) [
+						'name'        => 'Test product',
+						'quantity'    => 1,
+						'unitPrice'   => (object) [
+							'currency' => 'EUR',
+							'value'    => '100.00',
+						],
+						'totalAmount' => (object) [
+							'currency' => 'EUR',
+							'value'    => '121.00',
+						],
+						'vatRate'     => '21.00',
+						'vatAmount'   => (object) [
+							'currency' => 'EUR',
+							'value'    => '21.00',
+						],
+					],
+				],
 				'locale'         => 'nl_NL',
-				'billingAddress' => $this->request->get_billing_address()->get_json(),
+				'billingAddress' => (object) [
+					'organizationName' => 'Pronamic',
+					'givenName'        => 'Remco',
+					'familyName'       => 'Tolsma',
+					'email'            => 'info@pronamic.nl',
+					'phone'            => '085 40 11 580',
+					'streetAndNumber'  => 'Burgemeester Wuiteweg 39b',
+					'postalCode'       => '9203 KA',
+					'city'             => 'Drachten',
+					'region'           => 'Friesland',
+					'country'          => 'NL',
+				],
 				'redirectUrl'    => 'https://example.com/mollie-redirect/',
 				'webhookUrl'     => 'https://example.com/mollie-webhook/',
 				'method'         => Methods::KLARNA_PAY_LATER,
