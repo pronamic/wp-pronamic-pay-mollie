@@ -738,7 +738,7 @@ class Gateway extends Core_Gateway {
 				$payment->add_note(
 					\sprintf(
 						/* translators: 1: payment transaction ID, 2: Mollie payment ID */
-						\__( 'Payment transaction ID updated from `%1$s` to succesful order payment `%2$s`.', 'pronamic_ideal' ),
+						\__( 'Payment transaction ID updated from `%1$s` to successful order payment `%2$s`.', 'pronamic_ideal' ),
 						$transaction_id,
 						$mollie_payment_id
 					)
