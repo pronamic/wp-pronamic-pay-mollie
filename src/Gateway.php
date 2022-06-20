@@ -627,7 +627,7 @@ class Gateway extends Core_Gateway {
 	private function get_resource_for_payment( Payment $payment ) : string {
 		$resource = ResourceType::PAYMENTS;
 
-		$is_memberpress = ( 'memberpress' !== $payment->get_source() );
+		$is_memberpress = ( 'memberpress_transaction' === $payment->get_source() );
 
 		$is_klarna = \in_array(
 			$payment->get_payment_method(),
