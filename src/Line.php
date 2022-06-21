@@ -15,13 +15,6 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  */
 class Line {
 	/**
-	 * The order line’s unique identifier.
-	 *
-	 * @var string|null
-	 */
-	private $id;
-
-	/**
 	 * The type of product bought, for example, a physical or a digital product.
 	 *
 	 * @see LineType
@@ -134,22 +127,6 @@ class Line {
 	}
 
 	/**
-	 * Get the Mollie id / identifier of this payment line.
-	 */
-	public function get_id() : ?string {
-		return $this->id;
-	}
-
-	/**
-	 * Set the Mollie id / identifier of this payment line.
-	 *
-	 * @param string|null $id Number.
-	 */
-	public function set_id( ?string $id ) : void {
-		$this->id = $id;
-	}
-
-	/**
 	 * Set type.
 	 *
 	 * @param string|null $type Type.
@@ -210,7 +187,6 @@ class Line {
 	 */
 	public function get_json() : object {
 		$properties = [
-			'id'             => $this->id,
 			'type'           => $this->type,
 			'category'       => $this->category,
 			'name'           => $this->name,
