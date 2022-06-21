@@ -64,37 +64,17 @@ class Amount implements JsonSerializable {
 	}
 
 	/**
-	 * Get JSON.
-	 *
-	 * @return object
-	 */
-	public function get_json() {
-		return (object) [
-			'currency' => $this->get_currency(),
-			'value'    => $this->get_value(),
-		];
-	}
-
-	/**
 	 * Create amount from object.
 	 *
 	 * @param stdClass $object Object.
-	 *
 	 * @return Amount
-	 * @throws InvalidArgumentException Throws invalid argument exception when object does not contains the required properties.
 	 */
 	public static function from_object( stdClass $object ) {
-		if ( ! isset( $object->currency ) ) {
-			throw new InvalidArgumentException( 'Object must contain `currency` property.' );
-		}
-
-		if ( ! isset( $object->value ) ) {
-			throw new InvalidArgumentException( 'Object must contain `value` property.' );
-		}
+		$object_access = new ObjectAccess( $object );
 
 		return new self(
-			$object->currency,
-			$object->value
+			$object_access->get_property( 'currency' ),
+			$object_access->get_property( 'value' )
 		);
 	}
 

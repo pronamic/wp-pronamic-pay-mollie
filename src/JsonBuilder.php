@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use JsonSerializable;
+
 /**
  * JSON builder class
  */
@@ -27,12 +29,12 @@ class JsonBuilder implements JsonSerializable {
 	 * @param string $key   Key.
 	 * @param mixed  $value Value.
 	 */
-	public function set_optional( string $key, mixed $value ) {
+	public function set_optional( string $key, $value ) {
 		if ( null === $value ) {
 			return;
 		}
 
-		$this->set_value( $key, $valye );
+		$this->set_value( $key, $value );
 	}
 
 	/**
@@ -41,7 +43,7 @@ class JsonBuilder implements JsonSerializable {
 	 * @param string $key   Key.
 	 * @param mixed  $value Value.
 	 */
-	public function set_value( string $key, mixed $value ) {
+	public function set_value( string $key, $value ) {
 		$this->data[ $key ] = $value;
 	}
 

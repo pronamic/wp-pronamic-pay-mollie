@@ -233,9 +233,9 @@ class OrderRequest {
 	 */
 	public function get_array() {
 		$array = [
-			'amount'              => $this->amount->get_json(),
+			'amount'              => $this->amount->jsonSerialize(),
 			'orderNumber'         => $this->order_number,
-			'lines'               => $this->lines->get_json(),
+			'lines'               => $this->lines->jsonSerialize(),
 			'locale'              => $this->locale,
 			'billingAddress'      => null === $this->billing_address ? null : $this->billing_address->get_json(),
 			'shippingAddress'     => null === $this->shipping_address ? null : $this->shipping_address->get_json(),

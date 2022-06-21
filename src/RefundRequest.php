@@ -102,7 +102,7 @@ class RefundRequest {
 	 */
 	public function get_array() {
 		$array = [
-			'amount'      => $this->amount->get_json(),
+			'amount'      => $this->amount->jsonSerialize(),
 			'description' => $this->description,
 			'metadata'    => $this->metadata,
 		];

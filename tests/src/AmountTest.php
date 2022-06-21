@@ -45,7 +45,7 @@ class AmountTest extends \PHPUnit_Framework_TestCase {
 
 		$amount = Amount::from_json( $json_data );
 
-		$json_string = wp_json_encode( $amount->get_json(), JSON_PRETTY_PRINT );
+		$json_string = wp_json_encode( $amount->jsonSerialize(), JSON_PRETTY_PRINT );
 
 		$this->assertEquals( wp_json_encode( $json_data, JSON_PRETTY_PRINT ), $json_string );
 

@@ -10,35 +10,19 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use JsonSerializable;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 
 /**
  * Lines class
  */
-class Lines {
+class Lines implements JsonSerializable {
 	/**
 	 * The lines.
 	 *
 	 * @var Line[]
 	 */
-	private array $lines;
-
-	/**
-	 * Constructs and initialize a payment lines object.
-	 */
-	public function __construct() {
-		$this->lines = [];
-	}
-
-	/**
-	 * Add line.
-	 *
-	 * @param Line $line The line to add.
-	 * @return void
-	 */
-	public function add_line( Line $line ) : void {
-		$this->lines[] = $line;
-	}
+	private array $lines = [];
 
 	/**
 	 * New line.
@@ -60,17 +44,17 @@ class Lines {
 			$vat_amount
 		);
 
-		$this->add_line( $line );
+		$this->lines[] = $line;
 
 		return $line;
 	}
 
 	/**
-	 * Get JSON.
+	 * JSON serialize.
 	 *
-	 * @return array<object>
+	 * @return mixed
 	 */
-	public function get_json() {
+	public function jsonSerialize() {
 		$objects = array_map(
 			/**
 			 * Get JSON for payment line.
@@ -79,7 +63,7 @@ class Lines {
 			 * @return object
 			 */
 			function( Line $line ) {
-				return $line->get_json();
+				return $line->jsonSerialize();
 			},
 			$this->lines
 		);

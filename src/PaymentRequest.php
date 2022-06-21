@@ -323,7 +323,7 @@ class PaymentRequest {
 		}
 
 		$array = [
-			'amount'          => $this->amount->get_json(),
+			'amount'          => $this->amount->jsonSerialize(),
 			'description'     => $this->description,
 			'method'          => $this->method,
 			'redirectUrl'     => $this->redirect_url,

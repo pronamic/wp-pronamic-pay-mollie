@@ -56,7 +56,7 @@ class PaymentRequestTest extends WP_UnitTestCase {
 	public function test_payment_request() {
 		$this->assertEquals(
 			[
-				'amount'       => $this->request->amount->get_json(),
+				'amount'       => $this->request->amount->jsonSerialize(),
 				'description'  => 'Test',
 				'redirectUrl'  => 'https://example.com/mollie-redirect/',
 				'webhookUrl'   => 'https://example.com/mollie-webhook/',
@@ -83,7 +83,7 @@ class PaymentRequestTest extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			[
-				'amount'       => $this->request->amount->get_json(),
+				'amount'       => $this->request->amount->jsonSerialize(),
 				'description'  => 'Test',
 				'redirectUrl'  => 'https://example.com/mollie-redirect/',
 				'webhookUrl'   => 'https://example.com/mollie-webhook/',
@@ -117,7 +117,7 @@ class PaymentRequestTest extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			[
-				'amount'       => $request->amount->get_json(),
+				'amount'       => $request->amount->jsonSerialize(),
 				'description'  => 'Test',
 				'billingEmail' => 'john@example.com',
 			],
@@ -148,7 +148,7 @@ class PaymentRequestTest extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			[
-				'amount'      => $request->amount->get_json(),
+				'amount'      => $request->amount->jsonSerialize(),
 				'description' => 'Test',
 				'metadata'    => $metadata,
 			],

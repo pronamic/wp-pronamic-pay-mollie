@@ -45,25 +45,29 @@ class Client {
 	/**
 	 * Send request with the specified action and parameters
 	 *
-	 * @param string                            $url    URL.
-	 * @param string                            $method HTTP method to use.
-	 * @param array<string, string|object|null> $data   Request data.
+	 * @param string $url    URL.
+	 * @param string $method HTTP method to use.
+	 * @param mixed  $data   Request data.
 	 * @return object
 	 * @throws Error Throws Error when Mollie error occurs.
 	 * @throws \Exception Throws exception when error occurs.
 	 */
-	public function send_request( $url, $method = 'GET', array $data = [] ) {
+	public function send_request( $url, $method = 'GET', $data = null ) {
 		// Request.
-		$response = Http::request(
-			$url,
-			[
-				'method'  => $method,
-				'headers' => [
-					'Authorization' => 'Bearer ' . $this->api_key,
-				],
-				'body'    => $data,
-			]
-		);
+		$args = [
+			'method'  => $method,
+			'headers' => [
+				'Authorization' => 'Bearer ' . $this->api_key,
+			],
+		];
+
+		if ( null !== $data ) {
+			$args['headers']['Content-Type'] = 'application/json';
+
+			$args['body'] = \wp_json_encode( $data );
+		}
+
+		$response = Http::request( $url, $args );
 
 		$data = $response->json();
 

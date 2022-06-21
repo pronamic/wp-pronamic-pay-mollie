@@ -10,10 +10,12 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use JsonSerializable;
+
 /**
  * Line class
  */
-class Line {
+class Line implements JsonSerializable {
 	/**
 	 * The type of product bought, for example, a physical or a digital product.
 	 *
@@ -181,11 +183,11 @@ class Line {
 	}
 
 	/**
-	 * Get JSON.
+	 * JSON serialize.
 	 *
-	 * @return object
+	 * @return mixed
 	 */
-	public function get_json() : object {
+	public function jsonSerialize() {
 		$json_builder = new JsonBuilder();
 
 		$json_builder->set_optional( 'type', $this->type );
