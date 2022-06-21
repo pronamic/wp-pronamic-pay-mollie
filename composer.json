@@ -39,6 +39,7 @@
 	},
 	"require": {
 		"php": ">=5.6.20",
+		"ext-json": "*",
 		"justinrainbow/json-schema": "^5.2",
 		"pronamic/wp-http": "^1.0",
 		"woocommerce/action-scheduler": "^3.4",
