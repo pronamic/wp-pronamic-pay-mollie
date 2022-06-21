@@ -186,6 +186,7 @@ class GatewayTest extends WP_UnitTestCase {
 	 * Test webhook url.
 	 *
 	 * @param string      $home_url Home URL.
+	 * @param Payment     $payment  Payment.
 	 * @param string|null $expected Expected value.
 	 *
 	 * @dataProvider webhook_url_provider
@@ -222,7 +223,7 @@ class GatewayTest extends WP_UnitTestCase {
 
 		$payment->set_id( 1 );
 
-		$payments_webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE. '/payments/webhook/1' );
+		$payments_webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/payments/webhook/1' );
 
 		// Orders resource.
 		$order_payment = new Payment();
@@ -231,7 +232,7 @@ class GatewayTest extends WP_UnitTestCase {
 		$order_payment->set_payment_method( PaymentMethods::KLARNA_PAY_LATER );
 		$order_payment->set_source( 'memberpress_transaction' );
 
-		$order_payment_webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE. '/orders/webhook/1' );
+		$order_payment_webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/orders/webhook/1' );
 
 		remove_filter( 'home_url', $filter_home_url );
 
