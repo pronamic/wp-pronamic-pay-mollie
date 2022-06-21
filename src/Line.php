@@ -186,23 +186,21 @@ class Line {
 	 * @return object
 	 */
 	public function get_json() : object {
-		$properties = [
-			'type'           => $this->type,
-			'category'       => $this->category,
-			'name'           => $this->name,
-			'quantity'       => $this->quantity,
-			'unitPrice'      => $this->unit_price->jsonSerialize(),
-			'discountAmount' => null === $this->discount_amount ? null : $this->discount_amount->jsonSerialize(),
-			'totalAmount'    => $this->total_amount->jsonSerialize(),
-			'vatRate'        => $this->vat_rate,
-			'vatAmount'      => $this->vat_amount->jsonSerialize(),
-			'sku'            => $this->sku,
-			'imageUrl'       => $this->image_url,
-			'productUrl'     => $this->product_url,
-		];
+		$json_builder = new JsonBuilder();
 
-		$properties = array_filter( $properties );
+		$json_builder->set_optional( 'type', $this->type );
+		$json_builder->set_optional( 'category', $this->category );
+		$json_builder->set_value( 'name', $this->name );
+		$json_builder->set_value( 'quantity', $this->quantity );
+		$json_builder->set_value( 'unitPrice', $this->unit_price->jsonSerialize() );
+		$json_builder->set_optional( 'discountAmount', null === $this->discount_amount ? null : $this->discount_amount->jsonSerialize() );
+		$json_builder->set_optional( 'totalAmount', $this->total_amount->jsonSerialize() );
+		$json_builder->set_value( 'vatRate', $this->vat_rate );
+		$json_builder->set_value( 'vatAmount',  $this->vat_amount->jsonSerialize() );
+		$json_builder->set_optional( 'sku', $this->sku );
+		$json_builder->set_optional( 'imageUrl', $this->image_url );
+		$json_builder->set_optional( 'productUrl', $this->product_url );
 
-		return (object) $properties;
+		return $json_builder->jsonSerialize();
 	}
 }
