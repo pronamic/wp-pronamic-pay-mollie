@@ -54,6 +54,15 @@ class Chargeback extends BaseResource {
 	}
 
 	/**
+	 * Get chargeback amount.
+	 *
+	 * @return Amount
+	 */
+	public function get_amount() {
+		return $this->amount;
+	}
+
+	/**
 	 * Create chargeback from JSON.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/chargebacks-api/get-chargeback

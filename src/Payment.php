@@ -157,7 +157,7 @@ class Payment extends BaseResource {
 	 * @param string            $description   Description.
 	 * @param string|null       $redirect_url  Redirect URL.
 	 * @param string|null       $method        Method.
-	 * @param string            $metadata      Metadata.
+	 * @param mixed             $metadata      Metadata.
 	 * @param string            $profile_id    Profile ID.
 	 * @param string            $sequence_type Sequence type.
 	 * @param object            $links         Links.
@@ -176,6 +176,15 @@ class Payment extends BaseResource {
 		$this->profile_id    = $profile_id;
 		$this->sequence_type = $sequence_type;
 		$this->links         = $links;
+	}
+
+	/**
+	 * Get mode.
+	 *
+	 * @return string
+	 */
+	public function get_mode() {
+		return $this->mode;
 	}
 
 	/**
@@ -375,6 +384,16 @@ class Payment extends BaseResource {
 	public function set_links( $links ) {
 		$this->links = $links;
 	}
+
+	/**
+	 * Get metadata.
+	 *
+	 * @return mixed
+	 */
+	public function get_metadata() {
+		return $this->metadata;
+	}
+
 
 	/**
 	 * Create payment from JSON.
