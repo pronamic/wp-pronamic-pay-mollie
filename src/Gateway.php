@@ -359,10 +359,12 @@ class Gateway extends Core_Gateway {
 
 		$order_payments = $mollie_order->get_payments();
 
-		$mollie_payment = reset( $order_payments );
+		if ( null !== $order_payments ) {
+			$mollie_payment = reset( $order_payments );
 
-		if ( $mollie_payment instanceof MolliePayment ) {
-			$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+			if ( $mollie_payment instanceof MolliePayment ) {
+				$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+			}
 		}
 	}
 
