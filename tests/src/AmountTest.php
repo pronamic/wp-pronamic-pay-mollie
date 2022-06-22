@@ -58,7 +58,7 @@ class AmountTest extends \PHPUnit_Framework_TestCase {
 	public function test_invalid_object_missing_currency() {
 		$object = (object) [ 'value' => '100.00' ];
 
-		$this->expectException( InvalidArgumentException::class );
+		$this->expectException( Exception::class );
 
 		Amount::from_object( $object );
 	}
@@ -69,7 +69,7 @@ class AmountTest extends \PHPUnit_Framework_TestCase {
 	public function test_from_object_missing_value() {
 		$object = (object) [ 'currency' => 'EUR' ];
 
-		$this->expectException( InvalidArgumentException::class );
+		$this->expectException( Exception::class );
 
 		Amount::from_object( $object );
 	}
