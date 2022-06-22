@@ -94,38 +94,62 @@ class Client {
 	}
 
 	/**
+	 * Post data to URL.
+	 *
+	 * @param string $url  URL.
+	 * @param mixed  $data Data.
+	 * @return object
+	 * @throws Error Throws Error when Mollie error occurs.
+	 */
+	private function post( string $url, $data = null ) {
+		return $this->send_request( $url, 'POST', $data );
+	}
+
+	/**
+	 * Get data from URL.
+	 *
+	 * @param string $url URL.
+	 * @return object
+	 * @throws Error Throws Error when Mollie error occurs.
+	 */
+	private function get( string $url ) {
+		return $this->send_request( $url, 'GET' );
+	}
+
+	/**
 	 * Get URL.
 	 *
-	 * @param string $endpoint URL endpoint.
+	 * @param string   $endpoint   URL endpoint.
+	 * @param string[] $parts      Parts.
+	 * @param string[] $parameters Parameters.
 	 * @return string
 	 */
-	public function get_url( $endpoint ) {
-		$url = self::API_URL . $endpoint;
+	private function get_url( $endpoint, array $parts = [], array $parameters = [] ) {
+		$url = self::API_URL . \strtr( $endpoint, $parts );
+
+		if ( \count( $parameters ) > 0 ) {
+			$url .= '?' . \http_build_query( $parameters, '', '&' );
+		}
 
 		return $url;
 	}
 
 	/**
-	 * Send request to endpoint.
-	 *
-	 * @param string                            $endpoint Endpoint.
-	 * @param string                            $method   HTTP method to use.
-	 * @param array<string, string|object|null> $data     Request data.
-	 * @return object
-	 */
-	public function send_request_to_endpoint( $endpoint, $method = 'GET', array $data = [] ) {
-		return $this->send_request( $this->get_url( $endpoint ), $method, $data );
-	}
-
-	/**
 	 * Get profile.
 	 *
-	 * @param string $profile Mollie profile ID.
+	 * @param string $profile_id Mollie profile ID.
 	 * @return object
 	 * @throws Error Throws Error when Mollie error occurs.
 	 */
-	public function get_profile( $profile ) {
-		return $this->send_request_to_endpoint( 'profiles/' . $profile, 'GET' );
+	public function get_profile( $profile_id ) {
+		return $this->get(
+			$this->get_url(
+				'profiles/*id*',
+				[
+					'*id*' => $profile_id,
+				]
+			)
+		);
 	}
 
 	/**
@@ -145,7 +169,16 @@ class Client {
 	 * @return Order
 	 */
 	public function create_order( OrderRequest $request ) {
-		$object = $this->send_request_to_endpoint( 'orders?embed=payments', 'POST', $request->get_array() );
+		$object = $this->post(
+			$this->get_url(
+				'orders',
+				[],
+				[
+					'embed' => 'payments',
+				]
+			),
+			$request
+		);
 
 		$order = Order::from_json( $object );
 
@@ -159,7 +192,10 @@ class Client {
 	 * @return Payment
 	 */
 	public function create_payment( PaymentRequest $request ) {
-		$object = $this->send_request_to_endpoint( 'payments', 'POST', $request->get_array() );
+		$object = $this->post(
+			$this->get_url( 'payments' ),
+			$request
+		);
 
 		$payment = Payment::from_json( $object );
 
@@ -173,7 +209,14 @@ class Client {
 	 * @return Shipment
 	 */
 	public function create_shipment( $order_id ) {
-		$response = $this->send_request_to_endpoint( 'orders/' . $order_id . '/shipments', 'POST' );
+		$response = $this->post(
+			$this->get_url(
+				'orders/*orderId*/shipments',
+				[
+					'*orderId*' => $order_id,
+				]
+			)
+		);
 
 		$shipment = Shipment::from_json( $response );
 
@@ -187,7 +230,17 @@ class Client {
 	 * @return Order
 	 */
 	public function get_order( string $order_id ) : Order {
-		$response = $this->send_request_to_endpoint( 'orders/' . $order_id . '?embed=payments', 'GET' );
+		$response = $this->get(
+			$this->get_url(
+				'orders/*id*',
+				[
+					'*id*' => $order_id,
+				],
+				[
+					'embed' => 'payments',
+				]
+			)
+		);
 
 		$order = Order::from_json( $response );
 
@@ -200,7 +253,7 @@ class Client {
 	 * @return bool|object
 	 */
 	public function get_payments() {
-		return $this->send_request_to_endpoint( 'payments', 'GET' );
+		return $this->get( $this->get_url( 'payments' ) );
 	}
 
 	/**
@@ -216,7 +269,15 @@ class Client {
 			throw new \InvalidArgumentException( 'Mollie payment ID can not be empty string.' );
 		}
 
-		$object = $this->send_request_to_endpoint( 'payments/' . $payment_id, 'GET', $parameters );
+		$object = $this->get(
+			$this->get_url(
+				'payments/*id*',
+				[
+					'*id*' => $payment_id,
+				],
+				$parameters
+			)
+		);
 
 		$payment = Payment::from_json( $object );
 
@@ -229,7 +290,15 @@ class Client {
 	 * @return array<string>
 	 */
 	public function get_issuers() {
-		$response = $this->send_request_to_endpoint( 'methods/ideal?include=issuers', 'GET' );
+		$response = $this->get(
+			$this->get_url(
+				'methods/ideal',
+				[],
+				[
+					'include' => 'issuers',
+				]
+			)
+		);
 
 		$issuers = [];
 
@@ -267,7 +336,13 @@ class Client {
 			$data['sequenceType'] = $sequence_type;
 		}
 
-		$response = $this->send_request_to_endpoint( 'methods', 'GET', $data );
+		$response = $this->get(
+			$this->get_url(
+				'methods',
+				[],
+				$data
+			)
+		);
 
 		$payment_methods = [];
 
@@ -300,10 +375,9 @@ class Client {
 	 * @since 1.1.6
 	 */
 	public function create_customer( Customer $customer ) {
-		$response = $this->send_request_to_endpoint(
-			'customers',
-			'POST',
-			$customer->get_array()
+		$response = $this->post(
+			$this->get_url( 'customers' ),
+			$customer
 		);
 
 		if ( \property_exists( $response, 'id' ) ) {
@@ -328,7 +402,14 @@ class Client {
 		}
 
 		try {
-			return $this->send_request_to_endpoint( 'customers/' . $customer_id, 'GET' );
+			return $this->get(
+				$this->get_url(
+					'customers/*id*',
+					[
+						'*id*' => $customer_id,
+					]
+				)
+			);
 		} catch ( Error $error ) {
 			if ( 404 === $error->get_status() ) {
 				return null;
@@ -347,9 +428,13 @@ class Client {
 	 * @throws \Exception Throws exception when mandate creation failed.
 	 */
 	public function create_mandate( $customer_id, BankAccountDetails $consumer_bank_details ) {
-		$response = $this->send_request_to_endpoint(
-			'customers/' . $customer_id . '/mandates',
-			'POST',
+		$response = $this->post(
+			$this->get_url(
+				'customers/*customerId*/mandates',
+				[
+					'*customerId*' => $customer_id,
+				]
+			),
 			[
 				'method'          => Methods::DIRECT_DEBIT,
 				'consumerName'    => $consumer_bank_details->get_name(),
@@ -381,7 +466,15 @@ class Client {
 			throw new \InvalidArgumentException( 'Mollie customer ID can not be empty string.' );
 		}
 
-		return $this->send_request_to_endpoint( 'customers/' . $customer_id . '/mandates/' . $mandate_id, 'GET' );
+		return $this->get(
+			$this->get_url(
+				'customers/*customerId*/mandates/*id*',
+				[
+					'*customerId*' => $customer_id,
+					'*id*'         => $mandate_id,
+				]
+			)
+		);
 	}
 
 	/**
@@ -396,7 +489,17 @@ class Client {
 			throw new \InvalidArgumentException( 'Mollie customer ID can not be empty string.' );
 		}
 
-		return $this->send_request_to_endpoint( 'customers/' . $customer_id . '/mandates?limit=250', 'GET' );
+		return $this->get(
+			$this->get_url(
+				'customers/*customerId*/mandates',
+				[
+					'*customerId*' => $customer_id,
+				],
+				[
+					'limit' => '250',
+				]
+			)
+		);
 	}
 
 	/**
@@ -509,7 +612,15 @@ class Client {
 	 * @return Refund
 	 */
 	public function create_refund( $payment_id, RefundRequest $refund_request ) {
-		$response = $this->send_request_to_endpoint( 'payments/' . $payment_id . '/refunds', 'POST', $refund_request->get_array() );
+		$response = $this->post(
+			$this->get_url(
+				'payments/*id*/refunds',
+				[
+					'*id*' => $payment_id,
+				]
+			),
+			$refund_request
+		);
 
 		return Refund::from_json( $response );
 	}
@@ -522,7 +633,15 @@ class Client {
 	 * @return array<Chargeback>
 	 */
 	public function get_payment_chargebacks( $payment_id, $parameters ) {
-		$object = $this->send_request_to_endpoint( 'payments/' . $payment_id . '/chargebacks', 'GET', $parameters );
+		$object = $this->get(
+			$this->get_url(
+				'payments/*paymentId*/chargebacks',
+				[
+					'*paymentId*' => $payment_id,
+				],
+				$parameters
+			)
+		);
 
 		$chargebacks = [];
 
