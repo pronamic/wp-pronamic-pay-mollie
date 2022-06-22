@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use JsonSerializable;
+use Pronamic\WordPress\Number\Number;
 
 /**
  * Line class
@@ -76,7 +77,7 @@ class Line implements JsonSerializable {
 	 * The VAT rate applied to the order line, for example "21.00" for 21%. The `vatRate` should
 	 * be passed as a string and not as a float to ensure the correct number of decimals are passed.
 	 *
-	 * @var string
+	 * @var Number
 	 */
 	private $vat_rate;
 
@@ -116,10 +117,10 @@ class Line implements JsonSerializable {
 	 * @param int    $quantity     Quantity.
 	 * @param Amount $unit_price   Unit price.
 	 * @param Amount $total_amount Total amount, including VAT and  discounts.
-	 * @param string $vat_rate     VAT rate.
+	 * @param Number $vat_rate     VAT rate.
 	 * @param Amount $vat_amount   Value-added tax amount.
 	 */
-	public function __construct( string $name, int $quantity, Amount $unit_price, Amount $total_amount, string $vat_rate, Amount $vat_amount ) {
+	public function __construct( string $name, int $quantity, Amount $unit_price, Amount $total_amount, Number $vat_rate, Amount $vat_amount ) {
 		$this->name         = $name;
 		$this->quantity     = $quantity;
 		$this->unit_price   = $unit_price;
@@ -197,7 +198,7 @@ class Line implements JsonSerializable {
 		$object_builder->set_required( 'unitPrice', $this->unit_price->jsonSerialize() );
 		$object_builder->set_optional( 'discountAmount', null === $this->discount_amount ? null : $this->discount_amount->jsonSerialize() );
 		$object_builder->set_optional( 'totalAmount', $this->total_amount->jsonSerialize() );
-		$object_builder->set_required( 'vatRate', $this->vat_rate );
+		$object_builder->set_required( 'vatRate', $this->vat_rate->format( 2, '.', '' ) );
 		$object_builder->set_required( 'vatAmount', $this->vat_amount->jsonSerialize() );
 		$object_builder->set_optional( 'sku', $this->sku );
 		$object_builder->set_optional( 'imageUrl', $this->image_url );

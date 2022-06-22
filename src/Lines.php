@@ -11,6 +11,8 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use JsonSerializable;
+use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 
 /**
@@ -31,10 +33,10 @@ class Lines implements JsonSerializable {
 	 * @param int    $quantity     Quantity.
 	 * @param Amount $unit_price   Unit price.
 	 * @param Amount $total_amount Total amount, including VAT and  discounts.
-	 * @param string $vat_rate     VAT rate.
+	 * @param Number $vat_rate     VAT rate.
 	 * @param Amount $vat_amount   Value-added tax amount.
 	 */
-	public function new_line( string $name, int $quantity, Amount $unit_price, Amount $total_amount, string $vat_rate, Amount $vat_amount ) : Line {
+	public function new_line( string $name, int $quantity, Amount $unit_price, Amount $total_amount, Number $vat_rate, Amount $vat_amount ) : Line {
 		$line = new Line(
 			$name,
 			$quantity,
@@ -84,6 +86,10 @@ class Lines implements JsonSerializable {
 		foreach ( $payment_lines as $payment_line ) {
 			$total_amount = $payment_line->get_total_amount();
 
+			if ( ! $total_amount instanceof TaxedMoney ) {
+				throw new \InvalidArgumentException( 'Payment line requires tax information.' );
+			}
+
 			$unit_price = $payment_line->get_unit_price();
 
 			if ( null === $unit_price ) {
@@ -96,7 +102,7 @@ class Lines implements JsonSerializable {
 				throw new \InvalidArgumentException( 'Payment line VAT amount is required.' );
 			}
 
-			$tax_percentage = $payment_line->get_tax_percentage();
+			$tax_percentage = $total_amount->get_tax_percentage();
 
 			if ( null === $tax_percentage ) {
 				throw new \InvalidArgumentException( 'Payment line VAT rate is required.' );
@@ -119,7 +125,7 @@ class Lines implements JsonSerializable {
 				$quantity,
 				AmountTransformer::transform( $unit_price ),
 				AmountTransformer::transform( $total_amount ),
-				\number_format( $tax_percentage, 2, '.', '' ),
+				Number::from_mixed( $tax_percentage ),
 				AmountTransformer::transform( $vat_amount ),
 			);
 
