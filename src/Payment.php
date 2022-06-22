@@ -219,7 +219,7 @@ class Payment extends BaseResource {
 	/**
 	 * Get redirect URL.
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public function get_redirect_url() {
 		return $this->redirect_url;
