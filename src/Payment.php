@@ -420,13 +420,8 @@ class Payment extends BaseResource {
 			$payment->set_locale( $object_access->get_property( 'locale' ) );
 		}
 
-		if ( $object_access->has_property( 'customerId' ) ) {
-			$payment->set_customer_id( $object_access->get_property( 'customerId' ) );
-		}
-
-		if ( $object_access->has_property( 'mandateId' ) ) {
-			$payment->set_mandate_id( $object_access->get_property( 'mandateId' ) );
-		}
+		$payment->set_customer_id( $object_access->get_optional( 'customerId' ) );
+		$payment->set_mandate_id( $object_access->get_optional( 'mandateId' ) );
 
 		if ( $object_access->has_property( 'details' ) ) {
 			$payment->set_details( PaymentDetails::from_json( (string) $payment->get_method(), $object_access->get_property( 'details' ) ) );

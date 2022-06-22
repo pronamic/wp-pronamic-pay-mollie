@@ -127,21 +127,12 @@ class Profile {
 	public static function from_object( $object ) {
 		$profile = new self();
 
-		if ( property_exists( $object, 'id' ) ) {
-			$profile->set_id( $object->id );
-		}
+		$object_access = new ObjectAccess( $object );
 
-		if ( property_exists( $object, 'mode' ) ) {
-			$profile->set_mode( $object->mode );
-		}
-
-		if ( property_exists( $object, 'name' ) ) {
-			$profile->set_name( $object->name );
-		}
-
-		if ( property_exists( $object, 'email' ) ) {
-			$profile->set_email( $object->email );
-		}
+		$profile->set_id( $object_access->get_optional( 'id' ) );
+		$profile->set_mode( $object_access->get_optional( 'mode' ) );
+		$profile->set_name( $object_access->get_optional( 'name' ) );
+		$profile->set_email( $object_access->get_optional( 'email' ) );
 
 		return $profile;
 	}

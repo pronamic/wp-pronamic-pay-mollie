@@ -36,7 +36,7 @@ class ObjectAccess {
 	 * @param string $property Property.
 	 * @return bool True if the property exists, false if it doesn't exist.
 	 */
-	public function has_property( $property ) {
+	public function has_property( string $property ) {
 		return \property_exists( $this->object, $property );
 	}
 
@@ -47,9 +47,23 @@ class ObjectAccess {
 	 * @return mixed
 	 * @throws \Exception Throws exception when property does not exists.
 	 */
-	public function get_property( $property ) {
+	public function get_property( string $property ) {
 		if ( ! \property_exists( $this->object, $property ) ) {
 			throw new \Exception( \sprintf( 'Object does not have `%s` property.', $property ) );
+		}
+
+		return $this->object->{$property};
+	}
+
+	/**
+	 * Get optional.
+	 *
+	 * @param string $property Property.
+	 * @return mixed
+	 */
+	public function get_optional( $property ) {
+		if ( ! \property_exists( $this->object, $property ) ) {
+			return null;
 		}
 
 		return $this->object->{$property};
