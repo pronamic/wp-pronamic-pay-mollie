@@ -21,6 +21,7 @@ if ( null === $payment ) {
 $mollie_payment_id  = $payment->get_transaction_id();
 $mollie_customer_id = $payment->get_meta( 'mollie_customer_id' );
 $mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
+$mollie_order_id    = $payment->get_meta( 'mollie_order_id' );
 
 ?>
 <p>
@@ -99,6 +100,24 @@ $mollie_mandate_id  = $payment->get_meta( 'mollie_mandate_id' );
 				/* translators: %s: Mollie mandate ID */
 				\__( 'Mandate: %s', 'pronamic_ideal' ),
 				$mollie_mandate_id
+			)
+		);
+
+		?>
+	</dl>
+
+<?php endif; ?>
+
+<?php if ( ! empty( $mollie_order_id ) ) : ?>
+
+	<dl>
+		<?php
+
+		echo \esc_html(
+			\sprintf(
+				/* translators: %s: Mollie order ID */
+				\__( 'Order: %s', 'pronamic_ideal' ),
+				$mollie_order_id
 			)
 		);
 
