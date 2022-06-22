@@ -424,7 +424,7 @@ class Client {
 	 *
 	 * @param string             $customer_id           Customer ID.
 	 * @param BankAccountDetails $consumer_bank_details Consumer bank details.
-	 * @return object
+	 * @return Mandate
 	 * @throws \Exception Throws exception when mandate creation failed.
 	 */
 	public function create_mandate( $customer_id, BankAccountDetails $consumer_bank_details ) {
@@ -442,11 +442,7 @@ class Client {
 			]
 		);
 
-		if ( ! \property_exists( $response, 'id' ) ) {
-			throw new \Exception( 'Missing mandate ID.' );
-		}
-
-		return $response;
+		return Mandate::from_json( $response );
 	}
 
 	/**
