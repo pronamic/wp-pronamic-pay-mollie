@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use InvalidArgumentException;
+use JsonSerializable;
 use Pronamic\WordPress\Pay\Address as Core_Address;
 
 /**
@@ -19,7 +20,7 @@ use Pronamic\WordPress\Pay\Address as Core_Address;
  * @link https://docs.mollie.com/reference/v2/orders-api/create-order
  * @link https://docs.mollie.com/overview/common-data-types#address-object
  */
-class Address {
+class Address implements JsonSerializable {
 	/**
 	 * The person’s organization, if applicable.
 	 *
@@ -172,50 +173,26 @@ class Address {
 	}
 
 	/**
-	 * Get JSON.
+	 * JSON serialize.
 	 *
-	 * @return object
+	 * @return mixed
 	 */
-	public function get_json() {
-		$properties = $this->filter_null(
-			[
-				'organizationName' => $this->organization_name,
-				'title'            => $this->title,
-				'givenName'        => $this->given_name,
-				'familyName'       => $this->family_name,
-				'email'            => $this->email,
-				'phone'            => $this->phone,
-				'streetAndNumber'  => $this->street_and_number,
-				'streetAdditional' => $this->street_additional,
-				'postalCode'       => $this->postal_code,
-				'city'             => $this->city,
-				'region'           => $this->region,
-				'country'          => $this->country,
-			]
-		);
+	public function jsonSerialize() {
+		$object_builder = new ObjectBuilder();
 
-		$object = (object) $properties;
+		$object_builder->set_optional( 'organizationName', $this->organization_name );
+		$object_builder->set_optional( 'title', $this->title );
+		$object_builder->set_required( 'givenName', $this->given_name );
+		$object_builder->set_required( 'familyName', $this->family_name );
+		$object_builder->set_required( 'email', $this->email );
+		$object_builder->set_optional( 'phone', $this->phone );
+		$object_builder->set_required( 'streetAndNumber', $this->street_and_number );
+		$object_builder->set_optional( 'streetAdditional', $this->street_additional );
+		$object_builder->set_optional( 'postalCode', $this->postal_code );
+		$object_builder->set_required( 'city', $this->city );
+		$object_builder->set_optional( 'region', $this->region );
+		$object_builder->set_required( 'country', $this->country );
 
-		return $object;
-	}
-
-	/**
-	 * Filter null.
-	 *
-	 * @param array<int|string, mixed> $array Array to filter null values from.
-	 * @return array<int|string, mixed>
-	 */
-	private function filter_null( array $array ) : array {
-		return array_filter( $array, [ $this, 'is_not_null' ] );
-	}
-
-	/**
-	 * Check if value is not null.
-	 *
-	 * @param mixed $value Value.
-	 * @return boolean True if value is not null, false otherwise.
-	 */
-	private function is_not_null( $value ) : bool {
-		return ( null !== $value );
+		return $object_builder->jsonSerialize();
 	}
 }

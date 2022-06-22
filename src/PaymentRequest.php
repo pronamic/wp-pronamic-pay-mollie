@@ -10,10 +10,12 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use JsonSerializable;
+
 /**
  * Payment request class
  */
-class PaymentRequest {
+class PaymentRequest implements JsonSerializable {
 	/**
 	 * The amount in EURO that you want to charge, e.g. `{"currency":"EUR", "value":"100.00"}`
 	 * if you would want to charge € 100,00.
@@ -310,41 +312,45 @@ class PaymentRequest {
 	}
 
 	/**
-	 * Get array of this Mollie payment request object.
+	 * JSON serialize.
 	 *
-	 * @return array<string,null|string|object>
+	 * @link https://www.php.net/manual/en/jsonserializable.jsonserialize.php
+	 * @return mixed
 	 */
-	public function get_array() {
+	public function jsonSerialize() {
+		$object_builder = new ObjectBuilder();
+
+		// General.
+		$object_builder->set_required( 'amount', $this->amount->jsonSerialize() );
+		$object_builder->set_required( 'description', $this->description );
+		$object_builder->set_required( 'redirectUrl', $this->redirect_url );
+		$object_builder->set_optional( 'webhookUrl', $this->webhook_url );
+		$object_builder->set_optional( 'locale', $this->locale );
+		$object_builder->set_optional( 'method', $this->method );
+		$object_builder->set_optional( 'metadata', $this->metadata );
+
+		// Parameters for recurring payments.
+		$object_builder->set_optional( 'sequenceType', $this->sequence_type );
+		$object_builder->set_optional( 'customerId', $this->customer_id );
+		$object_builder->set_optional( 'mandateId', $this->mandate_id );
+
+		// Payment method-specific parameters.
+		$object_builder->set_optional( 'billingEmail', $this->billing_email );
+
 		// Due date.
 		$due_date = $this->get_due_date();
 
 		if ( null !== $due_date ) {
-			$due_date = $due_date->format( 'Y-m-d' );
+			$object_builder->set_optional( 'dueDate', $due_date->format( 'Y-m-d' ) );
 		}
 
-		$array = [
-			'amount'          => $this->amount->jsonSerialize(),
-			'description'     => $this->description,
-			'method'          => $this->method,
-			'redirectUrl'     => $this->redirect_url,
-			'metadata'        => $this->metadata,
-			'locale'          => $this->locale,
-			'webhookUrl'      => $this->webhook_url,
-			'consumerName'    => $this->consumer_name,
-			'consumerAccount' => $this->consumer_account,
-			'issuer'          => $this->issuer,
-			'billingEmail'    => $this->billing_email,
-			'dueDate'         => $due_date,
-			'sequenceType'    => $this->sequence_type,
-			'customerId'      => $this->customer_id,
-			'mandateId'       => $this->mandate_id,
-		];
+		// IDeal.
+		$object_builder->set_optional( 'issuer', $this->issuer );
 
-		/*
-		 * Array filter will remove values NULL, FALSE and empty strings ('')
-		 */
-		$array = array_filter( $array );
+		// SEPA Direct Debit.
+		$object_builder->set_optional( 'consumerName', $this->consumer_name );
+		$object_builder->set_optional( 'consumerAccount', $this->consumer_account );
 
-		return $array;
+		return $object_builder->jsonSerialize();
 	}
 }

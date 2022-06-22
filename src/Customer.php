@@ -10,12 +10,14 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use JsonSerializable;
+
 /**
  * Customer class
  *
  * @link https://docs.mollie.com/reference/v2/customers-api/create-customer
  */
-class Customer {
+class Customer implements JsonSerializable {
 	/**
 	 * ID.
 	 *
@@ -156,23 +158,18 @@ class Customer {
 	}
 
 	/**
-	 * Get array.
+	 * JSON serialize.
 	 *
-	 * @return array<string>
+	 * @return mixed
 	 */
-	public function get_array() {
-		$array = [
-			'name'   => $this->get_name(),
-			'email'  => $this->get_email(),
-			'locale' => $this->get_locale(),
-		];
+	public function jsonSerialize() {
+		$object_builder = new ObjectBuilder();
 
-		/*
-		 * Array filter will remove values NULL, FALSE and empty strings ('')
-		 */
-		$array = array_filter( $array );
+		$object_builder->set_optional( 'name', $this->get_name() );
+		$object_builder->set_optional( 'email', $this->get_email() );
+		$object_builder->set_optional( 'locale', $this->get_locale() );
 
-		return $array;
+		return $object_builder->jsonSerialize();
 	}
 
 	/**

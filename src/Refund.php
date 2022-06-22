@@ -155,18 +155,16 @@ class Refund extends BaseResource {
 			\JsonSchema\Constraints\Constraint::CHECK_MODE_EXCEPTIONS
 		);
 
-		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+		$object_access = new ObjectAccess( $json );
 
 		$refund = new Refund(
-			$json->id,
-			Amount::from_json( $json->amount ),
-			$json->description,
-			$json->status,
-			$json->paymentId,
-			new \DateTimeImmutable( $json->createdAt )
+			$object_access->get_property( 'id' ),
+			Amount::from_json( $object_access->get_property( 'amount' ) ),
+			$object_access->get_property( 'description' ),
+			$object_access->get_property( 'status' ),
+			$object_access->get_property( 'paymentId' ),
+			new \DateTimeImmutable( $object_access->get_property( 'createdAt' ) )
 		);
-
-		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 		return $refund;
 	}

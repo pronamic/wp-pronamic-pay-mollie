@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use DateTimeInterface;
+use DateTimeImmutable;
 
 /**
  * Payment class
@@ -394,55 +395,50 @@ class Payment extends BaseResource {
 			\JsonSchema\Constraints\Constraint::CHECK_MODE_EXCEPTIONS
 		);
 
-		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+		$object_access = new ObjectAccess( $json );
+
 		$payment = new Payment(
-			$json->id,
-			$json->mode,
-			new \DateTimeImmutable( $json->createdAt ),
-			$json->status,
-			Amount::from_json( $json->amount ),
-			$json->description,
-			$json->redirectUrl,
-			$json->method,
-			$json->metadata,
-			$json->profileId,
-			$json->sequenceType,
-			$json->_links
+			$object_access->get_property( 'id' ),
+			$object_access->get_property( 'mode' ),
+			new DateTimeImmutable( $object_access->get_property( 'createdAt' ) ),
+			$object_access->get_property( 'status' ),
+			Amount::from_json( $object_access->get_property( 'amount' ) ),
+			$object_access->get_property( 'description' ),
+			$object_access->get_property( 'redirectUrl' ),
+			$object_access->get_property( 'method' ),
+			$object_access->get_property( 'metadata' ),
+			$object_access->get_property( 'profileId' ),
+			$object_access->get_property( 'sequenceType' ),
+			$object_access->get_property( '_links' ),
 		);
 
-		if ( \property_exists( $json, 'expiresAt' ) ) {
-			$payment->set_expires_at( new \DateTimeImmutable( $json->expiresAt ) );
+		if ( $object_access->has_property( 'expiresAt' ) ) {
+			$payment->set_expires_at( new DateTimeImmutable( $object_access->get_property( 'expiresAt' ) ) );
 		}
 
-		if ( \property_exists( $json, 'locale' ) ) {
-			$payment->set_locale( $json->locale );
+		if ( $object_access->has_property( 'locale' ) ) {
+			$payment->set_locale( $object_access->get_property( 'locale' ) );
 		}
 
-		if ( \property_exists( $json, 'customerId' ) ) {
-			$payment->set_customer_id( $json->customerId );
+		if ( $object_access->has_property( 'customerId' ) ) {
+			$payment->set_customer_id( $object_access->get_property( 'customerId' ) );
 		}
 
-		if ( \property_exists( $json, 'mandateId' ) ) {
-			$payment->set_mandate_id( $json->mandateId );
+		if ( $object_access->has_property( 'mandateId' ) ) {
+			$payment->set_mandate_id( $object_access->get_property( 'mandateId' ) );
 		}
 
-		if ( \property_exists( $json, 'details' ) ) {
-			$payment->set_details( PaymentDetails::from_json( (string) $payment->get_method(), $json->details ) );
+		if ( $object_access->has_property( 'details' ) ) {
+			$payment->set_details( PaymentDetails::from_json( (string) $payment->get_method(), $object_access->get_property( 'details' ) ) );
 		}
 
-		if ( \property_exists( $json, 'amountRefunded' ) ) {
-			$refunded_amount = Amount::from_json( $json->amountRefunded );
-
-			$payment->set_amount_refunded( $refunded_amount );
+		if ( $object_access->has_property( 'amountRefunded' ) ) {
+			$payment->set_amount_refunded( Amount::from_json( $object_access->get_property( 'amountRefunded' ) ) );
 		}
 
-		if ( \property_exists( $json, 'amountChargedBack' ) ) {
-			$charged_back_amount = Amount::from_json( $json->amountChargedBack );
-
-			$payment->set_amount_charged_back( $charged_back_amount );
+		if ( $object_access->has_property( 'amountChargedBack' ) ) {
+			$payment->set_amount_charged_back( Amount::from_json( $object_access->get_property( 'amountChargedBack' ) ) );
 		}
-
-		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 
 		return $payment;
 	}

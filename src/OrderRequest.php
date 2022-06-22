@@ -11,11 +11,12 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use DateTimeInterface;
+use JsonSerializable;
 
 /**
  * Order request class
  */
-class OrderRequest {
+class OrderRequest implements JsonSerializable {
 	/**
 	 * The total amount of the order, including VAT and discounts. This is the amount that
 	 * will be charged to your customer. It has to match the sum of the lines totalAmount amounts.
@@ -227,31 +228,26 @@ class OrderRequest {
 	}
 
 	/**
-	 * Get array of this Mollie payment request object.
+	 * JSON serialize.
 	 *
-	 * @return array<string, mixed>
+	 * @return mixed
 	 */
-	public function get_array() {
-		$array = [
-			'amount'              => $this->amount->jsonSerialize(),
-			'orderNumber'         => $this->order_number,
-			'lines'               => $this->lines->jsonSerialize(),
-			'locale'              => $this->locale,
-			'billingAddress'      => null === $this->billing_address ? null : $this->billing_address->get_json(),
-			'shippingAddress'     => null === $this->shipping_address ? null : $this->shipping_address->get_json(),
-			'consumerDateOfBirth' => null === $this->consumer_date_of_birth ? null : $this->consumer_date_of_birth->format( 'Y-m-d' ),
-			'redirectUrl'         => $this->redirect_url,
-			'webhookUrl'          => $this->webhook_url,
-			'method'              => \is_array( $this->method ) ? (object) $this->method : $this->method,
-			'payment'             => null === $this->payment ? null : (object) $this->payment,
-			'metadata'            => $this->metadata,
-		];
+	public function jsonSerialize() {
+		$object_builder = new ObjectBuilder();
 
-		/*
-		 * Array filter will remove values NULL, FALSE and empty strings ('')
-		 */
-		$array = array_filter( $array );
+		$object_builder->set_required( 'amount', $this->amount->jsonSerialize() );
+		$object_builder->set_required( 'orderNumber', $this->order_number );
+		$object_builder->set_required( 'lines', $this->lines->jsonSerialize() );
+		$object_builder->set_optional( 'billingAddress', null === $this->billing_address ? null : $this->billing_address->jsonSerialize() );
+		$object_builder->set_optional( 'shippingAddress', null === $this->shipping_address ? null : $this->shipping_address->jsonSerialize() );
+		$object_builder->set_optional( 'consumerDateOfBirth', null === $this->consumer_date_of_birth ? null : $this->consumer_date_of_birth->format( 'Y-m-d' ) );
+		$object_builder->set_optional( 'redirectUrl', $this->redirect_url );
+		$object_builder->set_optional( 'webhookUrl', $this->webhook_url );
+		$object_builder->set_required( 'locale', $this->locale );
+		$object_builder->set_optional( 'method', $this->method );
+		$object_builder->set_optional( 'payment', $this->payment );
+		$object_builder->set_optional( 'metadata', $this->metadata );
 
-		return $array;
+		return $object_builder->jsonSerialize();
 	}
 }

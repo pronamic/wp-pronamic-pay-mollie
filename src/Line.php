@@ -188,21 +188,21 @@ class Line implements JsonSerializable {
 	 * @return mixed
 	 */
 	public function jsonSerialize() {
-		$json_builder = new JsonBuilder();
+		$object_builder = new ObjectBuilder();
 
-		$json_builder->set_optional( 'type', $this->type );
-		$json_builder->set_optional( 'category', $this->category );
-		$json_builder->set_value( 'name', $this->name );
-		$json_builder->set_value( 'quantity', $this->quantity );
-		$json_builder->set_value( 'unitPrice', $this->unit_price->jsonSerialize() );
-		$json_builder->set_optional( 'discountAmount', null === $this->discount_amount ? null : $this->discount_amount->jsonSerialize() );
-		$json_builder->set_optional( 'totalAmount', $this->total_amount->jsonSerialize() );
-		$json_builder->set_value( 'vatRate', $this->vat_rate );
-		$json_builder->set_value( 'vatAmount',  $this->vat_amount->jsonSerialize() );
-		$json_builder->set_optional( 'sku', $this->sku );
-		$json_builder->set_optional( 'imageUrl', $this->image_url );
-		$json_builder->set_optional( 'productUrl', $this->product_url );
+		$object_builder->set_optional( 'type', $this->type );
+		$object_builder->set_optional( 'category', $this->category );
+		$object_builder->set_required( 'name', $this->name );
+		$object_builder->set_required( 'quantity', $this->quantity );
+		$object_builder->set_required( 'unitPrice', $this->unit_price->jsonSerialize() );
+		$object_builder->set_optional( 'discountAmount', null === $this->discount_amount ? null : $this->discount_amount->jsonSerialize() );
+		$object_builder->set_optional( 'totalAmount', $this->total_amount->jsonSerialize() );
+		$object_builder->set_required( 'vatRate', $this->vat_rate );
+		$object_builder->set_required( 'vatAmount', $this->vat_amount->jsonSerialize() );
+		$object_builder->set_optional( 'sku', $this->sku );
+		$object_builder->set_optional( 'imageUrl', $this->image_url );
+		$object_builder->set_optional( 'productUrl', $this->product_url );
 
-		return $json_builder->jsonSerialize();
+		return $object_builder->jsonSerialize();
 	}
 }

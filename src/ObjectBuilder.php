@@ -1,6 +1,6 @@
 <?php
 /**
- * JSON builder
+ * Object builder
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2022 Pronamic
@@ -13,13 +13,13 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use JsonSerializable;
 
 /**
- * JSON builder class
+ * Object builder class
  */
-class JsonBuilder implements JsonSerializable {
+class ObjectBuilder implements JsonSerializable {
 	/**
 	 * Data.
 	 *
-	 * @var array Data.
+	 * @var mixed[] Data.
 	 */
 	private $data = [];
 
@@ -28,6 +28,7 @@ class JsonBuilder implements JsonSerializable {
 	 *
 	 * @param string $key   Key.
 	 * @param mixed  $value Value.
+	 * @return void
 	 */
 	public function set_optional( string $key, $value ) {
 		if ( null === $value ) {
@@ -38,12 +39,24 @@ class JsonBuilder implements JsonSerializable {
 	}
 
 	/**
+	 * Set required value.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 * @return void
+	 */
+	public function set_required( string $key, $value ) {
+		$this->set_value( $key, $value );
+	}
+
+	/**
 	 * Set value.
 	 *
 	 * @param string $key   Key.
 	 * @param mixed  $value Value.
+	 * @return void
 	 */
-	public function set_value( string $key, $value ) {
+	private function set_value( string $key, $value ) {
 		$this->data[ $key ] = $value;
 	}
 
