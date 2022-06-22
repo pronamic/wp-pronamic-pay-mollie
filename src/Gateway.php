@@ -63,7 +63,7 @@ class Gateway extends Core_Gateway {
 	public function __construct( Config $config ) {
 		$this->config = $config;
 
-		parent::__construct( $config );
+		parent::__construct();
 
 		$this->set_method( self::METHOD_HTTP_REDIRECT );
 
