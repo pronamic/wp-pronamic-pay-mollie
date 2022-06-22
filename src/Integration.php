@@ -37,7 +37,7 @@ class Integration extends AbstractGatewayIntegration {
 	/**
 	 * Construct and initialize Mollie integration.
 	 *
-	 * @param array<string, array> $args Arguments.
+	 * @param array<string, string[]> $args Arguments.
 	 */
 	public function __construct( $args = [] ) {
 		$args = wp_parse_args(
