@@ -162,27 +162,27 @@ class Address implements JsonSerializable {
 		$country           = $address->get_country_code();
 
 		if ( null === $given_name ) {
-			throw new \InvalidArgumentException( 'Mollie requires a given name in an address.' );
+			throw new InvalidArgumentException( 'Mollie requires a given name in an address.' );
 		}
 
 		if ( null === $family_name ) {
-			throw new \InvalidArgumentException( 'Mollie requires a family name in an address.' );
+			throw new InvalidArgumentException( 'Mollie requires a family name in an address.' );
 		}
 
 		if ( null === $email ) {
-			throw new \InvalidArgumentException( 'Mollie requires an email in an address.' );
+			throw new InvalidArgumentException( 'Mollie requires an email in an address.' );
 		}
 
 		if ( null === $street_and_number ) {
-			throw new \InvalidArgumentException( 'Mollie requires a street and number in an address.' );
+			throw new InvalidArgumentException( 'Mollie requires a street and number in an address.' );
 		}
 
 		if ( null === $city ) {
-			throw new \InvalidArgumentException( 'Mollie requires a city in an address.' );
+			throw new InvalidArgumentException( 'Mollie requires a city in an address.' );
 		}
 
 		if ( null === $country ) {
-			throw new \InvalidArgumentException( 'Mollie requires a country in an address.' );
+			throw new InvalidArgumentException( 'Mollie requires a country in an address.' );
 		}
 
 		$mollie_address = new self( $given_name, $family_name, $email, $street_and_number, $city, $country );
