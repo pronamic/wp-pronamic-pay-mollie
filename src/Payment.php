@@ -109,13 +109,6 @@ class Payment extends BaseResource {
 	private $metadata;
 
 	/**
-	 * The customer’s locale, either forced on creation by specifying the `locale` parameter, or detected by us during checkout. Will be a full locale, for example `nl_NL`.
-	 *
-	 * @var string
-	 */
-	private $locale;
-
-	/**
 	 * Indicates which type of payment this is in a recurring sequence.
 	 * Set to `first` for first payments that allow the customer to agree to automatic recurring charges taking place on their account in the future.
 	 * Set to `recurring` for payments where the customer’s card is charged automatically.
@@ -188,12 +181,48 @@ class Payment extends BaseResource {
 	}
 
 	/**
+	 * Get created at.
+	 *
+	 * @return DateTimeInterface
+	 */
+	public function get_created_at() {
+		return $this->created_at;
+	}
+
+	/**
 	 * Get status.
 	 *
 	 * @return string
 	 */
 	public function get_status() {
 		return $this->status;
+	}
+
+	/**
+	 * Get amount.
+	 *
+	 * @return Amount
+	 */
+	public function get_amount() {
+		return $this->amount;
+	}
+
+	/**
+	 * Get description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return $this->description;
+	}
+
+	/**
+	 * Get redirect URL.
+	 *
+	 * @return string
+	 */
+	public function get_redirect_url() {
+		return $this->redirect_url;
 	}
 
 	/**
@@ -221,25 +250,6 @@ class Payment extends BaseResource {
 	 */
 	public function get_profile_id() {
 		return $this->profile_id;
-	}
-
-	/**
-	 * Get locale.
-	 *
-	 * @return string
-	 */
-	public function get_locale() {
-		return $this->locale;
-	}
-
-	/**
-	 * Set locale.
-	 *
-	 * @param string $locale Locale.
-	 * @return void
-	 */
-	public function set_locale( $locale ) {
-		$this->locale = $locale;
 	}
 
 	/**
@@ -433,10 +443,6 @@ class Payment extends BaseResource {
 
 		if ( $object_access->has_property( 'expiresAt' ) ) {
 			$payment->set_expires_at( new DateTimeImmutable( $object_access->get_property( 'expiresAt' ) ) );
-		}
-
-		if ( $object_access->has_property( 'locale' ) ) {
-			$payment->set_locale( $object_access->get_property( 'locale' ) );
 		}
 
 		$payment->set_customer_id( $object_access->get_optional( 'customerId' ) );
