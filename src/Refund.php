@@ -32,14 +32,6 @@ class Refund extends BaseResource {
 	private $description;
 
 	/**
-	 * The optional metadata you provided upon refund creation. Metadata can for
-	 * example be used to link an bookkeeping ID to a refund.
-	 *
-	 * @var mixed
-	 */
-	private $metadata;
-
-	/**
 	 * Since refunds may not be instant for certain payment methods,
 	 * the refund carries a status field.
 	 *
@@ -98,15 +90,6 @@ class Refund extends BaseResource {
 	 */
 	public function get_description() {
 		return $this->description;
-	}
-
-	/**
-	 * Get metadata.
-	 *
-	 * @return mixed
-	 */
-	public function get_metadata() {
-		return $this->metadata;
 	}
 
 	/**
