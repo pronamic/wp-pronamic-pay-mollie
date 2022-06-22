@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use InvalidArgumentException;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
@@ -282,6 +283,7 @@ class Gateway extends Core_Gateway {
 	 * Start Mollie payment for payment.
 	 *
 	 * @param Payment $payment Payment.
+	 * @return void
 	 * @throws Error Throws Mollie error when something goes wrong.
 	 */
 	private function start_payment( Payment $payment ) {
@@ -497,7 +499,7 @@ class Gateway extends Core_Gateway {
 				if ( false === $mandate_id ) {
 					$mandate = $this->client->create_mandate( $customer_id, $consumer_bank_details );
 
-					$mandate_id = $mandate->id;
+					$mandate_id = $mandate->get_id();
 				}
 
 				// Charge immediately on-demand.
@@ -570,16 +572,31 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param Payment $payment Payment.
 	 * @return OrderRequest
-	 * @throws Error Mollie error.
-	 * @throws \Exception Throws exception on error creating Mollie customer for payment.
+	 * @throws InvalidArgumentException Throws an invalid argument exception when the payment does not meet the Mollie requirements for an order.
 	 */
 	private function get_order_request( Payment $payment ) {
 		$payment_request = $this->get_payment_request( $payment );
 
+		$lines = $payment->get_lines();
+
+		if ( null === $lines ) {
+			throw new InvalidArgumentException( 'Mollie requires lines for order.' );
+		}
+
+		$order_number = $payment->get_source_id();
+
+		if ( null === $order_number ) {
+			throw new InvalidArgumentException( 'Mollie requires order number for order.' );
+		}
+
+		if ( null === $payment_request->locale ) {
+			throw new InvalidArgumentException( 'Mollie requires locale for order.' );
+		}
+
 		$order_request = new OrderRequest(
 			$payment_request->amount,
-			$payment->get_source_id(),
-			Lines::from_wp_payment_lines( $payment->get_lines() ),
+			(string) $order_number,
+			Lines::from_wp_payment_lines( $lines ),
 			$payment_request->locale
 		);
 
