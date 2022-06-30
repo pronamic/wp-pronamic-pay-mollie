@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use DateTimeInterface;
 use JsonSerializable;
 
 /**
@@ -38,6 +39,9 @@ class PaymentRequest implements JsonSerializable {
 	 * The URL the consumer will be redirected to after the payment process. It could make sense
 	 * for the redirectURL to contain a unique identifier – like your order ID – so you can show
 	 * the right page referencing the order when the consumer returns.
+	 *
+	 * The parameter can be omitted for recurring payments (sequenceType: `recurring`)
+	 * and for Apple Pay payments with an `applePayPaymentToken`.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var string|null
@@ -112,7 +116,7 @@ class PaymentRequest implements JsonSerializable {
 	 * is tomorrow and the maximum date is 100 days after tomorrow.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
-	 * @var \DateTimeInterface|null
+	 * @var DateTimeInterface|null
 	 */
 	private $due_date;
 
@@ -201,7 +205,7 @@ class PaymentRequest implements JsonSerializable {
 	/**
 	 * Get due date.
 	 *
-	 * @return null|\DateTimeInterface
+	 * @return null|DateTimeInterface
 	 */
 	public function get_due_date() {
 		return $this->due_date;
@@ -210,7 +214,7 @@ class PaymentRequest implements JsonSerializable {
 	/**
 	 * Set due date.
 	 *
-	 * @param null|\DateTimeInterface $due_date Due date.
+	 * @param null|DateTimeInterface $due_date Due date.
 	 * @return void
 	 */
 	public function set_due_date( $due_date ) {
@@ -323,7 +327,17 @@ class PaymentRequest implements JsonSerializable {
 		// General.
 		$object_builder->set_required( 'amount', $this->amount->jsonSerialize() );
 		$object_builder->set_required( 'description', $this->description );
-		$object_builder->set_required( 'redirectUrl', $this->redirect_url );
+
+		/**
+		 * The `redirectUrl` is documented as `required` but is not always required:
+		 *
+		 * > The parameter can be omitted for recurring payments (sequenceType: `recurring`)
+		 * > and for Apple Pay payments with an applePayPaymentToken.
+		 *
+		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+		 */
+		$object_builder->set_optional( 'redirectUrl', $this->redirect_url );
+
 		$object_builder->set_optional( 'webhookUrl', $this->webhook_url );
 		$object_builder->set_optional( 'locale', $this->locale );
 		$object_builder->set_optional( 'method', $this->method );
