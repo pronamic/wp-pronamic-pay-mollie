@@ -353,7 +353,6 @@ class GatewayTest extends WP_UnitTestCase {
 		$customer->set_user_id( $user_id );
 
 		$subscription = new Subscription();
-		$subscription->set_id( 1 );
 		$subscription->set_customer( $customer );
 
 		$subscriptions_data_store = new SubscriptionsDataStoreCPT();
