@@ -56,22 +56,12 @@ class GatewayTest extends WP_UnitTestCase {
 
 		$this->factory->fake( 'https://api.mollie.com/v2/methods/ideal?include=issuers', __DIR__ . '/../http/api-mollie-com-v2-methods-ideal.http' );
 
-		$this->factory->fake(
-			'https://api.mollie.com/v2/methods',
-			function( Request $request ) {
-				$file = __DIR__ . '/../http/api-mollie-com-v2-methods.http';
-
-				$body = $request->body();
-
-				if ( \is_array( $body ) && \array_key_exists( 'sequenceType', $body ) ) {
-					$sequence_type = $body['sequenceType'];
-
-					$file = __DIR__ . \sprintf( '/../http/api-mollie-com-v2-methods-%s.http', $sequence_type );
-				}
-
-				return Response::array_from_file( $file );
-			}
-		);
+		$this->factory->fake( 'https://api.mollie.com/v2/methods?includeWallets=applepay&resource=payments&sequenceType=oneoff', __DIR__ . '/../http/api-mollie-com-v2-methods-oneoff.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/methods?includeWallets=applepay&resource=payments&sequenceType=recurring', __DIR__ . '/../http/api-mollie-com-v2-methods-recurring.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/methods?includeWallets=applepay&resource=payments&sequenceType=first', __DIR__ . '/../http/api-mollie-com-v2-methods-recurring.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/methods?includeWallets=applepay&resource=orders&sequenceType=oneoff', __DIR__ . '/../http/api-mollie-com-v2-methods-oneoff.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/methods?includeWallets=applepay&resource=orders&sequenceType=recurring', __DIR__ . '/../http/api-mollie-com-v2-methods-recurring.http' );
+		$this->factory->fake( 'https://api.mollie.com/v2/methods?includeWallets=applepay&resource=orders&sequenceType=first', __DIR__ . '/../http/api-mollie-com-v2-methods-recurring.http' );
 
 		$this->set_gateway(
 			[
