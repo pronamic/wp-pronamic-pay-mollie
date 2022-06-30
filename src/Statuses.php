@@ -83,7 +83,7 @@ class Statuses {
 			case self::CANCELED:
 				return PaymentStatus::CANCELLED;
 			case self::AUTHORIZED:
-				return PaymentStatus::RESERVED;
+				return PaymentStatus::AUTHORIZED;
 			case self::PAID:
 				return PaymentStatus::SUCCESS;
 			case self::EXPIRED:
