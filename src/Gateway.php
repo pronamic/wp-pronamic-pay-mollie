@@ -230,9 +230,9 @@ class Gateway extends Core_Gateway {
 
 		$url = \rest_url( $path );
 
-		$host = wp_parse_url( $url, PHP_URL_HOST );
+		$host = \wp_parse_url( $url, PHP_URL_HOST );
 
-		if ( is_array( $host ) ) {
+		if ( ! \is_string( $host ) ) {
 			// Parsing failure.
 			$host = '';
 		}
