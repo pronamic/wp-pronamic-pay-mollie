@@ -308,7 +308,6 @@ class GatewayTest extends WP_UnitTestCase {
 			[ 0, null, null, false ],
 			[ 10, null, null, false ],
 			[ 1, null, null, false ],
-			[ 1, null, $cst_first, $cst_first ],
 			[ 1, $cst_subscription, null, $cst_subscription ],
 			[ 1, $cst_subscription, $cst_first, $cst_subscription ],
 			[ '1', $cst_subscription, $cst_first, $cst_subscription ],
