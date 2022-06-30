@@ -1,26 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit
-    bootstrap="tests/bootstrap.php"
-    backupGlobals="false"
-    colors="true"
-    convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
-    convertWarningsToExceptions="true"
->
-    <testsuites>
-        <testsuite>
-            <directory suffix=".php">tests/src</directory>
-        </testsuite>
-    </testsuites>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="tests/bootstrap.php" backupGlobals="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+	<coverage>
+		<include>
+			<directory suffix=".php">src</directory>
+		</include>
+	</coverage>
 
-    <filter>
-        <whitelist>
-            <directory suffix=".php">src</directory>
-        </whitelist>
-    </filter>
+	<testsuites>
+		<testsuite name="pronamic-pay-mollie">
+			<directory suffix=".php">tests/src</directory>
+		</testsuite>
+	</testsuites>
 
-    <php>
-        <env name="WP_PHPUNIT__TESTS_CONFIG" value="tests/wp-config.php" />
-    </php>
+	<php>
+		<env name="WP_PHPUNIT__TESTS_CONFIG" value="tests/wp-config.php"/>
+	</php>
 </phpunit>

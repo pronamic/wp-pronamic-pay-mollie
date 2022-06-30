@@ -10,7 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use InvalidArgumentException;
+use Exception;
 
 /**
  * Title: Mollie amount tests

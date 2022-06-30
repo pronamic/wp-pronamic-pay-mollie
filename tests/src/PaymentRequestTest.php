@@ -67,7 +67,7 @@ class PaymentRequestTest extends WP_UnitTestCase {
 				'customerId'   => 'cst_8wmqcHMN4U',
 				'sequenceType' => 'first',
 			],
-			$this->request->get_array()
+			(array) $this->request->jsonSerialize()
 		);
 	}
 
@@ -95,7 +95,7 @@ class PaymentRequestTest extends WP_UnitTestCase {
 				'customerId'   => 'cst_8wmqcHMN4U',
 				'sequenceType' => 'first',
 			],
-			$this->request->get_array()
+			(array) $this->request->jsonSerialize()
 		);
 	}
 
@@ -121,7 +121,7 @@ class PaymentRequestTest extends WP_UnitTestCase {
 				'description'  => 'Test',
 				'billingEmail' => 'john@example.com',
 			],
-			$request->get_array()
+			(array) $request->jsonSerialize()
 		);
 	}
 
@@ -152,7 +152,7 @@ class PaymentRequestTest extends WP_UnitTestCase {
 				'description' => 'Test',
 				'metadata'    => $metadata,
 			],
-			$request->get_array()
+			(array) $request->jsonSerialize()
 		);
 	}
 

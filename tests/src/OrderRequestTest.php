@@ -12,6 +12,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Address as Core_Address;
 use Pronamic\WordPress\Pay\ContactName;
+use Pronamic\WordPress\Number\Number;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
@@ -42,7 +43,7 @@ class OrderRequestTest extends TestCase {
 			1,
 			new Amount( 'EUR', '100.00' ),
 			new Amount( 'EUR', '121.00' ),
-			'21.00',
+			Number::from_mixed( '21.00' ),
 			new Amount( 'EUR', '21.00' )
 		);
 
@@ -86,7 +87,7 @@ class OrderRequestTest extends TestCase {
 	 */
 	public function test_order_request() {
 		$this->assertEquals(
-			[
+			(object) [
 				'amount'         => (object) [
 					'currency' => 'EUR',
 					'value'    => '121.00',
@@ -128,7 +129,7 @@ class OrderRequestTest extends TestCase {
 				'webhookUrl'     => 'https://example.com/mollie-webhook/',
 				'method'         => Methods::KLARNA_PAY_LATER,
 			],
-			$this->request->get_array()
+			$this->request->jsonSerialize()
 		);
 	}
 }
