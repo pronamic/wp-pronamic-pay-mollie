@@ -11,12 +11,9 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Mollie error
+ * Error class
  *
- * @link    https://docs.mollie.com/guides/handling-errors
- * @author  Remco Tolsma
- * @version 2.0.9
- * @since   2.0.9
+ * @link https://docs.mollie.com/guides/handling-errors
  */
 class Error extends \Exception {
 	/**

@@ -14,6 +14,8 @@ use Pronamic\WordPress\Pay\Admin\AdminPaymentPostType;
 
 $mollie_payment_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
 
+$mollie_payment = null;
+
 $payment = \get_pronamic_payment_by_transaction_id( $mollie_payment_id );
 
 $command_curl   = null;
@@ -144,6 +146,23 @@ if ( null !== $payment ) {
 						);
 
 						?>
+					</td>
+				</tr>
+
+			<?php endif; ?>
+
+			<?php if ( null !== $mollie_payment ) : ?>
+
+				<tr>
+					<th scope="row"><?php \esc_html_e( 'Mode', 'pronamic_ideal' ); ?></th>
+					<td>
+						<code><?php echo \esc_html( $mollie_payment->get_mode() ); ?></code>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php \esc_html_e( 'Metadata', 'pronamic_ideal' ); ?></th>
+					<td>
+						<pre style="margin: 0;"><?php echo \esc_html( wp_json_encode( $mollie_payment->get_metadata(), \JSON_PRETTY_PRINT ) ); ?></pre>
 					</td>
 				</tr>
 

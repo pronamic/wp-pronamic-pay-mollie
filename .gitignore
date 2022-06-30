@@ -20,3 +20,6 @@
 # WordPress
 /wordpress/
 /wp-content/
+
+# PHPUnit
+/.phpunit.result.cache

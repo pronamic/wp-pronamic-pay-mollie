@@ -1,0 +1,21 @@
+{
+	"$id": "https://github.com/wp-pronamic-pay-mollie/blob/master/json-schemas/mandate.json",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Mollie mandate.",
+	"type": "object",
+	"properties": {
+		"resource": {
+			"description": "Indicates the response contains a mandate object. Will always contain `mandate` for this endpoint.",
+			"type": "string",
+			"const": "mandate"
+		},
+		"id": {
+			"description": "The identifier uniquely referring to this mandate.",
+			"type": "string"
+		}
+	},
+	"required": [
+		"resource",
+		"id"
+	]
+}

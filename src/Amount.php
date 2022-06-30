@@ -11,18 +11,15 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use InvalidArgumentException;
+use JsonSerializable;
 use stdClass;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 
 /**
- * Amount
- *
- * @author  Reüel van der Steege
- * @version 2.1.0
- * @since   2.1.0
+ * Amount class
  */
-class Amount {
+class Amount implements JsonSerializable {
 	/**
 	 * Currency.
 	 *
@@ -67,37 +64,17 @@ class Amount {
 	}
 
 	/**
-	 * Get JSON.
-	 *
-	 * @return object
-	 */
-	public function get_json() {
-		return (object) [
-			'currency' => $this->get_currency(),
-			'value'    => $this->get_value(),
-		];
-	}
-
-	/**
 	 * Create amount from object.
 	 *
 	 * @param stdClass $object Object.
-	 *
 	 * @return Amount
-	 * @throws InvalidArgumentException Throws invalid argument exception when object does not contains the required properties.
 	 */
 	public static function from_object( stdClass $object ) {
-		if ( ! isset( $object->currency ) ) {
-			throw new InvalidArgumentException( 'Object must contain `currency` property.' );
-		}
-
-		if ( ! isset( $object->value ) ) {
-			throw new InvalidArgumentException( 'Object must contain `value` property.' );
-		}
+		$object_access = new ObjectAccess( $object );
 
 		return new self(
-			$object->currency,
-			$object->value
+			$object_access->get_property( 'currency' ),
+			$object_access->get_property( 'value' )
 		);
 	}
 
@@ -130,11 +107,15 @@ class Amount {
 	}
 
 	/**
-	 * Create string representation of amount.
+	 * JSON serialize.
 	 *
-	 * @return string
+	 * @link https://www.php.net/manual/en/jsonserializable.jsonserialize.php
+	 * @return mixed
 	 */
-	public function __toString() {
-		return sprintf( '%1$s %2$s', $this->get_currency(), $this->get_value() );
+	public function jsonSerialize() {
+		return (object) [
+			'currency' => $this->currency,
+			'value'    => $this->value,
+		];
 	}
 }

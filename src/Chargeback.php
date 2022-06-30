@@ -13,11 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use DateTimeInterface;
 
 /**
- * Chargeback
- *
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
+ * Chargeback class
  */
 class Chargeback extends BaseResource {
 	/**
@@ -58,6 +54,15 @@ class Chargeback extends BaseResource {
 	}
 
 	/**
+	 * Get chargeback amount.
+	 *
+	 * @return Amount
+	 */
+	public function get_amount() {
+		return $this->amount;
+	}
+
+	/**
 	 * Create chargeback from JSON.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/chargebacks-api/get-chargeback
@@ -76,11 +81,12 @@ class Chargeback extends BaseResource {
 			\JsonSchema\Constraints\Constraint::CHECK_MODE_EXCEPTIONS
 		);
 
+		$object_access = new ObjectAccess( $json );
+
 		$chargeback = new Chargeback(
-			$json->id,
-			Amount::from_json( $json->amount ),
-			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
-			new \DateTimeImmutable( $json->createdAt )
+			$object_access->get_property( 'id' ),
+			Amount::from_json( $object_access->get_property( 'amount' ) ),
+			new \DateTimeImmutable( $object_access->get_property( 'createdAt' ) )
 		);
 
 		return $chargeback;

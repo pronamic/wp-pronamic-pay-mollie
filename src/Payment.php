@@ -11,13 +11,10 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use DateTimeInterface;
+use DateTimeImmutable;
 
 /**
- * Payment
- *
- * @author  Remco Tolsma
- * @version 2.2.2
- * @since   2.1.0
+ * Payment class
  */
 class Payment extends BaseResource {
 	/**
@@ -112,13 +109,6 @@ class Payment extends BaseResource {
 	private $metadata;
 
 	/**
-	 * The customer’s locale, either forced on creation by specifying the `locale` parameter, or detected by us during checkout. Will be a full locale, for example `nl_NL`.
-	 *
-	 * @var string
-	 */
-	private $locale;
-
-	/**
 	 * Indicates which type of payment this is in a recurring sequence.
 	 * Set to `first` for first payments that allow the customer to agree to automatic recurring charges taking place on their account in the future.
 	 * Set to `recurring` for payments where the customer’s card is charged automatically.
@@ -160,7 +150,7 @@ class Payment extends BaseResource {
 	 * @param string            $description   Description.
 	 * @param string|null       $redirect_url  Redirect URL.
 	 * @param string|null       $method        Method.
-	 * @param string            $metadata      Metadata.
+	 * @param mixed             $metadata      Metadata.
 	 * @param string            $profile_id    Profile ID.
 	 * @param string            $sequence_type Sequence type.
 	 * @param object            $links         Links.
@@ -182,12 +172,57 @@ class Payment extends BaseResource {
 	}
 
 	/**
+	 * Get mode.
+	 *
+	 * @return string
+	 */
+	public function get_mode() {
+		return $this->mode;
+	}
+
+	/**
+	 * Get created at.
+	 *
+	 * @return DateTimeInterface
+	 */
+	public function get_created_at() {
+		return $this->created_at;
+	}
+
+	/**
 	 * Get status.
 	 *
 	 * @return string
 	 */
 	public function get_status() {
 		return $this->status;
+	}
+
+	/**
+	 * Get amount.
+	 *
+	 * @return Amount
+	 */
+	public function get_amount() {
+		return $this->amount;
+	}
+
+	/**
+	 * Get description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return $this->description;
+	}
+
+	/**
+	 * Get redirect URL.
+	 *
+	 * @return string|null
+	 */
+	public function get_redirect_url() {
+		return $this->redirect_url;
 	}
 
 	/**
@@ -215,25 +250,6 @@ class Payment extends BaseResource {
 	 */
 	public function get_profile_id() {
 		return $this->profile_id;
-	}
-
-	/**
-	 * Get locale.
-	 *
-	 * @return string
-	 */
-	public function get_locale() {
-		return $this->locale;
-	}
-
-	/**
-	 * Set locale.
-	 *
-	 * @param string $locale Locale.
-	 * @return void
-	 */
-	public function set_locale( $locale ) {
-		$this->locale = $locale;
 	}
 
 	/**
@@ -380,6 +396,16 @@ class Payment extends BaseResource {
 	}
 
 	/**
+	 * Get metadata.
+	 *
+	 * @return mixed
+	 */
+	public function get_metadata() {
+		return $this->metadata;
+	}
+
+
+	/**
 	 * Create payment from JSON.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/payments-api/get-payment
@@ -398,55 +424,41 @@ class Payment extends BaseResource {
 			\JsonSchema\Constraints\Constraint::CHECK_MODE_EXCEPTIONS
 		);
 
-		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
+		$object_access = new ObjectAccess( $json );
+
 		$payment = new Payment(
-			$json->id,
-			$json->mode,
-			new \DateTimeImmutable( $json->createdAt ),
-			$json->status,
-			Amount::from_json( $json->amount ),
-			$json->description,
-			$json->redirectUrl,
-			$json->method,
-			$json->metadata,
-			$json->profileId,
-			$json->sequenceType,
-			$json->_links
+			$object_access->get_property( 'id' ),
+			$object_access->get_property( 'mode' ),
+			new DateTimeImmutable( $object_access->get_property( 'createdAt' ) ),
+			$object_access->get_property( 'status' ),
+			Amount::from_json( $object_access->get_property( 'amount' ) ),
+			$object_access->get_property( 'description' ),
+			$object_access->get_property( 'redirectUrl' ),
+			$object_access->get_property( 'method' ),
+			$object_access->get_property( 'metadata' ),
+			$object_access->get_property( 'profileId' ),
+			$object_access->get_property( 'sequenceType' ),
+			$object_access->get_property( '_links' ),
 		);
 
-		if ( \property_exists( $json, 'expiresAt' ) ) {
-			$payment->set_expires_at( new \DateTimeImmutable( $json->expiresAt ) );
+		if ( $object_access->has_property( 'expiresAt' ) ) {
+			$payment->set_expires_at( new DateTimeImmutable( $object_access->get_property( 'expiresAt' ) ) );
 		}
 
-		if ( \property_exists( $json, 'locale' ) ) {
-			$payment->set_locale( $json->locale );
+		$payment->set_customer_id( $object_access->get_optional( 'customerId' ) );
+		$payment->set_mandate_id( $object_access->get_optional( 'mandateId' ) );
+
+		if ( $object_access->has_property( 'details' ) ) {
+			$payment->set_details( PaymentDetails::from_json( (string) $payment->get_method(), $object_access->get_property( 'details' ) ) );
 		}
 
-		if ( \property_exists( $json, 'customerId' ) ) {
-			$payment->set_customer_id( $json->customerId );
+		if ( $object_access->has_property( 'amountRefunded' ) ) {
+			$payment->set_amount_refunded( Amount::from_json( $object_access->get_property( 'amountRefunded' ) ) );
 		}
 
-		if ( \property_exists( $json, 'mandateId' ) ) {
-			$payment->set_mandate_id( $json->mandateId );
+		if ( $object_access->has_property( 'amountChargedBack' ) ) {
+			$payment->set_amount_charged_back( Amount::from_json( $object_access->get_property( 'amountChargedBack' ) ) );
 		}
-
-		if ( \property_exists( $json, 'details' ) ) {
-			$payment->set_details( PaymentDetails::from_json( (string) $payment->get_method(), $json->details ) );
-		}
-
-		if ( \property_exists( $json, 'amountRefunded' ) ) {
-			$refunded_amount = Amount::from_json( $json->amountRefunded );
-
-			$payment->set_amount_refunded( $refunded_amount );
-		}
-
-		if ( \property_exists( $json, 'amountChargedBack' ) ) {
-			$charged_back_amount = Amount::from_json( $json->amountChargedBack );
-
-			$payment->set_amount_charged_back( $charged_back_amount );
-		}
-
-		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie JSON object.
 
 		return $payment;
 	}

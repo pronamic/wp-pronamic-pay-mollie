@@ -10,7 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use InvalidArgumentException;
+use Exception;
 
 /**
  * Title: Mollie amount tests
@@ -33,8 +33,6 @@ class AmountTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals( 'EUR', $amount->get_currency() );
 		$this->assertEquals( '100.00', $amount->get_value() );
-
-		$this->assertEquals( 'EUR 100.00', (string) $amount );
 	}
 
 	/**
@@ -47,7 +45,7 @@ class AmountTest extends \PHPUnit_Framework_TestCase {
 
 		$amount = Amount::from_json( $json_data );
 
-		$json_string = wp_json_encode( $amount->get_json(), JSON_PRETTY_PRINT );
+		$json_string = wp_json_encode( $amount->jsonSerialize(), JSON_PRETTY_PRINT );
 
 		$this->assertEquals( wp_json_encode( $json_data, JSON_PRETTY_PRINT ), $json_string );
 
@@ -60,7 +58,7 @@ class AmountTest extends \PHPUnit_Framework_TestCase {
 	public function test_invalid_object_missing_currency() {
 		$object = (object) [ 'value' => '100.00' ];
 
-		$this->expectException( InvalidArgumentException::class );
+		$this->expectException( Exception::class );
 
 		Amount::from_object( $object );
 	}
@@ -71,7 +69,7 @@ class AmountTest extends \PHPUnit_Framework_TestCase {
 	public function test_from_object_missing_value() {
 		$object = (object) [ 'currency' => 'EUR' ];
 
-		$this->expectException( InvalidArgumentException::class );
+		$this->expectException( Exception::class );
 
 		Amount::from_object( $object );
 	}

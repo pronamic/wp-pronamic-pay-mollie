@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use InvalidArgumentException;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
@@ -24,14 +25,7 @@ use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 
 /**
- * Title: Mollie
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Remco Tolsma
- * @version 2.1.4
- * @since   1.1.0
+ * Gateway class
  */
 class Gateway extends Core_Gateway {
 	/**
@@ -70,7 +64,7 @@ class Gateway extends Core_Gateway {
 	public function __construct( Config $config ) {
 		$this->config = $config;
 
-		parent::__construct( $config );
+		parent::__construct();
 
 		$this->set_method( self::METHOD_HTTP_REDIRECT );
 
@@ -125,31 +119,33 @@ class Gateway extends Core_Gateway {
 	public function get_available_payment_methods() {
 		$payment_methods = [];
 
-		// Set sequence types to get payment methods for.
+		$resources      = [ ResourceType::PAYMENTS, ResourceType::ORDERS ];
 		$sequence_types = [ Sequence::ONE_OFF, Sequence::RECURRING, Sequence::FIRST ];
 
 		$results = [];
 
-		foreach ( $sequence_types as $sequence_type ) {
-			// Get active payment methods for Mollie account.
-			$result = $this->client->get_payment_methods( $sequence_type );
+		foreach ( $resources as $resource ) {
+			foreach ( $sequence_types as $sequence_type ) {
+				// Get active payment methods for Mollie account.
+				$result = $this->client->get_payment_methods( $sequence_type, $resource );
 
-			if ( Sequence::FIRST === $sequence_type ) {
-				foreach ( $result as $method => $title ) {
-					unset( $result[ $method ] );
+				if ( Sequence::FIRST === $sequence_type ) {
+					foreach ( $result as $method => $title ) {
+						unset( $result[ $method ] );
 
-					// Get WordPress payment method for direct debit method.
-					$method         = Methods::transform_gateway_method( $method );
-					$payment_method = array_search( $method, PaymentMethods::get_recurring_methods(), true );
+						// Get WordPress payment method for direct debit method.
+						$method         = Methods::transform_gateway_method( $method );
+						$payment_method = array_search( $method, PaymentMethods::get_recurring_methods(), true );
 
-					if ( $payment_method ) {
-						$results[ $payment_method ] = $title;
+						if ( $payment_method ) {
+							$results[ $payment_method ] = $title;
+						}
 					}
 				}
-			}
 
-			if ( is_array( $result ) ) {
-				$results = array_merge( $results, $result );
+				if ( is_array( $result ) ) {
+					$results = array_merge( $results, $result );
+				}
 			}
 		}
 
@@ -194,6 +190,9 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::GIROPAY,
 			PaymentMethods::IDEAL,
 			PaymentMethods::KBC,
+			PaymentMethods::KLARNA_PAY_LATER,
+			PaymentMethods::KLARNA_PAY_NOW,
+			PaymentMethods::KLARNA_PAY_OVER_TIME,
 			PaymentMethods::PAYPAL,
 			PaymentMethods::PRZELEWY24,
 			PaymentMethods::SOFORT,
@@ -205,13 +204,35 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param Payment $payment Payment.
 	 * @return string|null
+	 * @throws \Exception Throws exception when resource to use for payment is unknown.
 	 */
 	public function get_webhook_url( Payment $payment ) {
-		$url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/webhook/' . (string) $payment->get_id() );
+		$resource = $this->get_resource_for_payment( $payment );
 
-		$host = wp_parse_url( $url, PHP_URL_HOST );
+		switch ( $resource ) {
+			case ResourceType::ORDERS:
+				$path = '<namespace>/orders/webhook/<payment_id>';
+				break;
+			case ResourceType::PAYMENTS:
+				$path = '<namespace>/payments/webhook/<payment_id>';
+				break;
+			default:
+				throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
+		}
 
-		if ( is_array( $host ) ) {
+		$path = \strtr(
+			$path,
+			[
+				'<namespace>'  => Integration::REST_ROUTE_NAMESPACE,
+				'<payment_id>' => $payment->get_id(),
+			]
+		);
+
+		$url = \rest_url( $path );
+
+		$host = \wp_parse_url( $url, PHP_URL_HOST );
+
+		if ( ! \is_string( $host ) ) {
 			// Parsing failure.
 			$host = '';
 		}
@@ -239,15 +260,126 @@ class Gateway extends Core_Gateway {
 	 * @see Core_Gateway::start()
 	 * @param Payment $payment Payment.
 	 * @return void
-	 * @throws Error Mollie error.
 	 * @throws \Exception Throws exception on error creating Mollie customer for payment.
 	 */
 	public function start( Payment $payment ) {
+		$resource = $this->get_resource_for_payment( $payment );
+
+		switch ( $resource ) {
+			case ResourceType::ORDERS:
+				$this->start_order( $payment );
+
+				break;
+			case ResourceType::PAYMENTS:
+				$this->start_payment( $payment );
+
+				break;
+			default:
+				throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
+		}
+	}
+
+	/**
+	 * Start Mollie payment for payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return void
+	 * @throws Error Throws Mollie error when something goes wrong.
+	 */
+	private function start_payment( Payment $payment ) {
+		$request = $this->get_payment_request( $payment );
+
+		// Create payment.
+		$attempt = (int) $payment->get_meta( 'mollie_create_payment_attempt' );
+		$attempt = empty( $attempt ) ? 1 : $attempt + 1;
+
+		$payment->set_meta( 'mollie_create_payment_attempt', $attempt );
+
+		try {
+			$mollie_payment = $this->client->create_payment( $request );
+
+			$payment->delete_meta( 'mollie_create_payment_attempt' );
+		} catch ( Error $error ) {
+			if ( 'recurring' !== $request->get_sequence_type() ) {
+				throw $error;
+			}
+
+			if ( null === $request->get_mandate_id() ) {
+				throw $error;
+			}
+
+			/**
+			 * Only schedule retry for specific status codes.
+			 *
+			 * @link https://docs.mollie.com/overview/handling-errors
+			 */
+			if ( ! \in_array( $error->get_status(), [ 429, 502, 503 ], true ) ) {
+				throw $error;
+			}
+
+			\as_schedule_single_action(
+				\time() + $this->get_retry_seconds( $attempt ),
+				'pronamic_pay_mollie_payment_start',
+				[
+					'payment_id' => $payment->get_id(),
+				],
+				'pronamic-pay-mollie'
+			);
+
+			// Add note.
+			$payment->add_note(
+				\sprintf(
+					'%s - %s - %s',
+					$error->get_status(),
+					$error->get_title(),
+					$error->get_detail()
+				)
+			);
+
+			$payment->save();
+
+			return;
+		}
+
+		$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+	}
+
+	/**
+	 * Start Mollie order for payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return void
+	 */
+	private function start_order( Payment $payment ) {
+		$request = $this->get_order_request( $payment );
+
+		$mollie_order = $this->client->create_order( $request );
+
+		$payment->set_meta( 'mollie_order_id', $mollie_order->get_id() );
+
+		$order_payments = $mollie_order->get_payments();
+
+		if ( null !== $order_payments ) {
+			$mollie_payment = reset( $order_payments );
+
+			if ( $mollie_payment instanceof MolliePayment ) {
+				$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+			}
+		}
+	}
+
+	/**
+	 * Get Mollie payment request for the specified payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return PaymentRequest
+	 */
+	private function get_payment_request( Payment $payment ) {
 		$description = (string) $payment->get_description();
 
 		/**
 		 * Filters the Mollie payment description.
-		 * 
+		 *
 		 * The maximum length of the description field differs per payment
 		 * method, with the absolute maximum being 255 characters.
 		 *
@@ -317,8 +449,16 @@ class Gateway extends Core_Gateway {
 
 		if (
 			\count( $subscriptions ) > 0
-				||
-			PaymentMethods::is_direct_debit_method( $payment_method )
+			||
+			\in_array(
+				$payment_method,
+				[
+					PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+					PaymentMethods::DIRECT_DEBIT_IDEAL,
+					PaymentMethods::DIRECT_DEBIT_SOFORT,
+				],
+				true
+			)
 		) {
 			$request->set_sequence_type( 'first' );
 
@@ -369,11 +509,7 @@ class Gateway extends Core_Gateway {
 				if ( false === $mandate_id ) {
 					$mandate = $this->client->create_mandate( $customer_id, $consumer_bank_details );
 
-					if ( ! \property_exists( $mandate, 'id' ) ) {
-						throw new \Exception( 'Missing mandate ID.' );
-					}
-
-					$mandate_id = $mandate->id;
+					$mandate_id = $mandate->get_id();
 				}
 
 				// Charge immediately on-demand.
@@ -415,7 +551,7 @@ class Gateway extends Core_Gateway {
 		// Billing email.
 		$billing_email = ( null === $customer ) ? null : $customer->get_email();
 
-			/**
+		/**
 		 * Filters the Mollie payment billing email used for bank transfer payment instructions.
 		 *
 		 * @since 2.2.0
@@ -438,60 +574,113 @@ class Gateway extends Core_Gateway {
 			$request->set_due_date( $due_date );
 		}
 
-		// Create payment.
-		$attempt = (int) $payment->get_meta( 'mollie_create_payment_attempt' );
-		$attempt = empty( $attempt ) ? 1 : $attempt + 1;
+		return $request;
+	}
 
-		$payment->set_meta( 'mollie_create_payment_attempt', $attempt );
+	/**
+	 * Get Mollie order request.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return OrderRequest
+	 * @throws InvalidArgumentException Throws an invalid argument exception when the payment does not meet the Mollie requirements for an order.
+	 */
+	private function get_order_request( Payment $payment ) {
+		$payment_request = $this->get_payment_request( $payment );
 
-		try {
-			$mollie_payment = $this->client->create_payment( $request );
+		$lines = $payment->get_lines();
 
-			$payment->delete_meta( 'mollie_create_payment_attempt' );
-		} catch ( Error $error ) {
-			if ( 'recurring' !== $request->get_sequence_type() ) {
-				throw $error;
-			}
-
-			if ( null === $request->get_mandate_id() ) {
-				throw $error;
-			}
-
-			/**
-			 * Only schedule retry for specific status codes.
-			 *
-			 * @link https://docs.mollie.com/overview/handling-errors
-			 */
-			if ( ! \in_array( $error->get_status(), [ 429, 502, 503 ], true ) ) {
-				throw $error;
-			}
-
-			\as_schedule_single_action(
-				\time() + $this->get_retry_seconds( $attempt ),
-				'pronamic_pay_mollie_payment_start',
-				[
-					'payment_id' => $payment->get_id(),
-				],
-				'pronamic-pay-mollie'
-			);
-
-			// Add note.
-			$payment->add_note(
-				\sprintf(
-					'%s - %s - %s',
-					$error->get_status(),
-					$error->get_title(),
-					$error->get_detail()
-				)
-			);
-
-			$payment->save();
-
-			return;
+		if ( null === $lines ) {
+			throw new InvalidArgumentException( 'Mollie requires lines for order.' );
 		}
 
-		// Update payment from Mollie payment.
-		$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+		$order_number = $payment->get_source_id();
+
+		if ( null === $order_number ) {
+			throw new InvalidArgumentException( 'Mollie requires order number for order.' );
+		}
+
+		if ( null === $payment_request->locale ) {
+			throw new InvalidArgumentException( 'Mollie requires locale for order.' );
+		}
+
+		$order_request = new OrderRequest(
+			$payment_request->amount,
+			(string) $order_number,
+			Lines::from_wp_payment_lines( $lines ),
+			$payment_request->locale
+		);
+
+		$order_request->redirect_url = $payment->get_return_url();
+		$order_request->webhook_url  = $this->get_webhook_url( $payment );
+		$order_request->method       = $payment_request->method;
+
+		// Billing address.
+		$billing_address = $payment->get_billing_address();
+
+		$order_request->set_billing_address( null === $billing_address ? null : Address::from_wp_address( $billing_address ) );
+
+		// Shipping address.
+		$shipping_address = $payment->get_shipping_address();
+
+		$order_request->set_shipping_address( null === $shipping_address ? null : Address::from_wp_address( $shipping_address ) );
+
+		// Consumer date of birth.
+		$customer = $payment->get_customer();
+
+		$consumer_date_of_birth = null === $customer ? null : $customer->get_birth_date();
+
+		$order_request->set_consumer_date_of_birth( $consumer_date_of_birth );
+
+		// Payment.
+		$order_request->payment = \array_filter(
+			[
+				'issuer'       => $payment_request->issuer,
+				'customerId'   => $payment_request->customer_id,
+				'mandateId'    => $payment_request->mandate_id,
+				'sequenceType' => $payment_request->sequence_type,
+				'webhookUrl'   => $payment_request->webhook_url,
+			]
+		);
+
+		return $order_request;
+	}
+
+	/**
+	 * Determine if an order should be created for the payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return string
+	 */
+	private function get_resource_for_payment( Payment $payment ) : string {
+		$resource = ResourceType::PAYMENTS;
+
+		$is_memberpress = ( 'memberpress_transaction' === $payment->get_source() );
+
+		$is_klarna = \in_array(
+			$payment->get_payment_method(),
+			[
+				PaymentMethods::KLARNA_PAY_NOW,
+				PaymentMethods::KLARNA_PAY_LATER,
+				PaymentMethods::KLARNA_PAY_OVER_TIME,
+			],
+			true
+		);
+
+		if ( $is_memberpress && $is_klarna ) {
+			$resource = ResourceType::ORDERS;
+		}
+
+		/**
+		 * Filters the resource to use for the payment.
+		 *
+		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#parameters
+		 * @since 4.0.0
+		 * @param string  $resource Resource.
+		 * @param Payment $payment  Payment.
+		 */
+		$resource = \apply_filters( 'pronamic_pay_mollie_resource_for_payment', $resource, $payment );
+
+		return $resource;
 	}
 
 	/**
@@ -531,6 +720,72 @@ class Gateway extends Core_Gateway {
 		$mollie_payment = $this->client->get_payment( $transaction_id );
 
 		$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+
+		$this->maybe_create_shipment_for_payment( $payment );
+	}
+
+	/**
+	 * Maybe create shipment for payment.
+	 *
+	 * @param Payment $payment Payment.
+	 */
+	public function maybe_create_shipment_for_payment( Payment $payment ) : void {
+		$mollie_order_id = $payment->get_meta( 'mollie_order_id' );
+
+		if ( empty( $mollie_order_id ) ) {
+			return;
+		}
+
+		$order = $this->client->get_order( $mollie_order_id );
+
+		// Check order status.
+		if ( ! \in_array( $order->get_status(), [ Statuses::AUTHORIZED, Statuses::PAID ], true ) ) {
+			return;
+		}
+
+		// Update payment to successful order payment.
+		$mollie_payments = $order->get_payments();
+
+		if ( null === $mollie_payments ) {
+			return;
+		}
+
+		$transaction_id = $payment->get_transaction_id();
+
+		foreach ( $mollie_payments as $mollie_payment ) {
+			if ( ! \in_array( $order->get_status(), [ Statuses::AUTHORIZED, Statuses::PAID ] ) ) {
+				continue;
+			}
+
+			$mollie_payment_id = $mollie_payment->get_id();
+
+			if ( $mollie_payment_id !== $transaction_id ) {
+				$payment->set_transaction_id( $mollie_payment->get_id() );
+
+				$payment->add_note(
+					\sprintf(
+						/* translators: 1: payment transaction ID, 2: Mollie payment ID */
+						\__( 'Payment transaction ID updated from `%1$s` to successful order payment `%2$s`.', 'pronamic_ideal' ),
+						$transaction_id,
+						$mollie_payment_id
+					)
+				);
+
+				$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+			}
+		}
+
+		// Create shipment and add payment note.
+		$shipment = $this->client->create_shipment( $mollie_order_id );
+
+		$payment->add_note(
+			\sprintf(
+				/* translators: 1: payment transaction ID, 2: Mollie payment ID */
+				\__( 'Shipment `%1$s` created for Mollie order `%2$s`.', 'pronami c_ideal' ),
+				$shipment->get_id(),
+				$mollie_order_id
+			)
+		);
 	}
 
 	/**

@@ -11,11 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Payment Details
- *
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
+ * Payment details class
  */
 class PaymentDetails {
 	/**

@@ -10,17 +10,13 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use DateTimeInterface;
+use JsonSerializable;
+
 /**
- * Title: Mollie payment request
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Remco Tolsma
- * @version 2.1.4
- * @since   1.0.0
+ * Payment request class
  */
-class PaymentRequest {
+class PaymentRequest implements JsonSerializable {
 	/**
 	 * The amount in EURO that you want to charge, e.g. `{"currency":"EUR", "value":"100.00"}`
 	 * if you would want to charge € 100,00.
@@ -43,6 +39,9 @@ class PaymentRequest {
 	 * The URL the consumer will be redirected to after the payment process. It could make sense
 	 * for the redirectURL to contain a unique identifier – like your order ID – so you can show
 	 * the right page referencing the order when the consumer returns.
+	 *
+	 * The parameter can be omitted for recurring payments (sequenceType: `recurring`)
+	 * and for Apple Pay payments with an `applePayPaymentToken`.
 	 *
 	 * @link https://www.mollie.com/nl/docs/reference/payments/create
 	 * @var string|null
@@ -117,7 +116,7 @@ class PaymentRequest {
 	 * is tomorrow and the maximum date is 100 days after tomorrow.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
-	 * @var \DateTimeInterface|null
+	 * @var DateTimeInterface|null
 	 */
 	private $due_date;
 
@@ -206,7 +205,7 @@ class PaymentRequest {
 	/**
 	 * Get due date.
 	 *
-	 * @return null|\DateTimeInterface
+	 * @return null|DateTimeInterface
 	 */
 	public function get_due_date() {
 		return $this->due_date;
@@ -215,7 +214,7 @@ class PaymentRequest {
 	/**
 	 * Set due date.
 	 *
-	 * @param null|\DateTimeInterface $due_date Due date.
+	 * @param null|DateTimeInterface $due_date Due date.
 	 * @return void
 	 */
 	public function set_due_date( $due_date ) {
@@ -317,41 +316,55 @@ class PaymentRequest {
 	}
 
 	/**
-	 * Get array of this Mollie payment request object.
+	 * JSON serialize.
 	 *
-	 * @return array<string,null|string|object>
+	 * @link https://www.php.net/manual/en/jsonserializable.jsonserialize.php
+	 * @return mixed
 	 */
-	public function get_array() {
+	public function jsonSerialize() {
+		$object_builder = new ObjectBuilder();
+
+		// General.
+		$object_builder->set_required( 'amount', $this->amount->jsonSerialize() );
+		$object_builder->set_required( 'description', $this->description );
+
+		/**
+		 * The `redirectUrl` is documented as `required` but is not always required:
+		 *
+		 * > The parameter can be omitted for recurring payments (sequenceType: `recurring`)
+		 * > and for Apple Pay payments with an applePayPaymentToken.
+		 *
+		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment
+		 */
+		$object_builder->set_optional( 'redirectUrl', $this->redirect_url );
+
+		$object_builder->set_optional( 'webhookUrl', $this->webhook_url );
+		$object_builder->set_optional( 'locale', $this->locale );
+		$object_builder->set_optional( 'method', $this->method );
+		$object_builder->set_optional( 'metadata', $this->metadata );
+
+		// Parameters for recurring payments.
+		$object_builder->set_optional( 'sequenceType', $this->sequence_type );
+		$object_builder->set_optional( 'customerId', $this->customer_id );
+		$object_builder->set_optional( 'mandateId', $this->mandate_id );
+
+		// Payment method-specific parameters.
+		$object_builder->set_optional( 'billingEmail', $this->billing_email );
+
 		// Due date.
 		$due_date = $this->get_due_date();
 
 		if ( null !== $due_date ) {
-			$due_date = $due_date->format( 'Y-m-d' );
+			$object_builder->set_optional( 'dueDate', $due_date->format( 'Y-m-d' ) );
 		}
 
-		$array = [
-			'amount'          => $this->amount->get_json(),
-			'description'     => $this->description,
-			'method'          => $this->method,
-			'redirectUrl'     => $this->redirect_url,
-			'metadata'        => $this->metadata,
-			'locale'          => $this->locale,
-			'webhookUrl'      => $this->webhook_url,
-			'consumerName'    => $this->consumer_name,
-			'consumerAccount' => $this->consumer_account,
-			'issuer'          => $this->issuer,
-			'billingEmail'    => $this->billing_email,
-			'dueDate'         => $due_date,
-			'sequenceType'    => $this->sequence_type,
-			'customerId'      => $this->customer_id,
-			'mandateId'       => $this->mandate_id,
-		];
+		// IDeal.
+		$object_builder->set_optional( 'issuer', $this->issuer );
 
-		/*
-		 * Array filter will remove values NULL, FALSE and empty strings ('')
-		 */
-		$array = array_filter( $array );
+		// SEPA Direct Debit.
+		$object_builder->set_optional( 'consumerName', $this->consumer_name );
+		$object_builder->set_optional( 'consumerAccount', $this->consumer_account );
 
-		return $array;
+		return $object_builder->jsonSerialize();
 	}
 }

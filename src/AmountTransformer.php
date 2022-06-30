@@ -13,11 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Money\Money;
 
 /**
- * Amount transformer
- *
- * @author  Reüel van der Steege
- * @version 2.1.0
- * @since   2.1.0
+ * Amount transformer class
  */
 class AmountTransformer {
 	/**
