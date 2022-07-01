@@ -38,7 +38,7 @@ function _manually_load_plugin() {
 	global $pronamic_ideal;
 
 	$pronamic_ideal = \Pronamic\WordPress\Pay\Plugin::instance( array(
-		'action_scheduler' => __DIR__ . '/../wp-content/plugins/action-scheduler/action-scheduler.php',
+		'action_scheduler' => __DIR__ . '/../vendor/woocommerce/action-scheduler/action-scheduler.php',
 	) );
 }
 

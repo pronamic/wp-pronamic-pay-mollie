@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "39dca6e8750202c05e07bacbb6d9e0ae",
+    "content-hash": "ba79121f1888ae2e77630b62770eb711",
     "packages": [],
     "packages-dev": [
         {
@@ -101,16 +101,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.7.14",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "e6f145f196a59c7ca91ea926c87ef3d936c4305f"
+                "reference": "b7648d4ee9321665acaf112e49da9fd93df8fbd5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e6f145f196a59c7ca91ea926c87ef3d936c4305f",
-                "reference": "e6f145f196a59c7ca91ea926c87ef3d936c4305f",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b7648d4ee9321665acaf112e49da9fd93df8fbd5",
+                "reference": "b7648d4ee9321665acaf112e49da9fd93df8fbd5",
                 "shasum": ""
             },
             "require": {
@@ -136,7 +136,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.7.14"
+                "source": "https://github.com/phpstan/phpstan/tree/1.8.0"
             },
             "funding": [
                 {
@@ -156,7 +156,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-06-14T13:09:35+00:00"
+            "time": "2022-06-29T08:53:31+00:00"
         },
         {
             "name": "symfony/polyfill-php73",
@@ -239,21 +239,21 @@
         },
         {
             "name": "szepeviktor/phpstan-wordpress",
-            "version": "v1.1.1",
+            "version": "v1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/szepeviktor/phpstan-wordpress.git",
-                "reference": "99cfea6b4c15af12dec09110b25dbc7521363f78"
+                "reference": "e487dc725845ac914681e148d0e8ac479ad887ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/szepeviktor/phpstan-wordpress/zipball/99cfea6b4c15af12dec09110b25dbc7521363f78",
-                "reference": "99cfea6b4c15af12dec09110b25dbc7521363f78",
+                "url": "https://api.github.com/repos/szepeviktor/phpstan-wordpress/zipball/e487dc725845ac914681e148d0e8ac479ad887ec",
+                "reference": "e487dc725845ac914681e148d0e8ac479ad887ec",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2 || ^8.0",
-                "php-stubs/wordpress-stubs": "^4.7 || ^5.0",
+                "php-stubs/wordpress-stubs": "^4.7 || ^5.0 || ^6.0",
                 "phpstan/phpstan": "^1.6",
                 "symfony/polyfill-php73": "^1.12.0"
             },
@@ -292,7 +292,7 @@
             ],
             "support": {
                 "issues": "https://github.com/szepeviktor/phpstan-wordpress/issues",
-                "source": "https://github.com/szepeviktor/phpstan-wordpress/tree/v1.1.1"
+                "source": "https://github.com/szepeviktor/phpstan-wordpress/tree/v1.1.2"
             },
             "funding": [
                 {
@@ -300,7 +300,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2022-05-11T18:41:40+00:00"
+            "time": "2022-06-21T10:51:00+00:00"
         }
     ],
     "aliases": [],
