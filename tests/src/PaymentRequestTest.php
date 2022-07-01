@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use WP_UnitTestCase;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
  * Payment request test
@@ -19,7 +20,7 @@ use WP_UnitTestCase;
  * @version 2.1.4
  * @since   1.0.0
  */
-class PaymentRequestTest extends WP_UnitTestCase {
+class PaymentRequestTest extends TestCase {
 	/**
 	 * Payment request.
 	 *

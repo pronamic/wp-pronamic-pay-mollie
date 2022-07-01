@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Exception;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
  * Title: Mollie amount tests
@@ -22,7 +23,7 @@ use Exception;
  * @version 2.1.0
  * @since   2.1.0
  */
-class AmountTest extends \PHPUnit_Framework_TestCase {
+class AmountTest extends TestCase {
 	/**
 	 * Test amount setters and getters.
 	 */

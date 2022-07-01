@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Title: Mollie locale helper tests
  * Description:
@@ -21,7 +23,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @since   1.0.0
  * @see     https://www.mollie.nl/support/documentatie/betaaldiensten/ideal/en/
  */
-class LocaleHelperTest extends \PHPUnit_Framework_TestCase {
+class LocaleHelperTest extends TestCase {
 	/**
 	 * Test transform.
 	 *

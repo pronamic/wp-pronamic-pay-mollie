@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Title: Mollie profile tests
  * Description:
@@ -20,7 +22,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @version 2.1.0
  * @since   2.1.0
  */
-class ProfileTest extends \PHPUnit\Framework\TestCase {
+class ProfileTest extends TestCase {
 	/**
 	 * Test amount setters and getters.
 	 */

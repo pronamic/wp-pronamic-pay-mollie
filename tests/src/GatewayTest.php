@@ -22,8 +22,7 @@ use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionsDataStoreCPT;
-use WP_Http;
-use WP_UnitTestCase;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
  * Gateway test.
@@ -31,7 +30,7 @@ use WP_UnitTestCase;
  * @author Reüel van der Steege
  * @version 2.0.9
  */
-class GatewayTest extends WP_UnitTestCase {
+class GatewayTest extends TestCase {
 	/**
 	 * Gateway
 	 *
@@ -323,6 +322,7 @@ class GatewayTest extends WP_UnitTestCase {
 	 * @param bool   $expected    Expected value.
 	 *
 	 * @dataProvider provider_copy_customer_id_to_wp_user
+	 * @group require-database
 	 */
 	public function test_copy_customer_id_to_wp_user( $config_id, $user_id, $customer_id, $expected ) {
 		if ( $this->config_id !== $config_id ) {

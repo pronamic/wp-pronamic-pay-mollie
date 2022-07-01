@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Money\Money;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
  * Title: Mollie amount transformer tests
@@ -22,7 +23,7 @@ use Pronamic\WordPress\Money\Money;
  * @version 2.1.0
  * @since   2.1.0
  */
-class AmountTransformerTest extends \PHPUnit_Framework_TestCase {
+class AmountTransformerTest extends TestCase {
 	/**
 	 * Test transform.
 	 *
