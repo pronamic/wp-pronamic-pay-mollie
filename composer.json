@@ -38,7 +38,7 @@
 		}
 	},
 	"require": {
-		"php": ">=5.6.20",
+		"php": ">=7.4",
 		"ext-json": "*",
 		"justinrainbow/json-schema": "^5.2",
 		"pronamic/wp-http": "^1.0",
@@ -51,7 +51,7 @@
 		"php-coveralls/php-coveralls": "^2.4",
 		"phpmd/phpmd": "^2.7",
 		"pronamic/wp-coding-standards": "^1.0",
-		"roots/wordpress": "^5.9",
+		"roots/wordpress": "^5.7",
 		"wp-cli/wp-cli": "^2.3",
 		"wp-phpunit/wp-phpunit": "^6.0",
 		"yoast/phpunit-polyfills": "^1.0"
