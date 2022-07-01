@@ -243,6 +243,8 @@ class GatewayTest extends TestCase {
 	 * @param string $subscription_customer_id  Subscription Mollie customer ID.
 	 * @param string $first_payment_customer_id First payment Mollie customer ID.
 	 * @param bool   $expected                  Expected Mollie Customer ID.
+	 *
+	 * @group require-database
 	 */
 	public function test_get_customer_id_for_payment( $user_id, $subscription_customer_id, $first_payment_customer_id, $expected ) {
 		// Customer.
