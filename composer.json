@@ -64,7 +64,7 @@
 			"@coverage",
 			"@phpstan"
 		],
-		"coverage": "XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover build/logs/clover.xml --coverage-text",
+		"coverage": "XDEBUG_MODE=coverage vendor/bin/phpunit --colors=always --exclude-group=require-database --coverage-clover build/logs/clover.xml --coverage-text",
 		"coveralls": "vendor/bin/php-coveralls -v",
 		"phpcbf": "vendor/bin/phpcbf",
 		"phpcs": "XDEBUG_MODE=off vendor/bin/phpcs -s -v",
