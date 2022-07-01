@@ -11,14 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Title: Mollie sequence
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Reüel van der Steege
- * @version 2.1.0
- * @since   1.1.9
+ * Sequence class
  */
 class Sequence {
 	/**

@@ -10,6 +10,9 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use WP_UnitTestCase;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
 /**
  * Payment request test
  *
@@ -17,7 +20,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  * @version 2.1.4
  * @since   1.0.0
  */
-class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
+class PaymentRequestTest extends TestCase {
 	/**
 	 * Payment request.
 	 *
@@ -28,7 +31,9 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Setup.
 	 */
-	public function setUp() {
+	public function set_up() {
+		parent::set_up();
+
 		$request = new PaymentRequest(
 			new Amount( 'EUR', '100.00' ),
 			'Test'
@@ -52,7 +57,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	public function test_payment_request() {
 		$this->assertEquals(
 			[
-				'amount'       => $this->request->amount->get_json(),
+				'amount'       => $this->request->amount->jsonSerialize(),
 				'description'  => 'Test',
 				'redirectUrl'  => 'https://example.com/mollie-redirect/',
 				'webhookUrl'   => 'https://example.com/mollie-webhook/',
@@ -63,7 +68,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 				'customerId'   => 'cst_8wmqcHMN4U',
 				'sequenceType' => 'first',
 			],
-			$this->request->get_array()
+			(array) $this->request->jsonSerialize()
 		);
 	}
 
@@ -79,7 +84,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(
 			[
-				'amount'       => $this->request->amount->get_json(),
+				'amount'       => $this->request->amount->jsonSerialize(),
 				'description'  => 'Test',
 				'redirectUrl'  => 'https://example.com/mollie-redirect/',
 				'webhookUrl'   => 'https://example.com/mollie-webhook/',
@@ -91,7 +96,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 				'customerId'   => 'cst_8wmqcHMN4U',
 				'sequenceType' => 'first',
 			],
-			$this->request->get_array()
+			(array) $this->request->jsonSerialize()
 		);
 	}
 
@@ -113,11 +118,11 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(
 			[
-				'amount'       => $request->amount->get_json(),
+				'amount'       => $request->amount->jsonSerialize(),
 				'description'  => 'Test',
 				'billingEmail' => 'john@example.com',
 			],
-			$request->get_array()
+			(array) $request->jsonSerialize()
 		);
 	}
 
@@ -144,11 +149,11 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(
 			[
-				'amount'      => $request->amount->get_json(),
+				'amount'      => $request->amount->jsonSerialize(),
 				'description' => 'Test',
 				'metadata'    => $metadata,
 			],
-			$request->get_array()
+			(array) $request->jsonSerialize()
 		);
 	}
 

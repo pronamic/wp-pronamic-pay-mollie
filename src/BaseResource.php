@@ -11,12 +11,9 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Base Resource
+ * Base resource class
  *
  * @link https://github.com/mollie/mollie-api-php/blob/v2.25.0/src/Resources/BaseResource.php
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
  */
 abstract class BaseResource {
 	/**

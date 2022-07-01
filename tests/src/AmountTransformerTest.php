@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Money\Money;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
  * Title: Mollie amount transformer tests
@@ -22,19 +23,20 @@ use Pronamic\WordPress\Money\Money;
  * @version 2.1.0
  * @since   2.1.0
  */
-class AmountTransformerTest extends \PHPUnit_Framework_TestCase {
+class AmountTransformerTest extends TestCase {
 	/**
 	 * Test transform.
 	 *
-	 * @param Money  $money    Pronamic money.
-	 * @param string $expected Expected value.
-	 *
+	 * @param Money  $money             Pronamic money.
+	 * @param string $expected_currency Expected currency.
+	 * @param string $expected_value    Expected value.
 	 * @dataProvider amount_provider
 	 */
-	public function test_transform( $money, $expected ) {
+	public function test_transform( $money, $expected_currency, $expected_value ) {
 		$amount = AmountTransformer::transform( $money );
 
-		$this->assertEquals( $expected, strval( $amount ) );
+		$this->assertEquals( $expected_currency, $amount->get_currency() );
+		$this->assertEquals( $expected_value, $amount->get_value() );
 	}
 
 	/**
@@ -44,8 +46,8 @@ class AmountTransformerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function amount_provider() {
 		return [
-			[ new Money( 100, 'EUR' ), 'EUR 100.00' ],
-			[ new Money( 5, 'BHD' ), 'BHD 5.000' ],
+			[ new Money( 100, 'EUR' ), 'EUR', '100.00' ],
+			[ new Money( 5, 'BHD' ), 'BHD', '5.000' ],
 		];
 	}
 }

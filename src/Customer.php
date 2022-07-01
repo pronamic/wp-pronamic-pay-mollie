@@ -10,15 +10,14 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use JsonSerializable;
+
 /**
- * Mollie customer
+ * Customer class
  *
- * @link    https://docs.mollie.com/reference/v2/customers-api/create-customer
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
+ * @link https://docs.mollie.com/reference/v2/customers-api/create-customer
  */
-class Customer {
+class Customer implements JsonSerializable {
 	/**
 	 * ID.
 	 *
@@ -159,23 +158,18 @@ class Customer {
 	}
 
 	/**
-	 * Get array.
+	 * JSON serialize.
 	 *
-	 * @return array<string>
+	 * @return mixed
 	 */
-	public function get_array() {
-		$array = [
-			'name'   => $this->get_name(),
-			'email'  => $this->get_email(),
-			'locale' => $this->get_locale(),
-		];
+	public function jsonSerialize() {
+		$object_builder = new ObjectBuilder();
 
-		/*
-		 * Array filter will remove values NULL, FALSE and empty strings ('')
-		 */
-		$array = array_filter( $array );
+		$object_builder->set_optional( 'name', $this->get_name() );
+		$object_builder->set_optional( 'email', $this->get_email() );
+		$object_builder->set_optional( 'locale', $this->get_locale() );
 
-		return $array;
+		return $object_builder->jsonSerialize();
 	}
 
 	/**
@@ -187,25 +181,13 @@ class Customer {
 	public static function from_object( $object ) {
 		$customer = new self();
 
-		if ( property_exists( $object, 'id' ) ) {
-			$customer->set_id( $object->id );
-		}
+		$object_access = new ObjectAccess( $object );
 
-		if ( property_exists( $object, 'mode' ) ) {
-			$customer->set_mode( $object->mode );
-		}
-
-		if ( property_exists( $object, 'name' ) ) {
-			$customer->set_name( $object->name );
-		}
-
-		if ( property_exists( $object, 'email' ) ) {
-			$customer->set_email( $object->email );
-		}
-
-		if ( property_exists( $object, 'locale' ) ) {
-			$customer->set_locale( $object->locale );
-		}
+		$customer->set_id( $object_access->get_optional( 'id' ) );
+		$customer->set_mode( $object_access->get_optional( 'mode' ) );
+		$customer->set_name( $object_access->get_optional( 'name' ) );
+		$customer->set_email( $object_access->get_optional( 'email' ) );
+		$customer->set_locale( $object_access->get_optional( 'locale' ) );
 
 		return $customer;
 	}

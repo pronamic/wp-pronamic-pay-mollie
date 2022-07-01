@@ -11,14 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 /**
- * Title: Mollie profile data store
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
+ * Profile data store class
  */
 class ProfileDataStore {
 	/**

@@ -13,14 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
- * Title: Mollie methods
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Remco Tolsma
- * @version 2.0.9
- * @since   1.0.0
+ * Methods class
  */
 class Methods {
 	/**
@@ -87,6 +80,27 @@ class Methods {
 	const GIROPAY = 'giropay';
 
 	/**
+	 * Constant for the Klarna - Pay Later method.
+	 *
+	 * @var string
+	 */
+	const KLARNA_PAY_LATER = 'klarnapaylater';
+
+	/**
+	 * Constant for the Klarna - Pay Now method.
+	 *
+	 * @var string
+	 */
+	const KLARNA_PAY_NOW = 'klarnapaynow';
+
+	/**
+	 * Constant for the Klarna - Slice It method.
+	 *
+	 * @var string
+	 */
+	const KLARNA_SLICE_IT = 'klarnasliceit';
+
+	/**
 	 * Constant for the PayPal method.
 	 *
 	 * @var string
@@ -150,6 +164,9 @@ class Methods {
 		PaymentMethods::DIRECT_DEBIT_SOFORT     => self::DIRECT_DEBIT,
 		PaymentMethods::EPS                     => self::EPS,
 		PaymentMethods::GIROPAY                 => self::GIROPAY,
+		PaymentMethods::KLARNA_PAY_LATER        => self::KLARNA_PAY_LATER,
+		PaymentMethods::KLARNA_PAY_NOW          => self::KLARNA_PAY_NOW,
+		PaymentMethods::KLARNA_PAY_OVER_TIME    => self::KLARNA_SLICE_IT,
 		PaymentMethods::PAYPAL                  => self::PAYPAL,
 		PaymentMethods::PRZELEWY24              => self::PRZELEWY24,
 		PaymentMethods::SOFORT                  => self::SOFORT,

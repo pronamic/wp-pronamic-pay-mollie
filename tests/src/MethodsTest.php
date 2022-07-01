@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
  * Title: Mollie methods test
@@ -22,7 +23,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * @version 2.0.9
  * @since   1.0.0
  */
-class MethodsTest extends \PHPUnit_Framework_TestCase {
+class MethodsTest extends TestCase {
 	/**
 	 * Test transform.
 	 *

@@ -10,17 +10,12 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use JsonSerializable;
+
 /**
- * Title: Mollie refund request
- * Description:
- * Copyright: 2005-2022 Pronamic
- * Company: Pronamic
- *
- * @author  Reüel van der Steege
- * @version 2.3.0
- * @since   2.3.0
+ * Refund request class
  */
-class RefundRequest {
+class RefundRequest implements JsonSerializable {
 	/**
 	 * The amount to refund. For some payments, it can be up to €25.00 more
 	 * than the original transaction amount.
@@ -54,7 +49,7 @@ class RefundRequest {
 	 * Construct Mollie refund request object.
 	 *
 	 * @param Amount $amount The amount that you want to refund.
-	 * @retrun void
+	 * @return void
 	 */
 	public function __construct( $amount ) {
 		$this->amount = $amount;
@@ -103,22 +98,18 @@ class RefundRequest {
 	}
 
 	/**
-	 * Get array of this Mollie refund request object.
+	 * JSON serialize.
 	 *
-	 * @return array<string,null|string|object>
+	 * @link https://www.php.net/manual/en/jsonserializable.jsonserialize.php
+	 * @return mixed
 	 */
-	public function get_array() {
-		$array = [
-			'amount'      => $this->amount->get_json(),
-			'description' => $this->description,
-			'metadata'    => $this->metadata,
-		];
+	public function jsonSerialize() {
+		$object_builder = new ObjectBuilder();
 
-		/*
-		 * Array filter will remove values NULL, FALSE and empty strings ('')
-		 */
-		$array = array_filter( $array );
+		$object_builder->set_required( 'amount', $this->amount->jsonSerialize() );
+		$object_builder->set_optional( 'description', $this->description );
+		$object_builder->set_optional( 'metadata', $this->metadata );
 
-		return $array;
+		return $object_builder->jsonSerialize();
 	}
 }

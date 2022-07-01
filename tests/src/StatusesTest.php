@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
  * Title: Mollie statuses constants tests
@@ -23,7 +24,7 @@ use Pronamic\WordPress\Pay\Payments\PaymentStatus;
  * @since   1.0.0
  * @see     https://www.mollie.nl/support/documentatie/betaaldiensten/ideal/en/
  */
-class StatusesTest extends \PHPUnit_Framework_TestCase {
+class StatusesTest extends TestCase {
 	/**
 	 * Test transform.
 	 *
@@ -45,7 +46,7 @@ class StatusesTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function status_matrix_provider() {
 		return [
-			[ Statuses::AUTHORIZED, null ],
+			[ Statuses::AUTHORIZED, PaymentStatus::AUTHORIZED ],
 			[ Statuses::OPEN, PaymentStatus::OPEN ],
 			[ Statuses::CANCELED, PaymentStatus::CANCELLED ],
 			[ Statuses::PAID, PaymentStatus::SUCCESS ],

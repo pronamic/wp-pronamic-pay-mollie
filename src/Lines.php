@@ -1,0 +1,146 @@
+<?php
+/**
+ * Lines
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2022 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Gateways\Mollie
+ */
+
+namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
+use JsonSerializable;
+use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Number\Number;
+use Pronamic\WordPress\Pay\Payments\PaymentLines;
+
+/**
+ * Lines class
+ */
+class Lines implements JsonSerializable {
+	/**
+	 * The lines.
+	 *
+	 * @var Line[]
+	 */
+	private array $lines = [];
+
+	/**
+	 * New line.
+	 *
+	 * @param string $name         Description of the order line.
+	 * @param int    $quantity     Quantity.
+	 * @param Amount $unit_price   Unit price.
+	 * @param Amount $total_amount Total amount, including VAT and  discounts.
+	 * @param Number $vat_rate     VAT rate.
+	 * @param Amount $vat_amount   Value-added tax amount.
+	 */
+	public function new_line( string $name, int $quantity, Amount $unit_price, Amount $total_amount, Number $vat_rate, Amount $vat_amount ) : Line {
+		$line = new Line(
+			$name,
+			$quantity,
+			$unit_price,
+			$total_amount,
+			$vat_rate,
+			$vat_amount
+		);
+
+		$this->lines[] = $line;
+
+		return $line;
+	}
+
+	/**
+	 * JSON serialize.
+	 *
+	 * @return mixed
+	 */
+	public function jsonSerialize() {
+		$objects = array_map(
+			/**
+			 * Get JSON for payment line.
+			 *
+			 * @param Line $line Payment line.
+			 * @return object
+			 */
+			function( Line $line ) {
+				return $line->jsonSerialize();
+			},
+			$this->lines
+		);
+
+		return $objects;
+	}
+
+	/**
+	 * Create lines from WordPress Pay core payment lines.
+	 *
+	 * @param PaymentLines $payment_lines Payment lines.
+	 * @return Lines
+	 * @throws \InvalidArgumentException Throws exception on invalid arguments.
+	 */
+	public static function from_wp_payment_lines( PaymentLines $payment_lines ) : Lines {
+		$lines = new self();
+
+		foreach ( $payment_lines as $payment_line ) {
+			$total_amount = $payment_line->get_total_amount();
+
+			if ( ! $total_amount instanceof TaxedMoney ) {
+				throw new \InvalidArgumentException( 'Payment line requires tax information.' );
+			}
+
+			$unit_price = $payment_line->get_unit_price();
+
+			if ( null === $unit_price ) {
+				throw new \InvalidArgumentException( 'Payment line unit price is required.' );
+			}
+
+			$vat_amount = $payment_line->get_tax_amount();
+
+			if ( null === $vat_amount ) {
+				throw new \InvalidArgumentException( 'Payment line VAT amount is required.' );
+			}
+
+			$tax_percentage = $total_amount->get_tax_percentage();
+
+			if ( null === $tax_percentage ) {
+				throw new \InvalidArgumentException( 'Payment line VAT rate is required.' );
+			}
+
+			$name = $payment_line->get_name();
+
+			if ( null === $name ) {
+				throw new \InvalidArgumentException( 'Payment line name is required.' );
+			}
+
+			$quantity = $payment_line->get_quantity();
+
+			if ( null === $quantity ) {
+				throw new \InvalidArgumentException( 'Payment line quantity is required.' );
+			}
+
+			$line = $lines->new_line(
+				$name,
+				$quantity,
+				AmountTransformer::transform( $unit_price ),
+				AmountTransformer::transform( $total_amount ),
+				Number::from_mixed( $tax_percentage ),
+				AmountTransformer::transform( $vat_amount ),
+			);
+
+			$line->set_type( LineType::transform( $payment_line->get_type() ) );
+			$line->set_category( $payment_line->get_product_category() );
+			$line->set_sku( $payment_line->get_sku() );
+			$line->set_image_url( $payment_line->get_image_url() );
+			$line->set_product_url( $payment_line->get_product_url() );
+
+			// Discount amount.
+			$discount_amount = $payment_line->get_discount_amount();
+
+			$line->set_discount_amount( null === $discount_amount ? null : AmountTransformer::transform( $discount_amount ) );
+		}
+
+		return $lines;
+	}
+}

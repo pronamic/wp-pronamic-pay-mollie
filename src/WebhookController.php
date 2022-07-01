@@ -15,13 +15,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 /**
- * Webhook controller
+ * Webhook controller class
  *
  * @link https://docs.mollie.com/guides/webhooks
- *
- * @author  Remco Tolsma
- * @version 2.1.0
- * @since   2.1.0
  */
 class WebhookController {
 	/**
@@ -83,6 +79,50 @@ class WebhookController {
 				'permission_callback' => '__return_true',
 			]
 		);
+
+		\register_rest_route(
+			Integration::REST_ROUTE_NAMESPACE,
+			'/payments/webhook/(?P<payment_id>\d+)',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'rest_api_mollie_webhook_payment' ],
+				'args'                => [
+					'payment_id' => [
+						'description' => \__( 'Payment ID.', 'pronamic_ideal' ),
+						'type'        => 'string',
+						'required'    => true,
+					],
+					'id'         => [
+						'description' => \__( 'Mollie transaction ID.', 'pronamic_ideal' ),
+						'type'        => 'string',
+						'required'    => true,
+					],
+				],
+				'permission_callback' => '__return_true',
+			]
+		);
+
+		\register_rest_route(
+			Integration::REST_ROUTE_NAMESPACE,
+			'/orders/webhook/(?P<payment_id>\d+)',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'rest_api_mollie_webhook_order' ],
+				'args'                => [
+					'payment_id' => [
+						'description' => \__( 'Payment ID.', 'pronamic_ideal' ),
+						'type'        => 'string',
+						'required'    => true,
+					],
+					'id'         => [
+						'description' => \__( 'Mollie order ID.', 'pronamic_ideal' ),
+						'type'        => 'string',
+						'required'    => true,
+					],
+				],
+				'permission_callback' => '__return_true',
+			]
+		);
 	}
 
 	/**
@@ -108,7 +148,7 @@ class WebhookController {
 	}
 
 	/**
-	 * REST API Mollie webhook handler.
+	 * REST API Mollie payment webhook handler.
 	 *
 	 * @param WP_REST_Request $request Request.
 	 * @return object
@@ -154,11 +194,67 @@ class WebhookController {
 		}
 
 		// Add note.
-		$note = \sprintf(
-			/* translators: %s: payment provider name */
-			\__( 'Webhook requested by %s.', 'pronamic_ideal' ),
-			\__( 'Mollie', 'pronamic_ideal' )
+		$note = \__( 'Payment webhook requested by Mollie.', 'pronamic_ideal' );
+
+		$payment->add_note( $note );
+
+		// Log webhook request.
+		\do_action( 'pronamic_pay_webhook_log_payment', $payment );
+
+		// Update payment.
+		Plugin::update_payment( $payment, false );
+
+		return $response;
+	}
+
+	/**
+	 * REST API Mollie order webhook handler.
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return object
+	 */
+	public function rest_api_mollie_webhook_order( WP_REST_Request $request ) {
+		$id = $request->get_param( 'id' );
+
+		/**
+		 * Result.
+		 *
+		 * @link https://developer.wordpress.org/reference/functions/wp_send_json_success/
+		 */
+		$response = new WP_REST_Response(
+			[
+				'success' => true,
+				'id'      => $id,
+			]
 		);
+
+		$response->add_link( 'self', rest_url( $request->get_route() ) );
+
+		/**
+		 * Payment.
+		 */
+		$payment_id = $request->get_param( 'payment_id' );
+
+		if ( empty( $payment_id ) ) {
+			return $response;
+		}
+
+		$payment = \get_pronamic_payment( $payment_id );
+
+		if ( null === $payment ) {
+			/**
+			 * How to handle unknown IDs?
+			 *
+			 * To not leak any information to malicious third parties, it is recommended
+			 * to return a 200 OK response even if the ID is not known to your system.
+			 *
+			 * @link https://docs.mollie.com/guides/webhooks#how-to-handle-unknown-ids
+			 */
+			return $response;
+		}
+
+		// Add note.
+		$note = \__( 'Order webhook requested by Mollie.', 'pronamic_ideal' );
 
 		$payment->add_note( $note );
 
