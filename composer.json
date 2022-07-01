@@ -41,7 +41,7 @@
 		"php": ">=7.4",
 		"ext-json": "*",
 		"justinrainbow/json-schema": "^5.2",
-		"pronamic/wp-http": "^1.0",
+		"pronamic/wp-http": "^1.1",
 		"woocommerce/action-scheduler": "^3.4",
 		"wp-pay/core": "^4.3"
 	},
