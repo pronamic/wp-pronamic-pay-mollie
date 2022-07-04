@@ -9,7 +9,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [4.3.0] - 2022-07-01
 ### Added
-- Added support for Mollie orders API. [pronamic/wp-pronamic-pay/#32835](https://github.com/pronamic/wp-pronamic-pay/issues/190)
+- Added support for Mollie orders API. [pronamic/wp-pronamic-pay/#190](https://github.com/pronamic/wp-pronamic-pay/issues/190)
 
 ### Changed
 - Improved JSON serialization for communication towards Mollie API. 
