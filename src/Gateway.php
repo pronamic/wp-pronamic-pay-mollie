@@ -90,6 +90,38 @@ class Gateway extends Core_Gateway {
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', [ $this, 'copy_customer_id_to_wp_user' ], 99, 1 );
+
+		// Payment method iDEAL.
+		$ideal_payment_method = new PaymentMethod( PaymentMethods::IDEAL );
+
+		$ideal_issuer_field = new SelectField( 'ideal-issuer' );
+
+		$ideal_issuer_field->set_options_callback( function() {
+			return $this->get_issuers();
+		} );
+
+		$ideal_payment_method->add_field( $ideal_issuer_field );
+
+		// Payment methods.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::APPLE_PAY ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANCONTACT ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANK_TRANSFER ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BELFIUS ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::CREDIT_CARD ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::DIRECT_DEBIT ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::DIRECT_DEBIT_BANCONTACT ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::DIRECT_DEBIT_IDEAL ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::DIRECT_DEBIT_SOFORT ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::EPS ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::GIROPAY ) );
+		$this->register_payment_method( $ideal_payment_method );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KBC ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_LATER ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_NOW ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_OVER_TIME ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::PAYPAL ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::PRZELEWY24 ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::SOFORT ) );
 	}
 
 	/**
@@ -167,36 +199,6 @@ class Gateway extends Core_Gateway {
 		$payment_methods = array_unique( $payment_methods );
 
 		return $payment_methods;
-	}
-
-	/**
-	 * Get supported payment methods
-	 *
-	 * @see Core_Gateway::get_supported_payment_methods()
-	 * @return array<string>
-	 */
-	public function get_supported_payment_methods() {
-		return [
-			PaymentMethods::APPLE_PAY,
-			PaymentMethods::BANCONTACT,
-			PaymentMethods::BANK_TRANSFER,
-			PaymentMethods::BELFIUS,
-			PaymentMethods::CREDIT_CARD,
-			PaymentMethods::DIRECT_DEBIT,
-			PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-			PaymentMethods::DIRECT_DEBIT_IDEAL,
-			PaymentMethods::DIRECT_DEBIT_SOFORT,
-			PaymentMethods::EPS,
-			PaymentMethods::GIROPAY,
-			PaymentMethods::IDEAL,
-			PaymentMethods::KBC,
-			PaymentMethods::KLARNA_PAY_LATER,
-			PaymentMethods::KLARNA_PAY_NOW,
-			PaymentMethods::KLARNA_PAY_OVER_TIME,
-			PaymentMethods::PAYPAL,
-			PaymentMethods::PRZELEWY24,
-			PaymentMethods::SOFORT,
-		];
 	}
 
 	/**
