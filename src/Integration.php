@@ -211,7 +211,7 @@ class Integration extends AbstractGatewayIntegration {
 		}
 
 		return sprintf(
-			'https://www.mollie.com/dashboard/payments/%s',
+			'https://my.mollie.com/dashboard/payments/%s',
 			$transaction_id
 		);
 	}
