@@ -309,7 +309,16 @@ class Integration extends AbstractGatewayIntegration {
 			return $next_payment_delivery_date;
 		}
 
-		if ( ! PaymentMethods::is_direct_debit_method( $payment_method ) ) {
+		if ( ! in_array(
+			$payment_method,
+			[
+				PaymentMethods::DIRECT_DEBIT,
+				PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+				PaymentMethods::DIRECT_DEBIT_IDEAL,
+				PaymentMethods::DIRECT_DEBIT_SOFORT,
+			],
+			true
+		) ) {
 			return $next_payment_delivery_date;
 		}
 
