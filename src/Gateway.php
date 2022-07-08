@@ -99,9 +99,11 @@ class Gateway extends Core_Gateway {
 
 		$ideal_issuer_field = new SelectField( 'ideal-issuer' );
 
-		$ideal_issuer_field->set_options_callback( function() {
-			return $this->get_issuers();
-		} );
+		$ideal_issuer_field->set_options_callback(
+			function() {
+				return $this->get_issuers();
+			} 
+		);
 
 		$ideal_payment_method->add_field( $ideal_issuer_field );
 
