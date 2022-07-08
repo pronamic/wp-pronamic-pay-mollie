@@ -92,7 +92,7 @@ if ( null !== $payment ) {
 					<?php
 
 					$mollie_link = \sprintf(
-						'https://www.mollie.com/dashboard/payments/%s',
+						'https://my.mollie.com/dashboard/payments/%s',
 						$mollie_payment_id
 					);
 
