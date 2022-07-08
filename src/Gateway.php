@@ -493,7 +493,19 @@ class Gateway extends Core_Gateway {
 		}
 
 		if ( 'first' === $request->get_sequence_type() ) {
-			$first_method = PaymentMethods::get_first_payment_method( $payment_method );
+			$first_method = $payment_method;
+
+			switch ( $payment_method ) {
+				case PaymentMethods::DIRECT_DEBIT_BANCONTACT:
+					$first_method = PaymentMethods::BANCONTACT;
+					break;
+				case PaymentMethods::DIRECT_DEBIT_IDEAL:
+					$first_method = PaymentMethods::IDEAL;
+					break;
+				case PaymentMethods::DIRECT_DEBIT_SOFORT:
+					$first_method = PaymentMethods::SOFORT;
+					break;
+			}
 
 			$request->set_method( Methods::transform( $first_method, $first_method ) );
 		}
