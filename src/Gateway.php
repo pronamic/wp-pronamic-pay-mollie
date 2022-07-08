@@ -102,13 +102,22 @@ class Gateway extends Core_Gateway {
 
 		$ideal_payment_method->add_field( $ideal_issuer_field );
 
+		// Payment method direct debit.
+		$payment_method_direct_debit = new PaymentMethod( PaymentMethods::DIRECT_DEBIT );
+
+		$field_consumer_name = new Field( 'pronamic_pay_consumer_bank_details_name' );
+		$field_consumer_iban = new Field( 'pronamic_pay_consumer_bank_details_iban' );
+
+		$payment_method_direct_debit->add_field( $field_consumer_name );
+		$payment_method_direct_debit->add_field( $field_consumer_iban );
+
 		// Payment methods.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::APPLE_PAY ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANCONTACT ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANK_TRANSFER ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BELFIUS ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::CREDIT_CARD ) );
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::DIRECT_DEBIT ) );
+		$this->register_payment_method( $payment_method_direct_debit );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::DIRECT_DEBIT_BANCONTACT ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::DIRECT_DEBIT_IDEAL ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::DIRECT_DEBIT_SOFORT ) );
