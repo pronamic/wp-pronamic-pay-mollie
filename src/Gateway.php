@@ -99,7 +99,7 @@ class Gateway extends Core_Gateway {
 
 		$field_ideal_issuer->set_options_callback(
 			function() {
-				return $this->get_issuers();
+				return $this->get_ideal_issuers();
 			}
 		);
 
@@ -178,11 +178,11 @@ class Gateway extends Core_Gateway {
 	}
 
 	/**
-	 * Get issuers.
+	 * Get iDEAL issuers.
 	 *
 	 * @return array<int, array<string, array<string>>>
 	 */
-	private function get_issuers() {
+	private function get_ideal_issuers() {
 		$groups = [];
 
 		$result = $this->client->get_issuers();
