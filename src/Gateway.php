@@ -199,58 +199,10 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @see Core_Gateway::get_available_payment_methods()
 	 * @return array<int, string>
+	 * @todo Refactor.
 	 */
 	public function get_available_payment_methods() {
-		$payment_methods = [];
-
-		$resources      = [ ResourceType::PAYMENTS, ResourceType::ORDERS ];
-		$sequence_types = [ Sequence::ONE_OFF, Sequence::RECURRING, Sequence::FIRST ];
-
-		$results = [];
-
-		foreach ( $resources as $resource ) {
-			foreach ( $sequence_types as $sequence_type ) {
-				// Get active payment methods for Mollie account.
-				$result = $this->client->get_payment_methods( $sequence_type, $resource );
-
-				if ( Sequence::FIRST === $sequence_type ) {
-					foreach ( $result as $method => $title ) {
-						unset( $result[ $method ] );
-
-						// Get WordPress payment method for direct debit method.
-						$method         = Methods::transform_gateway_method( $method );
-						$payment_method = array_search( $method, PaymentMethods::get_recurring_methods(), true );
-
-						if ( $payment_method ) {
-							$results[ $payment_method ] = $title;
-						}
-					}
-				}
-
-				if ( is_array( $result ) ) {
-					$results = array_merge( $results, $result );
-				}
-			}
-		}
-
-		// Transform to WordPress payment methods.
-		foreach ( $results as $method => $title ) {
-			$method = (string) $method;
-
-			$payment_method = Methods::transform_gateway_method( $method );
-
-			if ( PaymentMethods::is_recurring_method( $method ) ) {
-				$payment_method = $method;
-			}
-
-			if ( null !== $payment_method ) {
-				$payment_methods[] = (string) $payment_method;
-			}
-		}
-
-		$payment_methods = array_unique( $payment_methods );
-
-		return $payment_methods;
+		return [];
 	}
 
 	/**
