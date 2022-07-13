@@ -116,25 +116,6 @@ class GatewayTest extends TestCase {
 	}
 
 	/**
-	 * Test if supported payment methods are valid core payment methods.
-	 *
-	 * @depends test_get_supported_payment_methods_type
-	 */
-	public function test_get_supported_payment_methods_valid() {
-		$payment_methods = new PaymentMethods();
-
-		// Check if payment method is known.
-		$methods_reflection = new \ReflectionClass( get_class( $payment_methods ) );
-		$methods            = $methods_reflection->getConstants();
-
-		$supported = $this->gateway->get_supported_payment_methods();
-
-		foreach ( $supported as $method ) {
-			$this->assertContains( $method, $methods );
-		}
-	}
-
-	/**
 	 * Test available payment methods array type.
 	 */
 	public function test_get_available_payment_methods_type() {
