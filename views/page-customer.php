@@ -173,7 +173,7 @@ $users = $wpdb->get_results(
 					<?php
 
 					$mollie_link = \sprintf(
-						'https://www.mollie.com/dashboard/customers/%s',
+						'https://my.mollie.com/dashboard/customers/%s',
 						$mollie_customer_id
 					);
 

@@ -7,9 +7,12 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.1] - 2022-08-15
+- Updated payment provider URL from `www.mollie.com` to `my.mollie.com` ([pronamic/wp-pronamic-pay-mollie#8](https://github.com/pronamic/wp-pronamic-pay-mollie/issues/8)).
+
 ## [4.3.0] - 2022-07-01
 ### Added
-- Added support for Mollie orders API. [pronamic/wp-pronamic-pay/#32835](https://github.com/pronamic/wp-pronamic-pay/issues/190)
+- Added support for Mollie orders API. [pronamic/wp-pronamic-pay/#190](https://github.com/pronamic/wp-pronamic-pay/issues/190)
 
 ### Changed
 - Improved JSON serialization for communication towards Mollie API. 
@@ -208,7 +211,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.1...HEAD
+[4.3.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.0...4.3.1
 [4.3.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.2.0...4.3.0
 [4.2.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.1.0...4.2.0
 [4.1.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.0.1...4.1.0

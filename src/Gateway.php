@@ -780,8 +780,8 @@ class Gateway extends Core_Gateway {
 
 		$payment->add_note(
 			\sprintf(
-				/* translators: 1: payment transaction ID, 2: Mollie payment ID */
-				\__( 'Shipment `%1$s` created for Mollie order `%2$s`.', 'pronami c_ideal' ),
+				/* translators: 1: Mollie shipment ID, 2: Mollie order ID */
+				\__( 'Shipment `%1$s` created for Mollie order `%2$s`.', 'pronamic_ideal' ),
 				$shipment->get_id(),
 				$mollie_order_id
 			)
