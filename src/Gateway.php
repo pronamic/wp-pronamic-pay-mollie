@@ -17,9 +17,10 @@ use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Field;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
+use Pronamic\WordPress\Pay\Core\IDealIssuerSelectField;
 use Pronamic\WordPress\Pay\Core\PaymentMethod;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Core\SelectField;
+use Pronamic\WordPress\Pay\Core\SelectFieldOption;
 use Pronamic\WordPress\Pay\Gateways\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -95,7 +96,7 @@ class Gateway extends Core_Gateway {
 		add_action( 'pronamic_payment_status_update', [ $this, 'copy_customer_id_to_wp_user' ], 99, 1 );
 
 		// Fields.
-		$field_ideal_issuer = new SelectField( 'ideal-issuer' );
+		$field_ideal_issuer = new IDealIssuerSelectField( 'ideal-issuer' );
 
 		$field_ideal_issuer->set_options_callback(
 			function() {
@@ -185,13 +186,15 @@ class Gateway extends Core_Gateway {
 	private function get_ideal_issuers() {
 		$groups = [];
 
-		$result = $this->client->get_issuers();
+		$issuers = $this->client->get_issuers();
 
-		$groups[] = [
-			'options' => $result,
-		];
+		$items = [];
 
-		return $groups;
+		foreach ( $issuers as $key => $value ) {
+			$items[] = new SelectFieldOption( $key, $value );
+		}
+
+		return $items;
 	}
 
 	/**
