@@ -173,6 +173,7 @@ class Methods {
 		PaymentMethods::IDEAL                   => self::IDEAL,
 		PaymentMethods::KBC                     => self::KBC,
 		PaymentMethods::BELFIUS                 => self::BELFIUS,
+		PaymentMethods::VOID                    => null,
 	];
 
 	/**
