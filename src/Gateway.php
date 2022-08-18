@@ -98,6 +98,8 @@ class Gateway extends Core_Gateway {
 		// Fields.
 		$field_ideal_issuer = new IDealIssuerSelectField( 'ideal-issuer' );
 
+		$field_ideal_issuer->set_cache_key( 'pronamic_pay_ideal_issuers_' . \md5( \wp_json_encode( $config ) ) );
+
 		$field_ideal_issuer->set_options_callback(
 			function() {
 				return $this->get_ideal_issuers();
