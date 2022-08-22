@@ -331,54 +331,6 @@ class Client {
 	}
 
 	/**
-	 * Get payment methods
-	 *
-	 * @param string $sequence_type Sequence type.
-	 * @param string $resource      Resource type to query, e.g. `payments`, `orders`.
-	 * @return array<string>
-	 * @throws \Exception Throws exception for methods on failed request or invalid response.
-	 */
-	public function get_payment_methods( $sequence_type = '', $resource = 'payments' ) {
-		$data = [
-			'includeWallets' => Methods::APPLE_PAY,
-			'resource'       => $resource,
-		];
-
-		if ( '' !== $sequence_type ) {
-			$data['sequenceType'] = $sequence_type;
-		}
-
-		$response = $this->get(
-			$this->get_url(
-				'methods',
-				[],
-				$data
-			)
-		);
-
-		$payment_methods = [];
-
-		if ( ! isset( $response->_embedded ) ) {
-			throw new \Exception( 'No embedded data in Mollie response.' );
-		}
-
-		if ( isset( $response->_embedded->methods ) ) {
-			foreach ( $response->_embedded->methods as $payment_method ) {
-				$id   = Security::filter( $payment_method->id );
-				$name = Security::filter( $payment_method->description );
-
-				if ( null === $id || null === $name ) {
-					continue;
-				}
-
-				$payment_methods[ $id ] = $name;
-			}
-		}
-
-		return $payment_methods;
-	}
-
-	/**
 	 * Create customer.
 	 *
 	 * @param Customer $customer Customer.
