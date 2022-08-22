@@ -319,6 +319,18 @@ class Client {
 	}
 
 	/**
+	 * Get all payment methods.
+	 *
+	 * @link https://docs.mollie.com/reference/v2/methods-api/list-all-methods
+	 * @return array
+	 */
+	public function get_all_payment_methods() {
+		$response = $this->get( $this->get_url( 'methods/all' ) );
+
+		return $response;
+	}
+
+	/**
 	 * Get payment methods
 	 *
 	 * @param string $sequence_type Sequence type.

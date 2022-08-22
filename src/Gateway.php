@@ -192,6 +192,43 @@ class Gateway extends Core_Gateway {
 	}
 
 	/**
+	 * Get payment methods.
+	 *
+	 * @param array $args Query arguments.
+	 * @return PaymentMethod[]
+	 */
+	public function get_payment_methods( $args = [] ) {
+		$this->maybe_enricht_payment_methods();
+
+		return parent::get_payment_methods( $args );
+	}
+
+	/**
+	 * Maybe enricht payment methods.
+	 *
+	 * @todo Add caching.
+	 * @return void
+	 */
+	private function maybe_enricht_payment_methods() {
+		$mollie_payment_methods = $this->client->get_all_payment_methods();
+
+		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
+			$core_payment_method_id = Methods::transform_gateway_method( $mollie_payment_method->id );
+
+			$core_payment_method = $this->get_payment_method( $core_payment_method_id );
+
+			if ( null !== $core_payment_method ) {
+				switch( $mollie_payment_method->status ) {
+					case 'activated':
+						$core_payment_method->set_status( 'active' );
+
+						break;
+				}
+			}
+		}
+	}
+
+	/**
 	 * Get iDEAL issuers.
 	 *
 	 * @return iterable<SelectFieldOption|SelectFieldOptionGroup>
@@ -206,17 +243,6 @@ class Gateway extends Core_Gateway {
 		}
 
 		return $items;
-	}
-
-	/**
-	 * Get available payment methods.
-	 *
-	 * @see Core_Gateway::get_available_payment_methods()
-	 * @return array<int, string>
-	 * @todo Refactor.
-	 */
-	public function get_available_payment_methods() {
-		return [];
 	}
 
 	/**
