@@ -18,9 +18,11 @@ use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethod;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Fields\CachedCallbackOptions;
 use Pronamic\WordPress\Pay\Fields\IDealIssuerSelectField;
 use Pronamic\WordPress\Pay\Fields\Field;
 use Pronamic\WordPress\Pay\Fields\SelectFieldOption;
+use Pronamic\WordPress\Pay\Fields\SelectFieldOptionGroup;
 use Pronamic\WordPress\Pay\Gateways\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -98,13 +100,12 @@ class Gateway extends Core_Gateway {
 		// Fields.
 		$field_ideal_issuer = new IDealIssuerSelectField( 'ideal-issuer' );
 
-		$field_ideal_issuer->set_cache_key( 'pronamic_pay_ideal_issuers_' . \md5( \wp_json_encode( $config ) ) );
-
-		$field_ideal_issuer->set_options_callback(
+		$field_ideal_issuer->set_options( new CachedCallbackOptions(
 			function() {
 				return $this->get_ideal_issuers();
-			}
-		);
+			},
+			'pronamic_pay_ideal_issuers_' . \md5( \wp_json_encode( $config ) )
+		) );
 
 		$field_consumer_name = new Field( 'pronamic_pay_consumer_bank_details_name' );
 		$field_consumer_iban = new Field( 'pronamic_pay_consumer_bank_details_iban' );
@@ -193,11 +194,9 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Get iDEAL issuers.
 	 *
-	 * @return array<int, array<string, array<string>>>
+	 * @return iterable<SelectFieldOption|SelectFieldOptionGroup>
 	 */
 	private function get_ideal_issuers() {
-		$groups = [];
-
 		$issuers = $this->client->get_issuers();
 
 		$items = [];
