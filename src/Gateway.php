@@ -231,6 +231,16 @@ class Gateway extends Core_Gateway {
 						$core_payment_method->set_status( 'active' );
 
 						break;
+					case 'pending-boarding':
+					case 'pending-review':
+					case 'pending-external':
+						$core_payment_method->set_status( 'pending' );
+
+						break;
+					case 'rejected':
+						$core_payment_method->set_status( 'rejected' );
+
+						break;
 				}
 			}
 		}
