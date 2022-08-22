@@ -210,7 +210,15 @@ class Gateway extends Core_Gateway {
 	 * @return void
 	 */
 	private function maybe_enricht_payment_methods() {
-		$mollie_payment_methods = $this->client->get_all_payment_methods();
+		$cache_key = 'pronamic_pay_mollie_payment_methods_' . \md5( \wp_json_encode( $this->config ) );
+
+		$mollie_payment_methods = \get_transient( $cache_key );
+
+		if ( false === $mollie_payment_methods ) {
+			$mollie_payment_methods = $this->client->get_all_payment_methods();
+
+			\set_transient( $cache_key, $mollie_payment_methods, \DAY_IN_SECONDS );
+		}
 
 		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
 			$core_payment_method_id = Methods::transform_gateway_method( $mollie_payment_method->id );
