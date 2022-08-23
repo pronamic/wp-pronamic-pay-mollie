@@ -198,18 +198,17 @@ class Gateway extends Core_Gateway {
 	 * @return PaymentMethod[]
 	 */
 	public function get_payment_methods( $args = [] ) {
-		$this->maybe_enricht_payment_methods();
+		$this->maybe_enrich_payment_methods();
 
 		return parent::get_payment_methods( $args );
 	}
 
 	/**
-	 * Maybe enricht payment methods.
+	 * Maybe enrich payment methods.
 	 *
-	 * @todo Add caching.
 	 * @return void
 	 */
-	private function maybe_enricht_payment_methods() {
+	private function maybe_enrich_payment_methods() {
 		$cache_key = 'pronamic_pay_mollie_payment_methods_' . \md5( \wp_json_encode( $this->config ) );
 
 		$mollie_payment_methods = \get_transient( $cache_key );
