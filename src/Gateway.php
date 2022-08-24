@@ -193,7 +193,6 @@ class Gateway extends Core_Gateway {
 		 */
 		$payment_method_void = new PaymentMethod( PaymentMethods::VOID );
 		$payment_method_void->set_name( \__( 'Mollie Checkout', 'pronamic_ideal' ) );
-		$payment_method_void->set_status( 'active' );
 
 		$this->register_payment_method( $payment_method_void );
 	}
