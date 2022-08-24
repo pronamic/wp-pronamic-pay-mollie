@@ -10,12 +10,13 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use JsonSerializable;
 use Pronamic\WordPress\Pay\Core\GatewayConfig;
 
 /**
  * Config class
  */
-class Config extends GatewayConfig {
+class Config extends GatewayConfig implements JsonSerializable {
 	/**
 	 * ID.
 	 *
@@ -48,5 +49,17 @@ class Config extends GatewayConfig {
 		}
 
 		return ( 'test_' === substr( $this->api_key, 0, 5 ) );
+	}
+
+	/**
+	 * Serialize to JSON.
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize() {
+		return [
+			'@type'   => __CLASS__,
+			'api_key' => $this->api_key,
+		];
 	}
 }
