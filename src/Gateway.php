@@ -98,7 +98,7 @@ class Gateway extends Core_Gateway {
 		add_action( 'pronamic_payment_status_update', [ $this, 'copy_customer_id_to_wp_user' ], 99, 1 );
 
 		// Fields.
-		$field_ideal_issuer = new IDealIssuerSelectField( 'ideal-issuer' );
+		$field_ideal_issuer = new IDealIssuerSelectField( 'mollie_ideal_issuer' );
 
 		$field_ideal_issuer->set_options( new CachedCallbackOptions(
 			function() {
@@ -621,7 +621,7 @@ class Gateway extends Core_Gateway {
 
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
-			$request->issuer = $payment->get_meta( 'issuer' );
+			$request->issuer = $payment->get_meta( 'mollie_ideal_issuer' );
 		}
 
 		// Billing email.
