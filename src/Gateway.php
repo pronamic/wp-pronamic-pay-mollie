@@ -98,14 +98,12 @@ class Gateway extends Core_Gateway {
 		add_action( 'pronamic_payment_status_update', [ $this, 'copy_customer_id_to_wp_user' ], 99, 1 );
 
 		// Fields.
-		$field_ideal_issuer = new IDealIssuerSelectField( 'ideal-issuer' );
-
-		$field_ideal_issuer->set_options( new CachedCallbackOptions(
+		$ideal_options = new CachedCallbackOptions(
 			function() {
 				return $this->get_ideal_issuers();
 			},
 			'pronamic_pay_ideal_issuers_' . \md5( \wp_json_encode( $config ) )
-		) );
+		);
 
 		$field_consumer_name = new Field( 'pronamic_pay_consumer_bank_details_name' );
 		$field_consumer_iban = new Field( 'pronamic_pay_consumer_bank_details_iban' );
@@ -144,6 +142,10 @@ class Gateway extends Core_Gateway {
 		// Payment method direct debit and iDEAL.
 		$payment_method_direct_debit_ideal = new PaymentMethod( PaymentMethods::DIRECT_DEBIT_IDEAL );
 		$payment_method_direct_debit_ideal->add_support( 'recurring' );
+
+		$field_ideal_issuer = new IDealIssuerSelectField( 'pronamic_pay_mollie_direct_debit_ideal_issuer' );
+		$field_ideal_issuer->set_options( $ideal_options  );
+
 		$payment_method_direct_debit_ideal->add_field( $field_ideal_issuer );
 
 		$this->register_payment_method( $payment_method_direct_debit_ideal );
@@ -160,6 +162,10 @@ class Gateway extends Core_Gateway {
 
 		// Payment method iDEAL.
 		$payment_method_ideal = new PaymentMethod( PaymentMethods::IDEAL );
+
+		$field_ideal_issuer = new IDealIssuerSelectField( 'pronamic_pay_mollie_ideal_issuer' );
+		$field_ideal_issuer->set_options( $ideal_options  );
+
 		$payment_method_ideal->add_field( $field_ideal_issuer );
 
 		$this->register_payment_method( $payment_method_ideal );
