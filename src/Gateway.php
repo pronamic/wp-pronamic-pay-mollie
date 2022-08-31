@@ -145,7 +145,7 @@ class Gateway extends Core_Gateway {
 		$payment_method_direct_debit_ideal->add_support( 'recurring' );
 
 		$field_ideal_issuer = new IDealIssuerSelectField( 'pronamic_pay_mollie_direct_debit_ideal_issuer' );
-		$field_ideal_issuer->set_options( $ideal_options  );
+		$field_ideal_issuer->set_options( $ideal_options );
 
 		$payment_method_direct_debit_ideal->add_field( $field_ideal_issuer );
 
@@ -165,7 +165,7 @@ class Gateway extends Core_Gateway {
 		$payment_method_ideal = new PaymentMethod( PaymentMethods::IDEAL );
 
 		$field_ideal_issuer = new IDealIssuerSelectField( 'pronamic_pay_mollie_ideal_issuer' );
-		$field_ideal_issuer->set_options( $ideal_options  );
+		$field_ideal_issuer->set_options( $ideal_options );
 
 		$payment_method_ideal->add_field( $field_ideal_issuer );
 
@@ -238,7 +238,7 @@ class Gateway extends Core_Gateway {
 			$core_payment_method = $this->get_payment_method( $core_payment_method_id );
 
 			if ( null !== $core_payment_method ) {
-				switch( $mollie_payment_method->status ) {
+				switch ( $mollie_payment_method->status ) {
 					case 'activated':
 						$core_payment_method->set_status( 'active' );
 
