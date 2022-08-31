@@ -229,6 +229,8 @@ class Gateway extends Core_Gateway {
 			\set_transient( $cache_key, $mollie_payment_methods, \DAY_IN_SECONDS );
 		}
 
+		$has_active_method = false;
+
 		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
 			$core_payment_method_id = Methods::transform_gateway_method( $mollie_payment_method->id );
 
@@ -243,16 +245,43 @@ class Gateway extends Core_Gateway {
 					case 'pending-boarding':
 					case 'pending-review':
 					case 'pending-external':
-						$core_payment_method->set_status( 'pending' );
+						$core_payment_method->set_status( $this->config->is_test_mode() ? 'active' : 'inactive' );
 
 						break;
 					case 'rejected':
-						$core_payment_method->set_status( 'rejected' );
+					case null:
+						$core_payment_method->set_status( 'inactive' );
 
 						break;
 				}
+
+				// Check active payment method status.
+				if ( 'active' === $core_payment_method->get_status() ) {
+					$has_active_method = true;
+				}
 			}
 		}
+
+		// Update `Direct Debit (mandate via ...)` payment method statuses.
+		if ( 'active' === $this->get_payment_method( PaymentMethods::DIRECT_DEBIT )->get_status() ) {
+			// Bancontact.
+			$bancontact_method = $this->get_payment_method( PaymentMethods::BANCONTACT );
+
+			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_BANCONTACT )->set_status( $bancontact_method->get_status() );
+
+			// iDEAL.
+			$ideal_method = $this->get_payment_method( PaymentMethods::IDEAL );
+
+			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_IDEAL )->set_status( $ideal_method->get_status() );
+
+			// SOFORT.
+			$sofort_method = $this->get_payment_method( PaymentMethods::SOFORT );
+
+			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_SOFORT )->set_status( $sofort_method->get_status() );
+		}
+
+		// Update void payment method status.
+		$this->get_payment_method( PaymentMethods::VOID )->set_status( $has_active_method ? 'active' : 'inactive' );
 	}
 
 	/**
