@@ -186,16 +186,6 @@ class Gateway extends Core_Gateway {
 		// Other.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::PRZELEWY24 ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::SOFORT ) );
-
-		/**
-		 * Payment method void leads to Mollie Checkout.
-		 *
-		 * @link https://docs.mollie.com/payments/hosted-checkout
-		 */
-		$payment_method_void = new PaymentMethod( PaymentMethods::VOID );
-		$payment_method_void->set_name( \__( 'Mollie Checkout', 'pronamic_ideal' ) );
-
-		$this->register_payment_method( $payment_method_void );
 	}
 
 	/**
@@ -280,9 +270,6 @@ class Gateway extends Core_Gateway {
 
 			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_SOFORT )->set_status( $sofort_method->get_status() );
 		}
-
-		// Update void payment method status.
-		$this->get_payment_method( PaymentMethods::VOID )->set_status( $has_active_method ? 'active' : 'inactive' );
 	}
 
 	/**
