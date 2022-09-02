@@ -160,6 +160,7 @@ class Integration extends AbstractGatewayIntegration {
 			'type'     => 'text',
 			'classes'  => [ 'regular-text', 'code' ],
 			'tooltip'  => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
+			'required' => true,
 		];
 
 		// Due date days.
