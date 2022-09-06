@@ -21,9 +21,9 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\PaymentMethodsCollection;
 use Pronamic\WordPress\Pay\Fields\CachedCallbackOptions;
 use Pronamic\WordPress\Pay\Fields\IDealIssuerSelectField;
-use Pronamic\WordPress\Pay\Fields\Field;
 use Pronamic\WordPress\Pay\Fields\SelectFieldOption;
 use Pronamic\WordPress\Pay\Fields\SelectFieldOptionGroup;
+use Pronamic\WordPress\Pay\Fields\TextField;
 use Pronamic\WordPress\Pay\Gateways\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -106,8 +106,13 @@ class Gateway extends Core_Gateway {
 			'pronamic_pay_ideal_issuers_' . \md5( \wp_json_encode( $config ) )
 		);
 
-		$field_consumer_name = new Field( 'pronamic_pay_consumer_bank_details_name' );
-		$field_consumer_iban = new Field( 'pronamic_pay_consumer_bank_details_iban' );
+		$field_consumer_name = new TextField( 'pronamic_pay_consumer_bank_details_name' );
+		$field_consumer_name->set_label( __( 'Account holder name', 'pronamic_ideal' ) );
+		$field_consumer_name->meta_key = 'consumer_bank_details_name';
+
+		$field_consumer_iban = new TextField( 'pronamic_pay_consumer_bank_details_iban' );
+		$field_consumer_iban->set_label( __( 'Account number (IBAN)', 'pronamic_ideal' ) );
+		$field_consumer_iban->meta_key = 'consumer_bank_details_iban';
 
 		// Apple Pay.
 		$payment_method_apple_pay = new PaymentMethod( PaymentMethods::APPLE_PAY );
@@ -1194,6 +1199,16 @@ class Gateway extends Core_Gateway {
 		// Action URL.
 		if ( \property_exists( $links, 'checkout' ) ) {
 			$payment->set_action_url( $links->checkout->href );
+		}
+
+		if (
+			null === $payment->get_action_url()
+				&&
+			'' === $payment->get_meta( 'mollie_sequence_type' )
+				&&
+			PaymentMethods::DIRECT_DEBIT === $payment->get_payment_method()
+		) {
+			$payment->set_action_url( $payment->get_return_redirect_url() );
 		}
 
 		// Change payment state URL.
