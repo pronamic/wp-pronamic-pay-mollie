@@ -668,7 +668,9 @@ class Gateway extends Core_Gateway {
 		 */
 		$billing_email = \apply_filters( 'pronamic_pay_mollie_payment_billing_email', $billing_email, $payment );
 
-		$request->set_billing_email( $billing_email );
+		if ( ! empty( $billing_email ) ) {
+			$request->set_billing_email( $billing_email );
+		}
 
 		// Due date.
 		if ( ! empty( $this->config->due_date_days ) ) {
