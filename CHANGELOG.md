@@ -7,6 +7,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.4.0] - 2022-09-26
+- Fixed empty billing email address causing `Unprocessable Entity - The email address '' is invalid` error.
+- Updated payment methods registration.
+
 ## [4.3.1] - 2022-08-15
 - Updated payment provider URL from `www.mollie.com` to `my.mollie.com` ([pronamic/wp-pronamic-pay-mollie#8](https://github.com/pronamic/wp-pronamic-pay-mollie/issues/8)).
 
@@ -211,7 +215,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.1...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.0...HEAD
+[4.4.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.1...4.4.0
 [4.3.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.0...4.3.1
 [4.3.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.2.0...4.3.0
 [4.2.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.1.0...4.2.0
