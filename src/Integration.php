@@ -160,6 +160,7 @@ class Integration extends AbstractGatewayIntegration {
 			'type'     => 'text',
 			'classes'  => [ 'regular-text', 'code' ],
 			'tooltip'  => __( 'API key as mentioned in the payment provider dashboard', 'pronamic_ideal' ),
+			'required' => true,
 		];
 
 		// Due date days.
@@ -214,6 +215,19 @@ class Integration extends AbstractGatewayIntegration {
 			'https://my.mollie.com/dashboard/payments/%s',
 			$transaction_id
 		);
+	}
+
+	/**
+	 * Save post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	public function save_post( $post_id ) {
+		$config = $this->get_config( $post_id );
+
+		\delete_transient( 'pronamic_pay_mollie_payment_methods_' . \md5( \wp_json_encode( $config ) ) );
+		\delete_transient( 'pronamic_pay_ideal_issuers_' . \md5( \wp_json_encode( $config ) ) );
 	}
 
 	/**
@@ -309,7 +323,16 @@ class Integration extends AbstractGatewayIntegration {
 			return $next_payment_delivery_date;
 		}
 
-		if ( ! PaymentMethods::is_direct_debit_method( $payment_method ) ) {
+		if ( ! in_array(
+			$payment_method,
+			[
+				PaymentMethods::DIRECT_DEBIT,
+				PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+				PaymentMethods::DIRECT_DEBIT_IDEAL,
+				PaymentMethods::DIRECT_DEBIT_SOFORT,
+			],
+			true
+		) ) {
 			return $next_payment_delivery_date;
 		}
 

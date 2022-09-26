@@ -189,7 +189,7 @@ class Methods {
 			return null;
 		}
 
-		if ( isset( self::$map[ $payment_method ] ) ) {
+		if ( \array_key_exists( $payment_method, self::$map ) ) {
 			return self::$map[ $payment_method ];
 		}
 

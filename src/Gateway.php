@@ -16,7 +16,14 @@ use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
 use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
+use Pronamic\WordPress\Pay\Core\PaymentMethod;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Core\PaymentMethodsCollection;
+use Pronamic\WordPress\Pay\Fields\CachedCallbackOptions;
+use Pronamic\WordPress\Pay\Fields\IDealIssuerSelectField;
+use Pronamic\WordPress\Pay\Fields\SelectFieldOption;
+use Pronamic\WordPress\Pay\Fields\SelectFieldOptionGroup;
+use Pronamic\WordPress\Pay\Fields\TextField;
 use Pronamic\WordPress\Pay\Gateways\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -62,9 +69,9 @@ class Gateway extends Core_Gateway {
 	 * @param Config $config Config.
 	 */
 	public function __construct( Config $config ) {
-		$this->config = $config;
-
 		parent::__construct();
+
+		$this->config = $config;
 
 		$this->set_method( self::METHOD_HTTP_REDIRECT );
 
@@ -90,113 +97,201 @@ class Gateway extends Core_Gateway {
 
 		// Actions.
 		add_action( 'pronamic_payment_status_update', [ $this, 'copy_customer_id_to_wp_user' ], 99, 1 );
+
+		// Fields.
+		$ideal_options = new CachedCallbackOptions(
+			function() {
+				return $this->get_ideal_issuers();
+			},
+			'pronamic_pay_ideal_issuers_' . \md5( \wp_json_encode( $config ) )
+		);
+
+		$field_consumer_name = new TextField( 'pronamic_pay_consumer_bank_details_name' );
+		$field_consumer_name->set_label( __( 'Account holder name', 'pronamic_ideal' ) );
+		$field_consumer_name->meta_key = 'consumer_bank_details_name';
+
+		$field_consumer_iban = new TextField( 'pronamic_pay_consumer_bank_details_iban' );
+		$field_consumer_iban->set_label( __( 'Account number (IBAN)', 'pronamic_ideal' ) );
+		$field_consumer_iban->meta_key = 'consumer_bank_details_iban';
+
+		// Apple Pay.
+		$payment_method_apple_pay = new PaymentMethod( PaymentMethods::APPLE_PAY );
+		$payment_method_apple_pay->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_apple_pay );
+
+		// Other.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANCONTACT ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANK_TRANSFER ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BELFIUS ) );
+
+		// Payment method credit card.
+		$payment_method_credit_card = new PaymentMethod( PaymentMethods::CREDIT_CARD );
+		$payment_method_credit_card->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_credit_card );
+
+		// Payment method direct debit.
+		$payment_method_direct_debit = new PaymentMethod( PaymentMethods::DIRECT_DEBIT );
+		$payment_method_direct_debit->add_support( 'recurring' );
+		$payment_method_direct_debit->add_field( $field_consumer_name );
+		$payment_method_direct_debit->add_field( $field_consumer_iban );
+
+		$this->register_payment_method( $payment_method_direct_debit );
+
+		// Payment method direct debit and Bancontact.
+		$payment_method_direct_debit_bancontact = new PaymentMethod( PaymentMethods::DIRECT_DEBIT_BANCONTACT );
+		$payment_method_direct_debit_bancontact->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_direct_debit_bancontact );
+
+		// Payment method direct debit and iDEAL.
+		$payment_method_direct_debit_ideal = new PaymentMethod( PaymentMethods::DIRECT_DEBIT_IDEAL );
+		$payment_method_direct_debit_ideal->add_support( 'recurring' );
+
+		$field_ideal_issuer = new IDealIssuerSelectField( 'pronamic_pay_mollie_direct_debit_ideal_issuer' );
+		$field_ideal_issuer->set_options( $ideal_options );
+
+		$payment_method_direct_debit_ideal->add_field( $field_ideal_issuer );
+
+		$this->register_payment_method( $payment_method_direct_debit_ideal );
+
+		// Payment method direct debit and SOFORT.
+		$payment_method_direct_debit_sofort = new PaymentMethod( PaymentMethods::DIRECT_DEBIT_SOFORT );
+		$payment_method_direct_debit_sofort->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_direct_debit_sofort );
+
+		// Other.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::EPS ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::GIROPAY ) );
+
+		// Payment method iDEAL.
+		$payment_method_ideal = new PaymentMethod( PaymentMethods::IDEAL );
+
+		$field_ideal_issuer = new IDealIssuerSelectField( 'pronamic_pay_mollie_ideal_issuer' );
+		$field_ideal_issuer->set_options( $ideal_options );
+
+		$payment_method_ideal->add_field( $field_ideal_issuer );
+
+		$this->register_payment_method( $payment_method_ideal );
+
+		// Other.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KBC ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_LATER ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_NOW ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_OVER_TIME ) );
+
+		// PayPal.
+		$payment_method_paypal = new PaymentMethod( PaymentMethods::PAYPAL );
+		$payment_method_paypal->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_paypal );
+
+		// Other.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::PRZELEWY24 ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::SOFORT ) );
 	}
 
 	/**
-	 * Get issuers
+	 * Get payment methods.
 	 *
-	 * @see Core_Gateway::get_issuers()
-	 * @return array<int, array<string, array<string>>>
+	 * @param array $args Query arguments.
+	 * @return PaymentMethodsCollection
 	 */
-	public function get_issuers() {
-		$groups = [];
+	public function get_payment_methods( array $args = [] ) : PaymentMethodsCollection {
+		try {
+			$this->maybe_enrich_payment_methods();
+		} catch ( \Exception $e ) {
+			// No problem.
+		}
 
-		$result = $this->client->get_issuers();
-
-		$groups[] = [
-			'options' => $result,
-		];
-
-		return $groups;
+		return parent::get_payment_methods( $args );
 	}
 
 	/**
-	 * Get available payment methods.
+	 * Maybe enrich payment methods.
 	 *
-	 * @see Core_Gateway::get_available_payment_methods()
-	 * @return array<int, string>
+	 * @return void
 	 */
-	public function get_available_payment_methods() {
-		$payment_methods = [];
+	private function maybe_enrich_payment_methods() {
+		$cache_key = 'pronamic_pay_mollie_payment_methods_' . \md5( \wp_json_encode( $this->config ) );
 
-		$resources      = [ ResourceType::PAYMENTS, ResourceType::ORDERS ];
-		$sequence_types = [ Sequence::ONE_OFF, Sequence::RECURRING, Sequence::FIRST ];
+		$mollie_payment_methods = \get_transient( $cache_key );
 
-		$results = [];
+		if ( false === $mollie_payment_methods ) {
+			$mollie_payment_methods = $this->client->get_all_payment_methods();
 
-		foreach ( $resources as $resource ) {
-			foreach ( $sequence_types as $sequence_type ) {
-				// Get active payment methods for Mollie account.
-				$result = $this->client->get_payment_methods( $sequence_type, $resource );
+			\set_transient( $cache_key, $mollie_payment_methods, \DAY_IN_SECONDS );
+		}
 
-				if ( Sequence::FIRST === $sequence_type ) {
-					foreach ( $result as $method => $title ) {
-						unset( $result[ $method ] );
+		$has_active_method = false;
 
-						// Get WordPress payment method for direct debit method.
-						$method         = Methods::transform_gateway_method( $method );
-						$payment_method = array_search( $method, PaymentMethods::get_recurring_methods(), true );
+		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
+			$core_payment_method_id = Methods::transform_gateway_method( $mollie_payment_method->id );
 
-						if ( $payment_method ) {
-							$results[ $payment_method ] = $title;
-						}
-					}
+			$core_payment_method = $this->get_payment_method( $core_payment_method_id );
+
+			if ( null !== $core_payment_method ) {
+				switch ( $mollie_payment_method->status ) {
+					case 'activated':
+						$core_payment_method->set_status( 'active' );
+
+						break;
+					case 'pending-boarding':
+					case 'pending-review':
+					case 'pending-external':
+						$core_payment_method->set_status( $this->config->is_test_mode() ? 'active' : 'inactive' );
+
+						break;
+					case 'rejected':
+					case null:
+						$core_payment_method->set_status( 'inactive' );
+
+						break;
 				}
 
-				if ( is_array( $result ) ) {
-					$results = array_merge( $results, $result );
+				// Check active payment method status.
+				if ( 'active' === $core_payment_method->get_status() ) {
+					$has_active_method = true;
 				}
 			}
 		}
 
-		// Transform to WordPress payment methods.
-		foreach ( $results as $method => $title ) {
-			$method = (string) $method;
+		// Update `Direct Debit (mandate via ...)` payment method statuses.
+		if ( 'active' === $this->get_payment_method( PaymentMethods::DIRECT_DEBIT )->get_status() ) {
+			// Bancontact.
+			$bancontact_method = $this->get_payment_method( PaymentMethods::BANCONTACT );
 
-			$payment_method = Methods::transform_gateway_method( $method );
+			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_BANCONTACT )->set_status( $bancontact_method->get_status() );
 
-			if ( PaymentMethods::is_recurring_method( $method ) ) {
-				$payment_method = $method;
-			}
+			// iDEAL.
+			$ideal_method = $this->get_payment_method( PaymentMethods::IDEAL );
 
-			if ( null !== $payment_method ) {
-				$payment_methods[] = (string) $payment_method;
-			}
+			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_IDEAL )->set_status( $ideal_method->get_status() );
+
+			// SOFORT.
+			$sofort_method = $this->get_payment_method( PaymentMethods::SOFORT );
+
+			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_SOFORT )->set_status( $sofort_method->get_status() );
 		}
-
-		$payment_methods = array_unique( $payment_methods );
-
-		return $payment_methods;
 	}
 
 	/**
-	 * Get supported payment methods
+	 * Get iDEAL issuers.
 	 *
-	 * @see Core_Gateway::get_supported_payment_methods()
-	 * @return array<string>
+	 * @return iterable<SelectFieldOption|SelectFieldOptionGroup>
 	 */
-	public function get_supported_payment_methods() {
-		return [
-			PaymentMethods::APPLE_PAY,
-			PaymentMethods::BANCONTACT,
-			PaymentMethods::BANK_TRANSFER,
-			PaymentMethods::BELFIUS,
-			PaymentMethods::CREDIT_CARD,
-			PaymentMethods::DIRECT_DEBIT,
-			PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-			PaymentMethods::DIRECT_DEBIT_IDEAL,
-			PaymentMethods::DIRECT_DEBIT_SOFORT,
-			PaymentMethods::EPS,
-			PaymentMethods::GIROPAY,
-			PaymentMethods::IDEAL,
-			PaymentMethods::KBC,
-			PaymentMethods::KLARNA_PAY_LATER,
-			PaymentMethods::KLARNA_PAY_NOW,
-			PaymentMethods::KLARNA_PAY_OVER_TIME,
-			PaymentMethods::PAYPAL,
-			PaymentMethods::PRZELEWY24,
-			PaymentMethods::SOFORT,
-		];
+	private function get_ideal_issuers() {
+		$issuers = $this->client->get_issuers();
+
+		$items = [];
+
+		foreach ( $issuers as $key => $value ) {
+			$items[] = new SelectFieldOption( $key, $value );
+		}
+
+		return $items;
 	}
 
 	/**
@@ -482,7 +577,19 @@ class Gateway extends Core_Gateway {
 		}
 
 		if ( 'first' === $request->get_sequence_type() ) {
-			$first_method = PaymentMethods::get_first_payment_method( $payment_method );
+			$first_method = $payment_method;
+
+			switch ( $payment_method ) {
+				case PaymentMethods::DIRECT_DEBIT_BANCONTACT:
+					$first_method = PaymentMethods::BANCONTACT;
+					break;
+				case PaymentMethods::DIRECT_DEBIT_IDEAL:
+					$first_method = PaymentMethods::IDEAL;
+					break;
+				case PaymentMethods::DIRECT_DEBIT_SOFORT:
+					$first_method = PaymentMethods::SOFORT;
+					break;
+			}
 
 			$request->set_method( Methods::transform( $first_method, $first_method ) );
 		}
@@ -561,7 +668,9 @@ class Gateway extends Core_Gateway {
 		 */
 		$billing_email = \apply_filters( 'pronamic_pay_mollie_payment_billing_email', $billing_email, $payment );
 
-		$request->set_billing_email( $billing_email );
+		if ( ! empty( $billing_email ) ) {
+			$request->set_billing_email( $billing_email );
+		}
 
 		// Due date.
 		if ( ! empty( $this->config->due_date_days ) ) {
@@ -1092,6 +1201,16 @@ class Gateway extends Core_Gateway {
 		// Action URL.
 		if ( \property_exists( $links, 'checkout' ) ) {
 			$payment->set_action_url( $links->checkout->href );
+		}
+
+		if (
+			null === $payment->get_action_url()
+				&&
+			'' === $payment->get_meta( 'mollie_sequence_type' )
+				&&
+			PaymentMethods::DIRECT_DEBIT === $payment->get_payment_method()
+		) {
+			$payment->set_action_url( $payment->get_return_redirect_url() );
 		}
 
 		// Change payment state URL.
