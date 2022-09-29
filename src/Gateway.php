@@ -225,8 +225,6 @@ class Gateway extends Core_Gateway {
 			\set_transient( $cache_key, $mollie_payment_methods, \DAY_IN_SECONDS );
 		}
 
-		$has_active_method = false;
-
 		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
 			$core_payment_method_id = Methods::transform_gateway_method( $mollie_payment_method->id );
 
@@ -249,11 +247,6 @@ class Gateway extends Core_Gateway {
 						$core_payment_method->set_status( 'inactive' );
 
 						break;
-				}
-
-				// Check active payment method status.
-				if ( 'active' === $core_payment_method->get_status() ) {
-					$has_active_method = true;
 				}
 			}
 		}
