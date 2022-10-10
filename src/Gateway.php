@@ -671,7 +671,9 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Process only when customer is known.
-		if ( null === $request->customer_id ) {
+		$customer_id = $request->customer_id;
+
+		if ( null === $customer_id ) {
 			return;
 		}
 
