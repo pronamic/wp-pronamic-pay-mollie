@@ -658,7 +658,7 @@ class Gateway extends Core_Gateway {
 	 * 
 	 * Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
 	 * 
-	 * @param Payment $payment Payment.
+	 * @param Payment        $payment Payment.
 	 * @param PaymentRequest $request Request.
 	 * @return void
 	 */
