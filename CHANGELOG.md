@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.4.1] - 2022-10-11
+- Fixed recurring payments using latest mandate of Mollie customer instead of subscription mandate (pronamic/wp-pronamic-pay-mollie#11).
+
 ## [4.4.0] - 2022-09-26
 - Fixed empty billing email address causing `Unprocessable Entity - The email address '' is invalid` error.
 - Updated payment methods registration.
@@ -215,7 +218,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.1...HEAD
+[4.4.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.0...4.4.1
 [4.4.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.1...4.4.0
 [4.3.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.0...4.3.1
 [4.3.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.2.0...4.3.0

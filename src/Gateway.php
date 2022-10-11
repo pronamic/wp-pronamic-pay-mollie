@@ -225,8 +225,6 @@ class Gateway extends Core_Gateway {
 			\set_transient( $cache_key, $mollie_payment_methods, \DAY_IN_SECONDS );
 		}
 
-		$has_active_method = false;
-
 		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
 			$core_payment_method_id = Methods::transform_gateway_method( $mollie_payment_method->id );
 
@@ -249,11 +247,6 @@ class Gateway extends Core_Gateway {
 						$core_payment_method->set_status( 'inactive' );
 
 						break;
-				}
-
-				// Check active payment method status.
-				if ( 'active' === $core_payment_method->get_status() ) {
-					$has_active_method = true;
 				}
 			}
 		}
@@ -596,34 +589,8 @@ class Gateway extends Core_Gateway {
 
 		/**
 		 * Direct Debit.
-		 *
-		 * Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
 		 */
-		$consumer_bank_details = $payment->get_consumer_bank_details();
-
-		if ( PaymentMethods::DIRECT_DEBIT === $payment_method && null !== $consumer_bank_details ) {
-			$consumer_name = $consumer_bank_details->get_name();
-			$consumer_iban = $consumer_bank_details->get_iban();
-
-			$request->consumer_name    = $consumer_name;
-			$request->consumer_account = $consumer_iban;
-
-			// Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
-			if ( null !== $customer_id ) {
-				// Find or create mandate.
-				$mandate_id = $this->client->has_valid_mandate( $customer_id, PaymentMethods::DIRECT_DEBIT, $consumer_iban );
-
-				if ( false === $mandate_id ) {
-					$mandate = $this->client->create_mandate( $customer_id, $consumer_bank_details );
-
-					$mandate_id = $mandate->get_id();
-				}
-
-				// Charge immediately on-demand.
-				$request->set_sequence_type( 'recurring' );
-				$request->set_mandate_id( (string) $mandate_id );
-			}
-		}
+		$this->process_direct_debit_mandate_from_bank_details( $payment, $request );
 
 		/**
 		 * Metadata.
@@ -684,6 +651,65 @@ class Gateway extends Core_Gateway {
 		}
 
 		return $request;
+	}
+
+	/**
+	 * Process direct debit mandate from bank details.
+	 * 
+	 * Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
+	 * 
+	 * @param Payment        $payment Payment.
+	 * @param PaymentRequest $request Request.
+	 * @return void
+	 */
+	private function process_direct_debit_mandate_from_bank_details( Payment $payment, PaymentRequest $request ) {
+		// Process only when method is direct debit.
+		$method = $request->get_method();
+
+		if ( Methods::DIRECT_DEBIT !== $method ) {
+			return;
+		}
+
+		// Process only when customer is known.
+		$customer_id = $request->customer_id;
+
+		if ( null === $customer_id ) {
+			return;
+		}
+
+		// Process only when mandate is unknown.
+		$mandata_id = $request->get_mandate_id();
+
+		if ( null !== $mandate_id ) {
+			return;
+		}
+
+		// Process only when bank details are known.
+		$consumer_bank_details = $payment->get_consumer_bank_details();
+
+		if ( null === $consumer_bank_details ) {
+			return;
+		}
+
+		$consumer_name = $consumer_bank_details->get_name();
+		$consumer_iban = $consumer_bank_details->get_iban();
+
+		$request->consumer_name    = $consumer_name;
+		$request->consumer_account = $consumer_iban;
+
+		// Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
+		// Find or create mandate.
+		$mandate_id = $this->client->has_valid_mandate( $customer_id, PaymentMethods::DIRECT_DEBIT, $consumer_iban );
+
+		if ( false === $mandate_id ) {
+			$mandate = $this->client->create_mandate( $customer_id, $consumer_bank_details );
+
+			$mandate_id = $mandate->get_id();
+		}
+
+		// Charge immediately on-demand.
+		$request->set_sequence_type( 'recurring' );
+		$request->set_mandate_id( (string) $mandate_id );
 	}
 
 	/**
