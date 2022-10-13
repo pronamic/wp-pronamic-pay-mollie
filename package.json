@@ -30,5 +30,15 @@
   "bugs": {
     "url": "https://github.com/wp-pay-gateways/mollie/issues"
   },
-  "homepage": "http://www.wp-pay.org/gateways/mollie/"
+  "homepage": "http://www.wp-pay.org/gateways/mollie/",
+  "devDependencies": {
+    "@wordpress/env": "^5.4.0",
+    "npm-run-all": "^4.1.5"
+  },
+  "scripts": {
+    "start": "wp-env start --xdebug && npm run setup && npm run login",
+    "setup": "npm-run-all setup-*",
+    "setup-mollie-api-key": "wp-env run cli wp config set MOLLIE_API_KEY $MOLLIE_API_KEY",
+    "login": "wp-env run cli wp user one-time-login admin"
+  }
 }
