@@ -43,6 +43,17 @@ class Client {
 	}
 
 	/**
+	 * Get user agent value for requests to Mollie.
+	 * 
+	 * @link https://github.com/WordPress/WordPress/blob/f9db66d504fc72942515f6c0ed2b63aee7cef876/wp-includes/class-wp-http.php#L183-L192
+	 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13
+	 * @return string
+	 */
+	private function get_user_agent() {
+		return 'PronamicPay/' . \pronamic_pay_plugin()->get_version() . ' WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' );
+	}
+
+	/**
 	 * Send request with the specified action and parameters
 	 *
 	 * @param string $url    URL.
@@ -55,8 +66,9 @@ class Client {
 	public function send_request( $url, $method = 'GET', $data = null ) {
 		// Request.
 		$args = [
-			'method'  => $method,
-			'headers' => [
+			'method'     => $method,
+			'user-agent' => $this->get_user_agent(),
+			'headers'    => [
 				'Authorization' => 'Bearer ' . $this->api_key,
 			],
 		];
