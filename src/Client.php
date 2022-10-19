@@ -45,12 +45,33 @@ class Client {
 	/**
 	 * Get user agent value for requests to Mollie.
 	 * 
-	 * @link https://github.com/WordPress/WordPress/blob/f9db66d504fc72942515f6c0ed2b63aee7cef876/wp-includes/class-wp-http.php#L183-L192
 	 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13
 	 * @return string
 	 */
 	private function get_user_agent() {
-		return 'PronamicPay/' . \pronamic_pay_plugin()->get_version() . ' WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' );
+		return implode(
+			' ',
+			[
+				/**
+				 * Pronamic Pay version.
+				 * 
+				 * @link https://github.com/pronamic/pronamic-pay/issues/12
+				 */
+				'PronamicPay/' . \pronamic_pay_plugin()->get_version(),
+				/**
+				 * Pronamic - Mollie user agent token.
+				 *
+				 * @link https://github.com/pronamic/pronamic-pay/issues/12
+				 */
+				'uap/FyuVeDDqnKdzdry7',
+				/**
+				 * WordPress version.
+				 *
+				 * @link https://github.com/WordPress/WordPress/blob/f9db66d504fc72942515f6c0ed2b63aee7cef876/wp-includes/class-wp-http.php#L183-L192
+				 */
+				'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ),
+			]
+		);
 	}
 
 	/**
