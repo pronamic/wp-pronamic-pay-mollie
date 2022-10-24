@@ -51,9 +51,6 @@ class Integration extends AbstractGatewayIntegration {
 				'provider'               => 'mollie',
 				'supports'               => [
 					'payment_status_request',
-					'recurring_apple_pay',
-					'recurring_direct_debit',
-					'recurring_credit_card',
 					'recurring',
 					'refunds',
 					'webhook',
