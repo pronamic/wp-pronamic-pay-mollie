@@ -43,7 +43,7 @@
 		"justinrainbow/json-schema": "^5.2",
 		"pronamic/wp-http": "^1.1",
 		"woocommerce/action-scheduler": "^3.4",
-		"wp-pay/core": "^4.4"
+		"wp-pay/core": "^4.5"
 	},
 	"require-dev": {
 		"automattic/wordbless": "^0.3.1",
@@ -75,7 +75,7 @@
 		"post-install-cmd": "echo 'Optionally run: composer bin all install'",
 		"post-update-cmd": [
 			"echo 'Optionally run: composer bin all update'",
-			"php -r \"copy('vendor/automattic/wordbless/src/dbless-wpdb.php', 'wordpress/wp-content/db.php');\""
+			"mkdir -p wordpress/wp-content && cp vendor/automattic/wordbless/src/dbless-wpdb.php wordpress/wp-content/db.php"
 		],
 		"psalm": "vendor/bin/psalm",
 		"build-docs": [
