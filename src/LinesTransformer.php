@@ -28,6 +28,8 @@ class LinesTransformer {
 	public function transform_wp_to_mollie( WordPressLines $payment_lines ): MollieLines {
 		$lines = new self();
 
+		$amount_transformer = new AmountTransformer();
+
 		foreach ( $payment_lines as $payment_line ) {
 			$total_amount = $payment_line->get_total_amount();
 
@@ -68,10 +70,10 @@ class LinesTransformer {
 			$line = $lines->new_line(
 				$name,
 				$quantity,
-				AmountTransformer::transform( $unit_price ),
-				AmountTransformer::transform( $total_amount ),
+				$amount_transformer->transform_wp_to_mollie( $unit_price ),
+				$amount_transformer->transform_wp_to_mollie( $total_amount ),
 				Number::from_mixed( $tax_percentage ),
-				AmountTransformer::transform( $vat_amount ),
+				$amount_transformer->transform_wp_to_mollie( $vat_amount ),
 			);
 
 			$line_type_transformer = new LineTypeTransformer();
@@ -85,7 +87,7 @@ class LinesTransformer {
 			// Discount amount.
 			$discount_amount = $payment_line->get_discount_amount();
 
-			$line->set_discount_amount( null === $discount_amount ? null : AmountTransformer::transform( $discount_amount ) );
+			$line->set_discount_amount( null === $discount_amount ? null : $amount_transformer->transform_wp_to_mollie( $discount_amount ) );
 		}
 
 		return $lines;

@@ -29,6 +29,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
+use Pronamic\WordPress\Mollie\AmountTransformer;
 use Pronamic\WordPress\Mollie\Customer;
 use Pronamic\WordPress\Mollie\Methods;
 use Pronamic\WordPress\Mollie\Payment as MolliePayment;
@@ -482,8 +483,10 @@ class Gateway extends Core_Gateway {
 		 */
 		$description = \apply_filters( 'pronamic_pay_mollie_payment_description', $description, $payment );
 
+		$amount_transformer = new AmountTransformer();
+
 		$request = new PaymentRequest(
-			AmountTransformer::transform( $payment->get_total_amount() ),
+			$amount_transformer->transform_wp_to_mollie( $payment->get_total_amount() ),
 			$description
 		);
 
@@ -1390,7 +1393,9 @@ class Gateway extends Core_Gateway {
 	 * @return string
 	 */
 	public function create_refund( $transaction_id, Money $amount, $description = null ) {
-		$request = new RefundRequest( AmountTransformer::transform( $amount ) );
+		$amount_transformer = new AmountTransformer();
+
+		$request = new RefundRequest( $amount_transformer->transform_wp_to_mollie( $amount ) );
 
 		// Metadata payment ID.
 		$payment = \get_pronamic_payment_by_transaction_id( $transaction_id );
