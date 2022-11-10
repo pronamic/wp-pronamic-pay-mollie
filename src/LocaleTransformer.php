@@ -1,6 +1,6 @@
 <?php
 /**
- * Mollie locale helper.
+ * Mollie transformer helper.
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2022 Pronamic
@@ -10,17 +10,19 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Mollie\Locales as MollieLocale;
+
 /**
- * Locale helper class
+ * Locale transformer class
  */
-class LocaleHelper {
+class LocaleTransformer {
 	/**
 	 * Get Mollie locale by the specified WordPress locale.
 	 *
 	 * @param string|null $locale Locale string (en_US) to transform to Mollie locale.
 	 * @return string|null
 	 */
-	public static function transform( $locale ) {
+	public function transform_wp_to_mollie( $locale ) {
 		if ( ! \is_string( $locale ) ) {
 			return null;
 		}
@@ -31,27 +33,27 @@ class LocaleHelper {
 		 * @var array<int, string>
 		 */
 		$supported = [
-			Locales::EN_US,
-			Locales::NL_NL,
-			Locales::NL_BE,
-			Locales::FR_FR,
-			Locales::FR_BE,
-			Locales::DE_DE,
-			Locales::DE_AT,
-			Locales::DE_CH,
-			Locales::ES_ES,
-			Locales::CA_ES,
-			Locales::PT_PT,
-			Locales::IT_IT,
-			Locales::NB_NO,
-			Locales::SV_SE,
-			Locales::FI_FI,
-			Locales::DA_DK,
-			Locales::IS_IS,
-			Locales::HU_HU,
-			Locales::PL_PL,
-			Locales::LV_LV,
-			Locales::LT_LT,
+			MollieLocale::EN_US,
+			MollieLocale::NL_NL,
+			MollieLocale::NL_BE,
+			MollieLocale::FR_FR,
+			MollieLocale::FR_BE,
+			MollieLocale::DE_DE,
+			MollieLocale::DE_AT,
+			MollieLocale::DE_CH,
+			MollieLocale::ES_ES,
+			MollieLocale::CA_ES,
+			MollieLocale::PT_PT,
+			MollieLocale::IT_IT,
+			MollieLocale::NB_NO,
+			MollieLocale::SV_SE,
+			MollieLocale::FI_FI,
+			MollieLocale::DA_DK,
+			MollieLocale::IS_IS,
+			MollieLocale::HU_HU,
+			MollieLocale::PL_PL,
+			MollieLocale::LV_LV,
+			MollieLocale::LT_LT,
 		];
 
 		// Lowercase.

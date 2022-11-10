@@ -71,7 +71,9 @@ class OrderRequestTest extends TestCase {
 		$billing_address->set_region( 'Friesland' );
 		$billing_address->set_phone( '085 40 11 580' );
 
-		$request->set_billing_address( Address::from_wp_address( $billing_address ) );
+		$address_transformer = new AddressTransformer();
+
+		$request->set_billing_address( $address_transformer->transform_wp_to_mollie( $billing_address ) );
 
 		$request->redirect_url = 'https://example.com/mollie-redirect/';
 		$request->webhook_url  = 'https://example.com/mollie-webhook/';

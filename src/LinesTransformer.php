@@ -1,6 +1,6 @@
 <?php
 /**
- * Lines
+ * Lines transformer
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2022 Pronamic
@@ -10,69 +10,14 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use JsonSerializable;
-use Pronamic\WordPress\Money\TaxedMoney;
-use Pronamic\WordPress\Number\Number;
-use Pronamic\WordPress\Pay\Payments\PaymentLines;
+use InvalidArgumentException;
+use Pronamic\WordPress\Mollie\Address as MollieLines;
+use Pronamic\WordPress\Pay\Payments\PaymentLines as WordPressLines;
 
 /**
- * Lines class
+ * Lines transformer class
  */
-class Lines implements JsonSerializable {
-	/**
-	 * The lines.
-	 *
-	 * @var Line[]
-	 */
-	private array $lines = [];
-
-	/**
-	 * New line.
-	 *
-	 * @param string $name         Description of the order line.
-	 * @param int    $quantity     Quantity.
-	 * @param Amount $unit_price   Unit price.
-	 * @param Amount $total_amount Total amount, including VAT and  discounts.
-	 * @param Number $vat_rate     VAT rate.
-	 * @param Amount $vat_amount   Value-added tax amount.
-	 */
-	public function new_line( string $name, int $quantity, Amount $unit_price, Amount $total_amount, Number $vat_rate, Amount $vat_amount ) : Line {
-		$line = new Line(
-			$name,
-			$quantity,
-			$unit_price,
-			$total_amount,
-			$vat_rate,
-			$vat_amount
-		);
-
-		$this->lines[] = $line;
-
-		return $line;
-	}
-
-	/**
-	 * JSON serialize.
-	 *
-	 * @return mixed
-	 */
-	public function jsonSerialize() {
-		$objects = array_map(
-			/**
-			 * Get JSON for payment line.
-			 *
-			 * @param Line $line Payment line.
-			 * @return object
-			 */
-			function( Line $line ) {
-				return $line->jsonSerialize();
-			},
-			$this->lines
-		);
-
-		return $objects;
-	}
-
+class LinesTransformer {
 	/**
 	 * Create lines from WordPress Pay core payment lines.
 	 *
@@ -80,7 +25,7 @@ class Lines implements JsonSerializable {
 	 * @return Lines
 	 * @throws \InvalidArgumentException Throws exception on invalid arguments.
 	 */
-	public static function from_wp_payment_lines( PaymentLines $payment_lines ) : Lines {
+	public function transform_wp_to_mollie( WordPressLines $payment_lines ): MollieLines {
 		$lines = new self();
 
 		foreach ( $payment_lines as $payment_line ) {
@@ -129,7 +74,9 @@ class Lines implements JsonSerializable {
 				AmountTransformer::transform( $vat_amount ),
 			);
 
-			$line->set_type( LineType::transform( $payment_line->get_type() ) );
+			$line_type_transformer = new LineTypeTransformer();
+
+			$line->set_type( $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() ) );
 			$line->set_category( $payment_line->get_product_category() );
 			$line->set_sku( $payment_line->get_sku() );
 			$line->set_image_url( $payment_line->get_image_url() );

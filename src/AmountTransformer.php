@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Mollie\Amount;
 use Pronamic\WordPress\Money\Money;
 
 /**

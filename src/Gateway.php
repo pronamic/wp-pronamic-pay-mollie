@@ -24,12 +24,17 @@ use Pronamic\WordPress\Pay\Fields\IDealIssuerSelectField;
 use Pronamic\WordPress\Pay\Fields\SelectFieldOption;
 use Pronamic\WordPress\Pay\Fields\SelectFieldOptionGroup;
 use Pronamic\WordPress\Pay\Fields\TextField;
-use Pronamic\WordPress\Pay\Gateways\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
+use Pronamic\WordPress\Mollie\Customer;
+use Pronamic\WordPress\Mollie\Methods;
+use Pronamic\WordPress\Mollie\Payment as MolliePayment;
+use Pronamic\WordPress\Mollie\PaymentRequest;
+use Pronamic\WordPress\Mollie\Profile;
+use Pronamic\WordPress\Mollie\ResourceType;
 
 /**
  * Gateway class
@@ -86,7 +91,7 @@ class Gateway extends Core_Gateway {
 		];
 
 		// Client.
-		$this->client = new Client( (string) $config->api_key );
+		$this->client = new \Pronamic\WordPress\Mollie\Client( (string) $config->api_key );
 
 		// Data Stores.
 		$this->profile_data_store  = new ProfileDataStore();
@@ -222,8 +227,10 @@ class Gateway extends Core_Gateway {
 			\set_transient( $cache_key, $mollie_payment_methods, \DAY_IN_SECONDS );
 		}
 
+		$method_transformer = new MethodTransformer();
+
 		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
-			$core_payment_method_id = Methods::transform_gateway_method( $mollie_payment_method->id );
+			$core_payment_method_id = $method_transformer->transform_mollie_to_wp( $mollie_payment_method->id );
 
 			$core_payment_method = $this->get_payment_method( $core_payment_method_id );
 
@@ -487,7 +494,9 @@ class Gateway extends Core_Gateway {
 		$customer = $payment->get_customer();
 
 		if ( null !== $customer ) {
-			$request->locale = LocaleHelper::transform( $customer->get_locale() );
+			$locale_transformer = new LocaleTransformer();
+
+			$request->locale = $locale_transformer->transform_wp_to_mollie( $customer->get_locale() );
 		}
 
 		// Customer ID.
@@ -523,7 +532,9 @@ class Gateway extends Core_Gateway {
 		 */
 		$payment_method = $payment->get_payment_method();
 
-		$request->set_method( Methods::transform( $payment_method, $payment_method ) );
+		$method_transformer = new MethodTransformer();
+
+		$request->set_method( $method_transformer->transform_wp_to_mollie( $payment_method, $payment_method ) );
 
 		/**
 		 * Sequence type.
@@ -735,10 +746,12 @@ class Gateway extends Core_Gateway {
 			throw new InvalidArgumentException( 'Mollie requires locale for order.' );
 		}
 
+		$lines_transformer = new LinesTransformer();
+
 		$order_request = new OrderRequest(
 			$payment_request->amount,
 			(string) $order_number,
-			Lines::from_wp_payment_lines( $lines ),
+			$lines_transformer->transform_wp_to_mollie( $lines ),
 			$payment_request->locale
 		);
 
@@ -746,15 +759,18 @@ class Gateway extends Core_Gateway {
 		$order_request->webhook_url  = $this->get_webhook_url( $payment );
 		$order_request->method       = $payment_request->method;
 
+		// Adresses.
+		$address_transformer = new AddressTransformer();
+
 		// Billing address.
 		$billing_address = $payment->get_billing_address();
 
-		$order_request->set_billing_address( null === $billing_address ? null : Address::from_wp_address( $billing_address ) );
+		$order_request->set_billing_address( null === $billing_address ? null : $address_transformer->transform_wp_to_mollie( $billing_address ) );
 
 		// Shipping address.
 		$shipping_address = $payment->get_shipping_address();
 
-		$order_request->set_shipping_address( null === $shipping_address ? null : Address::from_wp_address( $shipping_address ) );
+		$order_request->set_shipping_address( null === $shipping_address ? null : $address_transformer->transform_wp_to_mollie( $shipping_address ) );
 
 		// Consumer date of birth.
 		$customer = $payment->get_customer();
@@ -938,7 +954,9 @@ class Gateway extends Core_Gateway {
 		/**
 		 * Status.
 		 */
-		$status = Statuses::transform( $mollie_payment->get_status() );
+		$status_transformer = new StatusTransformer();
+
+		$status = $status_transformer->transform_mollie_to_wp( $mollie_payment->get_status() );
 
 		if ( null !== $status ) {
 			$payment->set_status( $status );
@@ -950,7 +968,9 @@ class Gateway extends Core_Gateway {
 		$method = $mollie_payment->get_method();
 
 		if ( null !== $method ) {
-			$payment_method = Methods::transform_gateway_method( $method );
+			$method_transformer = new MethodTransformer();
+
+			$payment_method = $method_transformer->transform_mollie_to_wp( $method );
 
 			// Use wallet method as payment method.
 			$mollie_payment_details = $mollie_payment->get_details();
@@ -1540,7 +1560,9 @@ class Gateway extends Core_Gateway {
 			$locale = $pronamic_customer->get_locale();
 
 			if ( null !== $locale ) {
-				$mollie_customer->set_locale( LocaleHelper::transform( $locale ) );
+				$locale_transformer = new LocaleTransformer();
+
+				$mollie_customer->set_locale( $locale_transformer->transform_wp_to_mollie( $locale ) );
 			}
 		}
 
