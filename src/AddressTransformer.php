@@ -21,8 +21,8 @@ class AddressTransformer {
 	/**
 	 * Transform from WordPress Pay core address.
 	 *
-	 * @param Core_Address $address Address.
-	 * @return Address
+	 * @param WordPressAddress $address Address.
+	 * @return MollieAddress
 	 * @throws InvalidArgumentException Throws exception on invalid arguments.
 	 */
 	public function transform_wp_to_mollie( WordPressAddress $address ): MollieAddress {

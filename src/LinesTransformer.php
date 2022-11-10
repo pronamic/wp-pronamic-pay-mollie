@@ -21,14 +21,15 @@ class LinesTransformer {
 	/**
 	 * Create lines from WordPress Pay core payment lines.
 	 *
-	 * @param PaymentLines $payment_lines Payment lines.
-	 * @return Lines
+	 * @param WordPressLines $payment_lines Payment lines.
+	 * @return MollieLines
 	 * @throws \InvalidArgumentException Throws exception on invalid arguments.
 	 */
 	public function transform_wp_to_mollie( WordPressLines $payment_lines ): MollieLines {
 		$lines = new self();
 
-		$amount_transformer = new AmountTransformer();
+		$amount_transformer    = new AmountTransformer();
+		$line_type_transformer = new LineTypeTransformer();
 
 		foreach ( $payment_lines as $payment_line ) {
 			$total_amount = $payment_line->get_total_amount();
@@ -75,8 +76,6 @@ class LinesTransformer {
 				Number::from_mixed( $tax_percentage ),
 				$amount_transformer->transform_wp_to_mollie( $vat_amount ),
 			);
-
-			$line_type_transformer = new LineTypeTransformer();
 
 			$line->set_type( $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() ) );
 			$line->set_category( $payment_line->get_product_category() );
