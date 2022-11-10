@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Mollie\Locales as MollieLocale;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
@@ -23,7 +24,7 @@ use Yoast\PHPUnitPolyfills\TestCases\TestCase;
  * @since   1.0.0
  * @see     https://www.mollie.nl/support/documentatie/betaaldiensten/ideal/en/
  */
-class LocaleHelperTest extends TestCase {
+class LocaleTransformerTest extends TestCase {
 	/**
 	 * Test transform.
 	 *
@@ -33,7 +34,9 @@ class LocaleHelperTest extends TestCase {
 	 * @dataProvider locale_matrix_provider
 	 */
 	public function test_get_locale( $locale, $expected ) {
-		$mollie_locale = LocaleHelper::transform( $locale );
+		$transformer = new LocaleTransformer();
+
+		$mollie_locale = $transformer->transform_wp_to_mollie( $locale );
 
 		$this->assertEquals( $expected, $mollie_locale );
 	}
@@ -46,14 +49,14 @@ class LocaleHelperTest extends TestCase {
 	public function locale_matrix_provider() {
 		return [
 			// English.
-			[ 'en_US', Locales::EN_US ],
-			[ 'en_us', Locales::EN_US ],
+			[ 'en_US', MollieLocale::EN_US ],
+			[ 'en_us', MollieLocale::EN_US ],
 			[ 'en_GB', null ],
 			[ 'EN', null ],
 			[ 'en', null ],
 
 			// Dutch.
-			[ 'nl_NL', Locales::NL_NL ],
+			[ 'nl_NL', MollieLocale::NL_NL ],
 			[ 'NL', null ],
 			[ 'nl', null ],
 

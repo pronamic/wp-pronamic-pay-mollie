@@ -90,59 +90,6 @@ class GatewayTest extends TestCase {
 	}
 
 	/**
-	 * Test get issuers type.
-	 */
-	public function test_get_issuers_type() {
-		$issuers = $this->gateway->get_issuers();
-
-		$this->assertIsArray( $issuers );
-	}
-
-	/**
-	 * Test for issuers array structure.
-	 *
-	 * @depends test_get_issuers_type
-	 */
-	public function test_get_issuers_structure() {
-		$issuers = $this->gateway->get_issuers();
-
-		$this->assertIsArray( $issuers );
-
-		// Check issuers array structure.
-		if ( ! empty( $issuers ) ) {
-			$this->assertIsArray( $issuers[0] );
-			$this->assertArrayHasKey( 'options', $issuers[0] );
-		}
-	}
-
-	/**
-	 * Test available payment methods array type.
-	 */
-	public function test_get_available_payment_methods_type() {
-		$available = $this->gateway->get_available_payment_methods();
-
-		$this->assertIsArray( $available );
-	}
-
-	/**
-	 * Test if available payment methods are valid core payment methods.
-	 *
-	 * @depends test_get_available_payment_methods_type
-	 */
-	public function test_get_available_payment_methods_valid() {
-		$payment_methods = new PaymentMethods();
-
-		$methods_reflection = new \ReflectionClass( get_class( $payment_methods ) );
-		$methods            = $methods_reflection->getConstants();
-
-		$available = $this->gateway->get_available_payment_methods();
-
-		foreach ( $available as $method ) {
-			$this->assertContains( $method, $methods );
-		}
-	}
-
-	/**
 	 * Test webhook url.
 	 *
 	 * @param string      $home_url Home URL.

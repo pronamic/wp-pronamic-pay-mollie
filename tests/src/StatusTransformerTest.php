@@ -10,7 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Pay\Payments\PaymentStatus;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus as WordPressStatus;
+use Pronamic\WordPress\Mollie\Statuses as MollieStatus;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
@@ -24,7 +25,7 @@ use Yoast\PHPUnitPolyfills\TestCases\TestCase;
  * @since   1.0.0
  * @see     https://www.mollie.nl/support/documentatie/betaaldiensten/ideal/en/
  */
-class StatusesTest extends TestCase {
+class StatusTransformerTest extends TestCase {
 	/**
 	 * Test transform.
 	 *
@@ -34,7 +35,9 @@ class StatusesTest extends TestCase {
 	 * @dataProvider status_matrix_provider
 	 */
 	public function test_transform( $mollie_status, $expected ) {
-		$status = Statuses::transform( $mollie_status );
+		$transformer = new StatusTransformer();
+
+		$status = $transformer->transform_mollie_to_wp( $mollie_status );
 
 		$this->assertEquals( $expected, $status );
 	}
@@ -46,12 +49,12 @@ class StatusesTest extends TestCase {
 	 */
 	public function status_matrix_provider() {
 		return [
-			[ Statuses::AUTHORIZED, PaymentStatus::AUTHORIZED ],
-			[ Statuses::OPEN, PaymentStatus::OPEN ],
-			[ Statuses::CANCELED, PaymentStatus::CANCELLED ],
-			[ Statuses::PAID, PaymentStatus::SUCCESS ],
-			[ Statuses::EXPIRED, PaymentStatus::EXPIRED ],
-			[ Statuses::FAILED, PaymentStatus::FAILURE ],
+			[ MollieStatus::AUTHORIZED, WordPressStatus::AUTHORIZED ],
+			[ MollieStatus::OPEN, WordPressStatus::OPEN ],
+			[ MollieStatus::CANCELED, WordPressStatus::CANCELLED ],
+			[ MollieStatus::PAID, WordPressStatus::SUCCESS ],
+			[ MollieStatus::EXPIRED, WordPressStatus::EXPIRED ],
+			[ MollieStatus::FAILED, WordPressStatus::FAILURE ],
 			[ 'not existing status', null ],
 		];
 	}

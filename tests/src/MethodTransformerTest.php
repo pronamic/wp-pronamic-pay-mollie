@@ -10,7 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Mollie\Methods as MollieMethod;
+use Pronamic\WordPress\Pay\Core\PaymentMethods as PronamicMethod;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
@@ -23,7 +24,7 @@ use Yoast\PHPUnitPolyfills\TestCases\TestCase;
  * @version 2.0.9
  * @since   1.0.0
  */
-class MethodsTest extends TestCase {
+class MethodTransformerTest extends TestCase {
 	/**
 	 * Test transform.
 	 *
@@ -34,7 +35,9 @@ class MethodsTest extends TestCase {
 	 * @dataProvider method_matrix_provider
 	 */
 	public function test_transform( $payment_method, $expected, $default = null ) {
-		$mollie_method = Methods::transform( $payment_method, $default );
+		$transformer = new MethodTransformer();
+
+		$mollie_method = $transformer->transform_wp_to_mollie( $payment_method, $default );
 
 		$this->assertEquals( $expected, $mollie_method );
 	}
@@ -46,15 +49,15 @@ class MethodsTest extends TestCase {
 	 */
 	public function method_matrix_provider() {
 		return [
-			[ PaymentMethods::BANCONTACT, Methods::BANCONTACT ],
-			[ PaymentMethods::BANK_TRANSFER, Methods::BANKTRANSFER ],
-			[ PaymentMethods::CREDIT_CARD, Methods::CREDITCARD ],
-			[ PaymentMethods::DIRECT_DEBIT, Methods::DIRECT_DEBIT ],
-			[ PaymentMethods::DIRECT_DEBIT_IDEAL, Methods::DIRECT_DEBIT ],
-			[ PaymentMethods::SOFORT, Methods::SOFORT ],
-			[ PaymentMethods::IDEAL, Methods::IDEAL ],
-			[ PaymentMethods::KBC, Methods::KBC ],
-			[ PaymentMethods::BELFIUS, Methods::BELFIUS ],
+			[ PronamicMethod::BANCONTACT, MollieMethod::BANCONTACT ],
+			[ PronamicMethod::BANK_TRANSFER, MollieMethod::BANKTRANSFER ],
+			[ PronamicMethod::CREDIT_CARD, MollieMethod::CREDITCARD ],
+			[ PronamicMethod::DIRECT_DEBIT, MollieMethod::DIRECT_DEBIT ],
+			[ PronamicMethod::DIRECT_DEBIT_IDEAL, MollieMethod::DIRECT_DEBIT ],
+			[ PronamicMethod::SOFORT, MollieMethod::SOFORT ],
+			[ PronamicMethod::IDEAL, MollieMethod::IDEAL ],
+			[ PronamicMethod::KBC, MollieMethod::KBC ],
+			[ PronamicMethod::BELFIUS, MollieMethod::BELFIUS ],
 			[ 'not existing payment method', null ],
 			[ 'not existing payment method', 'test', 'test' ],
 			[ null, null ],
@@ -73,7 +76,9 @@ class MethodsTest extends TestCase {
 	 * @dataProvider transform_gateway_method_matrix_provider
 	 */
 	public function test_transform_gateway_method( $payment_method, $expected ) {
-		$wp_method = Methods::transform_gateway_method( $payment_method );
+		$transformer = new MethodTransformer();
+
+		$wp_method = $transformer->transform_mollie_to_wp( $payment_method );
 
 		$this->assertEquals( $expected, $wp_method );
 	}
@@ -85,15 +90,15 @@ class MethodsTest extends TestCase {
 	 */
 	public function transform_gateway_method_matrix_provider() {
 		return [
-			[ Methods::BANCONTACT, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANCONTACT ],
-			[ Methods::BANKTRANSFER, \Pronamic\WordPress\Pay\Core\PaymentMethods::BANK_TRANSFER ],
-			[ Methods::CREDITCARD, \Pronamic\WordPress\Pay\Core\PaymentMethods::CREDIT_CARD ],
-			[ Methods::DIRECT_DEBIT, \Pronamic\WordPress\Pay\Core\PaymentMethods::DIRECT_DEBIT ],
-			[ Methods::PAYPAL, \Pronamic\WordPress\Pay\Core\PaymentMethods::PAYPAL ],
-			[ Methods::SOFORT, \Pronamic\WordPress\Pay\Core\PaymentMethods::SOFORT ],
-			[ Methods::IDEAL, \Pronamic\WordPress\Pay\Core\PaymentMethods::IDEAL ],
-			[ Methods::KBC, \Pronamic\WordPress\Pay\Core\PaymentMethods::KBC ],
-			[ Methods::BELFIUS, \Pronamic\WordPress\Pay\Core\PaymentMethods::BELFIUS ],
+			[ MollieMethod::BANCONTACT, PronamicMethod::BANCONTACT ],
+			[ MollieMethod::BANKTRANSFER, PronamicMethod::BANK_TRANSFER ],
+			[ MollieMethod::CREDITCARD, PronamicMethod::CREDIT_CARD ],
+			[ MollieMethod::DIRECT_DEBIT, PronamicMethod::DIRECT_DEBIT ],
+			[ MollieMethod::PAYPAL, PronamicMethod::PAYPAL ],
+			[ MollieMethod::SOFORT, PronamicMethod::SOFORT ],
+			[ MollieMethod::IDEAL, PronamicMethod::IDEAL ],
+			[ MollieMethod::KBC, PronamicMethod::KBC ],
+			[ MollieMethod::BELFIUS, PronamicMethod::BELFIUS ],
 			[ 'not existing payment method', null ],
 			[ null, null ],
 			[ 0, null ],
