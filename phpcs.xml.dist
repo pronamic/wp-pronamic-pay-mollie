@@ -6,10 +6,6 @@
 	<exclude-pattern>tests/bootstrap.php</exclude-pattern>
 	<exclude-pattern>tests/wp-config.php</exclude-pattern>
 
-	<rule ref="Generic.CodeAnalysis.EmptyStatement.DetectedCatch">
-		<exclude-pattern>src/Gateway.php</exclude-pattern>
-	</rule>
-
 	<rule ref="PronamicWP">
 		<exclude name="WordPress.DB.DirectDatabaseQuery" />
 
@@ -33,12 +29,4 @@
 	<rule ref="WordPress.DB.SlowDBQuery.slow_db_query_meta_key">
 		<exclude-pattern>src/Integration.php</exclude-pattern>
 	</rule>
-
-	<rule ref="PEAR.Functions.FunctionCallSignature.Indent">
-		<exclude-pattern>src/Client.php</exclude-pattern>
-	</rule>
-
-    <rule ref="Squiz.Commenting.FunctionCommentThrowTag.WrongNumber">
-        <exclude-pattern>src/Amount.php</exclude-pattern>
-    </rule>
 </ruleset>

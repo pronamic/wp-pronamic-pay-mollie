@@ -205,7 +205,7 @@ class Gateway extends Core_Gateway {
 	public function get_payment_methods( array $args = [] ) : PaymentMethodsCollection {
 		try {
 			$this->maybe_enrich_payment_methods();
-		} catch ( \Exception $e ) {
+		} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch -- No problem.
 			// No problem.
 		}
 
