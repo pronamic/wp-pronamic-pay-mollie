@@ -710,7 +710,7 @@ class Gateway extends Core_Gateway {
 
 		// Check if one-off SEPA Direct Debit can be used, otherwise short circuit payment.
 		// Find or create mandate.
-		$mandate_id = $this->client->has_valid_mandate( $customer_id, PaymentMethods::DIRECT_DEBIT, $consumer_iban );
+		$mandate_id = $this->has_valid_mandate( $customer_id, PaymentMethods::DIRECT_DEBIT, $consumer_iban );
 
 		if ( false === $mandate_id ) {
 			$mandate = $this->client->create_mandate(
@@ -728,6 +728,57 @@ class Gateway extends Core_Gateway {
 		// Charge immediately on-demand.
 		$request->set_sequence_type( 'recurring' );
 		$request->set_mandate_id( (string) $mandate_id );
+	}
+
+	/**
+	 * Is there a valid mandate for customer?
+	 *
+	 * @param string      $customer_id    Mollie customer ID.
+	 * @param string|null $payment_method Payment method to find mandates for.
+	 * @param string|null $search         Search.
+	 *
+	 * @return string|bool
+	 * @throws \Exception Throws exception for mandates on failed request or invalid response.
+	 */
+	private function has_valid_mandate( $customer_id, $payment_method = null, $search = null ) {
+		$mandates = $this->client->get_mandates( $customer_id );
+
+		$mollie_method = Methods::transform( $payment_method );
+
+		if ( ! isset( $mandates->_embedded ) ) {
+			throw new \Exception( 'No embedded data in Mollie response.' );
+		}
+
+		foreach ( $mandates->_embedded->mandates as $mandate ) {
+			if ( null !== $mollie_method && $mollie_method !== $mandate->method ) {
+				continue;
+			}
+
+			// Search consumer account or card number.
+			if ( null !== $search ) {
+				switch ( $mollie_method ) {
+					case Methods::DIRECT_DEBIT:
+					case Methods::PAYPAL:
+						if ( $search !== $mandate->details->consumerAccount ) {
+							continue 2;
+						}
+
+						break;
+					case Methods::CREDITCARD:
+						if ( $search !== $mandate->details->cardNumber ) {
+							continue 2;
+						}
+
+						break;
+				}
+			}
+
+			if ( 'valid' === $mandate->status ) {
+				return $mandate->id;
+			}
+		}
+
+		return false;
 	}
 
 	/**
