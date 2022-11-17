@@ -713,7 +713,14 @@ class Gateway extends Core_Gateway {
 		$mandate_id = $this->client->has_valid_mandate( $customer_id, PaymentMethods::DIRECT_DEBIT, $consumer_iban );
 
 		if ( false === $mandate_id ) {
-			$mandate = $this->client->create_mandate( $customer_id, $consumer_bank_details );
+			$mandate = $this->client->create_mandate(
+				$customer_id,
+				[
+					'method'          => Methods::DIRECT_DEBIT,
+					'consumerName'    => $consumer_bank_details->get_name(),
+					'consumerAccount' => $consumer_bank_details->get_iban(),
+				]
+			);
 
 			$mandate_id = $mandate->get_id();
 		}
