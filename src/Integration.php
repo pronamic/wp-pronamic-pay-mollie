@@ -223,8 +223,8 @@ class Integration extends AbstractGatewayIntegration {
 	public function save_post( $post_id ) {
 		$config = $this->get_config( $post_id );
 
-		\delete_transient( 'pronamic_pay_mollie_payment_methods_' . \md5( \wp_json_encode( $config ) ) );
-		\delete_transient( 'pronamic_pay_ideal_issuers_' . \md5( \wp_json_encode( $config ) ) );
+		\delete_transient( 'pronamic_pay_mollie_payment_methods_' . \md5( (string) \wp_json_encode( $config ) ) );
+		\delete_transient( 'pronamic_pay_ideal_issuers_' . \md5( (string) \wp_json_encode( $config ) ) );
 	}
 
 	/**

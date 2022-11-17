@@ -11,7 +11,10 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use InvalidArgumentException;
-use Pronamic\WordPress\Mollie\Address as MollieLines;
+use Pronamic\WordPress\Mollie\AmountTransformer;
+use Pronamic\WordPress\Mollie\Lines as MollieLines;
+use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Payments\PaymentLines as WordPressLines;
 
 /**
@@ -26,7 +29,7 @@ class LinesTransformer {
 	 * @throws \InvalidArgumentException Throws exception on invalid arguments.
 	 */
 	public function transform_wp_to_mollie( WordPressLines $payment_lines ): MollieLines {
-		$lines = new self();
+		$lines = new MollieLines();
 
 		$amount_transformer    = new AmountTransformer();
 		$line_type_transformer = new LineTypeTransformer();

@@ -10,7 +10,9 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Mollie\LineType as MollieLineType;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
+
 
 /**
  * Line type transformer class
@@ -24,11 +26,11 @@ class LineTypeTransformer {
 	 * @var array<string, string>
 	 */
 	private static $map = [
-		PaymentLineType::DIGITAL  => self::DIGITAL,
-		PaymentLineType::DISCOUNT => self::DISCOUNT,
-		PaymentLineType::FEE      => self::SURCHARGE,
-		PaymentLineType::PHYSICAL => self::PHYSICAL,
-		PaymentLineType::SHIPPING => self::SHIPPING_FEE,
+		PaymentLineType::DIGITAL  => MollieLineType::DIGITAL,
+		PaymentLineType::DISCOUNT => MollieLineType::DISCOUNT,
+		PaymentLineType::FEE      => MollieLineType::SURCHARGE,
+		PaymentLineType::PHYSICAL => MollieLineType::PHYSICAL,
+		PaymentLineType::SHIPPING => MollieLineType::SHIPPING_FEE,
 	];
 
 	/**

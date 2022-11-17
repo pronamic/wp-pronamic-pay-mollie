@@ -30,12 +30,17 @@ use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Mollie\AmountTransformer;
+use Pronamic\WordPress\Mollie\Client;
 use Pronamic\WordPress\Mollie\Customer;
+use Pronamic\WordPress\Mollie\Error;
 use Pronamic\WordPress\Mollie\Methods;
+use Pronamic\WordPress\Mollie\OrderRequest;
 use Pronamic\WordPress\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Mollie\PaymentRequest;
 use Pronamic\WordPress\Mollie\Profile;
+use Pronamic\WordPress\Mollie\RefundRequest;
 use Pronamic\WordPress\Mollie\ResourceType;
+use Pronamic\WordPress\Mollie\Statuses;
 
 /**
  * Gateway class
@@ -92,7 +97,7 @@ class Gateway extends Core_Gateway {
 		];
 
 		// Client.
-		$this->client = new \Pronamic\WordPress\Mollie\Client( (string) $config->api_key );
+		$this->client = new Client( (string) $config->api_key );
 
 		// Data Stores.
 		$this->profile_data_store  = new ProfileDataStore();
@@ -106,7 +111,7 @@ class Gateway extends Core_Gateway {
 			function() {
 				return $this->get_ideal_issuers();
 			},
-			'pronamic_pay_ideal_issuers_' . \md5( \wp_json_encode( $config ) )
+			'pronamic_pay_ideal_issuers_' . \md5( (string) \wp_json_encode( $config ) )
 		);
 
 		$field_consumer_name = new TextField( 'pronamic_pay_consumer_bank_details_name' );
@@ -199,7 +204,7 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Get payment methods.
 	 *
-	 * @param array $args Query arguments.
+	 * @param array<string, string> $args Query arguments.
 	 * @return PaymentMethodsCollection
 	 */
 	public function get_payment_methods( array $args = [] ) : PaymentMethodsCollection {
@@ -218,7 +223,7 @@ class Gateway extends Core_Gateway {
 	 * @return void
 	 */
 	private function maybe_enrich_payment_methods() {
-		$cache_key = 'pronamic_pay_mollie_payment_methods_' . \md5( \wp_json_encode( $this->config ) );
+		$cache_key = 'pronamic_pay_mollie_payment_methods_' . \md5( (string) \wp_json_encode( $this->config ) );
 
 		$mollie_payment_methods = \get_transient( $cache_key );
 
@@ -232,6 +237,10 @@ class Gateway extends Core_Gateway {
 
 		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
 			$core_payment_method_id = $method_transformer->transform_mollie_to_wp( $mollie_payment_method->id );
+
+			if ( null === $core_payment_method_id ) {
+				continue;
+			}
 
 			$core_payment_method = $this->get_payment_method( $core_payment_method_id );
 
@@ -257,21 +266,23 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Update `Direct Debit (mandate via ...)` payment method statuses.
-		if ( 'active' === $this->get_payment_method( PaymentMethods::DIRECT_DEBIT )->get_status() ) {
-			// Bancontact.
-			$bancontact_method = $this->get_payment_method( PaymentMethods::BANCONTACT );
+		$payment_method_direct_debit = $this->get_payment_method( PaymentMethods::DIRECT_DEBIT );
 
-			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_BANCONTACT )->set_status( $bancontact_method->get_status() );
+		if ( null !== $payment_method_direct_debit && 'active' === $payment_method_direct_debit->get_status() ) {
+			$map = [
+				PaymentMethods::BANCONTACT => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+				PaymentMethods::IDEAL      => PaymentMethods::DIRECT_DEBIT_IDEAL,
+				PaymentMethods::SOFORT     => PaymentMethods::DIRECT_DEBIT_SOFORT,
+			];
 
-			// iDEAL.
-			$ideal_method = $this->get_payment_method( PaymentMethods::IDEAL );
+			foreach ( $map as $a => $b ) {
+				$method_a = $this->get_payment_method( $a );
+				$method_b = $this->get_payment_method( $b );
 
-			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_IDEAL )->set_status( $ideal_method->get_status() );
-
-			// SOFORT.
-			$sofort_method = $this->get_payment_method( PaymentMethods::SOFORT );
-
-			$this->get_payment_method( PaymentMethods::DIRECT_DEBIT_SOFORT )->set_status( $sofort_method->get_status() );
+				if ( null !== $method_a && null !== $method_b ) {
+					$method_b->set_status( $method_a->get_status() );
+				}
+			}
 		}
 	}
 
@@ -595,7 +606,7 @@ class Gateway extends Core_Gateway {
 					break;
 			}
 
-			$request->set_method( Methods::transform( $first_method, $first_method ) );
+			$request->set_method( $method_transformer->transform_wp_to_mollie( $first_method, $first_method ) );
 		}
 
 		/**
@@ -689,7 +700,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Process only when mandate is unknown.
-		$mandata_id = $request->get_mandate_id();
+		$mandate_id = $request->get_mandate_id();
 
 		if ( null !== $mandate_id ) {
 			return;
@@ -743,7 +754,9 @@ class Gateway extends Core_Gateway {
 	private function has_valid_mandate( $customer_id, $payment_method = null, $search = null ) {
 		$mandates = $this->client->get_mandates( $customer_id );
 
-		$mollie_method = Methods::transform( $payment_method );
+		$method_transformer = new MethodTransformer();
+
+		$mollie_method = $method_transformer->transform_wp_to_mollie( $payment_method );
 
 		if ( ! isset( $mandates->_embedded ) ) {
 			throw new \Exception( 'No embedded data in Mollie response.' );
@@ -1037,7 +1050,7 @@ class Gateway extends Core_Gateway {
 			$mollie_payment_details = $mollie_payment->get_details();
 
 			if ( null !== $mollie_payment_details && isset( $mollie_payment_details->wallet ) ) {
-				$wallet_method = Methods::transform_gateway_method( $mollie_payment_details->wallet );
+				$wallet_method = $method_transformer->transform_mollie_to_wp( $mollie_payment_details->wallet );
 
 				if ( null !== $wallet_method ) {
 					$payment_method = $wallet_method;
@@ -1422,8 +1435,10 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Update payment method.
+		$method_transformer = new MethodTransformer();
+
 		$old_method = $subscription->get_payment_method();
-		$new_method = ( null === $payment_method && \property_exists( $mandate, 'method' ) ? Methods::transform_gateway_method( $mandate->method ) : $payment_method );
+		$new_method = ( null === $payment_method && \property_exists( $mandate, 'method' ) ? $method_transformer->transform_mollie_to_wp( $mandate->method ) : $payment_method );
 
 		if ( ! empty( $old_method ) && $old_method !== $new_method ) {
 			$subscription->set_payment_method( $new_method );

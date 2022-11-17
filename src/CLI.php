@@ -10,6 +10,10 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Mollie\Client;
+use Pronamic\WordPress\Mollie\Customer;
+use Pronamic\WordPress\Mollie\Profile;
+
 /**
  * CLI class
  *
