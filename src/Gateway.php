@@ -122,6 +122,29 @@ class Gateway extends Core_Gateway {
 		$field_consumer_iban->set_label( __( 'Account number (IBAN)', 'pronamic_ideal' ) );
 		$field_consumer_iban->meta_key = 'consumer_bank_details_iban';
 
+		$field_mollie_components = new ComponentsField( 'pronamic_pay_mollie_components' );
+		$field_mollie_components->meta_key = 'mollie_card_token';
+
+		$cache_key = 'pronamic_pay_mollie_profile_id_' . \md5( (string) \wp_json_encode( $config ) );
+
+		$profile_id = \get_transient( $cache_key );
+
+		if ( false === $profile_id ) {
+			try {
+				$current_profile = $this->client->get_current_profile();
+
+				$profile = Profile::from_object( $current_profile );
+
+				$profile_id = $profile->get_id();
+			} catch ( \Exception $e ) {
+				// No problem.
+			}
+
+			\set_transient( $cache_key, $profile_id, \DAY_IN_SECONDS );
+		}
+
+		$field_mollie_components->set_profile_id( (string) $profile_id );
+
 		// Apple Pay.
 		$payment_method_apple_pay = new PaymentMethod( PaymentMethods::APPLE_PAY );
 		$payment_method_apple_pay->add_support( 'recurring' );
@@ -136,6 +159,7 @@ class Gateway extends Core_Gateway {
 		// Payment method credit card.
 		$payment_method_credit_card = new PaymentMethod( PaymentMethods::CREDIT_CARD );
 		$payment_method_credit_card->add_support( 'recurring' );
+		$payment_method_credit_card->add_field( $field_mollie_components );
 
 		$this->register_payment_method( $payment_method_credit_card );
 
