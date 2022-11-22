@@ -122,7 +122,7 @@ class Gateway extends Core_Gateway {
 		$field_consumer_iban->set_label( __( 'Account number (IBAN)', 'pronamic_ideal' ) );
 		$field_consumer_iban->meta_key = 'consumer_bank_details_iban';
 
-		$field_mollie_components = new ComponentsField( 'pronamic_pay_mollie_components' );
+		$field_mollie_components = new ComponentsField( 'pronamic_pay_mollie_card_token' );
 		$field_mollie_components->meta_key = 'mollie_card_token';
 
 		$cache_key = 'pronamic_pay_mollie_profile_id_' . \md5( (string) \wp_json_encode( $config ) );
@@ -666,6 +666,15 @@ class Gateway extends Core_Gateway {
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
 			$request->issuer = $payment->get_meta( 'issuer' );
+		}
+
+		// Card token.
+		if ( Methods::CREDITCARD === $request->method ) {
+			$card_token = $payment->get_meta( 'mollie_card_token' );
+
+			if ( ! empty( $card_token ) ) {
+				$request->card_token = $card_token;
+			}
 		}
 
 		// Billing email.
