@@ -158,8 +158,8 @@ class CLI {
 				$profile_id = $this->profile_data_store->save_profile(
 					$profile,
 					[
-						'api_key_live' => ( 'live_' === substr( $api_key, 0, 5 ) ) ? $api_key : null,
-						'api_key_test' => ( 'test_' === substr( $api_key, 0, 5 ) ) ? $api_key : null,
+						'api_key_live' => \str_starts_with( $api_key, 'live_' ) ? $api_key : null,
+						'api_key_test' => \str_starts_with( $api_key, 'test_' ) ? $api_key : null,
 					],
 					[
 						'api_key_live' => '%s',

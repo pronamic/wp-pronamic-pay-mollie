@@ -48,7 +48,7 @@ class Config extends GatewayConfig implements JsonSerializable {
 			return false;
 		}
 
-		return ( 'test_' === substr( $this->api_key, 0, 5 ) );
+		return \str_starts_with( $this->api_key, 'test_' );
 	}
 
 	/**

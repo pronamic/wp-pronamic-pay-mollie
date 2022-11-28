@@ -259,7 +259,7 @@ class Admin {
 
 		$transaction_id = \get_post_meta( $post->ID, '_pronamic_payment_transaction_id', true );
 
-		if ( 'tr_' !== \substr( $transaction_id, 0, 3 ) ) {
+		if ( ! \str_starts_with( $transaction_id, 'tr_' ) ) {
 			return;
 		}
 

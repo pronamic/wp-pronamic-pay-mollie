@@ -344,13 +344,13 @@ class Gateway extends Core_Gateway {
 		if ( 'localhost' === $host ) {
 			// Mollie doesn't allow localhost.
 			return null;
-		} elseif ( '.dev' === substr( $host, -4 ) ) {
+		} elseif ( \str_ends_with( $host, '.dev' ) ) {
 			// Mollie doesn't allow the .dev TLD.
 			return null;
-		} elseif ( '.local' === substr( $host, -6 ) ) {
+		} elseif ( \str_ends_with( $host, '.local' ) ) {
 			// Mollie doesn't allow the .local TLD.
 			return null;
-		} elseif ( '.test' === substr( $host, -5 ) ) {
+		} elseif ( \str_ends_with( $host, '.test' ) ) {
 			// Mollie doesn't allow the .test TLD.
 			return null;
 		}
