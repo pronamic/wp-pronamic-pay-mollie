@@ -86,6 +86,10 @@ class ComponentsField extends Field {
 	 * Render field.
 	 */
 	public function render() : string {
+		if ( ! $this->should_render() ) {
+			return '';
+		}
+
 		\wp_enqueue_script( 'pronamic-pay-mollie-components' );
 
 		\wp_enqueue_style( 'pronamic-pay-mollie-components' );
@@ -93,6 +97,25 @@ class ComponentsField extends Field {
 		$element = new Element( 'div', $this->get_html_attributes() );
 
 		return $element->render();
+	}
+
+	/**
+	 * Should render component.
+	 *
+	 * @return bool
+	 */
+	private function should_render(): bool {
+		$post_id = \get_the_ID();
+
+		$should_render = [
+			// Payment gateway test meta box.
+			'pronamic_gateway' === \get_post_type( $post_id ),
+
+			// WooCommerce.
+			\did_action( 'woocommerce_checkout_order_review' ) || \did_action( 'woocommerce_checkout_update_order_review' ),
+		];
+
+		return \in_array( true, $should_render, true );
 	}
 
 	/**
