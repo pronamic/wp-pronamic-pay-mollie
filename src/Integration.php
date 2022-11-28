@@ -71,6 +71,13 @@ class Integration extends AbstractGatewayIntegration {
 			\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function, 10, 2 );
 		}
 
+		$function = [ $this, 'http_request_args' ];
+
+		if ( ! \has_filter( 'http_request_args', $function ) ) {
+			// phpcs:ignore WordPressVIPMinimum.Hooks.RestrictedHooks.http_request_args -- Timeout is not adjusted.
+			\add_filter( 'http_request_args', $function, 10, 2 );
+		}
+
 		add_filter( 'pronamic_payment_provider_url_mollie', [ $this, 'payment_provider_url' ], 10, 2 );
 
 		// Actions.
@@ -373,5 +380,56 @@ class Integration extends AbstractGatewayIntegration {
 		$next_payment_delivery_date = $next_payment_delivery_date->setTime( 0, 0, 0 );
 
 		return $next_payment_delivery_date;
+	}
+
+
+	/**
+	 * Get user agent value for requests to Mollie.
+	 * 
+	 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13
+	 * @return string
+	 */
+	private function get_user_agent() {
+		return implode(
+			' ',
+			[
+				/**
+				 * Pronamic Pay version.
+				 * 
+				 * @link https://github.com/pronamic/pronamic-pay/issues/12
+				 */
+				'PronamicPay/' . \pronamic_pay_plugin()->get_version(),
+				/**
+				 * Pronamic - Mollie user agent token.
+				 *
+				 * @link https://github.com/pronamic/pronamic-pay/issues/12
+				 */
+				'uap/FyuVeDDqnKdzdry7',
+				/**
+				 * WordPress version.
+				 *
+				 * @link https://github.com/WordPress/WordPress/blob/f9db66d504fc72942515f6c0ed2b63aee7cef876/wp-includes/class-wp-http.php#L183-L192
+				 */
+				'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ),
+			]
+		);
+	}
+
+	/**
+	 * Filters the arguments used in an HTTP request.
+	 *
+	 * @link https://developer.wordpress.org/reference/hooks/http_request_args/
+	 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13
+	 * @param array  $args Arguments.
+	 * @param string $url  URL.
+	 */
+	public function http_request_args( $args, $url ) {
+		if ( ! \str_starts_with( $url, 'https://api.mollie.com/' ) ) {
+			return $args;
+		}
+
+		$args['user-agent'] = $this->get_user_agent();
+
+		return $args;
 	}
 }
