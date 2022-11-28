@@ -1,30 +1,67 @@
-body .pronamic_pay_mollie_card_token label {
-	display: block;
+.pronamic_pay_mollie_card_token .mollie-components {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 10px;
+  align-items: end;
+  max-width: 500px;
+}
+.pronamic_pay_mollie_card_token .mollie-components label {
+  display: block;
+}
+.pronamic_pay_mollie_card_token .mollie-components label:first-child {
+  grid-column: 1/4;
+}
+.pronamic_pay_mollie_card_token .mollie-components label:nth-of-type(2), .pronamic_pay_mollie_card_token .mollie-components label:nth-of-type(3), .pronamic_pay_mollie_card_token .mollie-components label:nth-of-type(4) {
+  grid-row: 3;
+}
+.pronamic_pay_mollie_card_token .mollie-components label:nth-of-type(2) {
+  grid-column: 1;
+  min-width: 250px;
+}
+.pronamic_pay_mollie_card_token .mollie-components label:nth-of-type(3) {
+  grid-column: 2;
+  min-width: 70px;
+}
+.pronamic_pay_mollie_card_token .mollie-components label:nth-of-type(4) {
+  grid-column: 3;
+  min-width: 70px;
+}
+.pronamic_pay_mollie_card_token .mollie-components label.is-invalid + .field-error {
+  display: block;
+}
+.pronamic_pay_mollie_card_token .mollie-components .mollie-component {
+  padding: 5px;
+  font-weight: 500;
+  background: #ffffff;
+  border-bottom: 2px solid #aaaaaa;
+  transition: 0.3s border-color ease;
+}
+.pronamic_pay_mollie_card_token .mollie-components .mollie-component.has-focus {
+  border-bottom-color: #0077ff;
+}
+.pronamic_pay_mollie_card_token .mollie-components .mollie-component.is-invalid {
+  border-bottom-color: #ff1717;
+}
+.pronamic_pay_mollie_card_token .mollie-components .field-error {
+  display: none;
+  grid-column: 1/4;
+  grid-row: 4;
+  font-size: 0.8em;
+  font-weight: 400;
+  color: #ff1717;
+}
+.pronamic_pay_mollie_card_token .mollie-components .field-error:first-of-type {
+  grid-row: 2;
+}
+.pronamic_pay_mollie_card_token .mollie-components .field-error:nth-of-type(2) {
+  grid-row: 4;
+}
+.pronamic_pay_mollie_card_token .mollie-components .field-error:nth-of-type(3) {
+  grid-row: 5;
+}
+.pronamic_pay_mollie_card_token .mollie-components .field-error:nth-of-type(4) {
+  grid-row: 6;
 }
 
-.mollie-component {
-	margin-top: .5rem;
-	padding: 10px;
-	font-weight: 500;
-	border: 1px solid transparent;
-	border-radius: 4px;
-	background: #fff;
-	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.25);
-	transition: 0.3s border-color cubic-bezier(0.4, 0, 0.2, 1);
-	max-width: 500px;
-}
-
-.mollie-component.has-focus {
-	border-color: #0077ff;
-}
-
-.mollie-component.is-invalid {
-	border-color: #ff1717;
-}
-
-.field-error {
-	margin: 4px 0 1rem 0;
-	font-size: .8em;
-	font-weight: 400;
-	color: #ff1717;
-}
+/*# sourceMappingURL=components.css.map */

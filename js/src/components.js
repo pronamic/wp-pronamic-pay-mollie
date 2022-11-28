@@ -1,5 +1,4 @@
 /* global Mollie */
-
 'use strict';
 
 /**
@@ -10,23 +9,23 @@
 ( ( $ ) => {
 	const components = [
 		{
-			id: 'card-number',
-			label: 'Card Number',
-			component: 'cardNumber'
-		},
-		{
 			id: 'card-holder',
 			label: 'Card Holder',
 			component: 'cardHolder'
 		},
 		{
+			id: 'card-number',
+			label: 'Card Number',
+			component: 'cardNumber'
+		},
+		{
 			id: 'expiry-date',
-			label: 'Expiry Date',
+			label: 'Expiry',
 			component: 'expiryDate'
 		},
 		{
 			id: 'verification-code',
-			label: 'Verification Code',
+			label: 'CVC',
 			component: 'verificationCode'
 		}
 	];
@@ -60,6 +59,11 @@
 				}
 			);
 
+			let componentsContainer = document.createElement( 'div' );
+			componentsContainer.classList.add( 'mollie-components' );
+
+			$cardTokenElement.append( componentsContainer );
+
 			components.forEach( ( component ) => {
 				// Label.
 				let label = document.createElement( 'label' );
@@ -70,13 +74,15 @@
 				let field = document.createElement( 'div' );
 				field.setAttribute( 'id', component.id );
 
+				label.append( field );
+
 				// Error.
 				let error = document.createElement( 'div' );
 				error.setAttribute( 'id', component.id + '-error' );
 				error.setAttribute( 'role', 'alert' );
 				error.classList.add( 'field-error' );
 
-				$cardTokenElement.append( label, field, error );
+				componentsContainer.append( label, error );
 
 				// Create and mount component.
 				let mollieComponent = mollie.createComponent( component.component );
@@ -85,7 +91,19 @@
 
 				// Handle errors.
 				mollieComponent.addEventListener( 'change', ( event ) => {
-					error.textContent = event.error && event.touched ? event.error : '';
+					// Add error.
+					if ( event.error && event.touched ) {
+						error.textContent = event.error;
+
+						label.classList.add( 'is-invalid' );
+
+						return;
+					}
+
+					// Remove error.
+					error.textContent = '';
+
+					label.classList.remove( 'is-invalid' );
 				} );
 			} );
 
@@ -111,7 +129,7 @@
 
 				// Add token to form.
 				const tokenInput = document.createElement( 'input' );
-				tokenInput.setAttribute( 'type', 'text' );
+				tokenInput.setAttribute( 'type', 'hidden' );
 				tokenInput.setAttribute( 'name', 'pronamic_pay_mollie_card_token' );
 				tokenInput.setAttribute( 'value', token );
 
@@ -120,7 +138,7 @@
 				if ( false !== form.dispatchEvent( new Event( 'pronamic_pay_mollie_components_card_token_added', { cancelable: true } ) ) ) {
 					// Submit form, now containing the hidden card token field.
 					// form.submit(); — not working with test meta box
-					form.querySelector( 'input[name="' + e.submitter.name + '"]' ).click();
+					form.querySelector( '[name="' + e.submitter.name + '"]' ).click();
 				}
 			} );
 		} );
