@@ -6,6 +6,7 @@
 		"pronamic/wp-pronamic-pay-test-helper",
 		"https://downloads.wordpress.org/plugin/pronamic-client.zip",
 		"https://downloads.wordpress.org/plugin/query-monitor.zip",
+		"https://downloads.wordpress.org/plugin/log-http-requests.zip",
 		"https://downloads.wordpress.org/plugin/one-time-login.zip"
 	],
 	"config": {
