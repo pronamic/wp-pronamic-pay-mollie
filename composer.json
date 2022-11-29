@@ -42,7 +42,7 @@
 		"ext-json": "*",
 		"justinrainbow/json-schema": "^5.2",
 		"pronamic/wp-http": "^1.1",
-		"pronamic/wp-mollie": "dev-main",
+		"pronamic/wp-mollie": "^1.0",
 		"woocommerce/action-scheduler": "^3.4",
 		"wp-pay/core": "^4.5"
 	},
