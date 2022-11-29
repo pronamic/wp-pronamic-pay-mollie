@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Mollie\Client;
 use Pronamic\WordPress\Pay\Admin\AdminPaymentPostType;
 
 $mollie_payment_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
