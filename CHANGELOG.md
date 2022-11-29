@@ -7,6 +7,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.6.0] - 2022-11-29
+- Use new `pronamic/wp-mollie` library.
+- Use new `str_*_with` functions, requires WordPress `5.9` or higher.
+
 ## [4.5.0] - 2022-11-07
 - Added user agent to HTTP requests to Mollie. [#13](https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13)
 
@@ -221,7 +225,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.5.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.6.0...HEAD
+[4.6.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.5.0...4.6.0
 [4.5.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.1...4.5.0
 [4.4.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.0...4.4.1
 [4.4.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.1...4.4.0
