@@ -33,7 +33,7 @@ class OrderRequestTest extends TestCase {
 	/**
 	 * Setup.
 	 */
-	public function set_up() : void {
+	public function set_up(): void {
 		parent::set_up();
 
 		$lines = new Lines();

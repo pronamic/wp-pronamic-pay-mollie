@@ -207,7 +207,7 @@ class Gateway extends Core_Gateway {
 	 * @param array<string, string> $args Query arguments.
 	 * @return PaymentMethodsCollection
 	 */
-	public function get_payment_methods( array $args = [] ) : PaymentMethodsCollection {
+	public function get_payment_methods( array $args = [] ): PaymentMethodsCollection {
 		try {
 			$this->maybe_enrich_payment_methods();
 		} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch -- No problem.
@@ -873,7 +873,7 @@ class Gateway extends Core_Gateway {
 	 * @param Payment $payment Payment.
 	 * @return string
 	 */
-	private function get_resource_for_payment( Payment $payment ) : string {
+	private function get_resource_for_payment( Payment $payment ): string {
 		$resource = ResourceType::PAYMENTS;
 
 		$is_memberpress = ( 'memberpress_transaction' === $payment->get_source() );
@@ -951,7 +951,7 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param Payment $payment Payment.
 	 */
-	public function maybe_create_shipment_for_payment( Payment $payment ) : void {
+	public function maybe_create_shipment_for_payment( Payment $payment ): void {
 		$mollie_order_id = $payment->get_meta( 'mollie_order_id' );
 
 		if ( empty( $mollie_order_id ) ) {
