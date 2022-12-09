@@ -384,7 +384,7 @@ class Integration extends AbstractGatewayIntegration {
 
 	/**
 	 * Get user agent value for requests to Mollie.
-	 * 
+	 *
 	 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13
 	 * @return string
 	 */
@@ -394,7 +394,7 @@ class Integration extends AbstractGatewayIntegration {
 			[
 				/**
 				 * Pronamic Pay version.
-				 * 
+				 *
 				 * @link https://github.com/pronamic/pronamic-pay/issues/12
 				 */
 				'PronamicPay/' . \pronamic_pay_plugin()->get_version(),

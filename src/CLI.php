@@ -336,7 +336,7 @@ class CLI {
 
 					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie name.
 					return $payment->isCancelable;
-				} 
+				}
 			);
 		}
 
