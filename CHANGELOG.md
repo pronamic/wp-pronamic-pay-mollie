@@ -7,6 +7,27 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.0] - 2022-12-22
+
+### Commits
+
+- Added "Requires Plugins" header. ([fbd32df](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/fbd32dff63e7086690eccfa30bf0bcf97267143f))
+- Only add anchor in meta box if destination page can be accessed. ([aecda56](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/aecda568d1bfbd85c1650fd1be62605b153ee282))
+- Removed `FILTER_SANITIZE_STRING` usage. ([1011701](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/10117012f586c11836cb8c3a7be1c9163f1b9738))
+
+### Composer
+
+- Changed `php` from `>=7.4` to `>=8.0`.
+- Changed `pronamic/wp-http` from `^1.1` to `v1.2.0`.
+	Release notes: https://github.com/pronamic/wp-http/releases/tag/v4.6.0
+- Changed `pronamic/wp-mollie` from `^1.0` to `v1.1.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v4.6.0
+- Changed `wp-pay/core` from `^4.5` to `v4.6.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.6.0
+Full set of changes: [`4.6.0...4.7.0`][4.7.0]
+
+[4.7.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.6.0...v4.7.0
+
 ## [4.6.0] - 2022-11-29
 - Use new `pronamic/wp-mollie` library.
 - Use new `str_*_with` functions, requires WordPress `5.9` or higher.
