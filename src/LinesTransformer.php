@@ -81,7 +81,6 @@ class LinesTransformer {
 			);
 
 			$line->set_type( $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() ) );
-			$line->set_category( $payment_line->get_product_category() );
 			$line->set_sku( $payment_line->get_sku() );
 			$line->set_image_url( $payment_line->get_image_url() );
 			$line->set_product_url( $payment_line->get_product_url() );
