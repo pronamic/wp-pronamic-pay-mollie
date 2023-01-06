@@ -841,10 +841,24 @@ class Gateway extends Core_Gateway {
 
 		$order_request->set_billing_address( null === $billing_address ? null : $address_transformer->transform_wp_to_mollie( $billing_address ) );
 
-		// Shipping address.
+		/**
+		 * Shipping address.
+		 * 
+		 * The Mollie shipping address in an order is optional.
+		 * If the transformers fails to transform we leave the
+		 * shipping address undefined.
+		 * 
+		 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
+		 */
 		$shipping_address = $payment->get_shipping_address();
 
-		$order_request->set_shipping_address( null === $shipping_address ? null : $address_transformer->transform_wp_to_mollie( $shipping_address ) );
+		if ( null !== $shipping_address ) {
+			try {
+				$order_request->set_shipping_address( $address_transformer->transform_wp_to_mollie( $shipping_address ) );
+			} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+				// Mollie order shipping address is optional.
+			}
+		}
 
 		// Consumer date of birth.
 		$customer = $payment->get_customer();
@@ -877,6 +891,8 @@ class Gateway extends Core_Gateway {
 		$resource = ResourceType::PAYMENTS;
 
 		$is_memberpress = ( 'memberpress_transaction' === $payment->get_source() );
+
+		$is_memberpress = true;
 
 		$is_klarna = \in_array(
 			$payment->get_payment_method(),
