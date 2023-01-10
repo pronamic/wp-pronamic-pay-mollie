@@ -1,6 +1,7 @@
 *.http text eol=crlf
 
 /bin               export-ignore
+/documentation/    export-ignore
 /tests             export-ignore
 /.gitattributes    export-ignore
 /.gitignore        export-ignore
