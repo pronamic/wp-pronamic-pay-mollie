@@ -890,9 +890,14 @@ class Gateway extends Core_Gateway {
 	private function get_resource_for_payment( Payment $payment ): string {
 		$resource = ResourceType::PAYMENTS;
 
-		$is_memberpress = ( 'memberpress_transaction' === $payment->get_source() );
-
-		$is_memberpress = true;
+		$is_supported_extension = \in_array(
+			$payment->get_source(),
+			[
+				'memberpress_transaction',
+				'woocommerce',
+			],
+			true
+		);
 
 		$is_klarna = \in_array(
 			$payment->get_payment_method(),
@@ -904,7 +909,7 @@ class Gateway extends Core_Gateway {
 			true
 		);
 
-		if ( $is_memberpress && $is_klarna ) {
+		if ( $is_supported_extension && $is_klarna ) {
 			$resource = ResourceType::ORDERS;
 		}
 
