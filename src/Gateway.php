@@ -966,6 +966,70 @@ class Gateway extends Core_Gateway {
 	}
 
 	/**
+	 * Maybe create shipment for payment.
+	 *
+	 * @param Payment $payment Payment.
+	 */
+	public function maybe_create_shipment_for_payment( Payment $payment ): void {
+		$mollie_order_id = $payment->get_meta( 'mollie_order_id' );
+
+		if ( empty( $mollie_order_id ) ) {
+			return;
+		}
+
+		$order = $this->client->get_order( $mollie_order_id );
+
+		// Check order status.
+		if ( ! \in_array( $order->get_status(), [ Statuses::AUTHORIZED, Statuses::PAID ], true ) ) {
+			return;
+		}
+
+		// Update payment to successful order payment.
+		$mollie_payments = $order->get_payments();
+
+		if ( null === $mollie_payments ) {
+			return;
+		}
+
+		$transaction_id = $payment->get_transaction_id();
+
+		foreach ( $mollie_payments as $mollie_payment ) {
+			if ( ! \in_array( $order->get_status(), [ Statuses::AUTHORIZED, Statuses::PAID ] ) ) {
+				continue;
+			}
+
+			$mollie_payment_id = $mollie_payment->get_id();
+
+			if ( $mollie_payment_id !== $transaction_id ) {
+				$payment->set_transaction_id( $mollie_payment->get_id() );
+
+				$payment->add_note(
+					\sprintf(
+						/* translators: 1: payment transaction ID, 2: Mollie payment ID */
+						\__( 'Payment transaction ID updated from `%1$s` to successful order payment `%2$s`.', 'pronamic_ideal' ),
+						$transaction_id,
+						$mollie_payment_id
+					)
+				);
+
+				$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
+			}
+		}
+
+		// Create shipment and add payment note.
+		$shipment = $this->client->create_shipment( $mollie_order_id );
+
+		$payment->add_note(
+			\sprintf(
+				/* translators: 1: Mollie shipment ID, 2: Mollie order ID */
+				\__( 'Shipment `%1$s` created for Mollie order `%2$s`.', 'pronamic_ideal' ),
+				$shipment->get_id(),
+				$mollie_order_id
+			)
+		);
+	}
+
+	/**
 	 * Update payment from Mollie payment.
 	 *
 	 * @param Payment       $payment        Payment.
