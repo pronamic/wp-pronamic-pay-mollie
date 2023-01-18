@@ -7,6 +7,21 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.1] - 2023-01-18
+
+### Commits
+
+- Maybe create shipment on payment fulfilled action. ([881d6d5](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/881d6d5ec49275a0ab86e5aa8969b04d9cb0996e))
+- Mark WooCommerce with support for Mollie orders. ([5440b76](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5440b76ee1ffa3c2e34dc7a1a8c5328e9b8fc447))
+- Ignore `documentation` folder in archive files. ([1cb8f56](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/1cb8f56690c8e7b76fecb6606f6b02b28c7890cc))
+- The Mollie order line category is not the same as a product category. ([10e1297](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/10e1297c52bdda8651aeff9979655239cf8b94e3))
+- Mollie order shipping address is optional. ([88d7458](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/88d745827e6aec33e6b08b49fdfe90698c2e8eae))
+- Happy 2023. ([cc44d7a](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/cc44d7ad4f0195fc0e2cfcaa4895f96cb3a69909))
+
+Full set of changes: [`4.7.0...4.7.1`][4.7.1]
+
+[4.7.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.0...v4.7.1
+
 ## [4.7.0] - 2022-12-22
 
 ### Commits
