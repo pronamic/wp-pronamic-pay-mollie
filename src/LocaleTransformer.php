@@ -28,6 +28,16 @@ class LocaleTransformer {
 		}
 
 		/**
+		 * Some browsers (Firefox) use language codes of only 2 characters, e.g. `nl` and `de`, which
+		 * are not supported by Mollie. We therefore try `nl_nl` and `de_de` instead.
+		 *
+		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/20
+		 */
+		if ( 2 === \strlen( $locale ) ) {
+			$locale = $locale . '_' . $locale;
+		}
+
+		/**
 		 * Supported locales.
 		 *
 		 * @var array<int, string>
