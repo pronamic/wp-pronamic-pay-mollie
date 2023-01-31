@@ -7,6 +7,18 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.2] - 2023-01-31
+### Commits
+
+- Fixed "Mollie requires locale for order" with language codes of only 2 characters in `Accept-Language` header (fixes #20). ([c9ca730](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/c9ca7308cc956c888a594d73724bcf02d8d4195c))
+
+### Composer
+
+- Changed `php` from `>=8.0` to `>=7.4`.
+Full set of changes: [`4.7.1...4.7.2`][4.7.2]
+
+[4.7.2]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.1...v4.7.2
+
 ## [4.7.1] - 2023-01-18
 
 ### Commits
