@@ -42,14 +42,14 @@ class Integration extends AbstractGatewayIntegration {
 		$args = wp_parse_args(
 			$args,
 			[
-				'id'                     => 'mollie',
-				'name'                   => 'Mollie',
-				'version'                => '2.1.0',
-				'url'                    => 'https://www.mollie.com/en/',
-				'product_url'            => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
-				'dashboard_url'          => 'https://my.mollie.com/dashboard/',
-				'provider'               => 'mollie',
-				'supports'               => [
+				'id'                  => 'mollie',
+				'name'                => 'Mollie',
+				'version'             => '2.1.0',
+				'url'                 => 'https://www.mollie.com/en/',
+				'product_url'         => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
+				'dashboard_url'       => 'https://my.mollie.com/dashboard/',
+				'provider'            => 'mollie',
+				'supports'            => [
 					'payment_status_request',
 					'recurring',
 					'refunds',
@@ -57,8 +57,7 @@ class Integration extends AbstractGatewayIntegration {
 					'webhook_log',
 					'webhook_no_config',
 				],
-				'version_option_name'    => 'pronamic_pay_mollie_version',
-				'db_version_option_name' => 'pronamic_pay_mollie_db_version',
+				'version_option_name' => 'pronamic_pay_mollie_version',
 			]
 		);
 
