@@ -45,7 +45,7 @@ class Install {
 		$version_option = $this->integration->get_version_option();
 		$version        = $this->integration->get_version();
 
-		if ( null === $version_option || null === $version ) {
+		if ( null === $version ) {
 			return;
 		}
 
