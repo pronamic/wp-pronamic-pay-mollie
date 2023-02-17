@@ -426,8 +426,9 @@ class Integration extends AbstractGatewayIntegration {
 	 *
 	 * @link https://developer.wordpress.org/reference/hooks/http_request_args/
 	 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13
-	 * @param array  $args Arguments.
-	 * @param string $url  URL.
+	 * @param array<string, string> $args Arguments.
+	 * @param string                $url  URL.
+	 * @return array<string, string>
 	 */
 	public function http_request_args( $args, $url ) {
 		if ( ! \str_starts_with( $url, 'https://api.mollie.com/' ) ) {
