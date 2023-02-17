@@ -95,10 +95,12 @@ class Integration extends AbstractGatewayIntegration {
 		// Tables.
 		$this->register_tables();
 
-		/**
-		 * Install.
-		 */
-		new Install( $this );
+		// Upgrades.
+		$version = $this->get_version();
+
+		$upgrades = $this->get_upgrades();
+
+		$upgrades->add( new Install( null === $version ? '1.0.0' : $version ) );
 
 		/**
 		 * Admin
