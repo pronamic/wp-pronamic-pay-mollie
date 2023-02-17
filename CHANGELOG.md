@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.4] - 2023-02-17
+
+### Commits
+
+- Fixed running integration installation. ([ba35110](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/ba3511097e85f5292edcf5d8d3542110ceb21374))
+
+Full set of changes: [`4.7.3...4.7.4`][4.7.4]
+
+[4.7.4]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.3...v4.7.4
+
 ## [4.7.3] - 2023-02-07
 ### Changed
 
