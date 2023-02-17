@@ -728,8 +728,8 @@ class Gateway extends Core_Gateway {
 				$customer_id,
 				[
 					'method'          => Methods::DIRECT_DEBIT,
-					'consumerName'    => $consumer_bank_details->get_name(),
-					'consumerAccount' => $consumer_bank_details->get_iban(),
+					'consumerName'    => (string) $consumer_name,
+					'consumerAccount' => (string) $consumer_iban,
 				]
 			);
 
