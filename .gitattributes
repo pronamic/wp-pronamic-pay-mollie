@@ -11,5 +11,6 @@
 /phpcs.xml.dist    export-ignore
 /phpmd.ruleset.xml export-ignore
 /phpunit.xml.dist  export-ignore
+/vendor-bin/       export-ignore
 
 vendor-bin/**/composer.lock binary
