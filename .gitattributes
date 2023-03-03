@@ -4,10 +4,11 @@
 /.github/          export-ignore
 /.gitignore        export-ignore
 /.phplint.yml      export-ignore
-/.travis.yml       export-ignore
+/.wp-env.json      export-ignore
 /Gruntfile.js      export-ignore
-/bin               export-ignore
+/docs/             export-ignore
 /documentation/    export-ignore
+/images/src/       export-ignore
 /package.json      export-ignore
 /phpcs.xml.dist    export-ignore
 /phpmd.ruleset.xml export-ignore
