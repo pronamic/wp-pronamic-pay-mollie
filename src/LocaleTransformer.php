@@ -43,6 +43,7 @@ class LocaleTransformer {
 		 * @var array<int, string>
 		 */
 		$supported = [
+			MollieLocale::EN_GB,
 			MollieLocale::EN_US,
 			MollieLocale::NL_NL,
 			MollieLocale::NL_BE,
