@@ -7,6 +7,19 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.5] - 2023-03-10
+
+### Commits
+
+- Added support for `en_GB` locale. ([5b3fc51](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5b3fc515d908ab10dc66c8611054197743f5c690))
+- Set `wordpress-plugin` type for Composer (pronamic/wp-pronamic-pay-with-mollie-for-contact-form-7#3). ([7517c92](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/7517c92862b7a6c6e31a921f3871c1c9cacabdbd))
+- Updated .gitattributes ([c12d414](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/c12d41423e90582570570afc95ace7594b914199)) ([be417d7](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/be417d73795fd3be2d82c24a4a8fb5584aac7fff))
+- Ignore `/vendor-bin/` in export to to archive files. ([baca178](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/baca17883e8f4213fe89307b169b5947f47f4038))
+
+Full set of changes: [`4.7.4...4.7.5`][4.7.5]
+
+[4.7.5]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.4...v4.7.5
+
 ## [4.7.4] - 2023-02-17
 
 ### Commits
