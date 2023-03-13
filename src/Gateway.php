@@ -12,6 +12,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use InvalidArgumentException;
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\Mollie\Order;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
@@ -470,6 +471,8 @@ class Gateway extends Core_Gateway {
 				$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
 			}
 		}
+
+		$this->update_payment_from_mollie_order( $payment, $mollie_order );
 	}
 
 	/**
@@ -1416,6 +1419,26 @@ class Gateway extends Core_Gateway {
 
 		foreach ( $payment->get_subscriptions() as $subscription ) {
 			$subscription->save();
+		}
+	}
+
+	/**
+	 * Update payment from Mollie order.
+	 *
+	 * @param Payment $payment      Payment.
+	 * @param Order   $mollie_order Mollie order.
+	 * @return void
+	 */
+	public function update_payment_from_mollie_order( Payment $payment, Order $mollie_order ) {
+		$payment_lines = $payment->get_lines();
+		$mollie_lines  = $mollie_order->get_lines();
+
+		foreach ( $payment_lines as &$payment_line ) {
+			$mollie_line = current( $mollie_lines );
+
+			$payment_line->set_meta( 'mollie_order_line_id', $mollie_line->get_id() );
+
+			next( $mollie_lines );
 		}
 	}
 
