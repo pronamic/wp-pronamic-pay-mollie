@@ -13,6 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use InvalidArgumentException;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Mollie\Order;
+use Pronamic\WordPress\Mollie\OrderRefundRequest;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
 use Pronamic\WordPress\Pay\Banks\BankTransferDetails;
@@ -28,6 +29,7 @@ use Pronamic\WordPress\Pay\Fields\TextField;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
+use Pronamic\WordPress\Pay\Payments\Refund;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Mollie\AmountTransformer;
@@ -1433,10 +1435,10 @@ class Gateway extends Core_Gateway {
 		$payment_lines = $payment->get_lines();
 		$mollie_lines  = $mollie_order->get_lines();
 
-		foreach ( $payment_lines as &$payment_line ) {
+		foreach ( $payment_lines as $payment_line ) {
 			$mollie_line = current( $mollie_lines );
 
-			$payment_line->set_meta( 'mollie_order_line_id', $mollie_line->get_id() );
+			$payment_line->set_meta( 'gateway_order_line_id', $mollie_line->get_id() );
 
 			next( $mollie_lines );
 		}
@@ -1502,33 +1504,88 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Create refund.
 	 *
-	 * @param string $transaction_id Transaction ID.
-	 * @param Money  $amount         Amount to refund.
-	 * @param string $description    Refund reason.
+	 * @param Refund $refund Refund.
 	 * @return string
+	 * @throws \Exception Throws exception on unknown resource type.
 	 */
-	public function create_refund( $transaction_id, Money $amount, $description = null ) {
-		$amount_transformer = new AmountTransformer();
+	public function create_refund( Refund $refund ) {
+		$payment = $refund->get_payment();
 
-		$request = new RefundRequest( $amount_transformer->transform_wp_to_mollie( $amount ) );
+		$resource = $this->get_resource_for_payment( $payment );
+
+		// Refund request for resource.
+		switch ( $resource ) {
+			case ResourceType::ORDERS:
+
+				$lines = $refund->get_lines();
+
+				if ( null === $lines ) {
+					throw new \Exception( \sprintf( 'Payment lines are required for order refunds.' ) );
+				}
+
+				foreach ( $lines as $line ) {
+					$mollie_order_line_id = $line->get_meta( 'gateway_order_line_id' );
+
+					if ( null !== $mollie_order_line_id ) {
+						$line->set_id( $mollie_order_line_id );
+					}
+				}
+
+				$lines_transformer = new LinesTransformer();
+
+				$lines = $lines_transformer->transform_wp_to_mollie_refund( $lines );
+
+				$request = new OrderRefundRequest( $lines );
+
+				break;
+			case ResourceType::PAYMENTS:
+				$amount_transformer = new AmountTransformer();
+
+				$amount = $amount_transformer->transform_wp_to_mollie( $refund->get_amount() );
+
+				$request = new RefundRequest( $amount );
+
+				break;
+			default:
+				throw new \Exception( \sprintf( 'Unknown resource for refund payment: %s.', $resource ) );
+		}
 
 		// Metadata payment ID.
-		$payment = \get_pronamic_payment_by_transaction_id( $transaction_id );
+		$payment_id = $payment->get_id();
 
-		if ( null !== $payment ) {
+		if ( null !== $payment_id ) {
 			$request->set_metadata(
 				[
-					'pronamic_payment_id' => $payment->get_id(),
+					'pronamic_payment_id' => $payment_id,
 				]
 			);
 		}
 
 		// Description.
+		$description = $refund->get_description();
+
 		if ( ! empty( $description ) ) {
 			$request->set_description( $description );
 		}
 
-		$refund = $this->client->create_refund( $transaction_id, $request );
+		switch ( $resource ) {
+			case ResourceType::ORDERS:
+				$order_id = $payment->get_meta( 'mollie_order_id' );
+
+				if ( null === $order_id ) {
+					throw new \Exception( \sprintf( 'Unable to create order refund without Mollie order ID.', $resource ) );
+				}
+
+				$refund = $this->client->create_order_refund( $order_id, $request );
+
+				break;
+			case ResourceType::PAYMENTS:
+				$refund = $this->client->create_refund( $payment->get_transaction_id(), $request );
+
+				break;
+			default:
+				throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
+		}
 
 		return $refund->get_id();
 	}
