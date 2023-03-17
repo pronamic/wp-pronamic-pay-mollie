@@ -1505,7 +1505,7 @@ class Gateway extends Core_Gateway {
 	 * Create refund.
 	 *
 	 * @param Refund $refund Refund.
-	 * @return string
+	 * @return void
 	 * @throws \Exception Throws exception on unknown resource type.
 	 */
 	public function create_refund( Refund $refund ) {
@@ -1561,18 +1561,18 @@ class Gateway extends Core_Gateway {
 					throw new \Exception( \sprintf( 'Unable to create order refund without Mollie order ID.', $resource ) );
 				}
 
-				$refund = $this->client->create_order_refund( $order_id, $request );
+				$mollie_refund = $this->client->create_order_refund( $order_id, $request );
 
 				break;
 			case ResourceType::PAYMENTS:
-				$refund = $this->client->create_refund( $payment->get_transaction_id(), $request );
+				$mollie_refund = $this->client->create_refund( $payment->get_transaction_id(), $request );
 
 				break;
 			default:
 				throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
 		}
 
-		return $refund->get_id();
+		$refund->psp_id = $mollie_refund->get_id();
 	}
 
 	/**
