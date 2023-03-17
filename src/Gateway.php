@@ -29,7 +29,7 @@ use Pronamic\WordPress\Pay\Fields\TextField;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus;
-use Pronamic\WordPress\Pay\Payments\Refund;
+use Pronamic\WordPress\Pay\Refunds\Refund;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Mollie\AmountTransformer;
@@ -1531,9 +1531,9 @@ class Gateway extends Core_Gateway {
 					}
 				}
 
-				$lines_transformer = new LinesTransformer();
+				$lines_transformer = new RefundLinesTransformer();
 
-				$lines = $lines_transformer->transform_wp_to_mollie_refund( $lines );
+				$lines = $lines_transformer->transform_wp_to_mollie( $lines );
 
 				$request = new OrderRefundRequest( $lines );
 
