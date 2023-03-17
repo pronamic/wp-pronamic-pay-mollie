@@ -1438,7 +1438,7 @@ class Gateway extends Core_Gateway {
 		foreach ( $payment_lines as $payment_line ) {
 			$mollie_line = current( $mollie_lines );
 
-			$payment_line->set_meta( 'gateway_order_line_id', $mollie_line->get_id() );
+			$payment_line->set_meta( 'mollie_order_line_id', $mollie_line->get_id() );
 
 			next( $mollie_lines );
 		}
@@ -1516,24 +1516,9 @@ class Gateway extends Core_Gateway {
 		// Refund request for resource.
 		switch ( $resource ) {
 			case ResourceType::ORDERS:
-
-				$lines = $refund->get_lines();
-
-				if ( null === $lines ) {
-					throw new \Exception( \sprintf( 'Payment lines are required for order refunds.' ) );
-				}
-
-				foreach ( $lines as $line ) {
-					$mollie_order_line_id = $line->get_meta( 'gateway_order_line_id' );
-
-					if ( null !== $mollie_order_line_id ) {
-						$line->set_id( $mollie_order_line_id );
-					}
-				}
-
 				$lines_transformer = new RefundLinesTransformer();
 
-				$lines = $lines_transformer->transform_wp_to_mollie( $lines );
+				$lines = $lines_transformer->transform_wp_to_mollie( $refund->get_lines() );
 
 				$request = new OrderRefundRequest( $lines );
 
