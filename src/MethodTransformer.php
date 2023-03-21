@@ -40,6 +40,7 @@ class MethodTransformer {
 		WordPressMethod::PRZELEWY24              => MollieMethod::PRZELEWY24,
 		WordPressMethod::SOFORT                  => MollieMethod::SOFORT,
 		WordPressMethod::IDEAL                   => MollieMethod::IDEAL,
+		WordPressMethod::IN3                     => MollieMethod::IN3,
 		WordPressMethod::KBC                     => MollieMethod::KBC,
 		WordPressMethod::BELFIUS                 => MollieMethod::BELFIUS,
 	];

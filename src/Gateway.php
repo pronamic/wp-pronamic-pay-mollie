@@ -188,6 +188,7 @@ class Gateway extends Core_Gateway {
 		$this->register_payment_method( $payment_method_ideal );
 
 		// Other.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::IN3 ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::KBC ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_LATER ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_NOW ) );
@@ -904,9 +905,10 @@ class Gateway extends Core_Gateway {
 			true
 		);
 
-		$is_klarna = \in_array(
+		$is_orders_api_method = \in_array(
 			$payment->get_payment_method(),
 			[
+				PaymentMethods::IN3,
 				PaymentMethods::KLARNA_PAY_NOW,
 				PaymentMethods::KLARNA_PAY_LATER,
 				PaymentMethods::KLARNA_PAY_OVER_TIME,
@@ -914,7 +916,7 @@ class Gateway extends Core_Gateway {
 			true
 		);
 
-		if ( $is_supported_extension && $is_klarna ) {
+		if ( $is_supported_extension && $is_orders_api_method ) {
 			$resource = ResourceType::ORDERS;
 		}
 
