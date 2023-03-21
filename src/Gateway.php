@@ -1413,7 +1413,9 @@ class Gateway extends Core_Gateway {
 		if ( null !== $amount_refunded ) {
 			$refunded_amount = new Money( $amount_refunded->get_value(), $amount_refunded->get_currency() );
 
-			$payment->set_refunded_amount( $refunded_amount->get_value() > 0 ? $refunded_amount : null );
+			if ( $refunded_amount->get_value() > 0 ) {
+				$payment->set_refunded_amount( $refunded_amount );
+			}
 		}
 
 		// Save.
