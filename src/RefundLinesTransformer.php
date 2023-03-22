@@ -40,7 +40,7 @@ class RefundLinesTransformer {
 
 			$line = $lines->new_line( $id );
 
-			$line->set_quantity( $refund_line->get_quantity() );
+			$line->set_quantity( $refund_line->get_quantity()->to_int() );
 			$line->set_amount( $amount_transformer->transform_wp_to_mollie( $refund_line->get_total_amount() ) );
 		}
 
