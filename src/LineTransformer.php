@@ -10,8 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Mollie\AmountTransformer;
 use Pronamic\WordPress\Mollie\Line as MollieLine;
+use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Refunds\Refund as PronamicRefund;
 use Pronamic\WordPress\Pay\Refunds\RefundLine as PronamicRefundLine;
@@ -42,11 +42,16 @@ class LineTransformer {
 	 * @return PronamicRefundLine
 	 */
 	public function update_mollie_to_pronamic( MollieLine $mollie_line, PronamicRefundLine $pronamic_refund_line ): PronamicRefundLine {
-		$amount_transformer = new AmountTransformer();
+		$total_amount = new TaxedMoney(
+			$mollie_line->total_amount->get_value(),
+			$mollie_line->total_amount->get_currency(),
+			$mollie_line->vat_amount->get_value(),
+			$mollie_line->vat_rate
+		);
 
 		$pronamic_refund_line->set_id( $mollie_line->get_id() );
 		$pronamic_refund_line->set_quantity( Number::from_int( $mollie_line->quantity ) );
-		$pronamic_refund_line->set_total_amount( $amount_transformer->transform_mollie_to_wp( $mollie_line->total_amount ) );
+		$pronamic_refund_line->set_total_amount( $total_amount );
 		$pronamic_refund_line->meta['mollie_order_line_id'] = $mollie_line->get_id();
 
 		return $pronamic_refund_line;
