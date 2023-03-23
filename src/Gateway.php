@@ -1410,13 +1410,38 @@ class Gateway extends Core_Gateway {
 		/**
 		 * Refunds.
 		 */
-		$amount_refunded = $mollie_payment->get_amount_refunded();
+		if ( $mollie_payment->has_refunds() ) {
+			$refund_transformer = new RefundTransformer();
 
-		if ( null !== $amount_refunded ) {
-			$refunded_amount = new Money( $amount_refunded->get_value(), $amount_refunded->get_currency() );
+			$mollie_refunds = $this->client->get_payment_refunds(
+				$mollie_payment->get_id(),
+				[]
+			);
 
-			if ( $refunded_amount->get_value() > 0 ) {
-				$payment->set_refunded_amount( $refunded_amount );
+			$map = [];
+
+			foreach ( $payment->refunds as $refund ) {
+				$map[ $refund->psp_id ] = $refund;
+			}
+
+			foreach ( $mollie_refunds as $mollie_refund ) {
+				$id = $mollie_refund->get_id();
+
+				if ( \array_key_exists( $id, $map ) ) {
+					$pronamic_refund = $map[ $id ];
+
+					$refund_transformer->update_mollie_to_pronamic( $mollie_refund, $pronamic_refund );
+				} else {
+					$payment->refunds[] = $refund_transformer->transform_mollie_to_pronamic( $mollie_refund, $payment );
+				}
+			}
+
+			$amount_refunded = $mollie_payment->get_amount_refunded();
+
+			if ( null !== $amount_refunded ) {
+				$amount_transformer = new AmountTransformer();
+
+				$payment->set_refunded_amount( $amount_transformer->transform_mollie_to_wp( $amount_refunded ) );
 			}
 		}
 

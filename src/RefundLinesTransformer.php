@@ -10,7 +10,6 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use InvalidArgumentException;
 use Pronamic\WordPress\Mollie\AmountTransformer;
 use Pronamic\WordPress\Mollie\OrderRefundLinesRequest as MollieRefundLines;
 use Pronamic\WordPress\Pay\Refunds\RefundLines as WordPressLines;
