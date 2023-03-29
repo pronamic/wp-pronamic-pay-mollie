@@ -3,7 +3,7 @@
  * Mollie order request test.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -33,7 +33,7 @@ class OrderRequestTest extends TestCase {
 	/**
 	 * Setup.
 	 */
-	public function set_up() : void {
+	public function set_up(): void {
 		parent::set_up();
 
 		$lines = new Lines();

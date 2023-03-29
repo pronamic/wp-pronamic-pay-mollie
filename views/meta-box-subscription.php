@@ -3,7 +3,7 @@
  * Subscription meta box.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  *
@@ -36,7 +36,7 @@ $mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 			/* translators: %s: Mollie customer ID anchor. */
 			\__( 'Customer: %s', 'pronamic_ideal' ),
 			\sprintf(
-				'<a href="%s">%s</a>',
+				current_user_can( 'manage_options' ) ? '<a href="%s">%s</a>' : '%2$s',
 				\esc_url( $customer_url ),
 				\esc_html( (string) $mollie_customer_id )
 			)

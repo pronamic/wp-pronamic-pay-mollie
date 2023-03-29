@@ -3,72 +3,29 @@
  * Mollie install.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Pay\Upgrades\Upgrade;
+
 /**
  * Install class
  */
-class Install {
+class Install extends Upgrade {
 	/**
-	 * Integration.
-	 *
-	 * @var Integration
-	 */
-	private $integration;
-
-	/**
-	 * Construct install.
-	 *
-	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-woocommerce.php#L368
-	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L1568
-	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L153-L166
-	 * @param Integration $integration Integration.
-	 */
-	public function __construct( Integration $integration ) {
-		$this->integration = $integration;
-
-		add_action( 'init', [ $this, 'check_version' ], 5 );
-	}
-
-	/**
-	 * Check version.
-	 *
-	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L168-L178
-	 * @return void
-	 */
-	public function check_version() {
-		$version_option = $this->integration->get_version_option();
-		$version        = $this->integration->get_version();
-
-		if ( null === $version_option || null === $version ) {
-			return;
-		}
-
-		$version_option = \strval( $version_option );
-		$version        = \strval( $version );
-
-		if ( version_compare( $version_option, $version, '<' ) ) {
-			$this->install();
-		}
-	}
-
-	/**
-	 * Install.
+	 * Execute.
 	 *
 	 * @link https://github.com/woocommerce/woocommerce/blob/4.0.0/includes/class-wc-install.php#L272-L306
 	 * @return void
 	 */
-	public function install() {
+	public function execute() {
 		$this->create_tables();
 		$this->add_foreign_keys();
 		$this->convert_user_meta();
-
-		$this->integration->update_version_option();
 	}
 
 	/**

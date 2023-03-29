@@ -3,7 +3,7 @@
  * Mollie transformer helper.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -28,11 +28,22 @@ class LocaleTransformer {
 		}
 
 		/**
+		 * Some browsers (Firefox) use language codes of only 2 characters, e.g. `nl` and `de`, which
+		 * are not supported by Mollie. We therefore try `nl_nl` and `de_de` instead.
+		 *
+		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/20
+		 */
+		if ( 2 === \strlen( $locale ) ) {
+			$locale = $locale . '_' . $locale;
+		}
+
+		/**
 		 * Supported locales.
 		 *
 		 * @var array<int, string>
 		 */
 		$supported = [
+			MollieLocale::EN_GB,
 			MollieLocale::EN_US,
 			MollieLocale::NL_NL,
 			MollieLocale::NL_BE,

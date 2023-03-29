@@ -3,7 +3,7 @@
  * Mollie transformer methods.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -40,6 +40,7 @@ class MethodTransformer {
 		WordPressMethod::PRZELEWY24              => MollieMethod::PRZELEWY24,
 		WordPressMethod::SOFORT                  => MollieMethod::SOFORT,
 		WordPressMethod::IDEAL                   => MollieMethod::IDEAL,
+		WordPressMethod::IN3                     => MollieMethod::IN3,
 		WordPressMethod::KBC                     => MollieMethod::KBC,
 		WordPressMethod::BELFIUS                 => MollieMethod::BELFIUS,
 	];

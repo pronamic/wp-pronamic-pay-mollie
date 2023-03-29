@@ -8,5 +8,3 @@ parameters:
 	scanDirectories:
 		- vendor/wp-cli
 		- vendor/woocommerce/action-scheduler
-	ignoreErrors:
-		- '#^Function apply_filters invoked with \d parameters, \d required\.$#'

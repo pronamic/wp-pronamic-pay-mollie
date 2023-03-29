@@ -3,7 +3,7 @@
  * CLI
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Mollie
  */
@@ -158,8 +158,8 @@ class CLI {
 				$profile_id = $this->profile_data_store->save_profile(
 					$profile,
 					[
-						'api_key_live' => ( 'live_' === substr( $api_key, 0, 5 ) ) ? $api_key : null,
-						'api_key_test' => ( 'test_' === substr( $api_key, 0, 5 ) ) ? $api_key : null,
+						'api_key_live' => \str_starts_with( $api_key, 'live_' ) ? $api_key : null,
+						'api_key_test' => \str_starts_with( $api_key, 'test_' ) ? $api_key : null,
 					],
 					[
 						'api_key_live' => '%s',
@@ -336,7 +336,7 @@ class CLI {
 
 					// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Mollie name.
 					return $payment->isCancelable;
-				} 
+				}
 			);
 		}
 

@@ -3,7 +3,7 @@
  * Lines transformer
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
@@ -81,7 +81,6 @@ class LinesTransformer {
 			);
 
 			$line->set_type( $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() ) );
-			$line->set_category( $payment_line->get_product_category() );
 			$line->set_sku( $payment_line->get_sku() );
 			$line->set_image_url( $payment_line->get_image_url() );
 			$line->set_product_url( $payment_line->get_product_url() );

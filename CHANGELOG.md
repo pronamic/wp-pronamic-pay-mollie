@@ -7,6 +7,109 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.6] - 2023-03-29
+### Changed
+
+- Extended support for refunds.
+
+### Commits
+
+- Added support for in3. ([f12c9b5](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/f12c9b50a7969a0e081a1163861fbc79a7748ee8))
+
+### Composer
+
+- Changed `pronamic/wp-mollie` from `^1.1` to `v1.2.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v1.2.0
+- Changed `wp-pay/core` from `^4.6` to `v4.9.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.9.0
+Full set of changes: [`4.7.5...4.7.6`][4.7.6]
+
+[4.7.6]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.5...v4.7.6
+
+## [4.7.5] - 2023-03-10
+
+### Commits
+
+- Added support for `en_GB` locale. ([5b3fc51](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5b3fc515d908ab10dc66c8611054197743f5c690))
+- Set `wordpress-plugin` type for Composer (pronamic/wp-pronamic-pay-with-mollie-for-contact-form-7#3). ([7517c92](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/7517c92862b7a6c6e31a921f3871c1c9cacabdbd))
+- Updated .gitattributes ([c12d414](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/c12d41423e90582570570afc95ace7594b914199)) ([be417d7](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/be417d73795fd3be2d82c24a4a8fb5584aac7fff))
+- Ignore `/vendor-bin/` in export to to archive files. ([baca178](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/baca17883e8f4213fe89307b169b5947f47f4038))
+
+Full set of changes: [`4.7.4...4.7.5`][4.7.5]
+
+[4.7.5]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.4...v4.7.5
+
+## [4.7.4] - 2023-02-17
+
+### Commits
+
+- Fixed running integration installation. ([ba35110](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/ba3511097e85f5292edcf5d8d3542110ceb21374))
+
+Full set of changes: [`4.7.3...4.7.4`][4.7.4]
+
+[4.7.4]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.3...v4.7.4
+
+## [4.7.3] - 2023-02-07
+### Changed
+
+- Removed `db_version_option_name` integration argument.
+
+Full set of changes: [`4.7.2...4.7.3`][4.7.3]
+
+[4.7.3]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.2...v4.7.3
+
+## [4.7.2] - 2023-01-31
+### Commits
+
+- Fixed "Mollie requires locale for order" with language codes of only 2 characters in `Accept-Language` header (fixes #20). ([c9ca730](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/c9ca7308cc956c888a594d73724bcf02d8d4195c))
+
+### Composer
+
+- Changed `php` from `>=8.0` to `>=7.4`.
+Full set of changes: [`4.7.1...4.7.2`][4.7.2]
+
+[4.7.2]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.1...v4.7.2
+
+## [4.7.1] - 2023-01-18
+
+### Commits
+
+- Maybe create shipment on payment fulfilled action. ([881d6d5](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/881d6d5ec49275a0ab86e5aa8969b04d9cb0996e))
+- Mark WooCommerce with support for Mollie orders. ([5440b76](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5440b76ee1ffa3c2e34dc7a1a8c5328e9b8fc447))
+- Ignore `documentation` folder in archive files. ([1cb8f56](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/1cb8f56690c8e7b76fecb6606f6b02b28c7890cc))
+- The Mollie order line category is not the same as a product category. ([10e1297](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/10e1297c52bdda8651aeff9979655239cf8b94e3))
+- Mollie order shipping address is optional. ([88d7458](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/88d745827e6aec33e6b08b49fdfe90698c2e8eae))
+- Happy 2023. ([cc44d7a](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/cc44d7ad4f0195fc0e2cfcaa4895f96cb3a69909))
+
+Full set of changes: [`4.7.0...4.7.1`][4.7.1]
+
+[4.7.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.0...v4.7.1
+
+## [4.7.0] - 2022-12-22
+
+### Commits
+
+- Added "Requires Plugins" header. ([fbd32df](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/fbd32dff63e7086690eccfa30bf0bcf97267143f))
+- Only add anchor in meta box if destination page can be accessed. ([aecda56](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/aecda568d1bfbd85c1650fd1be62605b153ee282))
+- Removed `FILTER_SANITIZE_STRING` usage. ([1011701](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/10117012f586c11836cb8c3a7be1c9163f1b9738))
+
+### Composer
+
+- Changed `php` from `>=7.4` to `>=8.0`.
+- Changed `pronamic/wp-http` from `^1.1` to `v1.2.0`.
+	Release notes: https://github.com/pronamic/wp-http/releases/tag/v4.6.0
+- Changed `pronamic/wp-mollie` from `^1.0` to `v1.1.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v4.6.0
+- Changed `wp-pay/core` from `^4.5` to `v4.6.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.6.0
+Full set of changes: [`4.6.0...4.7.0`][4.7.0]
+
+[4.7.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.6.0...v4.7.0
+
+## [4.6.0] - 2022-11-29
+- Use new `pronamic/wp-mollie` library.
+- Use new `str_*_with` functions, requires WordPress `5.9` or higher.
+
 ## [4.5.0] - 2022-11-07
 - Added user agent to HTTP requests to Mollie. [#13](https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13)
 
@@ -221,7 +324,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.5.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.6.0...HEAD
+[4.6.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.5.0...4.6.0
 [4.5.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.1...4.5.0
 [4.4.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.0...4.4.1
 [4.4.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.3.1...4.4.0

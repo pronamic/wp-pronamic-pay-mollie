@@ -3,12 +3,14 @@
  * Page customer
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
+
+use Pronamic\WordPress\Mollie\Client;
 
 /**
  * Valid global.
@@ -18,7 +20,12 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
  */
 global $wpdb;
 
-$mollie_customer_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not necessary because this parameter does not trigger an action
+$mollie_customer_id = array_key_exists( 'id', $_GET ) ? \sanitize_text_field( \wp_unslash( $_GET['id'] ) ) : null;
+
+if ( null === $mollie_customer_id ) {
+	return;
+}
 
 $mollie_customer_data = $wpdb->get_row(
 	$wpdb->prepare(
@@ -40,6 +47,10 @@ $mollie_customer_data = $wpdb->get_row(
 		$mollie_customer_id
 	)
 );
+
+if ( ! \is_object( $mollie_customer_data ) ) {
+	return;
+}
 
 $mollie_customer = null;
 

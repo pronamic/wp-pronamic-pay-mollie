@@ -3,16 +3,18 @@
  * Page payment.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Mollie\Client;
 use Pronamic\WordPress\Pay\Admin\AdminPaymentPostType;
 
-$mollie_payment_id = \filter_input( INPUT_GET, 'id', FILTER_SANITIZE_STRING );
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not necessary because this parameter does not trigger an action
+$mollie_payment_id = \array_key_exists( 'id', $_GET ) ? \sanitize_text_field( \wp_unslash( $_GET['id'] ) ) : '';
 
 $mollie_payment = null;
 

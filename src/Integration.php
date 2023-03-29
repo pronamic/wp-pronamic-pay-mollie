@@ -3,7 +3,7 @@
  * Mollie integration.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -42,14 +42,14 @@ class Integration extends AbstractGatewayIntegration {
 		$args = wp_parse_args(
 			$args,
 			[
-				'id'                     => 'mollie',
-				'name'                   => 'Mollie',
-				'version'                => '2.1.0',
-				'url'                    => 'https://www.mollie.com/en/',
-				'product_url'            => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
-				'dashboard_url'          => 'https://my.mollie.com/dashboard/',
-				'provider'               => 'mollie',
-				'supports'               => [
+				'id'                  => 'mollie',
+				'name'                => 'Mollie',
+				'version'             => '2.1.0',
+				'url'                 => 'https://www.mollie.com/en/',
+				'product_url'         => \__( 'https://www.mollie.com/en/pricing', 'pronamic_ideal' ),
+				'dashboard_url'       => 'https://my.mollie.com/dashboard/',
+				'provider'            => 'mollie',
+				'supports'            => [
 					'payment_status_request',
 					'recurring',
 					'refunds',
@@ -57,8 +57,7 @@ class Integration extends AbstractGatewayIntegration {
 					'webhook_log',
 					'webhook_no_config',
 				],
-				'version_option_name'    => 'pronamic_pay_mollie_version',
-				'db_version_option_name' => 'pronamic_pay_mollie_db_version',
+				'version_option_name' => 'pronamic_pay_mollie_version',
 			]
 		);
 
@@ -71,6 +70,13 @@ class Integration extends AbstractGatewayIntegration {
 			\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function, 10, 2 );
 		}
 
+		$function = [ $this, 'http_request_args' ];
+
+		if ( ! \has_filter( 'http_request_args', $function ) ) {
+			// phpcs:ignore WordPressVIPMinimum.Hooks.RestrictedHooks.http_request_args -- Timeout is not adjusted.
+			\add_filter( 'http_request_args', $function, 10, 2 );
+		}
+
 		add_filter( 'pronamic_payment_provider_url_mollie', [ $this, 'payment_provider_url' ], 10, 2 );
 
 		// Actions.
@@ -80,13 +86,21 @@ class Integration extends AbstractGatewayIntegration {
 			\add_action( 'pronamic_pay_mollie_payment_start', $function, 10, 1 );
 		}
 
+		$function = [ $this, 'payment_fulfilled' ];
+
+		if ( ! \has_action( 'pronamic_pay_payment_fulfilled', $function ) ) {
+			\add_action( 'pronamic_pay_payment_fulfilled', $function, 10, 1 );
+		}
+
 		// Tables.
 		$this->register_tables();
 
-		/**
-		 * Install.
-		 */
-		new Install( $this );
+		// Upgrades.
+		$version = $this->get_version();
+
+		$upgrades = $this->get_upgrades();
+
+		$upgrades->add( new Install( null === $version ? '1.0.0' : $version ) );
 
 		/**
 		 * Admin
@@ -151,7 +165,6 @@ class Integration extends AbstractGatewayIntegration {
 		// API Key.
 		$fields[] = [
 			'section'  => 'general',
-			'filter'   => FILTER_SANITIZE_STRING,
 			'meta_key' => '_pronamic_gateway_mollie_api_key',
 			'title'    => _x( 'API Key', 'mollie', 'pronamic_ideal' ),
 			'type'     => 'text',
@@ -373,5 +386,73 @@ class Integration extends AbstractGatewayIntegration {
 		$next_payment_delivery_date = $next_payment_delivery_date->setTime( 0, 0, 0 );
 
 		return $next_payment_delivery_date;
+	}
+
+
+	/**
+	 * Get user agent value for requests to Mollie.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13
+	 * @return string
+	 */
+	private function get_user_agent() {
+		return implode(
+			' ',
+			[
+				/**
+				 * Pronamic Pay version.
+				 *
+				 * @link https://github.com/pronamic/pronamic-pay/issues/12
+				 */
+				'PronamicPay/' . \pronamic_pay_plugin()->get_version(),
+				/**
+				 * Pronamic - Mollie user agent token.
+				 *
+				 * @link https://github.com/pronamic/pronamic-pay/issues/12
+				 */
+				'uap/FyuVeDDqnKdzdry7',
+				/**
+				 * WordPress version.
+				 *
+				 * @link https://github.com/WordPress/WordPress/blob/f9db66d504fc72942515f6c0ed2b63aee7cef876/wp-includes/class-wp-http.php#L183-L192
+				 */
+				'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ),
+			]
+		);
+	}
+
+	/**
+	 * Filters the arguments used in an HTTP request.
+	 *
+	 * @link https://developer.wordpress.org/reference/hooks/http_request_args/
+	 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/13
+	 * @param array<string, string> $args Arguments.
+	 * @param string                $url  URL.
+	 * @return array<string, string>
+	 */
+	public function http_request_args( $args, $url ) {
+		if ( ! \str_starts_with( $url, 'https://api.mollie.com/' ) ) {
+			return $args;
+		}
+
+		$args['user-agent'] = $this->get_user_agent();
+
+		return $args;
+	}
+
+	/**
+	 * Payment fulfilled.
+	 * 
+	 * @param Payment $payment Payment.
+	 * @return void
+	 */
+	public function payment_fulfilled( Payment $payment ): void {
+		$gateway = $payment->get_gateway();
+
+		if ( ! $gateway instanceof Gateway ) {
+			return;
+		}
+
+		$gateway->maybe_create_shipment_for_payment( $payment );
 	}
 }
