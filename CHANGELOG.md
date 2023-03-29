@@ -7,6 +7,25 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.6] - 2023-03-29
+### Changed
+
+- Extended support for refunds.
+
+### Commits
+
+- Added support for in3. ([f12c9b5](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/f12c9b50a7969a0e081a1163861fbc79a7748ee8))
+
+### Composer
+
+- Changed `pronamic/wp-mollie` from `^1.1` to `v1.2.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v1.2.0
+- Changed `wp-pay/core` from `^4.6` to `v4.9.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.9.0
+Full set of changes: [`4.7.5...4.7.6`][4.7.6]
+
+[4.7.6]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.5...v4.7.6
+
 ## [4.7.5] - 2023-03-10
 
 ### Commits
