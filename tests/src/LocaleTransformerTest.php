@@ -30,7 +30,7 @@ class LocaleTransformerTest extends TestCase {
 	 *
 	 * @param string $locale   Locale.
 	 * @param string $expected Expected locale.
-	 *
+	 * @return void
 	 * @dataProvider locale_matrix_provider
 	 */
 	public function test_get_locale( $locale, $expected ) {
@@ -44,21 +44,24 @@ class LocaleTransformerTest extends TestCase {
 	/**
 	 * Locale data provider.
 	 *
-	 * @return array
+	 * @return array<int,array<int,string|null>>
 	 */
 	public function locale_matrix_provider() {
 		return [
 			// English.
 			[ 'en_US', MollieLocale::EN_US ],
 			[ 'en_us', MollieLocale::EN_US ],
-			[ 'en_GB', null ],
+			[ 'en_GB', MollieLocale::EN_GB ],
+			[ 'en_AU', null ],
 			[ 'EN', null ],
 			[ 'en', null ],
 
 			// Dutch.
 			[ 'nl_NL', MollieLocale::NL_NL ],
-			[ 'NL', null ],
-			[ 'nl', null ],
+			[ 'NL', MollieLocale::NL_NL ],
+			[ 'nl', MollieLocale::NL_NL ],
+			[ 'nl_BE', MollieLocale::NL_BE ],
+			[ 'be', null ],
 
 			// Frisian.
 			[ 'FY', null ],
