@@ -42,8 +42,8 @@ class RefundTransformer {
 	/**
 	 * Update Pronamic refund from Mollie refund.
 	 *
-	 * @param MollieRefund    $mollie_refund    Mollie refund.
-	 * @param PronamicPayment $pronamic_payment Pronamic payment.
+	 * @param MollieRefund   $mollie_refund   Mollie refund.
+	 * @param PronamicRefund $pronamic_refund Pronamic refund.
 	 * @return PronamicRefund
 	 */
 	public function update_mollie_to_pronamic( MollieRefund $mollie_refund, PronamicRefund $pronamic_refund ): PronamicRefund {
