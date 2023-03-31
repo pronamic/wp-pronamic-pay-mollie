@@ -49,7 +49,7 @@ class LineTransformer {
 			$mollie_line->vat_rate
 		);
 
-		$pronamic_refund_line->set_id( $mollie_line->get_id() );
+		$pronamic_refund_line->set_id( (string) $mollie_line->get_id() );
 		$pronamic_refund_line->set_quantity( Number::from_int( $mollie_line->quantity ) );
 		$pronamic_refund_line->set_total_amount( $total_amount );
 		$pronamic_refund_line->meta['mollie_order_line_id'] = $mollie_line->get_id();

@@ -81,7 +81,7 @@ class RefundTransformer {
 
 		if ( null !== $mollie_refund->lines ) {
 			foreach ( $mollie_refund->lines as $mollie_line ) {
-				$id = $mollie_line->get_id();
+				$id = (string) $mollie_line->get_id();
 
 				if ( \array_key_exists( $id, $map_refund_lines ) ) {
 					$pronamic_refund_line = $map_refund_lines[ $id ];

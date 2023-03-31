@@ -111,7 +111,7 @@ class Gateway extends Core_Gateway {
 
 		// Fields.
 		$ideal_options = new CachedCallbackOptions(
-			function() {
+			function () {
 				return $this->get_ideal_issuers();
 			},
 			'pronamic_pay_ideal_issuers_' . \md5( (string) \wp_json_encode( $config ) )
@@ -365,10 +365,10 @@ class Gateway extends Core_Gateway {
 	/**
 	 * Start
 	 *
-	 * @see Core_Gateway::start()
 	 * @param Payment $payment Payment.
 	 * @return void
 	 * @throws \Exception Throws exception on error creating Mollie customer for payment.
+	 * @see Core_Gateway::start()
 	 */
 	public function start( Payment $payment ) {
 		$resource = $this->get_resource_for_payment( $payment );
@@ -493,7 +493,7 @@ class Gateway extends Core_Gateway {
 		 * The maximum length of the description field differs per payment
 		 * method, with the absolute maximum being 255 characters.
 		 *
-		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#parameters
+		 * @link  https://docs.mollie.com/reference/v2/payments-api/create-payment#parameters
 		 * @since 3.0.1
 		 * @param string  $description Description.
 		 * @param Payment $payment     Payment.
@@ -636,10 +636,9 @@ class Gateway extends Core_Gateway {
 		/**
 		 * Filters the Mollie metadata.
 		 *
-		 * @since 2.2.0
-		 *
 		 * @param mixed   $metadata Metadata.
 		 * @param Payment $payment  Payment.
+		 * @since 2.2.0
 		 */
 		$metadata = \apply_filters( 'pronamic_pay_mollie_payment_metadata', $metadata, $payment );
 
@@ -656,10 +655,9 @@ class Gateway extends Core_Gateway {
 		/**
 		 * Filters the Mollie payment billing email used for bank transfer payment instructions.
 		 *
-		 * @since 2.2.0
-		 *
 		 * @param string|null $billing_email Billing email.
 		 * @param Payment     $payment       Payment.
+		 * @since 2.2.0
 		 */
 		$billing_email = \apply_filters( 'pronamic_pay_mollie_payment_billing_email', $billing_email, $payment );
 
@@ -849,11 +847,11 @@ class Gateway extends Core_Gateway {
 
 		/**
 		 * Shipping address.
-		 * 
+		 *
 		 * The Mollie shipping address in an order is optional.
 		 * If the transformers fails to transform we leave the
 		 * shipping address undefined.
-		 * 
+		 *
 		 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
 		 */
 		$shipping_address = $payment->get_shipping_address();
@@ -923,7 +921,7 @@ class Gateway extends Core_Gateway {
 		/**
 		 * Filters the resource to use for the payment.
 		 *
-		 * @link https://docs.mollie.com/reference/v2/payments-api/create-payment#parameters
+		 * @link  https://docs.mollie.com/reference/v2/payments-api/create-payment#parameters
 		 * @since 4.0.0
 		 * @param string  $resource Resource.
 		 * @param Payment $payment  Payment.
@@ -1012,7 +1010,7 @@ class Gateway extends Core_Gateway {
 
 				$payment->add_note(
 					\sprintf(
-						/* translators: 1: payment transaction ID, 2: Mollie payment ID */
+					/* translators: 1: payment transaction ID, 2: Mollie payment ID */
 						\__( 'Payment transaction ID updated from `%1$s` to successful order payment `%2$s`.', 'pronamic_ideal' ),
 						$transaction_id,
 						$mollie_payment_id
@@ -1028,7 +1026,7 @@ class Gateway extends Core_Gateway {
 
 		$payment->add_note(
 			\sprintf(
-				/* translators: 1: Mollie shipment ID, 2: Mollie order ID */
+			/* translators: 1: Mollie shipment ID, 2: Mollie order ID */
 				\__( 'Shipment `%1$s` created for Mollie order `%2$s`.', 'pronamic_ideal' ),
 				$shipment->get_id(),
 				$mollie_order_id
@@ -1348,9 +1346,9 @@ class Gateway extends Core_Gateway {
 
 		if (
 			null === $payment->get_action_url()
-				&&
+			&&
 			'' === $payment->get_meta( 'mollie_sequence_type' )
-				&&
+			&&
 			PaymentMethods::DIRECT_DEBIT === $payment->get_payment_method()
 		) {
 			$payment->set_action_url( $payment->get_return_redirect_url() );
@@ -1464,10 +1462,16 @@ class Gateway extends Core_Gateway {
 		$payment_lines = $payment->get_lines();
 		$mollie_lines  = $mollie_order->get_lines();
 
+		if ( null === $payment_lines ) {
+			return;
+		}
+
 		foreach ( $payment_lines as $payment_line ) {
 			$mollie_line = current( $mollie_lines );
 
-			$payment_line->set_meta( 'mollie_order_line_id', $mollie_line->get_id() );
+			if ( false !== $mollie_line ) {
+				$payment_line->set_meta( 'mollie_order_line_id', $mollie_line->get_id() );
+			}
 
 			next( $mollie_lines );
 		}
@@ -1498,7 +1502,7 @@ class Gateway extends Core_Gateway {
 
 		if ( ! empty( $old_mandate_id ) && $old_mandate_id !== $mandate_id ) {
 			$note = \sprintf(
-				/* translators: 1: old mandate ID, 2: new mandate ID */
+			/* translators: 1: old mandate ID, 2: new mandate ID */
 				\__( 'Mandate for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
 				\esc_html( $old_mandate_id ),
 				\esc_html( $mandate_id )
@@ -1518,7 +1522,7 @@ class Gateway extends Core_Gateway {
 
 			// Add note.
 			$note = \sprintf(
-				/* translators: 1: old payment method, 2: new payment method */
+			/* translators: 1: old payment method, 2: new payment method */
 				\__( 'Payment method for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
 				\esc_html( (string) PaymentMethods::get_name( $old_method ) ),
 				\esc_html( (string) PaymentMethods::get_name( $new_method ) )
@@ -1582,23 +1586,24 @@ class Gateway extends Core_Gateway {
 			$request->set_description( $description );
 		}
 
-		switch ( $resource ) {
-			case ResourceType::ORDERS:
-				$order_id = $payment->get_meta( 'mollie_order_id' );
+		if ( $request instanceof OrderRefundRequest ) {
+			$order_id = $payment->get_meta( 'mollie_order_id' );
 
-				if ( null === $order_id ) {
-					throw new \Exception( \sprintf( 'Unable to create order refund without Mollie order ID.', $resource ) );
-				}
+			if ( null === $order_id ) {
+				throw new \Exception( \sprintf( 'Unable to create order refund without Mollie order ID.' ) );
+			}
 
-				$mollie_refund = $this->client->create_order_refund( $order_id, $request );
+			$mollie_refund = $this->client->create_order_refund( $order_id, $request );
+		} elseif ( $request instanceof RefundRequest ) {
+			$transaction_id = $payment->get_transaction_id();
 
-				break;
-			case ResourceType::PAYMENTS:
-				$mollie_refund = $this->client->create_refund( $payment->get_transaction_id(), $request );
+			if ( null === $transaction_id ) {
+				throw new \Exception( \sprintf( 'Unable to create payment refund without Mollie payment ID.' ) );
+			}
 
-				break;
-			default:
-				throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
+			$mollie_refund = $this->client->create_refund( $transaction_id, $request );
+		} else {
+			throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
 		}
 
 		$refund->psp_id = $mollie_refund->get_id();
