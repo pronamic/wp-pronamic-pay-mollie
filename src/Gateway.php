@@ -272,7 +272,7 @@ class Gateway extends Core_Gateway {
 		// Update `Direct Debit (mandate via ...)` payment method statuses.
 		$payment_method_direct_debit = $this->get_payment_method( PaymentMethods::DIRECT_DEBIT );
 
-		if ( null !== $payment_method_direct_debit && 'active' === $payment_method_direct_debit->get_status() ) {
+		if ( null !== $payment_method_direct_debit ) {
 			$map = [
 				PaymentMethods::BANCONTACT => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 				PaymentMethods::IDEAL      => PaymentMethods::DIRECT_DEBIT_IDEAL,
@@ -283,8 +283,19 @@ class Gateway extends Core_Gateway {
 				$method_a = $this->get_payment_method( $a );
 				$method_b = $this->get_payment_method( $b );
 
-				if ( null !== $method_a && null !== $method_b ) {
-					$method_b->set_status( $method_a->get_status() );
+				if ( null === $method_a || null === $method_b ) {
+					continue;
+				}
+
+				switch ( $payment_method_direct_debit->get_status() ) {
+					case 'active':
+						$method_b->set_status( $method_a->get_status() );
+
+						break;
+					case 'inactive':
+						$method_b->set_status( 'inactive' );
+
+						break;
 				}
 			}
 		}
