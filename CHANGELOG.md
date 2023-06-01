@@ -7,6 +7,19 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.7] - 2023-06-01
+
+### Commits
+
+- Switch from `pronamic/wp-deployer` to `pronamic/pronamic-cli`. ([1659c0a](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/1659c0ac9a0713fef7de66eeca72ff9d9a2afde8))
+- Prevent error when trying to retrieve iDEAL issuers when SEPA Direct Debit and iDEAL are both inactive. ([1f3e4a0](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/1f3e4a0ea58c60d0ae268cb70774861962acfb16))
+- Fixed method documentation. ([949cf76](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/949cf76e561f176e5264f94f16f620ee89df03a7))
+- Updated .gitattributes ([45c4a5c](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/45c4a5c8a629c7e6ca6d50bce0332fbb99bd683e))
+
+Full set of changes: [`4.7.6...4.7.7`][4.7.7]
+
+[4.7.7]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.6...v4.7.7
+
 ## [4.7.6] - 2023-03-29
 ### Changed
 
