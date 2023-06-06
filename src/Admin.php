@@ -231,6 +231,7 @@ class Admin {
 	 * @return void
 	 */
 	public function page_mollie_mandates() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not necessary because this parameter does not trigger an action
 		if ( \array_key_exists( 'mandate_id', $_GET ) ) {
 			include __DIR__ . '/../views/page-mandate.php';
 
