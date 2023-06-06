@@ -21,6 +21,9 @@ use Pronamic\WordPress\Mollie\Client;
 global $wpdb;
 
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not necessary because this parameter does not trigger an action
+$config_id = array_key_exists( 'config_id', $_GET ) ? \sanitize_text_field( \wp_unslash( $_GET['config_id'] ) ) : null;
+
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not necessary because this parameter does not trigger an action
 $mollie_customer_id = array_key_exists( 'id', $_GET ) ? \sanitize_text_field( \wp_unslash( $_GET['id'] ) ) : null;
 
 if ( null === $mollie_customer_id ) {
@@ -52,12 +55,18 @@ if ( ! \is_object( $mollie_customer_data ) ) {
 	return;
 }
 
+$api_key = \get_post_meta( $config_id, '_pronamic_gateway_mollie_api_key', true );
+
+if ( $mollie_customer_data->api_key ) {
+	$api_key = $mollie_customer_data->api_key;
+}
+
 $mollie_customer = null;
 
 $mollie_customer_mandates = null;
 
-if ( $mollie_customer_data->api_key ) {
-	$client = new Client( $mollie_customer_data->api_key );
+if ( $api_key ) {
+	$client = new Client( $api_key );
 
 	/**
 	 * Customer.

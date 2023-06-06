@@ -160,6 +160,15 @@ class Admin {
 
 		add_submenu_page(
 			'pronamic_pay_mollie',
+			__( 'Mollie Mandates', 'pronamic_ideal' ),
+			__( 'Mandates', 'pronamic_ideal' ),
+			'manage_options',
+			'pronamic_pay_mollie_mandates',
+			[ $this, 'page_mollie_mandates' ]
+		);
+
+		add_submenu_page(
+			'pronamic_pay_mollie',
 			__( 'Mollie Payments', 'pronamic_ideal' ),
 			__( 'Payments', 'pronamic_ideal' ),
 			'manage_options',
@@ -214,6 +223,21 @@ class Admin {
 		}
 
 		include __DIR__ . '/../views/page-customers.php';
+	}
+
+	/**
+	 * Page Mollie mandates.
+	 *
+	 * @return void
+	 */
+	public function page_mollie_mandates() {
+		if ( \array_key_exists( 'mandate_id', $_GET ) ) {
+			include __DIR__ . '/../views/page-mandate.php';
+
+			return;
+		}
+
+		include __DIR__ . '/../views/page-mandates.php';
 	}
 
 	/**

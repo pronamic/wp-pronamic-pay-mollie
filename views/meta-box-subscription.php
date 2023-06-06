@@ -25,8 +25,9 @@ $mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
 	$customer_url = \add_query_arg(
 		[
-			'page' => 'pronamic_pay_mollie_customers',
-			'id'   => $mollie_customer_id,
+			'page'      => 'pronamic_pay_mollie_customers',
+			'config_id' => $subscription->config_id,
+			'id'        => $mollie_customer_id,
 		],
 		\admin_url( 'admin.php' )
 	);
@@ -53,21 +54,40 @@ $mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
 <?php
 
-$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+$mollie_mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
-if ( ! empty( $mandate_id ) ) :
+if ( ! empty( $mollie_mandate_id ) ) :
 
 	?>
 
 	<p>
 		<?php
 
-		echo esc_html(
-			sprintf(
-				/* translators: %s: Mollie mandate ID */
+		$mandate_url = \add_query_arg(
+			[
+				'page'        => 'pronamic_pay_mollie_mandates',
+				'config_id'   => $subscription->config_id,
+				'customer_id' => $mollie_customer_id,
+				'mandate_id'  => $mollie_mandate_id,
+			],
+			\admin_url( 'admin.php' )
+		);
+
+		echo \wp_kses(
+			\sprintf(
+				/* translators: %s: Mollie mandate ID anchor. */
 				\__( 'Mandate: %s', 'pronamic_ideal' ),
-				$mandate_id
-			)
+				\sprintf(
+					current_user_can( 'manage_options' ) ? '<a href="%s">%s</a>' : '%2$s',
+					\esc_url( $mandate_url ),
+					\esc_html( (string) $mollie_mandate_id )
+				)
+			),
+			[
+				'a' => [
+					'href' => true,
+				],
+			]
 		);
 
 		?>
