@@ -183,7 +183,7 @@ if ( $api_key ) {
 				<tr>
 					<th scope="row"><?php \esc_html_e( 'Details', 'pronamic_ideal' ); ?></th>
 					<td>
-						<pre><?php echo \esc_html( \json_encode( $mollie_mandate->details, \JSON_PRETTY_PRINT ) ); ?></pre>
+						<pre><?php echo \esc_html( \wp_json_encode( $mollie_mandate->details, \JSON_PRETTY_PRINT ) ); ?></pre>
 					</td>
 				</tr>
 				<tr>
