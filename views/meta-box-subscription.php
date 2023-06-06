@@ -13,9 +13,9 @@
 
 $subscription = \get_pronamic_subscription( $post->ID );
 
-if ( null === $subscription ) :
+if ( null === $subscription ) {
 	return;
-endif;
+}
 
 $mollie_customer_id = $subscription->get_meta( 'mollie_customer_id' );
 
