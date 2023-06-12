@@ -26,6 +26,7 @@ class MethodTransformer {
 		WordPressMethod::APPLE_PAY               => MollieMethod::APPLE_PAY,
 		WordPressMethod::BANCONTACT              => MollieMethod::BANCONTACT,
 		WordPressMethod::BANK_TRANSFER           => MollieMethod::BANKTRANSFER,
+		WordPressMethod::BILLIE                  => MollieMethod::BILLIE,
 		WordPressMethod::CREDIT_CARD             => MollieMethod::CREDITCARD,
 		WordPressMethod::DIRECT_DEBIT            => MollieMethod::DIRECT_DEBIT,
 		WordPressMethod::DIRECT_DEBIT_BANCONTACT => MollieMethod::DIRECT_DEBIT,

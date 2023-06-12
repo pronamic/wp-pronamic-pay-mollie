@@ -135,6 +135,7 @@ class Gateway extends Core_Gateway {
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANCONTACT ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANK_TRANSFER ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BELFIUS ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BILLIE ) );
 
 		// Payment method credit card.
 		$payment_method_credit_card = new PaymentMethod( PaymentMethods::CREDIT_CARD );
@@ -917,6 +918,7 @@ class Gateway extends Core_Gateway {
 		$is_orders_api_method = \in_array(
 			$payment->get_payment_method(),
 			[
+				PaymentMethods::BILLIE,
 				PaymentMethods::IN3,
 				PaymentMethods::KLARNA_PAY_NOW,
 				PaymentMethods::KLARNA_PAY_LATER,
