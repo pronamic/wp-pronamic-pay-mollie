@@ -92,7 +92,7 @@ $mollie_order_id    = $payment->get_meta( 'mollie_order_id' );
 
 <?php if ( ! empty( $mollie_mandate_id ) ) : ?>
 
-	<dl>
+	<p>
 		<?php
 
 		echo \esc_html(
@@ -104,13 +104,13 @@ $mollie_order_id    = $payment->get_meta( 'mollie_order_id' );
 		);
 
 		?>
-	</dl>
+	</p>
 
 <?php endif; ?>
 
 <?php if ( ! empty( $mollie_order_id ) ) : ?>
 
-	<dl>
+	<p>
 		<?php
 
 		echo \esc_html(
@@ -122,6 +122,6 @@ $mollie_order_id    = $payment->get_meta( 'mollie_order_id' );
 		);
 
 		?>
-	</dl>
+	</p>
 
 <?php endif; ?>
