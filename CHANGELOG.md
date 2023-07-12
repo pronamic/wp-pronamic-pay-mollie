@@ -7,6 +7,20 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.8] - 2023-07-12
+
+### Commits
+
+- Mark payment methods recurring support. ([a0c1246](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/a0c1246a55f5393c68c6d3a5e0f182a2d70eac84))
+- Added link to payment mandate ID. ([9d37959](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/9d37959c0c0baa92682136a0de9eb97be8b554a1))
+- Change incomplete `<dl>` elements to `<p>`. ([7f18457](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/7f18457ea5cbca1d3ef224dd0c0ac123392d9380))
+- Added support for Billie. ([59ea0a8](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/59ea0a8911cbe5521c4102343c53e58963ced6ab))
+- Added mandate page and link. ([277adc0](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/277adc0193c8faa6f56564d95716915b4fada334))
+
+Full set of changes: [`4.7.7...4.7.8`][4.7.8]
+
+[4.7.8]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.7...v4.7.8
+
 ## [4.7.7] - 2023-06-01
 
 ### Commits
