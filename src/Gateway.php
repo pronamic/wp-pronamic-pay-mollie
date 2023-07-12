@@ -131,10 +131,22 @@ class Gateway extends Core_Gateway {
 
 		$this->register_payment_method( $payment_method_apple_pay );
 
-		// Other.
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANCONTACT ) );
+		// Bancontact.
+		$payment_method_bancontact = new PaymentMethod( PaymentMethods::BANCONTACT );
+		$payment_method_bancontact->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_bancontact );
+
+		// Bank transfer.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANK_TRANSFER ) );
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::BELFIUS ) );
+
+		// Belfius.
+		$payment_method_belfius = new PaymentMethod( PaymentMethods::BELFIUS );
+		$payment_method_belfius->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_belfius );
+
+		// Billie.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BILLIE ) );
 
 		// Payment method credit card.
@@ -174,12 +186,21 @@ class Gateway extends Core_Gateway {
 
 		$this->register_payment_method( $payment_method_direct_debit_sofort );
 
-		// Other.
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::EPS ) );
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::GIROPAY ) );
+		// EPS.
+		$payment_method_eps = new PaymentMethod( PaymentMethods::EPS );
+		$payment_method_eps->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_eps );
+
+		// Giropay.
+		$payment_method_giropay = new PaymentMethod( PaymentMethods::GIROPAY );
+		$payment_method_giropay->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_giropay );
 
 		// Payment method iDEAL.
 		$payment_method_ideal = new PaymentMethod( PaymentMethods::IDEAL );
+		$payment_method_ideal->add_support( 'recurring' );
 
 		$field_ideal_issuer = new IDealIssuerSelectField( 'pronamic_pay_mollie_ideal_issuer' );
 		$field_ideal_issuer->set_options( $ideal_options );
@@ -188,9 +209,16 @@ class Gateway extends Core_Gateway {
 
 		$this->register_payment_method( $payment_method_ideal );
 
-		// Other.
+		// IN3.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::IN3 ) );
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::KBC ) );
+
+		// KBC.
+		$payment_method_kbc = new PaymentMethod( PaymentMethods::KBC );
+		$payment_method_kbc->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_kbc );
+
+		// Klarna.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_LATER ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_NOW ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_OVER_TIME ) );
@@ -201,9 +229,14 @@ class Gateway extends Core_Gateway {
 
 		$this->register_payment_method( $payment_method_paypal );
 
-		// Other.
+		// Przelewy24.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::PRZELEWY24 ) );
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::SOFORT ) );
+
+		// Sofort.
+		$payment_method_sofort = new PaymentMethod( PaymentMethods::SOFORT );
+		$payment_method_sofort->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_sofort );
 	}
 
 	/**
