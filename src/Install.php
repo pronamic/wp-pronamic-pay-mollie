@@ -342,24 +342,6 @@ class Install extends Upgrade {
 			);
 		}
 
-		/**
-		 * Collate caluse.
-		 *
-		 * Force a specific collate to fix:
-		 * "Illegal mix of collations (utf8mb4_unicode_ci,IMPLICIT) and
-		 * (utf8mb4_unicode_520_ci,IMPLICIT) for operation '='. ".
-		 *
-		 * @link https://dev.mysql.com/doc/refman/8.0/en/charset-collate.html
-		 */
-		$collate_clause = '';
-
-		if ( ! empty( $wpdb->collate ) ) {
-			$collate_clause = \sprintf(
-				'COLLATE %s',
-				$wpdb->collate
-			);
-		}
-
 		$query = "
 			INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customer_users (
 				customer_id,
@@ -372,7 +354,7 @@ class Install extends Upgrade {
 				$wpdb->pronamic_pay_mollie_customers AS mollie_customer
 					INNER JOIN
 				$wpdb->usermeta AS wp_user_meta
-						ON wp_user_meta.meta_value = mollie_customer.mollie_id $collate_clause
+						ON wp_user_meta.meta_value = mollie_customer.mollie_id
 					INNER JOIN
 				$wpdb->users AS wp_user
 						ON wp_user_meta.user_id = wp_user.ID
