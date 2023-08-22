@@ -359,7 +359,7 @@ class CLI {
 
 				$automatic = \WP_CLI\Utils\get_flag_value( $assoc_args, 'automatic' );
 
-				if ( true == $automatic ) {
+				if ( $automatic ) {
 					$new_assoc_args = $assoc_args;
 
 					$new_assoc_args['api_url'] = $response->_links->next->href;

@@ -296,7 +296,13 @@ class Integration extends AbstractGatewayIntegration {
 		$attempt = (int) $payment->get_meta( 'mollie_create_payment_attempt' );
 
 		if ( $attempt > 4 ) {
-			throw new \Exception( \sprintf( 'Could not create Mollie payment for %s after %s attempts.', $payment_id, $attempt ) );
+			throw new \Exception(
+				\sprintf(
+					'Could not create Mollie payment for %s after %s attempts.',
+					\esc_html( $payment_id ),
+					\esc_html( $attempt )
+				)
+			);
 		}
 
 		// Start payment.

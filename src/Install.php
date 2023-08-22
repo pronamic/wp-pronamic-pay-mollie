@@ -273,8 +273,8 @@ class Install extends Upgrade {
 			throw new \Exception(
 				\sprintf(
 					'Could not count foreign keys: %s, database error: %s.',
-					$item->name,
-					$wpdb->last_error
+					\esc_html( $item->name ),
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}
@@ -291,8 +291,8 @@ class Install extends Upgrade {
 				throw new \Exception(
 					\sprintf(
 						'Could not add foreign key: %s, database error: %s.',
-						$item->name,
-						$wpdb->last_error
+						\esc_html( $item->name ),
+						\esc_html( $wpdb->last_error )
 					)
 				);
 			}
@@ -335,9 +335,9 @@ class Install extends Upgrade {
 
 		if ( false === $result ) {
 			throw new \Exception(
-				sprintf(
+				\sprintf(
 					'Could not convert user meta, database error: %s.',
-					$wpdb->last_error
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}
@@ -373,9 +373,9 @@ class Install extends Upgrade {
 
 		if ( false === $result ) {
 			throw new \Exception(
-				sprintf(
+				\sprintf(
 					'Could not convert user meta, database error: %s.',
-					$wpdb->last_error
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}

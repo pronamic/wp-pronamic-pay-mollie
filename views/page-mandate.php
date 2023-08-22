@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use Pronamic\WordPress\Mollie\Client;
+use Pronamic\WordPress\Mollie\ObjectAccess;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -190,22 +191,29 @@ if ( $api_key ) {
 						<pre><?php echo \esc_html( \wp_json_encode( $mollie_mandate->details, \JSON_PRETTY_PRINT ) ); ?></pre>
 					</td>
 				</tr>
+
+				<?php
+
+				$object_access = new ObjectAccess( $mollie_mandate );
+
+				?>
+
 				<tr>
 					<th scope="row"><?php \esc_html_e( 'Reference', 'pronamic_ideal' ); ?></th>
 					<td>
-						<?php echo \esc_html( $mollie_mandate->mandateReference ); ?>
+						<?php echo \esc_html( $object_access->get_optional( 'mandateReference' ) ); ?>
 					</td>
 				</tr>
 				<tr>
 					<th scope="row"><?php \esc_html_e( 'Signature date', 'pronamic_ideal' ); ?></th>
 					<td>
-						<?php echo \esc_html( $mollie_mandate->signatureDate ); ?>
+						<?php echo \esc_html( $object_access->get_optional( 'signatureDate' ) ); ?>
 					</td>
 				</tr>
 				<tr>
 					<th scope="row"><?php \esc_html_e( 'Created at', 'pronamic_ideal' ); ?></th>
 					<td>
-						<?php echo \esc_html( $mollie_mandate->createdAt ); ?>
+						<?php echo \esc_html( $object_access->get_optional( 'createdAt' ) ); ?>
 					</td>
 				</tr>
 

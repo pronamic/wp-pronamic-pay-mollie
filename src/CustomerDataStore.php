@@ -111,8 +111,8 @@ class CustomerDataStore {
 			throw new \Exception(
 				sprintf(
 					'Could not insert Mollie customer ID: %s, error: %s.',
-					$mollie_id,
-					$wpdb->last_error
+					\esc_html( $mollie_id ),
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}
@@ -162,8 +162,8 @@ class CustomerDataStore {
 			throw new \Exception(
 				sprintf(
 					'Could not update Mollie customer ID: %s, error: %s.',
-					$mollie_id,
-					$wpdb->last_error
+					\esc_html( $mollie_id ),
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}
@@ -234,9 +234,9 @@ class CustomerDataStore {
 
 		if ( false === $result ) {
 			throw new \Exception(
-				sprintf(
+				\sprintf(
 					'Database error: %s.',
-					$wpdb->last_error
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}

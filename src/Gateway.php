@@ -370,7 +370,12 @@ class Gateway extends Core_Gateway {
 				$path = '<namespace>/payments/webhook/<payment_id>';
 				break;
 			default:
-				throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
+				throw new \Exception(
+					\sprintf(
+						'Unknown resource for payment: %s.',
+						\esc_html( $resource )
+					)
+				);
 		}
 
 		$path = \strtr(
@@ -428,7 +433,12 @@ class Gateway extends Core_Gateway {
 
 				break;
 			default:
-				throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
+				throw new \Exception(
+					\sprintf(
+						'Unknown resource for payment: %s.',
+						\esc_html( $resource )
+					)
+				);
 		}
 	}
 
@@ -1045,7 +1055,7 @@ class Gateway extends Core_Gateway {
 		$transaction_id = $payment->get_transaction_id();
 
 		foreach ( $mollie_payments as $mollie_payment ) {
-			if ( ! \in_array( $order->get_status(), [ Statuses::AUTHORIZED, Statuses::PAID ] ) ) {
+			if ( ! \in_array( $order->get_status(), [ Statuses::AUTHORIZED, Statuses::PAID ], true ) ) {
 				continue;
 			}
 
@@ -1611,7 +1621,12 @@ class Gateway extends Core_Gateway {
 
 				break;
 			default:
-				throw new \Exception( \sprintf( 'Unknown resource for refund payment: %s.', $resource ) );
+				throw new \Exception(
+					\sprintf(
+						'Unknown resource for refund payment: %s.',
+						\esc_html( $resource )
+					)
+				);
 		}
 
 		// Metadata payment ID.
@@ -1636,7 +1651,7 @@ class Gateway extends Core_Gateway {
 			$order_id = $payment->get_meta( 'mollie_order_id' );
 
 			if ( null === $order_id ) {
-				throw new \Exception( \sprintf( 'Unable to create order refund without Mollie order ID.' ) );
+				throw new \Exception( 'Unable to create order refund without Mollie order ID.' );
 			}
 
 			$mollie_refund = $this->client->create_order_refund( $order_id, $request );
@@ -1644,12 +1659,17 @@ class Gateway extends Core_Gateway {
 			$transaction_id = $payment->get_transaction_id();
 
 			if ( null === $transaction_id ) {
-				throw new \Exception( \sprintf( 'Unable to create payment refund without Mollie payment ID.' ) );
+				throw new \Exception( 'Unable to create payment refund without Mollie payment ID.' );
 			}
 
 			$mollie_refund = $this->client->create_refund( $transaction_id, $request );
 		} else {
-			throw new \Exception( \sprintf( 'Unknown resource for payment: %s.', $resource ) );
+			throw new \Exception(
+				\sprintf(
+					'Unknown resource for payment: %s.',
+					\esc_html( $resource )
+				)
+			);
 		}
 
 		$refund->psp_id = $mollie_refund->get_id();

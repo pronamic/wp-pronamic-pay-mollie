@@ -52,10 +52,10 @@ class MethodTransformer {
 	 * @since 1.1.6
 	 *
 	 * @param string|null $payment_method Payment method.
-	 * @param mixed       $default        Default payment method.
+	 * @param mixed       $fallback       Default payment method.
 	 * @return string|null
 	 */
-	public static function transform_wp_to_mollie( $payment_method, $default = null ) {
+	public static function transform_wp_to_mollie( $payment_method, $fallback = null ) {
 		if ( ! \is_scalar( $payment_method ) ) {
 			return null;
 		}
@@ -64,8 +64,8 @@ class MethodTransformer {
 			return self::$map[ $payment_method ];
 		}
 
-		if ( ! empty( $default ) ) {
-			return $default;
+		if ( ! empty( $fallback ) ) {
+			return $fallback;
 		}
 
 		return null;

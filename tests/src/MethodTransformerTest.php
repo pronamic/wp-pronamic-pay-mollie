@@ -30,14 +30,14 @@ class MethodTransformerTest extends TestCase {
 	 *
 	 * @param string      $payment_method WordPress Pay payment method.
 	 * @param string      $expected       Expected Mollie method.
-	 * @param string|null $default        Default payment method.
+	 * @param string|null $fallback       Default payment method.
 	 *
 	 * @dataProvider method_matrix_provider
 	 */
-	public function test_transform( $payment_method, $expected, $default = null ) {
+	public function test_transform( $payment_method, $expected, $fallback = null ) {
 		$transformer = new MethodTransformer();
 
-		$mollie_method = $transformer->transform_wp_to_mollie( $payment_method, $default );
+		$mollie_method = $transformer->transform_wp_to_mollie( $payment_method, $fallback );
 
 		$this->assertEquals( $expected, $mollie_method );
 	}
