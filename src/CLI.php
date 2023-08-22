@@ -40,7 +40,7 @@ class CLI {
 	public function __construct() {
 		\WP_CLI::add_command(
 			'pronamic-pay mollie organizations synchronize',
-			function( $args, $assoc_args ) {
+			function ( $args, $assoc_args ) {
 				$this->wp_cli_organizations_synchronize( $args, $assoc_args );
 			},
 			[
@@ -50,7 +50,7 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie customers synchronize',
-			function( $args, $assoc_args ) {
+			function ( $args, $assoc_args ) {
 				$this->wp_cli_customers_synchronize( $args, $assoc_args );
 			},
 			[
@@ -60,7 +60,7 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie customers connect-wp-users',
-			function( $args, $assoc_args ) {
+			function ( $args, $assoc_args ) {
 				$this->wp_cli_customers_connect_wp_users( $args, $assoc_args );
 			},
 			[
@@ -70,7 +70,7 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie payments list',
-			function( $args, $assoc_args ) {
+			function ( $args, $assoc_args ) {
 				$this->wp_cli_payments( $args, $assoc_args );
 			},
 			[
@@ -80,7 +80,7 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie payments cancel',
-			function( $args, $assoc_args ) {
+			function ( $args, $assoc_args ) {
 				$this->wp_cli_payments_cancel( $args, $assoc_args );
 			},
 			[
@@ -329,7 +329,7 @@ class CLI {
 		if ( null !== $is_cancelable ) {
 			$payments = \array_filter(
 				$payments,
-				function( $payment ) {
+				function ( $payment ) {
 					if ( ! \property_exists( $payment, 'isCancelable' ) ) {
 						return false;
 					}

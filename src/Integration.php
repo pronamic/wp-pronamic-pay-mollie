@@ -442,7 +442,7 @@ class Integration extends AbstractGatewayIntegration {
 
 	/**
 	 * Payment fulfilled.
-	 * 
+	 *
 	 * @param Payment $payment Payment.
 	 * @return void
 	 */

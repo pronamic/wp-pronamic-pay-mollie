@@ -291,7 +291,7 @@ class Admin {
 		\add_meta_box(
 			'pronamic_pay_mollie_payment',
 			\__( 'Mollie', 'pronamic_ideal' ),
-			function( $post ) {
+			function ( $post ) {
 				include __DIR__ . '/../views/meta-box-payment.php';
 			},
 			$post_type,
@@ -331,7 +331,7 @@ class Admin {
 		\add_meta_box(
 			'pronamic_pay_mollie_subscription',
 			\__( 'Mollie', 'pronamic_ideal' ),
-			function( $post ) {
+			function ( $post ) {
 				include __DIR__ . '/../views/meta-box-subscription.php';
 			},
 			$post_type,
