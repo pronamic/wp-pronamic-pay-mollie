@@ -10,11 +10,11 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Mollie\Client;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-use Pronamic\WordPress\Mollie\Client;
 
 /**
  * Valid global.

@@ -10,12 +10,12 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use Pronamic\WordPress\Mollie\Client;
+use Pronamic\WordPress\Pay\Admin\AdminPaymentPostType;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-use Pronamic\WordPress\Mollie\Client;
-use Pronamic\WordPress\Pay\Admin\AdminPaymentPostType;
 
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not necessary because this parameter does not trigger an action
 $mollie_payment_id = \array_key_exists( 'id', $_GET ) ? \sanitize_text_field( \wp_unslash( $_GET['id'] ) ) : '';
