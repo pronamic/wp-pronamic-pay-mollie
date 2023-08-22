@@ -11,6 +11,10 @@
  * @link  https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $payment = \get_pronamic_payment( $post->ID );
 
 // Check valid payment.

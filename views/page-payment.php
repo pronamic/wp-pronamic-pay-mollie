@@ -10,6 +10,10 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use Pronamic\WordPress\Mollie\Client;
 use Pronamic\WordPress\Pay\Admin\AdminPaymentPostType;
 

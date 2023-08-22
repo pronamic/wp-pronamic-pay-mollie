@@ -10,6 +10,10 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 ?>
 <div class="wrap">
 	<h1><?php echo \esc_html( \get_admin_page_title() ); ?></h1>

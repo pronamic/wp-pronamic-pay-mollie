@@ -11,6 +11,10 @@
  * @link  https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $subscription = \get_pronamic_subscription( $post->ID );
 
 if ( null === $subscription ) {

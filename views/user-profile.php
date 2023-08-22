@@ -13,6 +13,10 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( ! isset( $user ) ) {
 	return;
 }
