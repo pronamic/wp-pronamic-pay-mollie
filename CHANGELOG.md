@@ -7,6 +7,18 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.9] - 2023-08-23
+
+### Commits
+
+- Fixed WPCS 3 issues. ([12b62fb](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/12b62fb3f733eb4a57c3a05f903f7273691f6fb7))
+- Dont allow direct file access. ([48c927b](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/48c927b97f30e9ff8b87d3b346589ac849001aa4))
+- Removed collate clause. ([bccdb0e](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/bccdb0eb6f5bc9ece8bd1146068758cb62a02270))
+
+Full set of changes: [`4.7.8...4.7.9`][4.7.9]
+
+[4.7.9]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.8...v4.7.9
+
 ## [4.7.8] - 2023-07-12
 
 ### Commits
