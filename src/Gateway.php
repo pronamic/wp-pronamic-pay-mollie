@@ -271,6 +271,11 @@ class Gateway extends Core_Gateway {
 			\set_transient( $cache_key, $mollie_payment_methods, \DAY_IN_SECONDS );
 		}
 
+		// All payment methods are inactive by default.
+		foreach ( $this->payment_methods as $payment_method ) {
+			$payment_method->set_status( 'inactive' );
+		}
+
 		$method_transformer = new MethodTransformer();
 
 		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
