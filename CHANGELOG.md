@@ -7,6 +7,20 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.10] - 2023-08-30
+
+### Fixed
+
+- Fixed setting Billie payment method status.
+
+### Commits
+
+- All payment methods are inactive by default. ([d15c1cc](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/d15c1cc82b5cf977c7a409d7cb161981aad03d8e))
+
+Full set of changes: [`4.7.9...4.7.10`][4.7.10]
+
+[4.7.10]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.9...v4.7.10
+
 ## [4.7.9] - 2023-08-23
 
 ### Commits
