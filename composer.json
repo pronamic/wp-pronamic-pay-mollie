@@ -36,7 +36,8 @@
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"roots/wordpress-core-installer": true,
 			"bamarni/composer-bin-plugin": true
-		}
+		},
+		"wp-slug": "pronamic-pay-mollie"
 	},
 	"require": {
 		"php": ">=7.4",
