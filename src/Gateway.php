@@ -119,10 +119,12 @@ class Gateway extends Core_Gateway {
 
 		$field_consumer_name = new TextField( 'pronamic_pay_consumer_bank_details_name' );
 		$field_consumer_name->set_label( __( 'Account holder name', 'pronamic_ideal' ) );
+		$field_consumer_name->set_required( true );
 		$field_consumer_name->meta_key = 'consumer_bank_details_name';
 
 		$field_consumer_iban = new TextField( 'pronamic_pay_consumer_bank_details_iban' );
 		$field_consumer_iban->set_label( __( 'Account number (IBAN)', 'pronamic_ideal' ) );
+		$field_consumer_iban->set_required( true );
 		$field_consumer_iban->meta_key = 'consumer_bank_details_iban';
 
 		// Apple Pay.
