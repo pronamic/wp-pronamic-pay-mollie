@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.11] - 2023-09-11
+
+### Commits
+
+- Make consumer name and IBAN fields required (https://github.com/pronamic/wp-pronamic-pay/issues/361). ([5f6d13c](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5f6d13c32745fba007fd1765ec964f8014c1b474))
+- Added `wp-slug` to Composer config. ([a9f0539](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/a9f05394943165dde9496e7f371394ddbed45886))
+
+Full set of changes: [`4.7.10...4.7.11`][4.7.11]
+
+[4.7.11]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.10...v4.7.11
+
 ## [4.7.10] - 2023-08-30
 
 ### Fixed
