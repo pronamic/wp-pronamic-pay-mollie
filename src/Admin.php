@@ -265,6 +265,8 @@ class Admin {
 	 * @return void
 	 */
 	public static function user_profile( $user ) {
+		$user = $user;
+
 		include __DIR__ . '/../views/user-profile.php';
 	}
 
@@ -292,6 +294,8 @@ class Admin {
 			'pronamic_pay_mollie_payment',
 			\__( 'Mollie', 'pronamic_ideal' ),
 			function ( $post ) {
+				$post = $post;
+
 				include __DIR__ . '/../views/meta-box-payment.php';
 			},
 			$post_type,
@@ -332,6 +336,8 @@ class Admin {
 			'pronamic_pay_mollie_subscription',
 			\__( 'Mollie', 'pronamic_ideal' ),
 			function ( $post ) {
+				$post = $post;
+
 				include __DIR__ . '/../views/meta-box-subscription.php';
 			},
 			$post_type,
