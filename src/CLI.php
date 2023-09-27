@@ -40,8 +40,8 @@ class CLI {
 	public function __construct() {
 		\WP_CLI::add_command(
 			'pronamic-pay mollie organizations synchronize',
-			function ( $args, $assoc_args ) {
-				$this->wp_cli_organizations_synchronize( $args, $assoc_args );
+			function () {
+				$this->wp_cli_organizations_synchronize();
 			},
 			[
 				'shortdesc' => 'Synchronize Mollie organizations to WordPress (not implemented yet).',
@@ -50,8 +50,8 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie customers synchronize',
-			function ( $args, $assoc_args ) {
-				$this->wp_cli_customers_synchronize( $args, $assoc_args );
+			function () {
+				$this->wp_cli_customers_synchronize();
 			},
 			[
 				'shortdesc' => 'Synchronize Mollie customers to WordPress.',
@@ -60,8 +60,8 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie customers connect-wp-users',
-			function ( $args, $assoc_args ) {
-				$this->wp_cli_customers_connect_wp_users( $args, $assoc_args );
+			function () {
+				$this->wp_cli_customers_connect_wp_users();
 			},
 			[
 				'shortdesc' => 'Connect Mollie customers to WordPress users by email.',
@@ -97,11 +97,9 @@ class CLI {
 	 * CLI organizations synchronize.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/organizations-api/current-organization
-	 * @param array<string> $args       Arguments.
-	 * @param array<string> $assoc_args Associative arguments.
 	 * @return void
 	 */
-	public function wp_cli_organizations_synchronize( $args, $assoc_args ) {
+	public function wp_cli_organizations_synchronize() {
 		\WP_CLI::error( 'Command not implemented yet.' );
 	}
 
@@ -109,11 +107,9 @@ class CLI {
 	 * CLI customers synchronize.
 	 *
 	 * @link https://docs.mollie.com/reference/v2/customers-api/list-customers
-	 * @param array<string> $args       Arguments.
-	 * @param array<string> $assoc_args Associative arguments.
 	 * @return void
 	 */
-	public function wp_cli_customers_synchronize( $args, $assoc_args ) {
+	public function wp_cli_customers_synchronize() {
 		global $post;
 		global $wpdb;
 
@@ -228,11 +224,9 @@ class CLI {
 	 * @link https://docs.mollie.com/reference/v2/customers-api/list-customers
 	 * @link https://make.wordpress.org/cli/handbook/internal-api/wp-cli-add-command/
 	 * @link https://developer.wordpress.org/reference/classes/wpdb/query/
-	 * @param array<string> $args       Arguments.
-	 * @param array<string> $assoc_args Associative arguments.
 	 * @return void
 	 */
-	public function wp_cli_customers_connect_wp_users( $args, $assoc_args ) {
+	public function wp_cli_customers_connect_wp_users() {
 		global $wpdb;
 
 		$query = "
