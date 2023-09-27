@@ -299,8 +299,8 @@ class Integration extends AbstractGatewayIntegration {
 			throw new \Exception(
 				\sprintf(
 					'Could not create Mollie payment for %s after %s attempts.',
-					\esc_html( $payment_id ),
-					\esc_html( $attempt )
+					\esc_html( (string) $payment_id ),
+					\esc_html( (string) $attempt )
 				)
 			);
 		}
