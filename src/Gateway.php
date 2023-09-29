@@ -1362,9 +1362,6 @@ class Gateway extends Core_Gateway {
 				$bank_transfer_recipient_details->set_reference( $mollie_payment_details->get_property( 'transferReference' ) );
 			}
 
-			/*
-			* Failure reason.
-			*/
 			$failure_reason = $payment->get_failure_reason();
 
 			if ( null === $failure_reason ) {
