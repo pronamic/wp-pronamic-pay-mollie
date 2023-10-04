@@ -1136,8 +1136,8 @@ class Gateway extends Core_Gateway {
 			// Use wallet method as payment method.
 			$mollie_payment_details = $mollie_payment->get_details();
 
-			if ( null !== $mollie_payment_details && isset( $mollie_payment_details->wallet ) ) {
-				$wallet_method = $method_transformer->transform_mollie_to_wp( $mollie_payment_details->wallet );
+			if ( null !== $mollie_payment_details && $mollie_payment_details->has_property( 'wallet' ) ) {
+				$wallet_method = $method_transformer->transform_mollie_to_wp( $mollie_payment_details->get_property( 'wallet' ) );
 
 				if ( null !== $wallet_method ) {
 					$payment_method = $wallet_method;
@@ -1281,46 +1281,46 @@ class Gateway extends Core_Gateway {
 				$payment->set_consumer_bank_details( $consumer_bank_details );
 			}
 
-			if ( isset( $mollie_payment_details->consumerName ) ) {
-				$consumer_bank_details->set_name( $mollie_payment_details->consumerName );
+			if ( $mollie_payment_details->has_property( 'consumerName' ) ) {
+				$consumer_bank_details->set_name( $mollie_payment_details->get_property( 'consumerName' ) );
 			}
 
-			if ( isset( $mollie_payment_details->cardHolder ) ) {
-				$consumer_bank_details->set_name( $mollie_payment_details->cardHolder );
+			if ( $mollie_payment_details->has_property( 'cardHolder' ) ) {
+				$consumer_bank_details->set_name( $mollie_payment_details->get_property( 'cardHolder' ) );
 			}
 
-			if ( isset( $mollie_payment_details->cardNumber ) ) {
+			if ( $mollie_payment_details->has_property( 'cardNumber' ) ) {
 				// The last four digits of the card number.
-				$consumer_bank_details->set_account_number( $mollie_payment_details->cardNumber );
+				$consumer_bank_details->set_account_number( $mollie_payment_details->get_property( 'cardNumber' ) );
 			}
 
-			if ( isset( $mollie_payment_details->cardCountryCode ) ) {
+			if ( $mollie_payment_details->has_property( 'cardCountryCode' ) ) {
 				// The ISO 3166-1 alpha-2 country code of the country the card was issued in.
-				$consumer_bank_details->set_country( $mollie_payment_details->cardCountryCode );
+				$consumer_bank_details->set_country( $mollie_payment_details->get_property( 'cardCountryCode' ) );
 			}
 
-			if ( isset( $mollie_payment_details->consumerAccount ) ) {
+			if ( $mollie_payment_details->has_property( 'consumerAccount' ) ) {
 				switch ( $mollie_payment->get_method() ) {
 					case Methods::BELFIUS:
 					case Methods::DIRECT_DEBIT:
 					case Methods::IDEAL:
 					case Methods::KBC:
 					case Methods::SOFORT:
-						$consumer_bank_details->set_iban( $mollie_payment_details->consumerAccount );
+						$consumer_bank_details->set_iban( $mollie_payment_details->get_property( 'consumerAccount' ) );
 
 						break;
 					case Methods::BANCONTACT:
 					case Methods::BANKTRANSFER:
 					case Methods::PAYPAL:
 					default:
-						$consumer_bank_details->set_account_number( $mollie_payment_details->consumerAccount );
+						$consumer_bank_details->set_account_number( $mollie_payment_details->get_property( 'consumerAccount' ) );
 
 						break;
 				}
 			}
 
-			if ( isset( $mollie_payment_details->consumerBic ) ) {
-				$consumer_bank_details->set_bic( $mollie_payment_details->consumerBic );
+			if ( $mollie_payment_details->has_property( 'consumerBic' ) ) {
+				$consumer_bank_details->set_bic( $mollie_payment_details->get_property( 'consumerBic' ) );
 			}
 
 			/**
@@ -1342,29 +1342,26 @@ class Gateway extends Core_Gateway {
 				$bank_transfer_recipient_details->set_bank_account( $bank_details );
 			}
 
-			if ( isset( $mollie_payment_details->bankName ) ) {
+			if ( $mollie_payment_details->has_property( 'bankName' ) ) {
 				/**
 				 * Set `bankName` as bank details name, as result "Stichting Mollie Payments"
 				 * is not the name of a bank, but the account holder name.
 				 */
-				$bank_details->set_name( $mollie_payment_details->bankName );
+				$bank_details->set_name( $mollie_payment_details->get_property( 'bankName' ) );
 			}
 
-			if ( isset( $mollie_payment_details->bankAccount ) ) {
-				$bank_details->set_iban( $mollie_payment_details->bankAccount );
+			if ( $mollie_payment_details->has_property( 'bankAccount' ) ) {
+				$bank_details->set_iban( $mollie_payment_details->get_property( 'bankAccount' ) );
 			}
 
-			if ( isset( $mollie_payment_details->bankBic ) ) {
-				$bank_details->set_bic( $mollie_payment_details->bankBic );
+			if ( $mollie_payment_details->has_property( 'bankBic' ) ) {
+				$bank_details->set_bic( $mollie_payment_details->get_property( 'bankBic' ) );
 			}
 
-			if ( isset( $mollie_payment_details->transferReference ) ) {
-				$bank_transfer_recipient_details->set_reference( $mollie_payment_details->transferReference );
+			if ( $mollie_payment_details->has_property( 'transferReference' ) ) {
+				$bank_transfer_recipient_details->set_reference( $mollie_payment_details->get_property( 'transferReference' ) );
 			}
 
-			/*
-			 * Failure reason.
-			 */
 			$failure_reason = $payment->get_failure_reason();
 
 			if ( null === $failure_reason ) {
@@ -1372,21 +1369,21 @@ class Gateway extends Core_Gateway {
 			}
 
 			// SEPA Direct Debit.
-			if ( isset( $mollie_payment_details->bankReasonCode ) ) {
-				$failure_reason->set_code( $mollie_payment_details->bankReasonCode );
+			if ( $mollie_payment_details->has_property( 'bankReasonCode' ) ) {
+				$failure_reason->set_code( $mollie_payment_details->get_property( 'bankReasonCode' ) );
 			}
 
-			if ( isset( $mollie_payment_details->bankReason ) ) {
-				$failure_reason->set_message( $mollie_payment_details->bankReason );
+			if ( $mollie_payment_details->has_property( 'bankReason' ) ) {
+				$failure_reason->set_message( $mollie_payment_details->get_property( 'bankReason' ) );
 			}
 
 			// Credit card.
-			if ( isset( $mollie_payment_details->failureReason ) ) {
-				$failure_reason->set_code( $mollie_payment_details->failureReason );
+			if ( $mollie_payment_details->has_property( 'failureReason' ) ) {
+				$failure_reason->set_code( $mollie_payment_details->get_property( 'failureReason' ) );
 			}
 
-			if ( isset( $mollie_payment_details->failureMessage ) ) {
-				$failure_reason->set_message( $mollie_payment_details->failureMessage );
+			if ( $mollie_payment_details->has_property( 'failureMessage' ) ) {
+				$failure_reason->set_message( $mollie_payment_details->get_property( 'failureMessage' ) );
 			}
 
 			$failure_code    = $failure_reason->get_code();
