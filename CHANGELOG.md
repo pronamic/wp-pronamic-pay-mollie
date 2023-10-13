@@ -7,6 +7,33 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.8.0] - 2023-10-13
+
+### Commits
+
+- Merge pull request #39 from pronamic/wp-mollie-4-dynamic-properties ([db6e935](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/db6e935910d7077c158f5817ced143c506716cc5))
+- Removed failure reason comment. ([83f2747](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/83f2747bbfbdb49b4d7d4917ddabeffe22a4201f))
+- Updated for payment details through `ObjectAccess` (pronamic/wp-mollie#4). ([450aca6](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/450aca61ca4a3e5efaffb195c249b3554a45c4f1))
+- Fixed the "The method parameter $args is never used" warnings. ([918d67d](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/918d67d6cac1fd7e72fd122e2378718ec4d477ff))
+- Fixed the "The method parameter $args is never used" warnings. ([1e3b3c7](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/1e3b3c73eabdc50aff2d0d6c7a8d5c79008f9fc6))
+- Cast vars to strings to make PHPStan happy. ([9fdee84](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/9fdee84e7f3cd209d273ed0afff1e05ab92e0178))
+- Compare meta value and Mollie ID as binary strings to avoid collate issues. ([fd373d1](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/fd373d18ab2ee08567b75042d2c72da4121d0ed6))
+- Require PHP >=8.0, updated pronamic/wp-coding-standards. ([d0daf64](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/d0daf64769c1abc2dce62f3c381df52190a612b4))
+
+### Composer
+
+- Changed `php` from `>=7.4` to `>=8.0`.
+- Changed `pronamic/wp-mollie` from `^1.2` to `v1.4.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v1.4.0
+- Changed `woocommerce/action-scheduler` from `^3.4` to `3.6.4`.
+	Release notes: https://github.com/woocommerce/action-scheduler/releases/tag/3.6.4
+- Changed `wp-pay/core` from `^4.9` to `v4.13.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.13.0
+
+Full set of changes: [`4.7.11...4.8.0`][4.8.0]
+
+[4.8.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.7.11...v4.8.0
+
 ## [4.7.11] - 2023-09-11
 
 ### Commits
