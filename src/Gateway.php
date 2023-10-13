@@ -625,17 +625,23 @@ class Gateway extends Core_Gateway {
 		 */
 		$subscriptions = $payment->get_subscriptions();
 
+		$sequence_type = $payment->get_meta( 'mollie_sequence_type' );
+
 		if (
-			\count( $subscriptions ) > 0
-			||
-			\in_array(
-				$payment_method,
-				[
-					PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-					PaymentMethods::DIRECT_DEBIT_IDEAL,
-					PaymentMethods::DIRECT_DEBIT_SOFORT,
-				],
-				true
+			'' !== $sequence_type
+				&&
+			(
+				\count( $subscriptions ) > 0
+					||
+				\in_array(
+					$payment_method,
+					[
+						PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+						PaymentMethods::DIRECT_DEBIT_IDEAL,
+						PaymentMethods::DIRECT_DEBIT_SOFORT,
+					],
+					true
+				)
 			)
 		) {
 			$request->set_sequence_type( 'first' );
@@ -648,8 +654,6 @@ class Gateway extends Core_Gateway {
 				}
 			}
 		}
-
-		$sequence_type = $payment->get_meta( 'mollie_sequence_type' );
 
 		if ( ! empty( $sequence_type ) ) {
 			$request->set_sequence_type( $sequence_type );
