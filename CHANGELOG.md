@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.8.1] - 2023-10-16
+
+### Commits
+
+- Allow bypassing `first` sequence type with empty string (pronamic/wp-pronamic-pay-woocommerce#58). ([2a08130](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/2a08130afd975f1396d6ac213b0a7cb8e18496e6))
+
+Full set of changes: [`4.8.0...4.8.1`][4.8.1]
+
+[4.8.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.8.0...v4.8.1
+
 ## [4.8.0] - 2023-10-13
 
 ### Commits
