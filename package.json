@@ -1,60 +1,44 @@
 {
-  "name": "mollie",
-  "version": "4.8.1",
-  "description": "Mollie driver for the WordPress payment processing library.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wp-pay-gateways/mollie"
-  },
-  "keywords": [
-    "wordpress",
-    "wp",
-    "pay",
-    "mollie",
-    "gateway",
-    "pronamic"
-  ],
-  "author": {
-    "name": "Pronamic",
-    "email": "info@pronamic.nl",
-    "url": "http://www.pronamic.nl/"
-  },
-  "contributors": [
-    {
-      "name": "Remco Tolsma",
-      "email": "info@remcotolsma.nl",
-      "url": "http://www.remcotolsma.nl/"
-    }
-  ],
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/wp-pay-gateways/mollie/issues"
-  },
-  "homepage": "http://www.wp-pay.org/gateways/mollie/",
-  "devDependencies": {
-    "@babel/cli": "^7.19.3",
-    "@babel/core": "^7.20.2",
-    "@babel/preset-env": "^7.20.2",
-    "@wordpress/env": "^5.7.0",
-    "autoprefixer": "^10.4.13",
-    "cssnano": "^5.1.14",
-    "eslint": "^7.32.0",
-    "eslint-plugin-json": "^3.1.0",
-    "npm-run-all": "^4.1.5",
-    "postcss": "^8.4.19",
-    "postcss-cli": "^10.0.0",
-    "postcss-eol": "0.0.8",
-    "sass": "^1.56.1",
-    "sass-lint": "^1.13.1"
-  },
-  "scripts": {
-    "babel": "babel ./js/src -d ./js/dist --source-maps",
-    "eslint": "eslint . --ext .json --ext .js",
-    "sass": "sass scss:css",
-    "sass-lint": "sass-lint --verbose",
-    "start": "wp-env start --xdebug && npm run setup && npm run login",
-    "setup": "npm-run-all setup-*",
-    "setup-mollie-api-key": "wp-env run cli wp config set MOLLIE_API_KEY $MOLLIE_API_KEY",
-    "login": "wp-env run cli wp user one-time-login admin"
-  }
+	"name": "mollie",
+	"version": "4.8.1",
+	"description": "Mollie driver for the WordPress payment processing library.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wp-pay-gateways/mollie"
+	},
+	"keywords": [
+		"wordpress",
+		"wp",
+		"pay",
+		"mollie",
+		"gateway",
+		"pronamic"
+	],
+	"author": {
+		"name": "Pronamic",
+		"email": "info@pronamic.nl",
+		"url": "http://www.pronamic.nl/"
+	},
+	"contributors": [
+		{
+			"name": "Remco Tolsma",
+			"email": "info@remcotolsma.nl",
+			"url": "http://www.remcotolsma.nl/"
+		}
+	],
+	"license": "GPL-3.0",
+	"bugs": {
+		"url": "https://github.com/wp-pay-gateways/mollie/issues"
+	},
+	"homepage": "http://www.wp-pay.org/gateways/mollie/",
+	"devDependencies": {
+		"@wordpress/env": "^5.7.0",
+		"npm-run-all": "^4.1.5"
+	},
+	"scripts": {
+		"start": "wp-env start --xdebug && npm run setup && npm run login",
+		"setup": "npm-run-all setup-*",
+		"setup-mollie-api-key": "wp-env run cli wp config set MOLLIE_API_KEY $MOLLIE_API_KEY",
+		"login": "wp-env run cli wp user one-time-login admin"
+	}
 }
