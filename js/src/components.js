@@ -44,7 +44,7 @@
 			const data = $cardTokenElement.dataset;
 
 			// Check required Mollie profile ID.
-			if ( ! ( "mollie-profile-id" in data ) ) {
+			if ( ! $cardTokenElement.dataset.mollieProfileId ) {
 				throw new Error( 'No Mollie profile ID in element dataset. Unable to load Mollie Components.' );
 
 				return;
@@ -52,10 +52,10 @@
 
 			// Initialize Mollie object.
 			const mollie = Mollie(
-				data['mollie-profile-id'],
+				$cardTokenElement.dataset.mollieProfileId,
 				{
-					locale: data['mollie-locale'] ?? null,
-					testmode: ( "mollie-testmode" in data ),
+					locale: $cardTokenElement.dataset.mollieLocale ?? null,
+					testmode: '1' === $cardTokenElement.dataset.mollieTestmode,
 				}
 			);
 
