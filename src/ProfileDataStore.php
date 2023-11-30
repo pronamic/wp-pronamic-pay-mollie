@@ -109,10 +109,10 @@ class ProfileDataStore {
 
 		if ( false === $result ) {
 			throw new \Exception(
-				sprintf(
+				\sprintf(
 					'Could not insert Mollie profile ID: %s, error: %s.',
-					$mollie_id,
-					$wpdb->last_error
+					\esc_html( $mollie_id ),
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}
@@ -160,10 +160,10 @@ class ProfileDataStore {
 
 		if ( false === $result ) {
 			throw new \Exception(
-				sprintf(
+				\sprintf(
 					'Could not update Mollie profile ID: %s, error: %s.',
-					$mollie_id,
-					$wpdb->last_error
+					\esc_html( $mollie_id ),
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}

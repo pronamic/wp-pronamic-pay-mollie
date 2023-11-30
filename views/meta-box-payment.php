@@ -11,6 +11,10 @@
  * @link  https://github.com/WordPress/WordPress/blob/4.5.2/wp-admin/user-edit.php#L578-L600
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $payment = \get_pronamic_payment( $post->ID );
 
 // Check valid payment.
@@ -92,25 +96,44 @@ $mollie_order_id    = $payment->get_meta( 'mollie_order_id' );
 
 <?php if ( ! empty( $mollie_mandate_id ) ) : ?>
 
-	<dl>
+	<p>
 		<?php
 
-		echo \esc_html(
-			sprintf(
-				/* translators: %s: Mollie mandate ID */
+		$mandate_url = \add_query_arg(
+			[
+				'page'        => 'pronamic_pay_mollie_mandates',
+				'config_id'   => $payment->config_id,
+				'customer_id' => $mollie_customer_id,
+				'mandate_id'  => $mollie_mandate_id,
+			],
+			\admin_url( 'admin.php' )
+		);
+
+		echo \wp_kses(
+			\sprintf(
+				/* translators: %s: Mollie mandate ID anchor. */
 				\__( 'Mandate: %s', 'pronamic_ideal' ),
-				$mollie_mandate_id
-			)
+				\sprintf(
+					current_user_can( 'manage_options' ) ? '<a href="%s">%s</a>' : '%2$s',
+					\esc_url( $mandate_url ),
+					\esc_html( (string) $mollie_mandate_id )
+				)
+			),
+			[
+				'a' => [
+					'href' => true,
+				],
+			]
 		);
 
 		?>
-	</dl>
+	</p>
 
 <?php endif; ?>
 
 <?php if ( ! empty( $mollie_order_id ) ) : ?>
 
-	<dl>
+	<p>
 		<?php
 
 		echo \esc_html(
@@ -122,6 +145,6 @@ $mollie_order_id    = $payment->get_meta( 'mollie_order_id' );
 		);
 
 		?>
-	</dl>
+	</p>
 
 <?php endif; ?>

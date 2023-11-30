@@ -273,8 +273,8 @@ class Install extends Upgrade {
 			throw new \Exception(
 				\sprintf(
 					'Could not count foreign keys: %s, database error: %s.',
-					$item->name,
-					$wpdb->last_error
+					\esc_html( $item->name ),
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}
@@ -291,8 +291,8 @@ class Install extends Upgrade {
 				throw new \Exception(
 					\sprintf(
 						'Could not add foreign key: %s, database error: %s.',
-						$item->name,
-						$wpdb->last_error
+						\esc_html( $item->name ),
+						\esc_html( $wpdb->last_error )
 					)
 				);
 			}
@@ -335,28 +335,10 @@ class Install extends Upgrade {
 
 		if ( false === $result ) {
 			throw new \Exception(
-				sprintf(
+				\sprintf(
 					'Could not convert user meta, database error: %s.',
-					$wpdb->last_error
+					\esc_html( $wpdb->last_error )
 				)
-			);
-		}
-
-		/**
-		 * Collate caluse.
-		 *
-		 * Force a specific collate to fix:
-		 * "Illegal mix of collations (utf8mb4_unicode_ci,IMPLICIT) and
-		 * (utf8mb4_unicode_520_ci,IMPLICIT) for operation '='. ".
-		 *
-		 * @link https://dev.mysql.com/doc/refman/8.0/en/charset-collate.html
-		 */
-		$collate_clause = '';
-
-		if ( ! empty( $wpdb->collate ) ) {
-			$collate_clause = \sprintf(
-				'COLLATE %s',
-				$wpdb->collate
 			);
 		}
 
@@ -372,7 +354,7 @@ class Install extends Upgrade {
 				$wpdb->pronamic_pay_mollie_customers AS mollie_customer
 					INNER JOIN
 				$wpdb->usermeta AS wp_user_meta
-						ON wp_user_meta.meta_value = mollie_customer.mollie_id $collate_clause
+						ON BINARY wp_user_meta.meta_value = mollie_customer.mollie_id
 					INNER JOIN
 				$wpdb->users AS wp_user
 						ON wp_user_meta.user_id = wp_user.ID
@@ -391,9 +373,9 @@ class Install extends Upgrade {
 
 		if ( false === $result ) {
 			throw new \Exception(
-				sprintf(
+				\sprintf(
 					'Could not convert user meta, database error: %s.',
-					$wpdb->last_error
+					\esc_html( $wpdb->last_error )
 				)
 			);
 		}

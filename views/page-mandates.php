@@ -1,6 +1,6 @@
 <?php
 /**
- * Page Mollie
+ * Page mandates
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2023 Pronamic

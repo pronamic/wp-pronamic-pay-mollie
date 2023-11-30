@@ -5,7 +5,7 @@
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
- * @package   Pronamic\WordPress\Pay\Core
+ * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
 
 /**
@@ -28,10 +28,11 @@ if ( defined( 'PSALM_VERSION' ) ) {
 /**
  * Plugin.
  */
-$plugin = \Pronamic\WordPress\Pay\Plugin::instance(
+$pronamic_pay_plugin = \Pronamic\WordPress\Pay\Plugin::instance(
 	array(
+		'file'             => __DIR__ . '/../pronamic-pay-mollie.php',
 		'action_scheduler' => __DIR__ . '/../vendor/woocommerce/action-scheduler/action-scheduler.php',
 	)
 );
 
-$plugin->plugins_loaded();
+$pronamic_pay_plugin->plugins_loaded();

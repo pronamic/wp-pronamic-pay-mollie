@@ -26,6 +26,7 @@ class MethodTransformer {
 		WordPressMethod::APPLE_PAY               => MollieMethod::APPLE_PAY,
 		WordPressMethod::BANCONTACT              => MollieMethod::BANCONTACT,
 		WordPressMethod::BANK_TRANSFER           => MollieMethod::BANKTRANSFER,
+		WordPressMethod::BILLIE                  => MollieMethod::BILLIE,
 		WordPressMethod::CREDIT_CARD             => MollieMethod::CREDITCARD,
 		WordPressMethod::DIRECT_DEBIT            => MollieMethod::DIRECT_DEBIT,
 		WordPressMethod::DIRECT_DEBIT_BANCONTACT => MollieMethod::DIRECT_DEBIT,
@@ -51,10 +52,10 @@ class MethodTransformer {
 	 * @since 1.1.6
 	 *
 	 * @param string|null $payment_method Payment method.
-	 * @param mixed       $default        Default payment method.
+	 * @param mixed       $fallback       Default payment method.
 	 * @return string|null
 	 */
-	public static function transform_wp_to_mollie( $payment_method, $default = null ) {
+	public static function transform_wp_to_mollie( $payment_method, $fallback = null ) {
 		if ( ! \is_scalar( $payment_method ) ) {
 			return null;
 		}
@@ -63,8 +64,8 @@ class MethodTransformer {
 			return self::$map[ $payment_method ];
 		}
 
-		if ( ! empty( $default ) ) {
-			return $default;
+		if ( ! empty( $fallback ) ) {
+			return $fallback;
 		}
 
 		return null;

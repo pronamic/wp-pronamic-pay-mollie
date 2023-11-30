@@ -86,7 +86,7 @@ class Admin {
 			throw new \Exception(
 				\sprintf(
 					'Could not read WordPress admin menu icon from file: %s.',
-					$file
+					\esc_html( $file )
 				)
 			);
 		}
@@ -97,7 +97,7 @@ class Admin {
 			throw new \Exception(
 				\sprintf(
 					'Could not read WordPress admin menu icon from file: %s.',
-					$file
+					\esc_html( $file )
 				)
 			);
 		}
@@ -160,6 +160,15 @@ class Admin {
 
 		add_submenu_page(
 			'pronamic_pay_mollie',
+			__( 'Mollie Mandates', 'pronamic_ideal' ),
+			__( 'Mandates', 'pronamic_ideal' ),
+			'manage_options',
+			'pronamic_pay_mollie_mandates',
+			[ $this, 'page_mollie_mandates' ]
+		);
+
+		add_submenu_page(
+			'pronamic_pay_mollie',
 			__( 'Mollie Payments', 'pronamic_ideal' ),
 			__( 'Payments', 'pronamic_ideal' ),
 			'manage_options',
@@ -217,6 +226,22 @@ class Admin {
 	}
 
 	/**
+	 * Page Mollie mandates.
+	 *
+	 * @return void
+	 */
+	public function page_mollie_mandates() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is not necessary because this parameter does not trigger an action
+		if ( \array_key_exists( 'mandate_id', $_GET ) ) {
+			include __DIR__ . '/../views/page-mandate.php';
+
+			return;
+		}
+
+		include __DIR__ . '/../views/page-mandates.php';
+	}
+
+	/**
 	 * Page Mollie payments.
 	 *
 	 * @return void
@@ -240,6 +265,8 @@ class Admin {
 	 * @return void
 	 */
 	public static function user_profile( $user ) {
+		$user = $user;
+
 		include __DIR__ . '/../views/user-profile.php';
 	}
 
@@ -266,7 +293,9 @@ class Admin {
 		\add_meta_box(
 			'pronamic_pay_mollie_payment',
 			\__( 'Mollie', 'pronamic_ideal' ),
-			function( $post ) {
+			function ( $post ) {
+				$post = $post;
+
 				include __DIR__ . '/../views/meta-box-payment.php';
 			},
 			$post_type,
@@ -306,7 +335,9 @@ class Admin {
 		\add_meta_box(
 			'pronamic_pay_mollie_subscription',
 			\__( 'Mollie', 'pronamic_ideal' ),
-			function( $post ) {
+			function ( $post ) {
+				$post = $post;
+
 				include __DIR__ . '/../views/meta-box-subscription.php';
 			},
 			$post_type,
