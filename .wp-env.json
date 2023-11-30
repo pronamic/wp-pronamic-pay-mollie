@@ -15,5 +15,8 @@
 	},
 	"config": {
 		"PRONAMIC_PAY_DEBUG": true
+	},
+	"lifecycleScripts": {
+		"afterStart": "npm run wp-env-after-start"
 	}
 }
