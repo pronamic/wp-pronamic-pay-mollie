@@ -1,8 +1,7 @@
 {
 	"core": null,
 	"plugins": [
-		".",
-		"../../../",
+		"pronamic/wp-env-quick-login",
 		"pronamic/wp-pronamic-pay-test-helper",
 		"https://downloads.wordpress.org/plugin/pronamic-client.zip",
 		"https://downloads.wordpress.org/plugin/query-monitor.zip",
@@ -10,6 +9,10 @@
 		"https://downloads.wordpress.org/plugin/one-time-login.zip",
 		"https://downloads.wordpress.org/plugin/wp-plugin-dependencies.zip"
 	],
+	"mappings": {
+		"wp-content/plugins/pronamic-ideal": "../../../",
+		"wp-content/plugins/pronamic-pay-mollie": "."
+	},
 	"config": {
 		"PRONAMIC_PAY_DEBUG": true
 	}
