@@ -76,8 +76,6 @@
 	} );
 } )();
 
-console.log( jQuery );
-
 if ( jQuery ) {
 	jQuery( 'form.woocommerce-checkout' ).on( 'checkout_place_order', function() {
 		console.log( this );
