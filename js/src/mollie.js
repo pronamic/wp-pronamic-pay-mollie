@@ -1,41 +1,61 @@
 /* global Mollie */
 ( function () {
 	function init( data ) {
-		const mollie = Mollie( data.profileId, data.options );
+		const element = document.getElementById( data.elementId );
 
-		const tokenElement = document.getElementById( data.elementId );
-
-		if ( ! tokenElement ) {
+		if ( ! element ) {
 			throw new Error( 'No data token element.' );
 		}
 
-		if ( ! tokenElement.form ) {
+		if ( ! element.form ) {
 			throw new Error( 'Data token element not in form.' );
 		}
 
-		const form = tokenElement.form;
+		const form = element.form;
 
-		async function createToken( e ) {
-			e.preventDefault();
+		if ( ! form.mollie ) {
+			form.mollie = Mollie( data.profileId, data.options );
 
-			const { token } = await mollie.createToken();
+			async function createToken( e ) {
+				const tokenElement = document.getElementById( data.elementId );
 
-			if ( token ) {
-				tokenElement.value = token;
+				if ( ! tokenElement ) {
+					return;
+				}
+
+				e.preventDefault();
+
+				const { token, error } = await form.mollie.createToken();
+
+				if ( error ) {
+					console.log( error );
+				}
+
+				if ( token ) {
+					tokenElement.value = token;
+				}
+
+				form.requestSubmit( e.submitter );
+
+				form.addEventListener( 'submit', createToken, {
+					once: true,
+				} );
 			}
 
-			form.removeEventListener( 'submit', createToken );
-
-			form.requestSubmit( e.submitter );
-
-			form.addEventListener( 'submit', createToken );
+			form.addEventListener( 'submit', createToken, {
+				once: true,
+			} );
 		}
 
-		form.addEventListener( 'submit', createToken );
+		if ( form.mollieCardComponent ) {
+			form.mollieCardComponent.unmount();
+		}
 
-		const cardComponent = mollie.createComponent( 'card' );
+		if ( ! form.mollieCardComponent ) {
+			form.mollieCardComponent = form.mollie.createComponent( 'card' );
+		}
 
-		cardComponent.mount( data.mount );
+		form.mollieCardComponent.mount( data.mount );
 	}
 
 	window.pronamicPayMollieFields = window.pronamicPayMollieFields || [];

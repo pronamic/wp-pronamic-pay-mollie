@@ -58,7 +58,7 @@ class CardField extends Field {
 			\hash_file( 'crc32b', __DIR__ . '/' . $file ),
 		);
 
-		$file = '../js/dist/mollie.min.js';
+		$file = '../js/src/mollie.js';
 
 		\wp_register_script(
 			'pronamic-pay-mollie',
