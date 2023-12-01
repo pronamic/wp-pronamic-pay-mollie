@@ -26,7 +26,7 @@
 				e.preventDefault();
 				e.stopImmediatePropagation();
 
-				form.mollie.createToken().then( function( result ) {
+				form.mollie.createToken().then( function ( result ) {
 					if ( result.error ) {
 						console.log( result.error );
 					}
