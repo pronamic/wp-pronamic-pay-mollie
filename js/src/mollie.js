@@ -16,7 +16,7 @@
 		if ( ! form.mollie ) {
 			form.mollie = Mollie( data.profileId, data.options );
 
-			async function createToken( e ) {
+			function createToken( e ) {
 				const tokenElement = document.getElementById( data.elementId );
 
 				if ( ! tokenElement ) {
@@ -24,21 +24,22 @@
 				}
 
 				e.preventDefault();
+				e.stopImmediatePropagation();
 
-				const { token, error } = await form.mollie.createToken();
+				form.mollie.createToken().then( function( result ) {
+					if ( result.error ) {
+						console.log( result.error );
+					}
 
-				if ( error ) {
-					console.log( error );
-				}
+					if ( result.token ) {
+						tokenElement.value = result.token;
+					}
 
-				if ( token ) {
-					tokenElement.value = token;
-				}
+					form.requestSubmit( e.submitter );
 
-				form.requestSubmit( e.submitter );
-
-				form.addEventListener( 'submit', createToken, {
-					once: true,
+					form.addEventListener( 'submit', createToken, {
+						once: true,
+					} );
 				} );
 			}
 
