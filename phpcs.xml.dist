@@ -29,4 +29,8 @@
 	<rule ref="WordPress.DB.SlowDBQuery.slow_db_query_meta_key">
 		<exclude-pattern>src/Integration.php</exclude-pattern>
 	</rule>
+
+	<rule ref="Squiz.Commenting.FileComment.Missing">
+		<exclude-pattern>assets/dist/*.asset.php</exclude-pattern>
+	</rule>
 </ruleset>

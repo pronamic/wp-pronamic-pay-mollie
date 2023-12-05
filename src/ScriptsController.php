@@ -61,9 +61,23 @@ class ScriptsController {
 		);
 
 		/**
+		 * Card field style.
+		 * 
+		 * @link https://github.com/mollie/components-examples
+		 */
+		$file = '../assets/dist/card-field.css';
+
+		\wp_register_style(
+			'pronamic-pay-mollie-card-field',
+			\plugins_url( $file, __FILE__ ),
+			[],
+			\hash_file( 'crc32b', __DIR__ . '/' . $file ),
+		);
+
+		/**
 		 * WooCommerce legacy checkout script.
 		 */
-		$file = '../js/dist/wc-legacy-checkout.min.js';
+		$file = '../assets/dist/wc-legacy-checkout.js';
 
 		\wp_register_script(
 			'pronamic-pay-mollie-wc-legacy-checkout',
@@ -92,6 +106,7 @@ class ScriptsController {
 		 * @link https://github.com/woocommerce/woocommerce/blob/8.3.0/plugins/woocommerce/client/legacy/js/frontend/checkout.js
 		 */
 		if ( \wp_script_is( 'wc-checkout' ) ) {
+			\wp_enqueue_style( 'pronamic-pay-mollie-card-field' );
 			\wp_enqueue_script( 'pronamic-pay-mollie-wc-legacy-checkout' );
 		}
 	}

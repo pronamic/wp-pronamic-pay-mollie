@@ -1,0 +1,20 @@
+.pronamic-pay-mollie-card-field {
+	display: flex;
+
+	flex-flow: row wrap;
+
+	gap: 1em;
+
+	.mollie-card-component {
+		flex: 2 1 100%;
+
+		&--expiryDate,
+		&--verificationCode {
+			flex: 1 2 auto;
+		}
+
+		&__error {
+			color: #f00;
+		}
+	}
+}

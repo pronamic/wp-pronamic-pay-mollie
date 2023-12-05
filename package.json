@@ -2,18 +2,6 @@
 	"name": "mollie",
 	"version": "4.8.1",
 	"description": "Mollie driver for the WordPress payment processing library.",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/wp-pay-gateways/mollie"
-	},
-	"keywords": [
-		"wordpress",
-		"wp",
-		"pay",
-		"mollie",
-		"gateway",
-		"pronamic"
-	],
 	"author": {
 		"name": "Pronamic",
 		"email": "info@pronamic.nl",
@@ -26,23 +14,37 @@
 			"url": "http://www.remcotolsma.nl/"
 		}
 	],
-	"license": "GPL-3.0",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"wp",
+		"pay",
+		"mollie",
+		"gateway",
+		"pronamic"
+	],
+	"homepage": "http://www.wp-pay.org/gateways/mollie/",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wp-pay-gateways/mollie"
+	},
 	"bugs": {
 		"url": "https://github.com/wp-pay-gateways/mollie/issues"
 	},
-	"homepage": "http://www.wp-pay.org/gateways/mollie/",
 	"devDependencies": {
 		"@wordpress/env": "^8.13.0",
 		"@wordpress/prettier-config": "^3.4.0",
 		"@wordpress/scripts": "^26.18.0",
 		"npm-run-all": "^4.1.5",
-		"prettier": "npm:wp-prettier@^3.0.3",
-		"terser": "^5.24.0"
+		"prettier": "npm:wp-prettier@^3.0.3"
 	},
 	"prettier": "@wordpress/prettier-config",
 	"scripts": {
+		"build": "wp-scripts build assets/src/card-field.js assets/src/wc-legacy-checkout.js --output-path=assets/dist",
+		"start": "wp-scripts start assets/src/card-field.js assets/src/wc-legacy-checkout.js --output-path=assets/dist",
 		"lint-js": "wp-scripts lint-js ./js/src",
-		"js-minify": "terser js/src/wc-legacy-checkout.js --compress --mangle --output js/dist/wc-legacy-checkout.min.js",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"lint:style": "wp-scripts lint-style 'assets/src/**/*.scss'",
 		"wp-env-setup": "npm-run-all wp-env-setup-*",
 		"wp-env-setup-mollie": "wp-env run cli wp config set MOLLIE_API_KEY $MOLLIE_API_KEY",
 		"wp-env-setup-buckaroo-website-key": "wp-env run cli wp config set BUCKAROO_WEBSITE_KEY $BUCKAROO_WEBSITE_KEY",
