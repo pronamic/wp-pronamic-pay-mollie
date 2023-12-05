@@ -42,7 +42,7 @@
 	"prettier": "@wordpress/prettier-config",
 	"scripts": {
 		"lint-js": "wp-scripts lint-js ./js/src",
-		"js-minify": "terser js/src/mollie.js --compress --mangle --output js/dist/mollie.min.js",
+		"js-minify": "terser js/src/wc-legacy-checkout.js --compress --mangle --output js/dist/wc-legacy-checkout.min.js",
 		"wp-env-setup": "npm-run-all wp-env-setup-*",
 		"wp-env-setup-mollie": "wp-env run cli wp config set MOLLIE_API_KEY $MOLLIE_API_KEY",
 		"wp-env-setup-buckaroo-website-key": "wp-env run cli wp config set BUCKAROO_WEBSITE_KEY $BUCKAROO_WEBSITE_KEY",

@@ -102,6 +102,9 @@ class Integration extends AbstractGatewayIntegration {
 
 		$upgrades->add( new Install( null === $version ? '1.0.0' : $version ) );
 
+		// Scripts.
+		ScriptsController::instance()->setup();
+
 		/**
 		 * Admin
 		 */
