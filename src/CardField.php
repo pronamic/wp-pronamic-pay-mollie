@@ -84,6 +84,8 @@ class CardField extends Field {
 
 	/**
 	 * Serialize to JSON.
+	 * 
+	 * @return array
 	 */
 	public function jsonSerialize(): array {
 		$data = parent::jsonSerialize();

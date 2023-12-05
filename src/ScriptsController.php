@@ -82,6 +82,7 @@ class ScriptsController {
 	 * Print scripts.
 	 * 
 	 * @link https://developer.wordpress.org/reference/functions/wp_print_scripts/
+	 * @return void
 	 */
 	public function print_scripts() {
 		/**
