@@ -1,3 +1,8 @@
+/**
+ * Card field style.
+ * 
+ * @link https://github.com/mollie/components-examples
+ */
 .pronamic-pay-mollie-card-field {
 	display: flex;
 
@@ -16,5 +21,14 @@
 		&__error {
 			color: #f00;
 		}
+	}
+
+	.mollie-component {
+		background: #fff;
+
+		border: 1px solid #767676;
+		border-radius: 3px;
+
+		padding: .5em;
 	}
 }
