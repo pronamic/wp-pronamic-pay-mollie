@@ -247,22 +247,22 @@ class Gateway extends Core_Gateway {
 
 	/**
 	 * Get profile ID.
-	 * 
-	 * @return string
+	 *
+	 * @return string|null
 	 */
 	public function get_profile_id() {
-		$cache_key = 'pronamic_pay_mollie_profile_id_' . \md5( (string) \wp_json_encode( $this->config ) );
+		$profile_id = $this->config->profile_id;
 
-		$profile_id = \get_transient( $cache_key );
-
-		if ( false === $profile_id ) {
+		if ( '' === $profile_id ) {
 			$current_profile = $this->client->get_current_profile();
 
 			$profile = Profile::from_object( $current_profile );
 
 			$profile_id = $profile->get_id();
 
-			\set_transient( $cache_key, $profile_id, \DAY_IN_SECONDS );
+			\update_post_meta( $this->config->id, '_pronamic_gateway_mollie_profile_id', $profile_id );
+
+			$this->config->profile_id = $profile_id;
 		}
 
 		return $profile_id;
