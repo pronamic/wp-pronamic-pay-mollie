@@ -9,7 +9,7 @@
  */
 class PronamicPayMollieWooCommerceLegacyCheckoutFormController {
 	/**
-	 * Construct Pronamic Pay Mollie WooCommerce lgeacy checkout form controller.
+	 * Construct Pronamic Pay Mollie WooCommerce legacy checkout form controller.
 	 *
 	 * @param {jQuery}      jQuery The jQuery library.
 	 * @param {HTMLElement} body   Body element.
@@ -111,7 +111,7 @@ class PronamicPayMollieWooCommerceLegacyCheckoutFormController {
 	/**
 	 * Process token response.
 	 *
-	 * @param {Object} result         Mollie create token repsonse object.
+	 * @param {Object} result         Mollie create token response object.
 	 * @param {Object} wcCheckoutForm WooCommerce checkout form object.
 	 */
 	processTokenResponse( result, wcCheckoutForm ) {
