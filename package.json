@@ -42,7 +42,7 @@
 	"scripts": {
 		"build": "wp-scripts build assets/src/card-field.js assets/src/wc-legacy-checkout.js --output-path=assets/dist",
 		"start": "wp-scripts start assets/src/card-field.js assets/src/wc-legacy-checkout.js --output-path=assets/dist",
-		"lint-js": "wp-scripts lint-js ./js/src",
+		"lint-js": "wp-scripts lint-js assets/src",
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"lint:style": "wp-scripts lint-style 'assets/src/**/*.scss'",
 		"wp-env-setup": "npm-run-all wp-env-setup-*",
