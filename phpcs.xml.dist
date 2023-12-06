@@ -3,6 +3,7 @@
 <ruleset name="WordPress Pay Mollie rules">
 	<file>.</file>
 
+	<exclude-pattern>assets/dist/*.asset.php</exclude-pattern>
 	<exclude-pattern>tests/bootstrap.php</exclude-pattern>
 	<exclude-pattern>tests/wp-config.php</exclude-pattern>
 
@@ -28,9 +29,5 @@
 
 	<rule ref="WordPress.DB.SlowDBQuery.slow_db_query_meta_key">
 		<exclude-pattern>src/Integration.php</exclude-pattern>
-	</rule>
-
-	<rule ref="Squiz.Commenting.FileComment.Missing">
-		<exclude-pattern>assets/dist/*.asset.php</exclude-pattern>
 	</rule>
 </ruleset>
