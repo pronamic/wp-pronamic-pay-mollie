@@ -32,6 +32,13 @@ class Config extends GatewayConfig implements JsonSerializable {
 	public $api_key;
 
 	/**
+	 * Mollie profile ID.
+	 *
+	 * @var string|null
+	 */
+	public $profile_id;
+
+	/**
 	 * Bank transfer due date days.
 	 *
 	 * @var string|null

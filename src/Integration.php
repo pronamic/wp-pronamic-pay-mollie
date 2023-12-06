@@ -102,6 +102,9 @@ class Integration extends AbstractGatewayIntegration {
 
 		$upgrades->add( new Install( null === $version ? '1.0.0' : $version ) );
 
+		// Scripts.
+		ScriptsController::instance()->setup();
+
 		/**
 		 * Admin
 		 */
@@ -234,7 +237,15 @@ class Integration extends AbstractGatewayIntegration {
 	 * @return void
 	 */
 	public function save_post( $post_id ) {
+		\delete_post_meta( $post_id, '_pronamic_gateway_mollie_profile_id' );
+
 		$config = $this->get_config( $post_id );
+
+		try {
+			$config->profile_id = $this->get_gateway( $post_id )->get_profile_id();
+		} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch -- No problem.
+			// No problem.
+		}
 
 		\delete_transient( 'pronamic_pay_mollie_payment_methods_' . \md5( (string) \wp_json_encode( $config ) ) );
 		\delete_transient( 'pronamic_pay_ideal_issuers_' . \md5( (string) \wp_json_encode( $config ) ) );
@@ -251,6 +262,7 @@ class Integration extends AbstractGatewayIntegration {
 
 		$config->id            = intval( $post_id );
 		$config->api_key       = $this->get_meta( $post_id, 'mollie_api_key' );
+		$config->profile_id    = $this->get_meta( $post_id, 'mollie_profile_id' );
 		$config->due_date_days = $this->get_meta( $post_id, 'mollie_due_date_days' );
 
 		return $config;

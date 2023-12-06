@@ -37,6 +37,10 @@
 		}
 	},
 	"config": {
+		"platform": {
+			"php": "8.0"
+		},
+		"platform-check": false,
 		"sort-packages": true,
 		"allow-plugins": {
 			"composer/installers": true,

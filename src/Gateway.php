@@ -127,6 +127,9 @@ class Gateway extends Core_Gateway {
 		$field_consumer_iban->set_required( true );
 		$field_consumer_iban->meta_key = 'consumer_bank_details_iban';
 
+		$field_mollie_card           = new CardField( 'pronamic_pay_mollie_card_token', $this );
+		$field_mollie_card->meta_key = 'mollie_card_token';
+
 		// Apple Pay.
 		$payment_method_apple_pay = new PaymentMethod( PaymentMethods::APPLE_PAY );
 		$payment_method_apple_pay->add_support( 'recurring' );
@@ -154,6 +157,7 @@ class Gateway extends Core_Gateway {
 		// Payment method credit card.
 		$payment_method_credit_card = new PaymentMethod( PaymentMethods::CREDIT_CARD );
 		$payment_method_credit_card->add_support( 'recurring' );
+		$payment_method_credit_card->add_field( $field_mollie_card );
 
 		$this->register_payment_method( $payment_method_credit_card );
 
@@ -239,6 +243,29 @@ class Gateway extends Core_Gateway {
 		$payment_method_sofort->add_support( 'recurring' );
 
 		$this->register_payment_method( $payment_method_sofort );
+	}
+
+	/**
+	 * Get profile ID.
+	 *
+	 * @return string|null
+	 */
+	public function get_profile_id() {
+		$profile_id = $this->config->profile_id;
+
+		if ( '' === $profile_id ) {
+			$current_profile = $this->client->get_current_profile();
+
+			$profile = Profile::from_object( $current_profile );
+
+			$profile_id = $profile->get_id();
+
+			\update_post_meta( $this->config->id, '_pronamic_gateway_mollie_profile_id', $profile_id );
+
+			$this->config->profile_id = $profile_id;
+		}
+
+		return $profile_id;
 	}
 
 	/**
@@ -713,6 +740,15 @@ class Gateway extends Core_Gateway {
 		// Issuer.
 		if ( Methods::IDEAL === $request->method ) {
 			$request->issuer = $payment->get_meta( 'issuer' );
+		}
+
+		// Card token.
+		if ( Methods::CREDITCARD === $request->method ) {
+			$card_token = $payment->get_meta( 'mollie_card_token' );
+
+			if ( ! empty( $card_token ) ) {
+				$request->card_token = $card_token;
+			}
 		}
 
 		// Billing email.

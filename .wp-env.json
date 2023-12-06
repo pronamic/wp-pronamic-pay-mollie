@@ -7,6 +7,7 @@
 		"https://downloads.wordpress.org/plugin/query-monitor.zip",
 		"https://downloads.wordpress.org/plugin/log-http-requests.zip",
 		"https://downloads.wordpress.org/plugin/one-time-login.zip",
+		"https://downloads.wordpress.org/plugin/woocommerce.zip",
 		"https://downloads.wordpress.org/plugin/wp-plugin-dependencies.zip"
 	],
 	"mappings": {
