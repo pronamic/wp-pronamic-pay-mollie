@@ -101,9 +101,7 @@ class PronamicPayMollieWooCommerceLegacyCheckoutFormController {
 
 		this.mollie
 			.createToken()
-			.then( ( result ) =>
-				this.processTokenResponse( result, wcCheckoutForm )
-			);
+			.then( ( result ) => this.processTokenResponse( result ) );
 
 		return false;
 	}
@@ -111,17 +109,10 @@ class PronamicPayMollieWooCommerceLegacyCheckoutFormController {
 	/**
 	 * Process token response.
 	 *
-	 * @param {Object} result         Mollie create token repsonse object.
-	 * @param {Object} wcCheckoutForm WooCommerce checkout form object.
+	 * @param {Object} result Mollie create token repsonse object.
 	 */
-	processTokenResponse( result, wcCheckoutForm ) {
+	processTokenResponse( result ) {
 		if ( result.error ) {
-			wcCheckoutForm.submit_error(
-				'<div class="woocommerce-error">' +
-					result.error.message +
-					'</div>'
-			);
-
 			return;
 		}
 
@@ -139,6 +130,11 @@ class PronamicPayMollieWooCommerceLegacyCheckoutFormController {
 		);
 
 		this.jQuery( this.form ).submit();
+
+		this.jQuery( this.form ).on(
+			'checkout_place_order',
+			this.checkoutPlaceOrderListener
+		);
 	}
 }
 
