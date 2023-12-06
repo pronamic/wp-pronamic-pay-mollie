@@ -49,7 +49,8 @@ class PronamicPayMollieWooCommerceLegacyCheckoutFormController {
 
 		this.mollie = Mollie( mollieProfileId, mollieOptions );
 
-		this.checkoutPlaceOrderListener = () => this.checkoutPlaceOrder();
+		this.checkoutPlaceOrderListener = ( event, wcCheckoutForm ) =>
+			this.checkoutPlaceOrder( event, wcCheckoutForm );
 
 		this.jQuery( this.form ).on(
 			'checkout_place_order',
@@ -88,11 +89,21 @@ class PronamicPayMollieWooCommerceLegacyCheckoutFormController {
 	 * Checkout place order.
 	 *
 	 * @see https://github.com/woocommerce/woocommerce/blob/8.3.0/plugins/woocommerce/client/legacy/js/frontend/checkout.js#L478-L480
+	 * @param {jQuery.Event} event          A `jQuery.Event` object.
+	 * @param {Object}       wcCheckoutForm WooCommerce checkout form object.
 	 */
-	checkoutPlaceOrder() {
+	checkoutPlaceOrder( event, wcCheckoutForm ) {
+		if (
+			'pronamic_pay_credit_card' !== wcCheckoutForm.get_payment_method()
+		) {
+			return true;
+		}
+
 		this.mollie
 			.createToken()
-			.then( ( result ) => this.processTokenResponse( result ) );
+			.then( ( result ) =>
+				this.processTokenResponse( result, wcCheckoutForm )
+			);
 
 		return false;
 	}
@@ -100,10 +111,17 @@ class PronamicPayMollieWooCommerceLegacyCheckoutFormController {
 	/**
 	 * Process token response.
 	 *
-	 * @param {Object} result Mollie create token repsonse object.
+	 * @param {Object} result         Mollie create token repsonse object.
+	 * @param {Object} wcCheckoutForm WooCommerce checkout form object.
 	 */
-	processTokenResponse( result ) {
+	processTokenResponse( result, wcCheckoutForm ) {
 		if ( result.error ) {
+			wcCheckoutForm.submit_error(
+				'<div class="woocommerce-error">' +
+					result.error.message +
+					'</div>'
+			);
+
 			return;
 		}
 
