@@ -18,7 +18,7 @@ use Pronamic\WordPress\Pay\Fields\Field;
  */
 class CardField extends Field {
 	/**
-	 * Gatweay.
+	 * Gateway.
 	 * 
 	 * @var Gateway
 	 */
