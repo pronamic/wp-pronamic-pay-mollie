@@ -67,7 +67,7 @@ class ScriptsController {
 			[],
 			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Version is part of URL.
 			null,
-			false
+			true
 		);
 
 		/**
