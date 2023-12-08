@@ -46,6 +46,16 @@ class ScriptsController {
 
 		\add_action( 'wp_print_scripts', [ $this, 'print_scripts' ] );
 
+		\add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+	}
+
+	/**
+	 * Enqueue scripts.
+	 * 
+	 * @link https://developer.wordpress.org/reference/hooks/wp_enqueue_scripts/
+	 * @return void
+	 */
+	public function enqueue_scripts() {
 		/**
 		 * Mollie.js.
 		 * 
