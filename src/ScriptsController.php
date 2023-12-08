@@ -40,13 +40,13 @@ class ScriptsController {
 	 * @return void
 	 */
 	public function setup() {
-		if ( \has_action( 'wp_print_scripts', [ $this, 'print_scripts' ] ) ) {
+		if ( \has_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] ) ) {
 			return;
 		}
 
-		\add_action( 'wp_print_scripts', [ $this, 'print_scripts' ] );
-
 		\add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+
+		\add_action( 'wp_print_scripts', [ $this, 'print_scripts' ] );
 	}
 
 	/**
