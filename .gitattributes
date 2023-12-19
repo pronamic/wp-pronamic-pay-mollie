@@ -5,6 +5,7 @@
 /.github/          export-ignore
 /.gitignore        export-ignore
 /.phplint.yml      export-ignore
+/.phpmetrics.json  export-ignore
 /.wp-env.json      export-ignore
 /Gruntfile.js      export-ignore
 /docs/             export-ignore

@@ -1,0 +1,6 @@
+{
+	"includes": [ "src" ],
+	"report": {
+		"html": "build/phpmetrics"
+	}
+}
