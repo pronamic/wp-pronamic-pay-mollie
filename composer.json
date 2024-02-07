@@ -55,9 +55,9 @@
 		"ext-json": "*",
 		"justinrainbow/json-schema": "^5.2",
 		"pronamic/wp-http": "^1.2",
-		"pronamic/wp-mollie": "^1.4",
-		"woocommerce/action-scheduler": "^3.6",
-		"wp-pay/core": "^4.13"
+		"pronamic/wp-mollie": "^1.5",
+		"woocommerce/action-scheduler": "^3.7",
+		"wp-pay/core": "^4.15"
 	},
 	"require-dev": {
 		"automattic/wordbless": "^0.4.0",
