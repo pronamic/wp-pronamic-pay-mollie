@@ -7,6 +7,34 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.9.0] - 2024-02-07
+
+### Changed
+
+- The code further complies with (WordPress) coding standards.
+- The HTTP timeout option is increased when connecting to Mollie via WP-Cron, WP-CLI or the Action Scheduler library. [pronamic/wp-pay-core#170](https://github.com/pronamic/wp-pay-core/issues/170)
+
+### Fixed
+
+- Fixed `wp_register_script` and `wp_register_style` are called incorrectly https://github.com/pronamic/wp-pronamic-pay-mollie/issues/42. ([41bfb35](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/41bfb35d058cb50012d2141d111c084f24ec1e3c))
+
+### Added
+
+- Added support for Mollie card field/component in WooCommerce legacy checkout. [#40](https://github.com/pronamic/wp-pronamic-pay-mollie/pull/40)
+
+### Composer
+
+- Changed `pronamic/wp-mollie` from `^1.4` to `v1.5.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v1.5.0
+- Changed `woocommerce/action-scheduler` from `^3.6` to `3.7.1`.
+	Release notes: https://github.com/woocommerce/action-scheduler/releases/tag/3.7.1
+- Changed `wp-pay/core` from `^4.13` to `v4.15.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.15.0
+
+Full set of changes: [`4.8.1...4.9.0`][4.9.0]
+
+[4.9.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.8.1...v4.9.0
+
 ## [4.8.1] - 2023-10-16
 
 ### Commits
