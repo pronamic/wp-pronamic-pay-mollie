@@ -243,6 +243,9 @@ class Gateway extends Core_Gateway {
 		$payment_method_sofort->add_support( 'recurring' );
 
 		$this->register_payment_method( $payment_method_sofort );
+
+		// TWINT.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::TWINT ) );
 	}
 
 	/**
