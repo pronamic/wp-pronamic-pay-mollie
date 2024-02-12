@@ -100,7 +100,9 @@ class GatewayTest extends TestCase {
 	 */
 	public function test_webhook_url( $home_url, Payment $payment, $expected ) {
 		$filter_home_url = function ( $url ) use ( $home_url ) {
-			return $home_url;
+			$url = $home_url;
+
+			return $url;
 		};
 
 		add_filter( 'home_url', $filter_home_url );
@@ -120,7 +122,9 @@ class GatewayTest extends TestCase {
 		$home_url = 'https://example.org/';
 
 		$filter_home_url = function ( $url ) use ( $home_url ) {
-			return $home_url;
+			$url = $home_url;
+
+			return $url;
 		};
 
 		add_filter( 'home_url', $filter_home_url );
