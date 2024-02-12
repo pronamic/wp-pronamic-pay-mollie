@@ -10,7 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Pay\Core\PaymentMethods as WordPressMethod;
+use Pronamic\WordPress\Pay\Core\PaymentMethods as PronamicMethod;
 use Pronamic\WordPress\Mollie\Methods as MollieMethod;
 
 /**
@@ -23,28 +23,28 @@ class MethodTransformer {
 	 * @var array<string>
 	 */
 	private static $map = [
-		WordPressMethod::APPLE_PAY               => MollieMethod::APPLE_PAY,
-		WordPressMethod::BANCONTACT              => MollieMethod::BANCONTACT,
-		WordPressMethod::BANK_TRANSFER           => MollieMethod::BANKTRANSFER,
-		WordPressMethod::BILLIE                  => MollieMethod::BILLIE,
-		WordPressMethod::CREDIT_CARD             => MollieMethod::CREDITCARD,
-		WordPressMethod::DIRECT_DEBIT            => MollieMethod::DIRECT_DEBIT,
-		WordPressMethod::DIRECT_DEBIT_BANCONTACT => MollieMethod::DIRECT_DEBIT,
-		WordPressMethod::DIRECT_DEBIT_IDEAL      => MollieMethod::DIRECT_DEBIT,
-		WordPressMethod::DIRECT_DEBIT_SOFORT     => MollieMethod::DIRECT_DEBIT,
-		WordPressMethod::EPS                     => MollieMethod::EPS,
-		WordPressMethod::GIROPAY                 => MollieMethod::GIROPAY,
-		WordPressMethod::KLARNA_PAY_LATER        => MollieMethod::KLARNA_PAY_LATER,
-		WordPressMethod::KLARNA_PAY_NOW          => MollieMethod::KLARNA_PAY_NOW,
-		WordPressMethod::KLARNA_PAY_OVER_TIME    => MollieMethod::KLARNA_SLICE_IT,
-		WordPressMethod::PAYPAL                  => MollieMethod::PAYPAL,
-		WordPressMethod::PRZELEWY24              => MollieMethod::PRZELEWY24,
-		WordPressMethod::SOFORT                  => MollieMethod::SOFORT,
-		WordPressMethod::IDEAL                   => MollieMethod::IDEAL,
-		WordPressMethod::IN3                     => MollieMethod::IN3,
-		WordPressMethod::KBC                     => MollieMethod::KBC,
-		WordPressMethod::BELFIUS                 => MollieMethod::BELFIUS,
-		WordPressMethod::TWINT                   => MollieMethod::TWINT,
+		PronamicMethod::APPLE_PAY               => MollieMethod::APPLE_PAY,
+		PronamicMethod::BANCONTACT              => MollieMethod::BANCONTACT,
+		PronamicMethod::BANK_TRANSFER           => MollieMethod::BANKTRANSFER,
+		PronamicMethod::BILLIE                  => MollieMethod::BILLIE,
+		PronamicMethod::CREDIT_CARD             => MollieMethod::CREDITCARD,
+		PronamicMethod::DIRECT_DEBIT            => MollieMethod::DIRECT_DEBIT,
+		PronamicMethod::DIRECT_DEBIT_BANCONTACT => MollieMethod::DIRECT_DEBIT,
+		PronamicMethod::DIRECT_DEBIT_IDEAL      => MollieMethod::DIRECT_DEBIT,
+		PronamicMethod::DIRECT_DEBIT_SOFORT     => MollieMethod::DIRECT_DEBIT,
+		PronamicMethod::EPS                     => MollieMethod::EPS,
+		PronamicMethod::GIROPAY                 => MollieMethod::GIROPAY,
+		PronamicMethod::KLARNA_PAY_LATER        => MollieMethod::KLARNA_PAY_LATER,
+		PronamicMethod::KLARNA_PAY_NOW          => MollieMethod::KLARNA_PAY_NOW,
+		PronamicMethod::KLARNA_PAY_OVER_TIME    => MollieMethod::KLARNA_SLICE_IT,
+		PronamicMethod::PAYPAL                  => MollieMethod::PAYPAL,
+		PronamicMethod::PRZELEWY24              => MollieMethod::PRZELEWY24,
+		PronamicMethod::SOFORT                  => MollieMethod::SOFORT,
+		PronamicMethod::IDEAL                   => MollieMethod::IDEAL,
+		PronamicMethod::IN3                     => MollieMethod::IN3,
+		PronamicMethod::KBC                     => MollieMethod::KBC,
+		PronamicMethod::BELFIUS                 => MollieMethod::BELFIUS,
+		PronamicMethod::TWINT                   => MollieMethod::TWINT,
 	];
 
 	/**
