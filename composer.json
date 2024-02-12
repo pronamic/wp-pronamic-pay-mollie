@@ -67,7 +67,7 @@
 		"phpmd/phpmd": "^2.7",
 		"phpmetrics/phpmetrics": "^2.8",
 		"pronamic/pronamic-cli": "^1.1",
-		"pronamic/wp-coding-standards": "^2.0",
+		"pronamic/wp-coding-standards": "^2.1",
 		"roots/wordpress": "^6.0",
 		"wp-cli/wp-cli": "^2.3",
 		"wp-phpunit/wp-phpunit": "^6.1",
