@@ -44,6 +44,7 @@ class MethodTransformer {
 		WordPressMethod::IN3                     => MollieMethod::IN3,
 		WordPressMethod::KBC                     => MollieMethod::KBC,
 		WordPressMethod::BELFIUS                 => MollieMethod::BELFIUS,
+		WordPressMethod::TWINT                   => MollieMethod::TWINT,
 	];
 
 	/**
