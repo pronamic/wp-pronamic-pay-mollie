@@ -26,3 +26,7 @@
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
