@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.9.2] - 2024-02-13
+
+### Commits
+
+- Added `if ( ! defined( 'ABSPATH' ) )`. ([5c4840c](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5c4840cfc85939569674283cc1f7acb1f1fb9b14))
+
+Full set of changes: [`4.9.1...4.9.2`][4.9.2]
+
+[4.9.2]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.9.1...v4.9.2
+
 ## [4.9.1] - 2024-02-13
 
 ### Commits
