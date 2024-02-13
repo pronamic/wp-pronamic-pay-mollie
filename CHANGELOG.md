@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.9.1] - 2024-02-13
+
+### Commits
+
+- Added support for TWINT. ([e4b482b](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/e4b482b304c1157e7acd886e0815734e86733c39))
+
+Full set of changes: [`4.9.0...4.9.1`][4.9.1]
+
+[4.9.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.9.0...v4.9.1
+
 ## [4.9.0] - 2024-02-07
 
 ### Changed
