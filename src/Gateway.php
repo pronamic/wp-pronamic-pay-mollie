@@ -154,6 +154,13 @@ class Gateway extends Core_Gateway {
 		// Billie.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BILLIE ) );
 
+		// Card..
+		$payment_method_card = new PaymentMethod( PaymentMethods::CARD );
+		$payment_method_card->add_support( 'recurring' );
+		$payment_method_card->add_field( $field_mollie_card );
+
+		$this->register_payment_method( $payment_method_card );
+
 		// Payment method credit card.
 		$payment_method_credit_card = new PaymentMethod( PaymentMethods::CREDIT_CARD );
 		$payment_method_credit_card->add_support( 'recurring' );

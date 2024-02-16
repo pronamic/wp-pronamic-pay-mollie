@@ -27,6 +27,7 @@ class MethodTransformer {
 		PronamicMethod::BANCONTACT              => MollieMethod::BANCONTACT,
 		PronamicMethod::BANK_TRANSFER           => MollieMethod::BANKTRANSFER,
 		PronamicMethod::BILLIE                  => MollieMethod::BILLIE,
+		PronamicMethod::CARD                    => MollieMethod::CREDITCARD,
 		PronamicMethod::CREDIT_CARD             => MollieMethod::CREDITCARD,
 		PronamicMethod::DIRECT_DEBIT            => MollieMethod::DIRECT_DEBIT,
 		PronamicMethod::DIRECT_DEBIT_BANCONTACT => MollieMethod::DIRECT_DEBIT,
