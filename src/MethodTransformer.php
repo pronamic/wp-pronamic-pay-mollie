@@ -94,7 +94,7 @@ class MethodTransformer {
 	}
 
 	/**
-	 * Transform Mollie method to WordPress payment method.
+	 * Transform Mollie method to Pronamic payment method(s).
 	 *
 	 * @param string $method Mollie method.
 	 * @return array
