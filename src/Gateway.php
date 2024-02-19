@@ -318,31 +318,29 @@ class Gateway extends Core_Gateway {
 		$method_transformer = new MethodTransformer();
 
 		foreach ( $mollie_payment_methods->_embedded->methods as $mollie_payment_method ) {
-			$core_payment_method_id = $method_transformer->transform_mollie_to_wp( $mollie_payment_method->id );
+			$core_payment_method_ids = $method_transformer->from_mollie_to_pronamic( $mollie_payment_method->id );
 
-			if ( null === $core_payment_method_id ) {
-				continue;
-			}
+			foreach ( $core_payment_method_ids as $core_payment_method_id ) {
+				$core_payment_method = $this->get_payment_method( $core_payment_method_id );
 
-			$core_payment_method = $this->get_payment_method( $core_payment_method_id );
+				if ( null !== $core_payment_method ) {
+					switch ( $mollie_payment_method->status ) {
+						case 'activated':
+							$core_payment_method->set_status( 'active' );
 
-			if ( null !== $core_payment_method ) {
-				switch ( $mollie_payment_method->status ) {
-					case 'activated':
-						$core_payment_method->set_status( 'active' );
+							break;
+						case 'pending-boarding':
+						case 'pending-review':
+						case 'pending-external':
+							$core_payment_method->set_status( $this->config->is_test_mode() ? 'active' : 'inactive' );
 
-						break;
-					case 'pending-boarding':
-					case 'pending-review':
-					case 'pending-external':
-						$core_payment_method->set_status( $this->config->is_test_mode() ? 'active' : 'inactive' );
+							break;
+						case 'rejected':
+						case null:
+							$core_payment_method->set_status( 'inactive' );
 
-						break;
-					case 'rejected':
-					case null:
-						$core_payment_method->set_status( 'inactive' );
-
-						break;
+							break;
+					}
 				}
 			}
 		}

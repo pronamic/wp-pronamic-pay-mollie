@@ -92,4 +92,21 @@ class MethodTransformer {
 
 		return \strval( $payment_method );
 	}
+
+	/**
+	 * Transform Mollie method to WordPress payment method.
+	 *
+	 * @param string $method Mollie method.
+	 * @return array
+	 */
+	public function from_mollie_to_pronamic( $method ) {
+		return \array_keys(
+			\array_filter(
+				self::$map,
+				function ( $value ) use ( $method ) {
+					return ( $value === $method );
+				}
+			)
+		);
+	}
 }
