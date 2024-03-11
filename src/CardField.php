@@ -19,14 +19,14 @@ use Pronamic\WordPress\Pay\Fields\Field;
 class CardField extends Field {
 	/**
 	 * Gateway.
-	 * 
+	 *
 	 * @var Gateway
 	 */
 	private $gateway;
 
 	/**
 	 * Construct card field.
-	 * 
+	 *
 	 * @param string  $id      ID.
 	 * @param Gateway $gateway Gateway.
 	 */
@@ -38,13 +38,17 @@ class CardField extends Field {
 
 	/**
 	 * Get element.
-	 * 
+	 *
 	 * @return Element|null
 	 */
 	protected function get_element() {
 		try {
 			$profile_id = $this->gateway->get_profile_id();
 		} catch ( \Exception $e ) {
+			return null;
+		}
+
+		if ( null === $profile_id ) {
 			return null;
 		}
 
@@ -68,7 +72,7 @@ class CardField extends Field {
 					]
 				),
 			]
-		); 
+		);
 
 		$element->children[] = new Element(
 			'input',
@@ -84,8 +88,8 @@ class CardField extends Field {
 
 	/**
 	 * Serialize to JSON.
-	 * 
-	 * @return array
+	 *
+	 * @return array<string, string>
 	 */
 	public function jsonSerialize(): array {
 		$data = parent::jsonSerialize();
