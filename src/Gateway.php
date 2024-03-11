@@ -78,7 +78,7 @@ class Gateway extends Core_Gateway {
 	private $customer_data_store;
 
 	/**
-	 * Constructs and initializes an Mollie gateway
+	 * Constructs and initializes a Mollie gateway
 	 *
 	 * @param Config $config Config.
 	 */
