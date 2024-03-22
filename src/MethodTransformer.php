@@ -97,7 +97,7 @@ class MethodTransformer {
 	 * Transform Mollie method to Pronamic payment method(s).
 	 *
 	 * @param string $method Mollie method.
-	 * @return array
+	 * @return array<string>
 	 */
 	public function from_mollie_to_pronamic( $method ) {
 		return \array_keys(

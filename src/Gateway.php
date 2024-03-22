@@ -1630,7 +1630,7 @@ class Gateway extends Core_Gateway {
 
 			// Add note.
 			$note = \sprintf(
-			/* translators: 1: old payment method, 2: new payment method */
+				/* translators: 1: old payment method, 2: new payment method */
 				\__( 'Payment method for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
 				\esc_html( (string) PaymentMethods::get_name( $old_method ) ),
 				\esc_html( (string) PaymentMethods::get_name( $new_method ) )
