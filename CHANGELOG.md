@@ -7,6 +7,21 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.10.0] - 2024-03-26
+
+### Changed
+
+- Added support for the more general card payment method. ([9fe0f64](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/9fe0f64d1e725977c5ce83c9d19bf25479737b95))
+
+### Composer
+
+- Changed `wp-pay/core` from `^4.15` to `v4.16.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.16.0
+
+Full set of changes: [`4.9.2...4.10.0`][4.10.0]
+
+[4.10.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.9.2...v4.10.0
+
 ## [4.9.2] - 2024-02-13
 
 ### Commits
