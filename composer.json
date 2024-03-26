@@ -57,7 +57,7 @@
 		"pronamic/wp-http": "^1.2",
 		"pronamic/wp-mollie": "^1.5",
 		"woocommerce/action-scheduler": "^3.7",
-		"wp-pay/core": "^4.15"
+		"wp-pay/core": "^4.16"
 	},
 	"require-dev": {
 		"automattic/wordbless": "^0.4.0",
