@@ -92,7 +92,7 @@ class MethodTransformerTest extends TestCase {
 		return [
 			[ MollieMethod::BANCONTACT, PronamicMethod::BANCONTACT ],
 			[ MollieMethod::BANKTRANSFER, PronamicMethod::BANK_TRANSFER ],
-			[ MollieMethod::CREDITCARD, PronamicMethod::CREDIT_CARD ],
+			[ MollieMethod::CREDITCARD, PronamicMethod::CARD ],
 			[ MollieMethod::DIRECT_DEBIT, PronamicMethod::DIRECT_DEBIT ],
 			[ MollieMethod::PAYPAL, PronamicMethod::PAYPAL ],
 			[ MollieMethod::SOFORT, PronamicMethod::SOFORT ],
