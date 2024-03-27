@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.10.1] - 2024-03-27
+
+### Commits
+
+- No longer use `INSERT IGNORE` and `BINARY` operator. ([aec7ea5](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/aec7ea543459d807ff2e2c8e8062996ce5c88e34))
+
+Full set of changes: [`4.10.0...4.10.1`][4.10.1]
+
+[4.10.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.10.0...v4.10.1
+
 ## [4.10.0] - 2024-03-26
 
 ### Changed
