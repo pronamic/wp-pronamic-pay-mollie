@@ -311,22 +311,27 @@ class Install extends Upgrade {
 		global $wpdb;
 
 		$query = "
-			INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customers (
+			INSERT INTO $wpdb->pronamic_pay_mollie_customers (
 				mollie_id,
 				test_mode
 			)
 			SELECT
-				meta_value AS mollie_id,
-				'_pronamic_pay_mollie_customer_id_test' = meta_key AS test_mode
+				usermeta.meta_value AS mollie_id,
+				'_pronamic_pay_mollie_customer_id_test' = usermeta.meta_key AS test_mode
 			FROM
-				$wpdb->usermeta
+				$wpdb->usermeta AS usermeta
+					LEFT JOIN
+				$wpdb->pronamic_pay_mollie_customers AS mollie_customer
+						ON CAST( usermeta.meta_value AS BINARY ) = CAST( mollie_customer.mollie_id AS BINARY )
 			WHERE
-				meta_key IN (
+				usermeta.meta_key IN (
 					'_pronamic_pay_mollie_customer_id',
 					'_pronamic_pay_mollie_customer_id_test'
 				)
 					AND
-				meta_value != ''
+				usermeta.meta_value != ''
+					AND
+				mollie_customer.id IS NULL
 			;
 		";
 
@@ -343,7 +348,7 @@ class Install extends Upgrade {
 		}
 
 		$query = "
-			INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customer_users (
+			INSERT INTO $wpdb->pronamic_pay_mollie_customer_users (
 				customer_id,
 				user_id
 			)
@@ -354,10 +359,13 @@ class Install extends Upgrade {
 				$wpdb->pronamic_pay_mollie_customers AS mollie_customer
 					INNER JOIN
 				$wpdb->usermeta AS wp_user_meta
-						ON BINARY wp_user_meta.meta_value = mollie_customer.mollie_id
+						ON CAST( wp_user_meta.meta_value AS BINARY ) = CAST( mollie_customer.mollie_id AS BINARY )
 					INNER JOIN
 				$wpdb->users AS wp_user
 						ON wp_user_meta.user_id = wp_user.ID
+					LEFT JOIN
+				$wpdb->pronamic_pay_mollie_customer_users AS mollie_customer_user
+						ON ( mollie_customer_user.customer_id = mollie_customer.id AND mollie_customer_user.user_id = wp_user.ID )
 			WHERE
 				wp_user_meta.meta_key IN (
 					'_pronamic_pay_mollie_customer_id',
@@ -365,6 +373,8 @@ class Install extends Upgrade {
 				)
 					AND
 				wp_user_meta.meta_value != ''
+					AND
+				mollie_customer_user.id IS NULL
 			;
 		";
 
