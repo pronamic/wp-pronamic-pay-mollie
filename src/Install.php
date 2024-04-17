@@ -256,13 +256,13 @@ class Install extends Upgrade {
 		$result = $wpdb->get_var(
 			$wpdb->prepare(
 				"
-			SELECT COUNT(*)
-			FROM information_schema.TABLE_CONSTRAINTS
-			WHERE CONSTRAINT_SCHEMA = %s
-			AND CONSTRAINT_NAME = %s
-			AND CONSTRAINT_TYPE = 'FOREIGN KEY'
-			AND TABLE_NAME = %s
-			",
+				SELECT COUNT(*)
+				FROM information_schema.TABLE_CONSTRAINTS
+				WHERE CONSTRAINT_SCHEMA = %s
+				AND CONSTRAINT_NAME = %s
+				AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+				AND TABLE_NAME = %s
+				",
 				$wpdb->dbname,
 				$item->name,
 				$item->table
