@@ -230,7 +230,7 @@ class CLI {
 		global $wpdb;
 
 		$query = "
-			INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customer_users (
+			INSERT INTO $wpdb->pronamic_pay_mollie_customer_users (
 				customer_id,
 				user_id
 			)
@@ -241,7 +241,12 @@ class CLI {
 				$wpdb->pronamic_pay_mollie_customers AS mollie_customer
 					INNER JOIN
 				$wpdb->users AS wp_user
-						ON mollie_customer.email = wp_user.user_email
+						ON CAST( mollie_customer.email AS BINARY ) = CAST( wp_user.user_email AS BINARY )
+					LEFT JOIN
+				$wpdb->pronamic_pay_mollie_customer_users AS mollie_customer_user
+						ON ( mollie_customer_user.customer_id = mollie_customer.id AND mollie_customer_user.user_id = wp_user.ID )
+			WHERE
+				mollie_customer_user.id IS NULL
 			;
 		";
 
