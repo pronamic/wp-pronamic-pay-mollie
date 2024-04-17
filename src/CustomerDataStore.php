@@ -201,35 +201,34 @@ class CustomerDataStore {
 	 *
 	 * @param Customer $customer Mollie customer.
 	 * @param \WP_User $user     WordPress user.
-	 * @return int Number of rows affected.
+	 * @return void
 	 * @throws \Exception Throws exception on error.
 	 */
 	public function connect_mollie_customer_to_wp_user( $customer, \WP_User $user ) {
 		global $wpdb;
 
-		$result = $wpdb->query(
+		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"
-				INSERT IGNORE INTO $wpdb->pronamic_pay_mollie_customer_users (
-					customer_id,
-					user_id
-				)
-				SELECT
-					mollie_customer.id AS mollie_customer_id,
-					wp_user.ID AS wp_user_id
-				FROM
-					$wpdb->pronamic_pay_mollie_customers AS mollie_customer
-						JOIN
-					$wpdb->users AS wp_user
-				WHERE
-					mollie_customer.mollie_id = %s
-						AND
-					wp_user.ID = %d
-				;
-				",
+				"SELECT * FROM $wpdb->pronamic_pay_mollie_customer_users WHERE customer_id = %d AND user_id = %d;",
 				$customer->get_id(),
 				$user->ID
 			)
+		);
+
+		if ( null !== $row ) {
+			return;
+		}
+
+		$result = $wpdb->insert(
+			$wpdb->pronamic_pay_mollie_customer_users,
+			[
+				'customer_id' => $customer->get_id(),
+				'user_id'     => $user_id,
+			],
+			[
+				'customer_id' => '%d',
+				'user_id'     => '%d',
+			]
 		);
 
 		if ( false === $result ) {
@@ -240,7 +239,5 @@ class CustomerDataStore {
 				)
 			);
 		}
-
-		return $result;
 	}
 }
