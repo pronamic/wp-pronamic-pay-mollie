@@ -30,3 +30,31 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+/**
+ * Autoload.
+ */
+require_once __DIR__ . '/vendor/autoload_packages.php';
+
+/**
+ * Bootstrap.
+ */
+\Pronamic\WordPress\Pay\Plugin::instance(
+	[
+		'file'             => __FILE__,
+		'action_scheduler' => __DIR__ . '/vendor/woocommerce/action-scheduler/action-scheduler.php',
+	]
+);
+
+add_filter(
+	'pronamic_pay_gateways',
+	function ( $gateways ) {
+		$gateways[] = new \Pronamic\WordPress\Pay\Gateways\Mollie\Integration(
+			[
+				'manual_url' => \__( 'https://www.pronamicpay.com/en/manuals/how-to-connect-mollie-to-wordpress-with-pronamic-pay/', 'pronamic-pay-with-mollie-for-gravity-forms' ),
+			]
+		);
+
+		return $gateways;
+	}
+);
