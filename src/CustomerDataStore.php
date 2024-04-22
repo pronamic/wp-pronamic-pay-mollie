@@ -223,7 +223,7 @@ class CustomerDataStore {
 			$wpdb->pronamic_pay_mollie_customer_users,
 			[
 				'customer_id' => $customer->get_id(),
-				'user_id'     => $user_id,
+				'user_id'     => $user->ID,
 			],
 			[
 				'customer_id' => '%d',
