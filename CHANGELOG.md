@@ -7,6 +7,20 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.10.2] - 2024-04-22
+
+### Commits
+
+- No longer use `INSERT IGNORE INTO`, is not supported in Playground. [5c739d2](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5c739d2fcdc448d27e8f9246d713951a147a638c) [67a2a6e](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/67a2a6e45c481c2b555bd5533ad822312554519b)
+
+### Composer
+
+- Added `automattic/jetpack-autoloader` `^3.0`.
+
+Full set of changes: [`4.10.1...4.10.2`][4.10.2]
+
+[4.10.2]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.10.1...v4.10.2
+
 ## [4.10.1] - 2024-03-27
 
 ### Commits
