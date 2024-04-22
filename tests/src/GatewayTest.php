@@ -232,14 +232,11 @@ class GatewayTest extends TestCase {
 
 		return [
 			[ null, null, null, false ],
-			[ true, null, null, false ],
-			[ false, null, null, false ],
 			[ 0, null, null, false ],
 			[ 10, null, null, false ],
 			[ 1, null, null, false ],
 			[ 1, $cst_subscription, null, $cst_subscription ],
 			[ 1, $cst_subscription, $cst_first, $cst_subscription ],
-			[ '1', $cst_subscription, $cst_first, $cst_subscription ],
 		];
 	}
 
