@@ -66,4 +66,9 @@ tests_add_filter(
 	} 
 );
 
+/**
+ * Start up the WP testing environment.
+ * 
+ * @link https://github.com/wp-phpunit/example-plugin/blob/master/tests/bootstrap.php
+ */
 require getenv( 'WP_PHPUNIT__DIR' ) . '/includes/bootstrap.php';
