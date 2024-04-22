@@ -4,7 +4,6 @@
 	<file>.</file>
 
 	<exclude-pattern>assets/dist/*.asset.php</exclude-pattern>
-	<exclude-pattern>tests/bootstrap.php</exclude-pattern>
 	<exclude-pattern>tests/wp-config.php</exclude-pattern>
 
 	<rule ref="PronamicWP">
