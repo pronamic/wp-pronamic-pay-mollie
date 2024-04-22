@@ -8,6 +8,11 @@
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
 
+/**
+ * Give access to tests_add_filter() function.
+ * 
+ * @link https://github.com/wp-phpunit/example-plugin/blob/master/tests/bootstrap.php
+ */
 require_once getenv( 'WP_PHPUNIT__DIR' ) . '/includes/functions.php';
 
 /**
@@ -25,12 +30,14 @@ if ( defined( 'PSALM_VERSION' ) ) {
  * @link https://github.com/WordPress/wordpress-playground/blob/23c0fc6aae5d090a14d352160c34d39988167406/packages/playground/wordpress/build/Dockerfile#L25-L42
  */
 if ( ! is_dir( __DIR__ . '/../wordpress/wp-content/' ) ) {
+	// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.directory_mkdir
 	mkdir( __DIR__ . '/../wordpress/wp-content/' );
 }
 
 $db_dropin_file = __DIR__ . '/../wordpress/wp-content/db.php';
 
 if ( ! is_file( $db_dropin_file ) ) {
+	// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_file_put_contents
 	file_put_contents(
 		$db_dropin_file,
 		str_replace(
