@@ -7,23 +7,27 @@
 
 ### `pronamic_pay_webhook_log_payment`
 
+*REST API Mollie payment webhook handler.*
+
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
 `$payment` |  | 
 
-Source: [src/WebhookController.php](../src/WebhookController.php), [line 202](../src/WebhookController.php#L202-L202)
+Source: [src/WebhookController.php](../src/WebhookController.php), [line 150](../src/WebhookController.php#L150-L202)
 
 ### `pronamic_pay_webhook_log_payment`
 
+*REST API Mollie order webhook handler.*
+
 **Arguments**
 
 Argument | Type | Description
 -------- | ---- | -----------
 `$payment` |  | 
 
-Source: [src/WebhookController.php](../src/WebhookController.php), [line 262](../src/WebhookController.php#L262-L262)
+Source: [src/WebhookController.php](../src/WebhookController.php), [line 210](../src/WebhookController.php#L210-L262)
 
 ## Filters
 
