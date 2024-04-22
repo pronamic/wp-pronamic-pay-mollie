@@ -25,8 +25,4 @@
 		<exclude name="WordPressVIPMinimum.Performance.NoPaging.nopaging_nopaging" />
 		<exclude name="WordPressVIPMinimum.Variables.RestrictedVariables.user_meta__wpdb__users" />
 	</rule>
-
-	<rule ref="WordPress.DB.SlowDBQuery.slow_db_query_meta_key">
-		<exclude-pattern>src/Integration.php</exclude-pattern>
-	</rule>
 </ruleset>
