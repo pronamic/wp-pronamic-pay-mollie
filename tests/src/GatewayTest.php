@@ -234,9 +234,9 @@ class GatewayTest extends TestCase {
 			[ null, null, null, false ],
 			[ 0, null, null, false ],
 			[ 10, null, null, false ],
-			[ 1, null, null, false ],
-			[ 1, $cst_subscription, null, $cst_subscription ],
-			[ 1, $cst_subscription, $cst_first, $cst_subscription ],
+			[ 20, null, null, false ],
+			[ 21, $cst_subscription, null, $cst_subscription ],
+			[ 22, $cst_subscription, $cst_first, $cst_subscription ],
 		];
 	}
 
