@@ -46,6 +46,13 @@ class GatewayTest extends TestCase {
 	private $config_id = 1;
 
 	/**
+	 * HTTP factory.
+	 * 
+	 * @var Factory
+	 */
+	private $factory;
+
+	/**
 	 * Setup gateway test.
 	 */
 	public function set_up() {
@@ -64,8 +71,7 @@ class GatewayTest extends TestCase {
 
 		$this->set_gateway(
 			[
-				'id'   => $this->config_id,
-				'mode' => Gateway::MODE_TEST,
+				'id' => $this->config_id,
 			]
 		);
 	}
@@ -252,14 +258,14 @@ class GatewayTest extends TestCase {
 		if ( $this->config_id !== $config_id ) {
 			$this->set_gateway(
 				[
-					'id'   => $config_id,
-					'mode' => Gateway::MODE_TEST,
+					'id' => $config_id,
 				]
 			);
 		}
 
 		// New payment.
-		$payment            = new Payment();
+		$payment = new Payment();
+
 		$payment->config_id = 1;
 
 		$customer = new Customer();
