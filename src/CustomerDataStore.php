@@ -219,23 +219,28 @@ class CustomerDataStore {
 			return;
 		}
 
+		$data = [
+			'customer_id' => $customer->get_id(),
+			'user_id'     => $user->ID,
+		];
+
+		$format = [
+			'customer_id' => '%d',
+			'user_id'     => '%d',
+		];
+
 		$result = $wpdb->insert(
 			$wpdb->pronamic_pay_mollie_customer_users,
-			[
-				'customer_id' => $customer->get_id(),
-				'user_id'     => $user->ID,
-			],
-			[
-				'customer_id' => '%d',
-				'user_id'     => '%d',
-			]
+			$data,
+			$format
 		);
 
 		if ( false === $result ) {
 			throw new \Exception(
 				\sprintf(
-					'Database error: %s.',
-					\esc_html( $wpdb->last_error )
+					'Database error: %s, Data: %s.',
+					\esc_html( $wpdb->last_error ),
+					\esc_html( \wp_json_encode( $data ) )
 				)
 			);
 		}
