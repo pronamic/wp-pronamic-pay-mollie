@@ -207,10 +207,21 @@ class CustomerDataStore {
 	public function connect_mollie_customer_to_wp_user( $customer, \WP_User $user ) {
 		global $wpdb;
 
+		$customer_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT id FROM $wpdb->pronamic_pay_mollie_customers WHERE mollie_id = %s;",
+				$customer->get_id()
+			)
+		);
+
+		if ( null === $customer_id ) {
+			return;
+		}
+
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT * FROM $wpdb->pronamic_pay_mollie_customer_users WHERE customer_id = %d AND user_id = %d;",
-				$customer->get_id(),
+				$customer_id,
 				$user->ID
 			)
 		);
@@ -220,7 +231,7 @@ class CustomerDataStore {
 		}
 
 		$data = [
-			'customer_id' => $customer->get_id(),
+			'customer_id' => $customer_id,
 			'user_id'     => $user->ID,
 		];
 
