@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.10.3] - 2024-05-06
+
+### Commits
+
+- Fixed mix customer ID and Mollie ID, see 5c739d2fcdc448d27e8f9246d713951a147a638c. ([e2e47fa](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/e2e47fadf1594f095e34418e87165ae665c8223f))
+- Improve exception message with insert data. ([aa1006a](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/aa1006a5de804dad8a1003fac7e24b438b080366))
+
+Full set of changes: [`4.10.2...4.10.3`][4.10.3]
+
+[4.10.3]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.10.2...v4.10.3
+
 ## [4.10.2] - 2024-04-22
 
 ### Commits
