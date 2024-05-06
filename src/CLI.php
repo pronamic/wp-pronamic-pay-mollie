@@ -295,8 +295,6 @@ class CLI {
 
 		if ( empty( $api_key ) ) {
 			\WP_CLI::error( 'This command requires an API key for authentication' );
-
-			return;
 		}
 
 		$client = new Client( $api_key );
@@ -403,14 +401,10 @@ class CLI {
 
 		if ( empty( $api_key ) ) {
 			\WP_CLI::error( 'This command requires an API key for authentication' );
-
-			return;
 		}
 
 		if ( empty( $args ) ) {
 			\WP_CLI::error( 'This command requires a transaction ID to cancel payments' );
-
-			return;
 		}
 
 		$client = new Client( $api_key );
