@@ -251,7 +251,7 @@ class CustomerDataStore {
 				\sprintf(
 					'Database error: %s, Data: %s.',
 					\esc_html( $wpdb->last_error ),
-					\esc_html( \wp_json_encode( $data ) )
+					\esc_html( (string) \wp_json_encode( $data ) )
 				)
 			);
 		}
