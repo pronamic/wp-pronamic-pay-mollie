@@ -133,7 +133,6 @@ class CLI {
 		);
 
 		if ( $query->have_posts() ) {
-			// @phpstan-ignore-next-line
 			while ( $query->have_posts() ) {
 				$query->the_post();
 
@@ -213,7 +212,6 @@ class CLI {
 				}
 			}
 
-			// @phpstan-ignore-next-line
 			\wp_reset_postdata();
 		}
 	}
