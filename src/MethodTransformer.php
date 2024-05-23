@@ -39,6 +39,7 @@ class MethodTransformer {
 		PronamicMethod::KLARNA_PAY_LATER        => MollieMethod::KLARNA_PAY_LATER,
 		PronamicMethod::KLARNA_PAY_NOW          => MollieMethod::KLARNA_PAY_NOW,
 		PronamicMethod::KLARNA_PAY_OVER_TIME    => MollieMethod::KLARNA_SLICE_IT,
+		PronamicMethod::MYBANK                  => MollieMethod::MYBANK,
 		PronamicMethod::PAYPAL                  => MollieMethod::PAYPAL,
 		PronamicMethod::PRZELEWY24              => MollieMethod::PRZELEWY24,
 		PronamicMethod::SOFORT                  => MollieMethod::SOFORT,
