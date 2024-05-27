@@ -7,6 +7,30 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.11.0] - 2024-05-27
+
+### Commits
+
+- Updated composer.json ([cb4f3a8](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/cb4f3a85809153c6154514333e504efa253e448b))
+- Updated composer.json ([408efb0](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/408efb034b80758909f64131f972378da13dfed4))
+- npm run build ([6056a1c](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/6056a1c329df46e324515f6ac8e76c9511206514))
+- ncu -u ([437f62c](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/437f62ca0e6cfa7ce624096a6ff4a992833eca48))
+- Added MyBank. ([9c49ce6](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/9c49ce6cbc667e90fdc1c85f39045e5bb0a18758))
+- Added BLIK to payment method transformer. ([b0efe96](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/b0efe96d99a067557a59304508c33c427ef7252d))
+
+### Composer
+
+- Changed `pronamic/wp-mollie` from `^1.5` to `v1.6.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v1.6.0
+- Changed `woocommerce/action-scheduler` from `^3.7` to `3.8.0`.
+	Release notes: https://github.com/woocommerce/action-scheduler/releases/tag/3.8.0
+- Changed `wp-pay/core` from `^4.16` to `v4.18.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.18.0
+
+Full set of changes: [`4.10.3...4.11.0`][4.11.0]
+
+[4.11.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.10.3...v4.11.0
+
 ## [4.10.3] - 2024-05-06
 
 ### Commits
