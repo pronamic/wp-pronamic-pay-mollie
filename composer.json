@@ -63,9 +63,9 @@
 		"automattic/jetpack-autoloader": "^3.0",
 		"justinrainbow/json-schema": "^5.2",
 		"pronamic/wp-http": "^1.2",
-		"pronamic/wp-mollie": "^1.5",
-		"woocommerce/action-scheduler": "^3.7",
-		"wp-pay/core": "^4.16"
+		"pronamic/wp-mollie": "^1.6",
+		"woocommerce/action-scheduler": "^3.8",
+		"wp-pay/core": "^4.18"
 	},
 	"require-dev": {
 		"overtrue/phplint": "^9.0",
