@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.12.0] - 2024-06-07
+
+### Fixed
+
+- Improve the handling of Mollie mandate requests on the mandate detail page. ([9f23324](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/9f23324daa61972c400c9b2604e6d4c1e6e08e69))
+
+Full set of changes: [`4.11.0...4.12.0`][4.12.0]
+
+[4.12.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.11.0...v4.12.0
+
 ## [4.11.0] - 2024-05-27
 
 ### Commits
