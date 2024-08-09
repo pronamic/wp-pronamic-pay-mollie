@@ -3,7 +3,7 @@
  * Page customer
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2023 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
@@ -459,7 +459,7 @@ $users = $wpdb->get_results(
 				</tr>
 			</thead>
 
-			<tbody>	
+			<tbody>
 
 				<?php foreach ( $users as $user ) : ?>
 

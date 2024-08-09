@@ -3,7 +3,7 @@
  * Scripts controller
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2022 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Mollie
  */
@@ -36,7 +36,7 @@ class ScriptsController {
 
 	/**
 	 * Setup.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function setup() {
@@ -51,14 +51,14 @@ class ScriptsController {
 
 	/**
 	 * Enqueue scripts.
-	 * 
+	 *
 	 * @link https://developer.wordpress.org/reference/hooks/wp_enqueue_scripts/
 	 * @return void
 	 */
 	public function enqueue_scripts() {
 		/**
 		 * Mollie.js.
-		 * 
+		 *
 		 * @link https://docs.mollie.com/reference/mollie-js/overview
 		 */
 		\wp_register_script(
@@ -72,7 +72,7 @@ class ScriptsController {
 
 		/**
 		 * Card field style.
-		 * 
+		 *
 		 * @link https://github.com/mollie/components-examples
 		 */
 		$file = '../assets/dist/card-field.css';
@@ -104,14 +104,14 @@ class ScriptsController {
 
 	/**
 	 * Print scripts.
-	 * 
+	 *
 	 * @link https://developer.wordpress.org/reference/functions/wp_print_scripts/
 	 * @return void
 	 */
 	public function print_scripts() {
 		/**
 		 * WooCommerce legacy checkout.
-		 * 
+		 *
 		 * @link https://github.com/woocommerce/woocommerce/blob/8.3.0/plugins/woocommerce/includes/class-wc-frontend-scripts.php#L392-L394
 		 * @link https://github.com/woocommerce/woocommerce/blob/8.3.0/plugins/woocommerce/client/legacy/js/frontend/checkout.js
 		 */
