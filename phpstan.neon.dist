@@ -1,5 +1,4 @@
 parameters:
-	checkGenericClassInNonGenericObjectType: false
 	customRulesetUsed: false
 	level: 8
 	paths:
@@ -7,3 +6,6 @@ parameters:
 	scanDirectories:
 		- vendor/wp-cli
 		- vendor/woocommerce/action-scheduler
+	ignoreErrors:
+		-
+			identifier: missingType.generics
