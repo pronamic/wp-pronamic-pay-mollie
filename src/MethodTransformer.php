@@ -36,6 +36,7 @@ class MethodTransformer {
 		PronamicMethod::DIRECT_DEBIT_SOFORT     => MollieMethod::DIRECT_DEBIT,
 		PronamicMethod::EPS                     => MollieMethod::EPS,
 		PronamicMethod::GIROPAY                 => MollieMethod::GIROPAY,
+		PronamicMethod::KLARNA                  => MollieMethod::KLARNA,
 		PronamicMethod::KLARNA_PAY_LATER        => MollieMethod::KLARNA_PAY_LATER,
 		PronamicMethod::KLARNA_PAY_NOW          => MollieMethod::KLARNA_PAY_NOW,
 		PronamicMethod::KLARNA_PAY_OVER_TIME    => MollieMethod::KLARNA_SLICE_IT,
