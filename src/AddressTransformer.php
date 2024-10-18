@@ -63,12 +63,18 @@ class AddressTransformer {
 
 		$mollie_address = new MollieAddress( $given_name, $family_name, $email, $street_and_number, $city, $country );
 
-		$phone_util = PhoneNumberUtil::getInstance();
+		$phone = $address->get_phone();
 
-		$phone_number_object = $phone_util->parse( $address->get_phone(), $country );
+		if ( null !== $phone ) {
+			$phone_util = PhoneNumberUtil::getInstance();
+
+			$phone_number_object = $phone_util->parse( $phone, $country );
+
+			$phone = $phone_util->format( $phone_number_object, PhoneNumberFormat::E164 );
+		}
 
 		$mollie_address->organization_name = $address->get_company_name();
-		$mollie_address->phone             = $phone_util->format( $phone_number_object, PhoneNumberFormat::E164 );
+		$mollie_address->phone             = $phone;
 		$mollie_address->street_additional = $address->get_line_2();
 		$mollie_address->postal_code       = $address->get_postal_code();
 		$mollie_address->region            = $address->get_region();
