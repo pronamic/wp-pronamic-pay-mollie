@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 use InvalidArgumentException;
 use Pronamic\WordPress\Mollie\Address as MollieAddress;
 use Pronamic\WordPress\Pay\Address as WordPressAddress;
@@ -61,8 +63,12 @@ class AddressTransformer {
 
 		$mollie_address = new MollieAddress( $given_name, $family_name, $email, $street_and_number, $city, $country );
 
+		$phone_util = PhoneNumberUtil::getInstance();
+
+		$phone_number_object = $phone_util->parse( $address->get_phone(), $country );
+
 		$mollie_address->organization_name = $address->get_company_name();
-		$mollie_address->phone             = $address->get_phone();
+		$mollie_address->phone             = $phone_util->format( $phone_number_object, PhoneNumberFormat::E164 );
 		$mollie_address->street_additional = $address->get_line_2();
 		$mollie_address->postal_code       = $address->get_postal_code();
 		$mollie_address->region            = $address->get_region();
