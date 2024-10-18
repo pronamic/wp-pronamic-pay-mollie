@@ -57,7 +57,9 @@ class AddressTransformerTest extends TestCase {
 	public function transform_provider() {
 		return [
 			[ '1234567890', '+311234567890' ],
+			[ '12 34 56 78 90', '+311234567890' ],
 			[ '+321234567890', '+321234567890' ],
+			[ '+491234567890', '+491234567890' ],
 		];
 	}
 }
