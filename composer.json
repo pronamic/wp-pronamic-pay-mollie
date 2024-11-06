@@ -61,7 +61,7 @@
 		"php": ">=8.1",
 		"ext-json": "*",
 		"automattic/jetpack-autoloader": "^3.0",
-		"giggsey/libphonenumber-for-php": "^8.13",
+		"giggsey/libphonenumber-for-php-lite": "^8.13",
 		"justinrainbow/json-schema": "^5.2",
 		"pronamic/wp-http": "^1.2",
 		"pronamic/wp-mollie": "^1.7",
