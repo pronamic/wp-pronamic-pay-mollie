@@ -4,7 +4,7 @@
  * Plugin URI: https://www.pronamic.eu/plugins/pronamic-pay-mollie/
  * Description: Extend the Pronamic Pay plugin with the Mollie gateway to receive payments through a variety of WordPress plugins.
  *
- * Version: 4.12.0
+ * Version: 4.13.0
  * Requires at least: 5.9
  * Requires PHP: 7.4
  *

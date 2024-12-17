@@ -7,6 +7,27 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.13.0] - 2024-12-17
+
+### Commits
+
+- Format phone number in E164 format. ([170252d](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/170252dbfb0412cb63eaa84f2a2eaff15c624507))
+- Added Klarna payment method for https://github.com/pronamic/wp-pronamic-pay-mollie/issues/57. ([5249c39](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5249c39a73272ffe9fe48ede7994777c8efd3586))
+- Happy 2024. ([387a9fe](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/387a9fef5204753d75cd3f10d18b70ab09db799a))
+
+### Composer
+
+- Added `giggsey/libphonenumber-for-php-lite` `^8.13`.
+- Changed `php` from `>=8.0` to `>=8.1`.
+- Changed `pronamic/wp-mollie` from `^1.6` to `v1.7.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v1.7.0
+- Changed `wp-pay/core` from `^4.18` to `v4.24.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.24.0
+
+Full set of changes: [`4.12.0...4.13.0`][4.13.0]
+
+[4.13.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.12.0...v4.13.0
+
 ## [4.12.0] - 2024-06-07
 
 ### Fixed
