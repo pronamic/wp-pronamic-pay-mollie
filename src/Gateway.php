@@ -21,10 +21,6 @@ use Pronamic\WordPress\Pay\Core\Gateway as Core_Gateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethod;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Core\PaymentMethodsCollection;
-use Pronamic\WordPress\Pay\Fields\CachedCallbackOptions;
-use Pronamic\WordPress\Pay\Fields\IDealIssuerSelectField;
-use Pronamic\WordPress\Pay\Fields\SelectFieldOption;
-use Pronamic\WordPress\Pay\Fields\SelectFieldOptionGroup;
 use Pronamic\WordPress\Pay\Fields\TextField;
 use Pronamic\WordPress\Pay\Payments\FailureReason;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -110,13 +106,6 @@ class Gateway extends Core_Gateway {
 		add_action( 'pronamic_payment_status_update', [ $this, 'copy_customer_id_to_wp_user' ], 99, 1 );
 
 		// Fields.
-		$ideal_options = new CachedCallbackOptions(
-			function () {
-				return $this->get_ideal_issuers();
-			},
-			'pronamic_pay_ideal_issuers_' . \md5( (string) \wp_json_encode( $config ) )
-		);
-
 		$field_consumer_name = new TextField( 'pronamic_pay_consumer_bank_details_name' );
 		$field_consumer_name->set_label( __( 'Account holder name', 'pronamic_ideal' ) );
 		$field_consumer_name->set_required( true );
@@ -186,11 +175,6 @@ class Gateway extends Core_Gateway {
 		$payment_method_direct_debit_ideal = new PaymentMethod( PaymentMethods::DIRECT_DEBIT_IDEAL );
 		$payment_method_direct_debit_ideal->add_support( 'recurring' );
 
-		$field_ideal_issuer = new IDealIssuerSelectField( 'pronamic_pay_mollie_direct_debit_ideal_issuer' );
-		$field_ideal_issuer->set_options( $ideal_options );
-
-		$payment_method_direct_debit_ideal->add_field( $field_ideal_issuer );
-
 		$this->register_payment_method( $payment_method_direct_debit_ideal );
 
 		// Payment method direct debit and SOFORT.
@@ -214,11 +198,6 @@ class Gateway extends Core_Gateway {
 		// Payment method iDEAL.
 		$payment_method_ideal = new PaymentMethod( PaymentMethods::IDEAL );
 		$payment_method_ideal->add_support( 'recurring' );
-
-		$field_ideal_issuer = new IDealIssuerSelectField( 'pronamic_pay_mollie_ideal_issuer' );
-		$field_ideal_issuer->set_options( $ideal_options );
-
-		$payment_method_ideal->add_field( $field_ideal_issuer );
 
 		$this->register_payment_method( $payment_method_ideal );
 
@@ -376,23 +355,6 @@ class Gateway extends Core_Gateway {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Get iDEAL issuers.
-	 *
-	 * @return iterable<SelectFieldOption|SelectFieldOptionGroup>
-	 */
-	private function get_ideal_issuers() {
-		$issuers = $this->client->get_issuers();
-
-		$items = [];
-
-		foreach ( $issuers as $key => $value ) {
-			$items[] = new SelectFieldOption( $key, $value );
-		}
-
-		return $items;
 	}
 
 	/**
@@ -745,11 +707,6 @@ class Gateway extends Core_Gateway {
 		$metadata = \apply_filters( 'pronamic_pay_mollie_payment_metadata', $metadata, $payment );
 
 		$request->set_metadata( $metadata );
-
-		// Issuer.
-		if ( Methods::IDEAL === $request->method ) {
-			$request->issuer = $payment->get_meta( 'issuer' );
-		}
 
 		// Card token.
 		if ( Methods::CREDITCARD === $request->method ) {
