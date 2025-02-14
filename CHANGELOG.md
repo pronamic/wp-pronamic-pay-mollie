@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.14.0] - 2025-02-14
+
+### Commits
+
+- Removed iDEAL issuers support for iDEAL 2.0 migration. ([eebbad1](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/eebbad1ba21ec7d55862d40925efc1e1ea7035ef))
+
+Full set of changes: [`4.13.0...4.14.0`][4.14.0]
+
+[4.14.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.13.0...v4.14.0
+
 ## [4.13.0] - 2024-12-17
 
 ### Commits
