@@ -1554,22 +1554,14 @@ class Gateway extends Core_Gateway {
 	 * @throws \Exception Throws exception if subscription note could not be added.
 	 */
 	public function update_subscription_mandate( Subscription $subscription, $mandate_id, $payment_method = null ) {
-		$customer_id = (string) $subscription->get_meta( 'mollie_customer_id' );
-
-		$mandate = $this->client->get_mandate( $mandate_id, $customer_id );
-
-		if ( ! \is_object( $mandate ) ) {
-			return;
-		}
-
 		// Update mandate.
-		$old_mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
+		$old_mandate_id = (string) $subscription->get_meta( 'mollie_mandate_id' );
 
 		$subscription->set_meta( 'mollie_mandate_id', $mandate_id );
 
 		if ( ! empty( $old_mandate_id ) && $old_mandate_id !== $mandate_id ) {
 			$note = \sprintf(
-			/* translators: 1: old mandate ID, 2: new mandate ID */
+				/* translators: 1: old mandate ID, 2: new mandate ID */
 				\__( 'Mandate for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
 				\esc_html( $old_mandate_id ),
 				\esc_html( $mandate_id )
@@ -1578,36 +1570,53 @@ class Gateway extends Core_Gateway {
 			$subscription->add_note( $note );
 		}
 
-		// Update payment method.
-		$method_transformer = new MethodTransformer();
+		/*
+		 * Update payment method.
+		 *
+		 * A mandate might not be available immediately after starting a payment. Therefore,
+		 * we catch exceptions and rely on the payment method being updated during a later payment status update.
+		 *
+		 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/64
+		 */
+		try {
+			$customer_id = (string) $subscription->get_meta( 'mollie_customer_id' );
 
-		$old_method = $subscription->get_payment_method();
-		$new_method = $payment_method;
+			$mandate = $this->client->get_mandate( $mandate_id, $customer_id );
 
-		if ( null === $payment_method && \property_exists( $mandate, 'method' ) ) {
-			$pronamic_methods = $method_transformer->from_mollie_to_pronamic( $mandate->method );
+			if ( \is_object( $mandate ) ) {
+				$method_transformer = new MethodTransformer();
 
-			$new_method = in_array( $old_method, $pronamic_methods, true ) ? $old_method : null;
+				$old_method = $subscription->get_payment_method();
+				$new_method = $payment_method;
 
-			$first_pronamic_method = reset( $pronamic_methods );
+				if ( null === $payment_method && \property_exists( $mandate, 'method' ) ) {
+					$pronamic_methods = $method_transformer->from_mollie_to_pronamic( $mandate->method );
 
-			if ( null === $new_method && false !== $first_pronamic_method ) {
-				$new_method = $first_pronamic_method;
+					$new_method = in_array( $old_method, $pronamic_methods, true ) ? $old_method : null;
+
+					$first_pronamic_method = reset( $pronamic_methods );
+
+					if ( null === $new_method && false !== $first_pronamic_method ) {
+						$new_method = $first_pronamic_method;
+					}
+				}
+
+				if ( ! empty( $old_method ) && $old_method !== $new_method ) {
+					$subscription->set_payment_method( $new_method );
+
+					// Add note.
+					$note = \sprintf(
+						/* translators: 1: old payment method, 2: new payment method */
+						\__( 'Payment method for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
+						\esc_html( (string) PaymentMethods::get_name( $old_method ) ),
+						\esc_html( (string) PaymentMethods::get_name( $new_method ) )
+					);
+
+					$subscription->add_note( $note );
+				}
 			}
-		}
-
-		if ( ! empty( $old_method ) && $old_method !== $new_method ) {
-			$subscription->set_payment_method( $new_method );
-
-			// Add note.
-			$note = \sprintf(
-				/* translators: 1: old payment method, 2: new payment method */
-				\__( 'Payment method for subscription changed from "%1$s" to "%2$s".', 'pronamic_ideal' ),
-				\esc_html( (string) PaymentMethods::get_name( $old_method ) ),
-				\esc_html( (string) PaymentMethods::get_name( $new_method ) )
-			);
-
-			$subscription->add_note( $note );
+		} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Nothing to do.
 		}
 
 		$subscription->save();
