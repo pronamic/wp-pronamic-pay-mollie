@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.14.1] - 2025-02-25
+
+### Changed
+
+- Improved error handling when updating subscription mandate. ([8f03de5](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/8f03de511ccf3ebb0223919dd7fcf6185e4e9c3c))
+
+Full set of changes: [`4.14.0...4.14.1`][4.14.1]
+
+[4.14.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.14.0...v4.14.1
+
 ## [4.14.0] - 2025-02-14
 
 ### Commits
