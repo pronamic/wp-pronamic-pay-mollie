@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.14.3] - 2025-03-14
+
+### Removed
+
+- Removed inline CSS on WordPress admin user profile page for Mollie customers table.
+
+Full set of changes: [`4.14.2...4.14.3`][4.14.3]
+
+[4.14.3]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.14.2...v4.14.3
+
 ## [4.14.2] - 2025-03-14
 
 ### Commits
