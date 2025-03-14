@@ -36,86 +36,70 @@ if ( empty( $customers ) ) {
 ?>
 <h2><?php esc_html_e( 'Mollie', 'pronamic_ideal' ); ?></h2>
 
-<style type="text/css">
-	.form-table .pronamic-pay-mollie-customers-table th,
-	.form-table .pronamic-pay-mollie-customers-table td {
-		padding: 8px 10px;
-	}
-</style>
+<h3><?php echo esc_html( _x( 'Customers', 'mollie', 'pronamic_ideal' ) ); ?></h3>
 
-<table class="form-table" id="fieldset-billing">
-	<tbody>
+<table class="widefat striped">
+	<thead>
 		<tr>
-			<th>
-				<?php echo esc_html( _x( 'Customers', 'mollie', 'pronamic_ideal' ) ); ?>
-			</th>
-			<td>
-				<table class="widefat striped pronamic-pay-mollie-customers-table">
-					<thead>
-						<tr>
-							<th scope="col"><?php \esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
-							<th scope="col"><?php \esc_html_e( 'Test', 'pronamic_ideal' ); ?></th>
-							<th scope="col"><?php \esc_html_e( 'Name', 'pronamic_ideal' ); ?></th>
-							<th scope="col"><?php \esc_html_e( 'Email', 'pronamic_ideal' ); ?></th>
-						</tr>
-					</thead>
+			<th scope="col"><?php \esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
+			<th scope="col"><?php \esc_html_e( 'Test', 'pronamic_ideal' ); ?></th>
+			<th scope="col"><?php \esc_html_e( 'Name', 'pronamic_ideal' ); ?></th>
+			<th scope="col"><?php \esc_html_e( 'Email', 'pronamic_ideal' ); ?></th>
+		</tr>
+	</thead>
 
-					<tbody>
+	<tbody>
 
-						<?php foreach ( $customers as $customer ) : ?>
+		<?php foreach ( $customers as $customer ) : ?>
 
-							<tr>
-								<td>
-									<?php
-
-									$url = \add_query_arg(
-										[
-											'page' => 'pronamic_pay_mollie_customers',
-											'id'   => $customer->mollie_id,
-										],
-										\admin_url( 'admin.php' )
-									);
-
-									\printf(
-										'<a href="%s"><code>%s</code></a>',
-										\esc_url( $url ),
-										\esc_html( $customer->mollie_id )
-									);
-
-									?>
-								</td>
-								<td>
-									<?php $customer->test_mode ? \esc_html_e( 'Yes', 'pronamic_ideal' ) : \esc_html_e( 'No', 'pronamic_ideal' ); ?>
-								</td>
-								<td>
-									<?php echo empty( $customer->name ) ? '—' : \esc_html( $customer->name ); ?>
-								</td>
-								<td>
-									<?php
-
-									echo empty( $customer->email ) ? esc_html( '—' ) : \sprintf(
-										'<a href="%s">%s</a>',
-										esc_attr( 'mailto:' . $customer->email ),
-										esc_html( $customer->email )
-									);
-
-									?>
-								</td>
-							</tr>
-
-						<?php endforeach; ?>
-
-					</tbody>
-				</table>
-
-				<p class="description">
+			<tr>
+				<td>
 					<?php
 
-					esc_html_e( 'Mollie offers the possibility to register payers as a customer within the Mollie payment platform. This functionality remembers payment preferences to make future payments easier. The Mollie customers can be linked to WordPress users. This is a list of Mollie customers associated with this WordPress user. For subscriptions, a Mollie customer mandate can be used for recurring payments.', 'pronamic_ideal' );
+					$url = \add_query_arg(
+						[
+							'page' => 'pronamic_pay_mollie_customers',
+							'id'   => $customer->mollie_id,
+						],
+						\admin_url( 'admin.php' )
+					);
+
+					\printf(
+						'<a href="%s"><code>%s</code></a>',
+						\esc_url( $url ),
+						\esc_html( $customer->mollie_id )
+					);
 
 					?>
-				</p>
-			</td>
-		</tr>
+				</td>
+				<td>
+					<?php $customer->test_mode ? \esc_html_e( 'Yes', 'pronamic_ideal' ) : \esc_html_e( 'No', 'pronamic_ideal' ); ?>
+				</td>
+				<td>
+					<?php echo empty( $customer->name ) ? '—' : \esc_html( $customer->name ); ?>
+				</td>
+				<td>
+					<?php
+
+					echo empty( $customer->email ) ? esc_html( '—' ) : \sprintf(
+						'<a href="%s">%s</a>',
+						esc_attr( 'mailto:' . $customer->email ),
+						esc_html( $customer->email )
+					);
+
+					?>
+				</td>
+			</tr>
+
+		<?php endforeach; ?>
+
 	</tbody>
 </table>
+
+<p class="description">
+	<?php
+
+	esc_html_e( 'Mollie offers the possibility to register payers as a customer within the Mollie payment platform. This functionality remembers payment preferences to make future payments easier. The Mollie customers can be linked to WordPress users. This is a list of Mollie customers associated with this WordPress user. For subscriptions, a Mollie customer mandate can be used for recurring payments.', 'pronamic_ideal' );
+
+	?>
+</p>
