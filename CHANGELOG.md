@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.14.2] - 2025-03-14
+
+### Commits
+
+- Fixed text domain `pronamic-pay-mollie`, see https://github.com/pronamic/pronamic-pay-doneren-met-mollie/issues/8 ([09729e2](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/09729e20bd6bacbe1d3ebfdbdf8a5e435086815d))
+
+Full set of changes: [`4.14.1...4.14.2`][4.14.2]
+
+[4.14.2]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.14.1...v4.14.2
+
 ## [4.14.1] - 2025-02-25
 
 ### Changed
