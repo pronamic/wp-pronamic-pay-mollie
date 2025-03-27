@@ -5,7 +5,7 @@
  * Description: Extend the Pronamic Pay plugin with the Mollie gateway to receive payments through a variety of WordPress plugins.
  *
  * Version: 4.14.3
- * Requires at least: 5.9
+ * Requires at least: 6.6
  * Requires PHP: 7.4
  *
  * Author: Pronamic
