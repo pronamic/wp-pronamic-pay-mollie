@@ -7,6 +7,22 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.14.4] - 2025-03-27
+
+### Commits
+
+- For Jetpack Autoloader version 5 is WordPress 6.6 or higher required ([c437860](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/c4378604f106bfe51d785d2e7ac9b3f2104e9e34))
+- Allow Jetpack Autoloader version 4 and 5, see pronamic/pronamic-pay-doneren-met-mollie#11. ([0c0b93d](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/0c0b93d89a826e05de42ef6cbb70eb0c4cbef478))
+
+### Composer
+
+- Changed `automattic/jetpack-autoloader` from `^3.0` to `v5.0.5`.
+	Release notes: https://github.com/Automattic/jetpack-autoloader/releases/tag/v5.0.5
+
+Full set of changes: [`4.14.3...4.14.4`][4.14.4]
+
+[4.14.4]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.14.3...v4.14.4
+
 ## [4.14.3] - 2025-03-14
 
 ### Removed
