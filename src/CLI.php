@@ -40,7 +40,7 @@ class CLI {
 	public function __construct() {
 		\WP_CLI::add_command(
 			'pronamic-pay mollie organizations synchronize',
-			function () {
+			function (): void {
 				$this->wp_cli_organizations_synchronize();
 			},
 			[
@@ -50,7 +50,7 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie customers synchronize',
-			function () {
+			function (): void {
 				$this->wp_cli_customers_synchronize();
 			},
 			[
@@ -60,7 +60,7 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie customers connect-wp-users',
-			function () {
+			function (): void {
 				$this->wp_cli_customers_connect_wp_users();
 			},
 			[
@@ -70,7 +70,7 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie payments list',
-			function ( $args, $assoc_args ) {
+			function ( $args, $assoc_args ): void {
 				$this->wp_cli_payments( $args, $assoc_args );
 			},
 			[
@@ -80,7 +80,7 @@ class CLI {
 
 		\WP_CLI::add_command(
 			'pronamic-pay mollie payments cancel',
-			function ( $args, $assoc_args ) {
+			function ( $args, $assoc_args ): void {
 				$this->wp_cli_payments_cancel( $args, $assoc_args );
 			},
 			[
