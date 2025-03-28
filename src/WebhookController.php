@@ -26,9 +26,9 @@ class WebhookController {
 	 * @return void
 	 */
 	public function setup() {
-		add_action( 'rest_api_init', [ $this, 'rest_api_init' ] );
+		\add_action( 'rest_api_init', $this->rest_api_init( ... ) );
 
-		add_action( 'wp_loaded', [ $this, 'wp_loaded' ] );
+		\add_action( 'wp_loaded', $this->wp_loaded( ... ) );
 	}
 
 	/**
@@ -40,13 +40,13 @@ class WebhookController {
 	 *
 	 * @return void
 	 */
-	public function rest_api_init() {
+	private function rest_api_init() {
 		\register_rest_route(
 			Integration::REST_ROUTE_NAMESPACE,
 			'/webhook',
 			[
 				'methods'             => 'POST',
-				'callback'            => [ $this, 'rest_api_mollie_webhook' ],
+				'callback'            => $this->rest_api_mollie_webhook( ... ),
 				'args'                => [
 					'id' => [
 						'description' => \__( 'Mollie transaction ID.', 'pronamic_ideal' ),
@@ -54,7 +54,7 @@ class WebhookController {
 						'required'    => true,
 					],
 				],
-				'permission_callback' => '__return_true',
+				'permission_callback' => fn() => true,
 			]
 		);
 
@@ -63,7 +63,7 @@ class WebhookController {
 			'/webhook/(?P<payment_id>\d+)',
 			[
 				'methods'             => 'POST',
-				'callback'            => [ $this, 'rest_api_mollie_webhook_payment' ],
+				'callback'            => $this->rest_api_mollie_webhook_payment( ... ),
 				'args'                => [
 					'payment_id' => [
 						'description' => \__( 'Payment ID.', 'pronamic_ideal' ),
@@ -76,7 +76,7 @@ class WebhookController {
 						'required'    => true,
 					],
 				],
-				'permission_callback' => '__return_true',
+				'permission_callback' => fn() => true,
 			]
 		);
 
@@ -85,7 +85,7 @@ class WebhookController {
 			'/payments/webhook/(?P<payment_id>\d+)',
 			[
 				'methods'             => 'POST',
-				'callback'            => [ $this, 'rest_api_mollie_webhook_payment' ],
+				'callback'            => $this->rest_api_mollie_webhook_payment( ... ),
 				'args'                => [
 					'payment_id' => [
 						'description' => \__( 'Payment ID.', 'pronamic_ideal' ),
@@ -98,7 +98,7 @@ class WebhookController {
 						'required'    => true,
 					],
 				],
-				'permission_callback' => '__return_true',
+				'permission_callback' => fn() => true,
 			]
 		);
 
@@ -107,7 +107,7 @@ class WebhookController {
 			'/orders/webhook/(?P<payment_id>\d+)',
 			[
 				'methods'             => 'POST',
-				'callback'            => [ $this, 'rest_api_mollie_webhook_order' ],
+				'callback'            => $this->rest_api_mollie_webhook_order( ... ),
 				'args'                => [
 					'payment_id' => [
 						'description' => \__( 'Payment ID.', 'pronamic_ideal' ),
@@ -120,7 +120,7 @@ class WebhookController {
 						'required'    => true,
 					],
 				],
-				'permission_callback' => '__return_true',
+				'permission_callback' => fn() => true,
 			]
 		);
 	}
@@ -131,7 +131,7 @@ class WebhookController {
 	 * @param WP_REST_Request $request Request.
 	 * @return object
 	 */
-	public function rest_api_mollie_webhook( WP_REST_Request $request ) {
+	private function rest_api_mollie_webhook( WP_REST_Request $request ) {
 		$id = $request->get_param( 'id' );
 
 		if ( empty( $id ) ) {
@@ -153,7 +153,7 @@ class WebhookController {
 	 * @param WP_REST_Request $request Request.
 	 * @return object
 	 */
-	public function rest_api_mollie_webhook_payment( WP_REST_Request $request ) {
+	private function rest_api_mollie_webhook_payment( WP_REST_Request $request ) {
 		$id = $request->get_param( 'id' );
 
 		/**
@@ -213,7 +213,7 @@ class WebhookController {
 	 * @param WP_REST_Request $request Request.
 	 * @return object
 	 */
-	public function rest_api_mollie_webhook_order( WP_REST_Request $request ) {
+	private function rest_api_mollie_webhook_order( WP_REST_Request $request ) {
 		$id = $request->get_param( 'id' );
 
 		/**
@@ -273,7 +273,7 @@ class WebhookController {
 	 * @link https://github.com/WordPress/WordPress/blob/5.3/wp-includes/rest-api.php#L277-L309
 	 * @return void
 	 */
-	public function wp_loaded() {
+	private function wp_loaded() {
 		if ( ! filter_has_var( INPUT_GET, 'mollie_webhook' ) ) {
 			return;
 		}
