@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.14.5] - 2025-03-28
+
+### Commits
+
+- Modernize webhook controller with help from Rector. ([9cbec5e](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/9cbec5e73b6d70abca637c001a06875a927e325a))
+
+Full set of changes: [`4.14.4...4.14.5`][4.14.5]
+
+[4.14.5]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.14.4...v4.14.5
+
 ## [4.14.4] - 2025-03-27
 
 ### Commits
