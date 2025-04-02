@@ -216,6 +216,12 @@ class Gateway extends Core_Gateway {
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_NOW ) );
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_OVER_TIME ) );
 
+		// Pay by Bank.
+		$payment_method_pay_by_bank = new PaymentMethod( PaymentMethods::PAY_BY_BANK );
+		$payment_method_pay_by_bank->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_pay_by_bank );
+
 		// PayPal.
 		$payment_method_paypal = new PaymentMethod( PaymentMethods::PAYPAL );
 		$payment_method_paypal->add_support( 'recurring' );
