@@ -23,7 +23,9 @@ class MethodTransformer {
 	 * @var array<string>
 	 */
 	private static $map = [
+		PronamicMethod::ALMA                    => MollieMethod::ALMA,
 		PronamicMethod::APPLE_PAY               => MollieMethod::APPLE_PAY,
+		PronamicMethod::BANCOMAT_PAY            => MollieMethod::BANCOMAT_PAY,
 		PronamicMethod::BANCONTACT              => MollieMethod::BANCONTACT,
 		PronamicMethod::BANK_TRANSFER           => MollieMethod::BANKTRANSFER,
 		PronamicMethod::BILLIE                  => MollieMethod::BILLIE,
@@ -35,21 +37,32 @@ class MethodTransformer {
 		PronamicMethod::DIRECT_DEBIT_IDEAL      => MollieMethod::DIRECT_DEBIT,
 		PronamicMethod::DIRECT_DEBIT_SOFORT     => MollieMethod::DIRECT_DEBIT,
 		PronamicMethod::EPS                     => MollieMethod::EPS,
+		PronamicMethod::GIFT_CARD               => MollieMethod::GIFT_CARD,
 		PronamicMethod::GIROPAY                 => MollieMethod::GIROPAY,
 		PronamicMethod::KLARNA                  => MollieMethod::KLARNA,
 		PronamicMethod::KLARNA_PAY_LATER        => MollieMethod::KLARNA_PAY_LATER,
 		PronamicMethod::KLARNA_PAY_NOW          => MollieMethod::KLARNA_PAY_NOW,
 		PronamicMethod::KLARNA_PAY_OVER_TIME    => MollieMethod::KLARNA_SLICE_IT,
+		PronamicMethod::MB_WAY                  => MollieMethod::MB_WAY,
+		PronamicMethod::MULTIBANCO              => MollieMethod::MULTIBANCO,
 		PronamicMethod::MYBANK                  => MollieMethod::MYBANK,
 		PronamicMethod::PAY_BY_BANK             => MollieMethod::PAY_BY_BANK,
+		PronamicMethod::PAYCONIQ                => MollieMethod::PAYCONIQ,
 		PronamicMethod::PAYPAL                  => MollieMethod::PAYPAL,
+		PronamicMethod::PAYSAFECARD             => MollieMethod::PAYSAFECARD,
+		PronamicMethod::POINT_OF_SALE           => MollieMethod::POINT_OF_SALE,
 		PronamicMethod::PRZELEWY24              => MollieMethod::PRZELEWY24,
+		PronamicMethod::RIVERTY                 => MollieMethod::RIVERTY,
+		PronamicMethod::SATISPAY                => MollieMethod::SATISPAY,
+		PronamicMethod::SWISH                   => MollieMethod::SWISH,
 		PronamicMethod::SOFORT                  => MollieMethod::SOFORT,
+		PronamicMethod::TRUSTLY                 => MollieMethod::TRUSTLY,
 		PronamicMethod::IDEAL                   => MollieMethod::IDEAL,
 		PronamicMethod::IN3                     => MollieMethod::IN3,
 		PronamicMethod::KBC                     => MollieMethod::KBC,
 		PronamicMethod::BELFIUS                 => MollieMethod::BELFIUS,
 		PronamicMethod::TWINT                   => MollieMethod::TWINT,
+		PronamicMethod::VOUCHERS                => MollieMethod::VOUCHERS,
 	];
 
 	/**
