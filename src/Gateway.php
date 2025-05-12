@@ -762,6 +762,61 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
+		// Adresses.
+		$address_transformer = new AddressTransformer();
+
+		/**
+		 * Billing address.
+		 *
+		 * The customer's billing address details. Mollie advises to provide these details
+		 * to improve fraud protection and conversion. Should include `email` or a valid
+		 * postal address consisting of `streetAndNumber`, `postalCode`, `city` and `country`.
+		 *
+		 * Required for payment method `in3`, `klarna`, `billie` and `riverty`.
+		 *
+		 * @link https://docs.mollie.com/reference/create-payment
+		 */
+		$billing_address = $payment->get_billing_address();
+
+		if ( null !== $billing_address ) {
+			$request->set_billing_address( $address_transformer->transform_wp_to_mollie( $billing_address ) );
+			try {
+			} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+				$address_required = \in_array(
+					$payment_method,
+					[
+						PaymentMethods::IN3,
+						PaymentMethods::KLARNA,
+						PaymentMethods::BILLIE,
+						PaymentMethods::RIVERTY,
+					],
+					true
+				);
+
+				if ( $address_required ) {
+					throw $e;
+				}
+			}
+		}
+
+		/**
+		 * Shipping address.
+		 *
+		 * The Mollie shipping address in a payment is optional. If the transformation fails,
+		 * we leave the shipping address undefined.
+		 *
+		 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
+		 */
+		$shipping_address = $payment->get_shipping_address();
+
+		if ( null !== $shipping_address ) {
+			try {
+				$request->set_shipping_address( $address_transformer->transform_wp_to_mollie( $shipping_address ) );
+			} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+				// Mollie order shipping address is optional.
+			}
+		}
+
 		// Billing email.
 		$billing_email = ( null === $customer ) ? null : $customer->get_email();
 

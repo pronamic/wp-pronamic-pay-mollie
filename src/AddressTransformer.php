@@ -34,34 +34,26 @@ class AddressTransformer {
 		$family_name       = null === $name ? null : $name->get_last_name();
 		$email             = $address->get_email();
 		$street_and_number = $address->get_line_1();
+		$postal_code       = $address->get_postal_code();
 		$city              = $address->get_city();
 		$country           = $address->get_country_code();
 
-		if ( null === $given_name ) {
-			throw new InvalidArgumentException( 'Mollie requires a given name in an address.' );
+		if (
+			null === $email
+				&&
+			\in_array( null, [ $street_and_number, $postal_code, $city, $country ], true )
+		) {
+			throw new InvalidArgumentException( 'Mollie requires an email or postal address.' );
 		}
 
-		if ( null === $family_name ) {
-			throw new InvalidArgumentException( 'Mollie requires a family name in an address.' );
-		}
-
-		if ( null === $email ) {
-			throw new InvalidArgumentException( 'Mollie requires an email in an address.' );
-		}
-
-		if ( null === $street_and_number ) {
-			throw new InvalidArgumentException( 'Mollie requires a street and number in an address.' );
-		}
-
-		if ( null === $city ) {
-			throw new InvalidArgumentException( 'Mollie requires a city in an address.' );
-		}
-
-		if ( null === $country ) {
-			throw new InvalidArgumentException( 'Mollie requires a country in an address.' );
-		}
-
-		$mollie_address = new MollieAddress( $given_name, $family_name, $email, $street_and_number, $city, $country );
+		$mollie_address = new MollieAddress(
+			(string) $given_name,
+			(string) $family_name,
+			(string) $email,
+			(string) $street_and_number,
+			(string) $city,
+			(string) $country
+		);
 
 		$phone = $address->get_phone();
 
