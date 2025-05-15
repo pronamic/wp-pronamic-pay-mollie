@@ -10,7 +10,6 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use Pronamic\WordPress\Mollie\Address as MollieAddress;
 use Pronamic\WordPress\Pay\Address as PronamicAddress;
 use Pronamic\WordPress\Pay\ContactName;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
@@ -39,6 +38,7 @@ class AddressTransformerTest extends TestCase {
 		$pronamic_address->set_email( 'john.doe@example.com' );
 		$pronamic_address->set_phone( $phone );
 		$pronamic_address->set_line_1( 'Kleine Kerkstraat 1' );
+		$pronamic_address->set_postal_code( '8911 DK' );
 		$pronamic_address->set_city( 'Leeuwarden' );
 		$pronamic_address->set_country_code( 'NL' );
 
@@ -46,7 +46,71 @@ class AddressTransformerTest extends TestCase {
 
 		$mollie_address = $transformer->transform_wp_to_mollie( $pronamic_address );
 
+		$this->assertEquals( $pronamic_address->get_name()->get_first_name(), $mollie_address->given_name );
+		$this->assertEquals( $pronamic_address->get_name()->get_last_name(), $mollie_address->family_name );
+		$this->assertEquals( $pronamic_address->get_email(), $mollie_address->email );
 		$this->assertEquals( $phone_e164, $mollie_address->phone );
+		$this->assertEquals( $pronamic_address->get_line_1(), $mollie_address->street_and_number );
+		$this->assertEquals( $pronamic_address->get_postal_code(), $mollie_address->postal_code );
+		$this->assertEquals( $pronamic_address->get_city(), $mollie_address->city );
+		$this->assertEquals( $pronamic_address->get_country_code(), $mollie_address->country );
+	}
+
+	/**
+	 * Test transform with email only.
+	 */
+	public function test_transform_email() {
+		$pronamic_address = new PronamicAddress();
+		$transformer      = new AddressTransformer();
+
+		$pronamic_address->set_email( 'john.doe@example.com' );
+
+		$mollie_address = $transformer->transform_wp_to_mollie( $pronamic_address );
+
+		$this->assertEquals( $pronamic_address->get_email(), $mollie_address->email );
+
+		$json = $mollie_address->jsonSerialize();
+
+		$this->assertObjectNotHasProperty( 'streetAndNumber', $json );
+		$this->assertObjectNotHasProperty( 'postalCode', $json );
+		$this->assertObjectNotHasProperty( 'city', $json );
+		$this->assertObjectNotHasProperty( 'country', $json );
+	}
+
+	/**
+	 * Test transform with postal address.
+	 */
+	public function test_transform_postal() {
+		$pronamic_address = new PronamicAddress();
+		$transformer      = new AddressTransformer();
+
+		$pronamic_address->set_line_1( 'Kleine Kerkstraat 1' );
+		$pronamic_address->set_postal_code( '8911 DK' );
+		$pronamic_address->set_city( 'Leeuwarden' );
+		$pronamic_address->set_country_code( 'NL' );
+
+		$mollie_address = $transformer->transform_wp_to_mollie( $pronamic_address );
+
+		$this->assertEquals( $pronamic_address->get_line_1(), $mollie_address->street_and_number );
+		$this->assertEquals( $pronamic_address->get_postal_code(), $mollie_address->postal_code );
+		$this->assertEquals( $pronamic_address->get_city(), $mollie_address->city );
+		$this->assertEquals( $pronamic_address->get_country_code(), $mollie_address->country );
+
+		$json = $mollie_address->jsonSerialize();
+
+		$this->assertObjectNotHasProperty( 'email', $json );
+	}
+
+	/**
+	 * Test transform of invalid address.
+	 */
+	public function test_invalid_transform() {
+		$pronamic_address = new PronamicAddress();
+		$transformer      = new AddressTransformer();
+
+		$this->expectException( \InvalidArgumentException::class );
+
+		$mollie_address = $transformer->transform_wp_to_mollie( $pronamic_address );
 	}
 
 	/**
