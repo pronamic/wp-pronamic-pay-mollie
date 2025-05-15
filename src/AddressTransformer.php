@@ -46,14 +46,7 @@ class AddressTransformer {
 			throw new InvalidArgumentException( 'Mollie requires an email or postal address.' );
 		}
 
-		$mollie_address = new MollieAddress(
-			(string) $given_name,
-			(string) $family_name,
-			(string) $email,
-			(string) $street_and_number,
-			(string) $city,
-			(string) $country
-		);
+		$mollie_address = new MollieAddress( $given_name, $family_name, $email, $street_and_number, $city, $country );
 
 		$phone = $address->get_phone();
 
