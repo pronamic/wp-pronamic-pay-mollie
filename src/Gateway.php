@@ -410,26 +410,8 @@ class Gateway extends Core_Gateway {
 	 * @throws \Exception Throws exception when resource to use for payment is unknown.
 	 */
 	public function get_webhook_url( Payment $payment ) {
-		$resource = $this->get_resource_for_payment( $payment );
-
-		switch ( $resource ) {
-			case ResourceType::ORDERS:
-				$path = '<namespace>/orders/webhook/<payment_id>';
-				break;
-			case ResourceType::PAYMENTS:
-				$path = '<namespace>/payments/webhook/<payment_id>';
-				break;
-			default:
-				throw new \Exception(
-					\sprintf(
-						'Unknown resource for payment: %s.',
-						\esc_html( $resource )
-					)
-				);
-		}
-
 		$path = \strtr(
-			$path,
+			'<namespace>/payments/webhook/<payment_id>',
 			[
 				'<namespace>'  => Integration::REST_ROUTE_NAMESPACE,
 				'<payment_id>' => $payment->get_id(),
@@ -467,39 +449,10 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param Payment $payment Payment.
 	 * @return void
-	 * @throws \Exception Throws exception on error creating Mollie customer for payment.
+	 * @throws \Exception Throws exception on error creating payment.
 	 * @see Core_Gateway::start()
 	 */
 	public function start( Payment $payment ) {
-		$resource = $this->get_resource_for_payment( $payment );
-
-		switch ( $resource ) {
-			case ResourceType::ORDERS:
-				$this->start_order( $payment );
-
-				break;
-			case ResourceType::PAYMENTS:
-				$this->start_payment( $payment );
-
-				break;
-			default:
-				throw new \Exception(
-					\sprintf(
-						'Unknown resource for payment: %s.',
-						\esc_html( $resource )
-					)
-				);
-		}
-	}
-
-	/**
-	 * Start Mollie payment for payment.
-	 *
-	 * @param Payment $payment Payment.
-	 * @return void
-	 * @throws Error Throws Mollie error when something goes wrong.
-	 */
-	private function start_payment( Payment $payment ) {
 		$request = $this->get_payment_request( $payment );
 
 		// Create payment.
@@ -555,32 +508,6 @@ class Gateway extends Core_Gateway {
 		}
 
 		$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
-	}
-
-	/**
-	 * Start Mollie order for payment.
-	 *
-	 * @param Payment $payment Payment.
-	 * @return void
-	 */
-	private function start_order( Payment $payment ) {
-		$request = $this->get_order_request( $payment );
-
-		$mollie_order = $this->client->create_order( $request );
-
-		$payment->set_meta( 'mollie_order_id', $mollie_order->get_id() );
-
-		$order_payments = $mollie_order->get_payments();
-
-		if ( null !== $order_payments ) {
-			$mollie_payment = reset( $order_payments );
-
-			if ( $mollie_payment instanceof MolliePayment ) {
-				$this->update_payment_from_mollie_payment( $payment, $mollie_payment );
-			}
-		}
-
-		$this->update_payment_from_mollie_order( $payment, $mollie_order );
 	}
 
 	/**
@@ -817,20 +744,20 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		// Billing email.
-		$billing_email = ( null === $customer ) ? null : $customer->get_email();
-
 		/**
-		 * Filters the Mollie payment billing email used for bank transfer payment instructions.
+		 * Lines.
 		 *
-		 * @param string|null $billing_email Billing email.
-		 * @param Payment     $payment       Payment.
-		 * @since 2.2.0
+		 * Optionally provide the order lines for the payment. Each line contains
+		 * details such as a description of the item ordered and its price.
+		 *
+		 * Required for payment methods `billie`, `in3`, `klarna`, `riverty` and `voucher`.
 		 */
-		$billing_email = \apply_filters( 'pronamic_pay_mollie_payment_billing_email', $billing_email, $payment );
+		$lines = $payment->get_lines();
 
-		if ( ! empty( $billing_email ) ) {
-			$request->set_billing_email( $billing_email );
+		if ( null !== $lines ) {
+			$lines_transformer = new LinesTransformer();
+
+			$request->set_lines( $lines_transformer->transform_wp_to_mollie( $lines ) );
 		}
 
 		// Due date.
@@ -964,141 +891,6 @@ class Gateway extends Core_Gateway {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Get Mollie order request.
-	 *
-	 * @param Payment $payment Payment.
-	 * @return OrderRequest
-	 * @throws InvalidArgumentException Throws an invalid argument exception when the payment does not meet the Mollie requirements for an order.
-	 */
-	private function get_order_request( Payment $payment ) {
-		$payment_request = $this->get_payment_request( $payment );
-
-		$lines = $payment->get_lines();
-
-		if ( null === $lines ) {
-			throw new InvalidArgumentException( 'Mollie requires lines for order.' );
-		}
-
-		$order_number = $payment->get_source_id();
-
-		if ( null === $order_number ) {
-			throw new InvalidArgumentException( 'Mollie requires order number for order.' );
-		}
-
-		if ( null === $payment_request->locale ) {
-			throw new InvalidArgumentException( 'Mollie requires locale for order.' );
-		}
-
-		$lines_transformer = new LinesTransformer();
-
-		$order_request = new OrderRequest(
-			$payment_request->amount,
-			(string) $order_number,
-			$lines_transformer->transform_wp_to_mollie( $lines ),
-			$payment_request->locale
-		);
-
-		$order_request->redirect_url = $payment->get_return_url();
-		$order_request->webhook_url  = $this->get_webhook_url( $payment );
-		$order_request->method       = $payment_request->method;
-
-		// Adresses.
-		$address_transformer = new AddressTransformer();
-
-		// Billing address.
-		$billing_address = $payment->get_billing_address();
-
-		$order_request->set_billing_address( null === $billing_address ? null : $address_transformer->transform_wp_to_mollie( $billing_address ) );
-
-		/**
-		 * Shipping address.
-		 *
-		 * The Mollie shipping address in an order is optional.
-		 * If the transformers fails to transform we leave the
-		 * shipping address undefined.
-		 *
-		 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
-		 */
-		$shipping_address = $payment->get_shipping_address();
-
-		if ( null !== $shipping_address ) {
-			try {
-				$order_request->set_shipping_address( $address_transformer->transform_wp_to_mollie( $shipping_address ) );
-			} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-				// Mollie order shipping address is optional.
-			}
-		}
-
-		// Consumer date of birth.
-		$customer = $payment->get_customer();
-
-		$consumer_date_of_birth = null === $customer ? null : $customer->get_birth_date();
-
-		$order_request->set_consumer_date_of_birth( $consumer_date_of_birth );
-
-		// Payment.
-		$order_request->payment = \array_filter(
-			[
-				'issuer'       => $payment_request->issuer,
-				'customerId'   => $payment_request->customer_id,
-				'mandateId'    => $payment_request->mandate_id,
-				'sequenceType' => $payment_request->sequence_type,
-				'webhookUrl'   => $payment_request->webhook_url,
-			]
-		);
-
-		return $order_request;
-	}
-
-	/**
-	 * Determine if an order should be created for the payment.
-	 *
-	 * @param Payment $payment Payment.
-	 * @return string
-	 */
-	private function get_resource_for_payment( Payment $payment ): string {
-		$resource = ResourceType::PAYMENTS;
-
-		$is_supported_extension = \in_array(
-			$payment->get_source(),
-			[
-				'memberpress_transaction',
-				'woocommerce',
-			],
-			true
-		);
-
-		$is_orders_api_method = \in_array(
-			$payment->get_payment_method(),
-			[
-				PaymentMethods::BILLIE,
-				PaymentMethods::IN3,
-				PaymentMethods::KLARNA,
-				PaymentMethods::KLARNA_PAY_NOW,
-				PaymentMethods::KLARNA_PAY_LATER,
-				PaymentMethods::KLARNA_PAY_OVER_TIME,
-			],
-			true
-		);
-
-		if ( $is_supported_extension && $is_orders_api_method ) {
-			$resource = ResourceType::ORDERS;
-		}
-
-		/**
-		 * Filters the resource to use for the payment.
-		 *
-		 * @link  https://docs.mollie.com/reference/v2/payments-api/create-payment#parameters
-		 * @since 4.0.0
-		 * @param string  $resource Resource.
-		 * @param Payment $payment  Payment.
-		 */
-		$resource = \apply_filters( 'pronamic_pay_mollie_resource_for_payment', $resource, $payment );
-
-		return $resource;
 	}
 
 	/**
@@ -1732,7 +1524,13 @@ class Gateway extends Core_Gateway {
 	public function create_refund( Refund $refund ) {
 		$payment = $refund->get_payment();
 
-		$resource = $this->get_resource_for_payment( $payment );
+		$resource = ResourceType::PAYMENTS;
+
+		$mollie_order_id = $payment->get_meta( 'mollie_order_id' );
+
+		if ( ! empty( $mollie_order_id ) ) {
+			$resource = ResourceType::ORDERS;
+		}
 
 		// Refund request for resource.
 		switch ( $resource ) {

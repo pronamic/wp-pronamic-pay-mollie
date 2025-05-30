@@ -55,7 +55,7 @@ class LinesTransformer {
 
 			$tax_percentage = $total_amount->get_tax_percentage();
 
-			if ( null === $tax_percentage ) {
+			if ( null === $tax_percentage && ! $vat_amount->is_zero() ) {
 				throw new \InvalidArgumentException( 'Payment line VAT rate is required.' );
 			}
 
@@ -76,7 +76,7 @@ class LinesTransformer {
 				$quantity,
 				$amount_transformer->transform_wp_to_mollie( $unit_price ),
 				$amount_transformer->transform_wp_to_mollie( $total_amount ),
-				Number::from_mixed( $tax_percentage ),
+				null === $tax_percentage ? null : Number::from_mixed( $tax_percentage ),
 				$amount_transformer->transform_wp_to_mollie( $vat_amount ),
 			);
 
