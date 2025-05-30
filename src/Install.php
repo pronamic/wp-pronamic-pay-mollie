@@ -70,7 +70,7 @@ class Install extends Upgrade {
 		$queries = "
 			CREATE TABLE $wpdb->pronamic_pay_mollie_organizations (
 				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				mollie_id varchar(16) NOT NULL,
+				mollie_id varchar(40) NOT NULL,
 				name varchar(128) DEFAULT NULL,
 				email varchar(100) DEFAULT NULL,
 				PRIMARY KEY  ( id ),
@@ -78,7 +78,7 @@ class Install extends Upgrade {
 			) $table_options;
 			CREATE TABLE $wpdb->pronamic_pay_mollie_profiles (
 				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				mollie_id varchar(16) NOT NULL,
+				mollie_id varchar(40) NOT NULL,
 				organization_id bigint(20) unsigned DEFAULT NULL,
 				name varchar(128) DEFAULT NULL,
 				email varchar(100) DEFAULT NULL,
@@ -90,7 +90,7 @@ class Install extends Upgrade {
 			) $table_options;
 			CREATE TABLE $wpdb->pronamic_pay_mollie_customers (
 				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				mollie_id varchar(16) NOT NULL,
+				mollie_id varchar(40) NOT NULL,
 				organization_id bigint(20) unsigned DEFAULT NULL,
 				profile_id bigint(20) unsigned DEFAULT NULL,
 				test_mode tinyint(1) NOT NULL,
