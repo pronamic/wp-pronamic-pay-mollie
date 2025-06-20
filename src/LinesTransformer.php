@@ -37,26 +37,10 @@ class LinesTransformer {
 		foreach ( $payment_lines as $payment_line ) {
 			$total_amount = $payment_line->get_total_amount();
 
-			if ( ! $total_amount instanceof TaxedMoney ) {
-				throw new \InvalidArgumentException( 'Payment line requires tax information.' );
-			}
-
 			$unit_price = $payment_line->get_unit_price();
 
 			if ( null === $unit_price ) {
 				throw new \InvalidArgumentException( 'Payment line unit price is required.' );
-			}
-
-			$vat_amount = $payment_line->get_tax_amount();
-
-			if ( null === $vat_amount ) {
-				throw new \InvalidArgumentException( 'Payment line VAT amount is required.' );
-			}
-
-			$tax_percentage = $total_amount->get_tax_percentage();
-
-			if ( null === $tax_percentage && ! $vat_amount->is_zero() ) {
-				throw new \InvalidArgumentException( 'Payment line VAT rate is required.' );
 			}
 
 			$name = $payment_line->get_name();
@@ -75,20 +59,32 @@ class LinesTransformer {
 				$name,
 				$quantity,
 				$amount_transformer->transform_wp_to_mollie( $unit_price ),
-				$amount_transformer->transform_wp_to_mollie( $total_amount ),
-				null === $tax_percentage ? null : Number::from_mixed( $tax_percentage ),
-				$amount_transformer->transform_wp_to_mollie( $vat_amount ),
+				$amount_transformer->transform_wp_to_mollie( $total_amount )
 			);
 
-			$line->set_type( $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() ) );
-			$line->set_sku( $payment_line->get_sku() );
-			$line->set_image_url( $payment_line->get_image_url() );
-			$line->set_product_url( $payment_line->get_product_url() );
+			$line->type        = $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() );
+			$line->sku         = $payment_line->get_sku();
+			$line->image_url   = $payment_line->get_image_url();
+			$line->product_url = $payment_line->get_product_url();
+
+			if ( $total_amount instanceof TaxedMoney ) {
+				$vat_amount = $payment_line->get_tax_amount();
+
+				$line->vat_amount = $amount_transformer->transform_wp_to_mollie( $vat_amount );
+				
+				$tax_percentage = $total_amount->get_tax_percentage();
+				
+				if ( null !== $tax_percentage ) {
+					$line->vat_rate = Number::from_mixed( $tax_percentage );
+				}
+			}
 
 			// Discount amount.
 			$discount_amount = $payment_line->get_discount_amount();
 
-			$line->set_discount_amount( null === $discount_amount ? null : $amount_transformer->transform_wp_to_mollie( $discount_amount ) );
+			if ( null !== $discount_amount ) {
+				$line->discount_amount = $amount_transformer->transform_wp_to_mollie( $discount_amount );
+			}
 		}
 
 		return $lines;
