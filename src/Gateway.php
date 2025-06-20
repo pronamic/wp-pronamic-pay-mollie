@@ -706,8 +706,8 @@ class Gateway extends Core_Gateway {
 		$billing_address = $payment->get_billing_address();
 
 		if ( null !== $billing_address ) {
-			$request->set_billing_address( $address_transformer->transform_wp_to_mollie( $billing_address ) );
 			try {
+				$request->set_billing_address( $address_transformer->transform_wp_to_mollie( $billing_address ) );
 			} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 				$address_required = \in_array(
 					$payment_method,
