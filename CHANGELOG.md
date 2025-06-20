@@ -7,6 +7,27 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.15.0] - 2025-06-19
+
+### Added
+
+- Added support for 'Pay by Bank' payment method. ([d704e72](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/d704e7208ddf4acdb6fb4de43a5ba51d0edd8ce0))
+
+### Changed
+
+- Follow Mollie recommendation VARCHAR(40) for API identifiers ([3237c99](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/3237c992868c1d0ec9f671f5a85a7efe29c87036))
+
+### Composer
+
+- Changed `pronamic/wp-mollie` from `^1.7` to `v1.9.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v1.9.0
+- Changed `wp-pay/core` from `^4.23` to `v4.26.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.26.0
+
+Full set of changes: [`4.14.5...4.15.0`][4.15.0]
+
+[4.15.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.14.5...v4.15.0
+
 ## [4.14.5] - 2025-03-28
 
 ### Commits
