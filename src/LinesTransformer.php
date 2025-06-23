@@ -14,7 +14,6 @@ use InvalidArgumentException;
 use Pronamic\WordPress\Mollie\AmountTransformer;
 use Pronamic\WordPress\Mollie\Lines as MollieLines;
 use Pronamic\WordPress\Money\TaxedMoney;
-use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Payments\PaymentLines as WordPressLines;
 
 /**
@@ -78,10 +77,11 @@ class LinesTransformer {
 				$amount_transformer->transform_wp_to_mollie( $total_amount ),
 			);
 
-			$line->set_type( $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() ) );
-			$line->set_sku( $payment_line->get_sku() );
-			$line->set_image_url( $payment_line->get_image_url() );
-			$line->set_product_url( $payment_line->get_product_url() );
+			$line->type = $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() );
+			$line->sku  = $payment_line->get_sku();
+
+			$line->image_url   = $payment_line->get_image_url();
+			$line->product_url = $payment_line->get_product_url();
 
 			// Discount amount.
 			$discount_amount = $payment_line->get_discount_amount();

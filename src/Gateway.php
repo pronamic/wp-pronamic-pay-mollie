@@ -10,7 +10,6 @@
 
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
-use InvalidArgumentException;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Banks\BankAccountDetails;
@@ -35,8 +34,6 @@ use Pronamic\WordPress\Mollie\Payment as MolliePayment;
 use Pronamic\WordPress\Mollie\PaymentRequest;
 use Pronamic\WordPress\Mollie\Profile;
 use Pronamic\WordPress\Mollie\RefundRequest;
-use Pronamic\WordPress\Mollie\ResourceType;
-use Pronamic\WordPress\Mollie\Statuses;
 
 /**
  * Gateway class
@@ -424,11 +421,11 @@ class Gateway extends Core_Gateway {
 
 			$payment->delete_meta( 'mollie_create_payment_attempt' );
 		} catch ( Error $error ) {
-			if ( 'recurring' !== $request->get_sequence_type() ) {
+			if ( 'recurring' !== $request->sequence_type ) {
 				throw $error;
 			}
 
-			if ( null === $request->get_mandate_id() ) {
+			if ( null === $request->mandate_id ) {
 				throw $error;
 			}
 
@@ -1127,7 +1124,7 @@ class Gateway extends Core_Gateway {
 		$amount_charged_back = $mollie_payment->get_amount_charged_back();
 
 		if ( null !== $amount_charged_back ) {
-			$charged_back_amount = new Money( $amount_charged_back->get_value(), $amount_charged_back->get_currency() );
+			$charged_back_amount = new Money( $amount_charged_back->value, $amount_charged_back->currency );
 
 			$payment->set_charged_back_amount( $charged_back_amount->get_value() > 0 ? $charged_back_amount : null );
 		}
@@ -1206,32 +1203,6 @@ class Gateway extends Core_Gateway {
 
 		foreach ( $payment->get_subscriptions() as $subscription ) {
 			$subscription->save();
-		}
-	}
-
-	/**
-	 * Update payment from Mollie order.
-	 *
-	 * @param Payment $payment      Payment.
-	 * @param Order   $mollie_order Mollie order.
-	 * @return void
-	 */
-	public function update_payment_from_mollie_order( Payment $payment, Order $mollie_order ) {
-		$payment_lines = $payment->get_lines();
-		$mollie_lines  = $mollie_order->get_lines();
-
-		if ( null === $payment_lines ) {
-			return;
-		}
-
-		foreach ( $payment_lines as $payment_line ) {
-			$mollie_line = current( $mollie_lines );
-
-			if ( false !== $mollie_line ) {
-				$payment_line->set_meta( 'mollie_order_line_id', $mollie_line->get_id() );
-			}
-
-			next( $mollie_lines );
 		}
 	}
 

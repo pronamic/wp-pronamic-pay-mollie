@@ -13,10 +13,8 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\DateTime\DateTimeImmutable;
 use Pronamic\WordPress\Mollie\AmountTransformer;
 use Pronamic\WordPress\Mollie\Refund as MollieRefund;
-use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Payments\Payment as PronamicPayment;
 use Pronamic\WordPress\Pay\Refunds\Refund as PronamicRefund;
-use Pronamic\WordPress\Pay\Refunds\RefundLines as PronamicRefundLines;
 
 /**
  * Refund transformer class

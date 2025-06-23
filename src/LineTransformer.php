@@ -43,16 +43,14 @@ class LineTransformer {
 	 */
 	public function update_mollie_to_pronamic( MollieLine $mollie_line, PronamicRefundLine $pronamic_refund_line ): PronamicRefundLine {
 		$total_amount = new TaxedMoney(
-			$mollie_line->total_amount->get_value(),
-			$mollie_line->total_amount->get_currency(),
-			$mollie_line->vat_amount->get_value(),
+			$mollie_line->total_amount->value,
+			$mollie_line->total_amount->currency,
+			$mollie_line->vat_amount->value,
 			$mollie_line->vat_rate
 		);
 
-		$pronamic_refund_line->set_id( (string) $mollie_line->get_id() );
 		$pronamic_refund_line->set_quantity( Number::from_int( $mollie_line->quantity ) );
 		$pronamic_refund_line->set_total_amount( $total_amount );
-		$pronamic_refund_line->meta['mollie_order_line_id'] = $mollie_line->get_id();
 
 		return $pronamic_refund_line;
 	}
