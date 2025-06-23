@@ -44,7 +44,7 @@ class CardField extends Field {
 	protected function get_element() {
 		try {
 			$profile_id = $this->gateway->get_profile_id();
-		} catch ( \Exception $e ) {
+		} catch ( \Exception ) {
 			return null;
 		}
 

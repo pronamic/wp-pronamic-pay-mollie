@@ -100,7 +100,7 @@ class Gateway extends Core_Gateway {
 		$this->customer_data_store = new CustomerDataStore();
 
 		// Actions.
-		add_action( 'pronamic_payment_status_update', [ $this, 'copy_customer_id_to_wp_user' ], 99, 1 );
+		add_action( 'pronamic_payment_status_update', $this->copy_customer_id_to_wp_user( ... ), 99, 1 );
 
 		// Fields.
 		$field_consumer_name = new TextField( 'pronamic_pay_consumer_bank_details_name' );
@@ -270,7 +270,7 @@ class Gateway extends Core_Gateway {
 	public function get_payment_methods( array $args = [] ): PaymentMethodsCollection {
 		try {
 			$this->maybe_enrich_payment_methods();
-		} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch -- No problem.
+		} catch ( \Exception ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch -- No problem.
 			// No problem.
 		}
 
@@ -651,7 +651,7 @@ class Gateway extends Core_Gateway {
 		if ( ! empty( $this->config->due_date_days ) ) {
 			try {
 				$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
-			} catch ( \Exception $e ) {
+			} catch ( \Exception ) {
 				$due_date = null;
 			}
 
@@ -783,17 +783,12 @@ class Gateway extends Core_Gateway {
 	 * @return int
 	 */
 	private function get_retry_seconds( $attempt ) {
-		switch ( $attempt ) {
-			case 1:
-				return 5 * MINUTE_IN_SECONDS;
-			case 2:
-				return HOUR_IN_SECONDS;
-			case 3:
-				return 12 * HOUR_IN_SECONDS;
-			case 4:
-			default:
-				return DAY_IN_SECONDS;
-		}
+		return match ( $attempt ) {
+			1 => 5 * MINUTE_IN_SECONDS,
+			2 => HOUR_IN_SECONDS,
+			3 => 12 * HOUR_IN_SECONDS,
+			default => DAY_IN_SECONDS,
+		};
 	}
 
 	/**
@@ -1018,23 +1013,10 @@ class Gateway extends Core_Gateway {
 			}
 
 			if ( $mollie_payment_details->has_property( 'consumerAccount' ) ) {
-				switch ( $mollie_payment->get_method() ) {
-					case Methods::BELFIUS:
-					case Methods::DIRECT_DEBIT:
-					case Methods::IDEAL:
-					case Methods::KBC:
-					case Methods::SOFORT:
-						$consumer_bank_details->set_iban( $mollie_payment_details->get_property( 'consumerAccount' ) );
-
-						break;
-					case Methods::BANCONTACT:
-					case Methods::BANKTRANSFER:
-					case Methods::PAYPAL:
-					default:
-						$consumer_bank_details->set_account_number( $mollie_payment_details->get_property( 'consumerAccount' ) );
-
-						break;
-				}
+				match ( $mollie_payment->get_method() ) {
+					Methods::BELFIUS, Methods::DIRECT_DEBIT, Methods::IDEAL, Methods::KBC, Methods::SOFORT => $consumer_bank_details->set_iban( $mollie_payment_details->get_property( 'consumerAccount' ) ),
+					default => $consumer_bank_details->set_account_number( $mollie_payment_details->get_property( 'consumerAccount' ) ),
+				};
 			}
 
 			if ( $mollie_payment_details->has_property( 'consumerBic' ) ) {
@@ -1161,9 +1143,7 @@ class Gateway extends Core_Gateway {
 			if ( false !== $mollie_chargeback ) {
 				$subscriptions = array_filter(
 					$payment->get_subscriptions(),
-					function ( $subscription ) {
-						return SubscriptionStatus::ACTIVE === $subscription->get_status();
-					}
+					fn( $subscription ) => SubscriptionStatus::ACTIVE === $subscription->get_status()
 				);
 
 				foreach ( $subscriptions as $subscription ) {
@@ -1326,7 +1306,7 @@ class Gateway extends Core_Gateway {
 					$subscription->add_note( $note );
 				}
 			}
-		} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+		} catch ( \Exception ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			// Nothing to do.
 		}
 

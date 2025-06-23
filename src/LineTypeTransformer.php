@@ -45,10 +45,6 @@ class LineTypeTransformer {
 			return null;
 		}
 
-		if ( isset( self::$map[ $payment_line_type ] ) ) {
-			return self::$map[ $payment_line_type ];
-		}
-
-		return null;
+		return self::$map[ $payment_line_type ] ?? null;
 	}
 }

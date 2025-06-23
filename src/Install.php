@@ -206,7 +206,7 @@ class Install extends Upgrade {
 		foreach ( $data as $item ) {
 			try {
 				$this->add_foreign_key( $item );
-			} catch ( \Exception $e ) {
+			} catch ( \Exception ) {
 				// Foreign keys are not strictly required.
 				continue;
 			}

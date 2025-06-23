@@ -76,8 +76,6 @@ class LinesTransformer {
 				$quantity,
 				$amount_transformer->transform_wp_to_mollie( $unit_price ),
 				$amount_transformer->transform_wp_to_mollie( $total_amount ),
-				Number::from_mixed( $tax_percentage ),
-				$amount_transformer->transform_wp_to_mollie( $vat_amount ),
 			);
 
 			$line->set_type( $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() ) );

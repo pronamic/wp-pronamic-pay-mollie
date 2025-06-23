@@ -72,7 +72,7 @@ class IntegrationTest extends TestCase {
 			$this->integration->get_id()
 		);
 
-		if ( ! has_filter( $filter, [ $this->integration, 'payment_provider_url' ] ) ) {
+		if ( ! has_filter( $filter, $this->integration->payment_provider_url( ... ) ) ) {
 			return;
 		}
 
