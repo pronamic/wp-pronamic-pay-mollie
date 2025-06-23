@@ -38,7 +38,7 @@
 	},
 	"config": {
 		"platform": {
-			"php": "8.1"
+			"php": "8.2"
 		},
 		"platform-check": false,
 		"sort-packages": true,
@@ -58,11 +58,11 @@
 		}
 	],
 	"require": {
-		"php": ">=8.1",
+		"php": ">=8.2",
 		"ext-json": "*",
 		"automattic/jetpack-autoloader": "^3.0 || ^4.0 || ^5.0",
-		"giggsey/libphonenumber-for-php-lite": "^8.13",
-		"justinrainbow/json-schema": "^5.2",
+		"giggsey/libphonenumber-for-php-lite": "^9.0",
+		"justinrainbow/json-schema": "^5.3",
 		"pronamic/wp-http": "^1.2",
 		"pronamic/wp-mollie": "dev-migrating-from-orders-to-payments as 2.0",
 		"woocommerce/action-scheduler": "^3.8",

@@ -544,7 +544,7 @@ class Gateway extends Core_Gateway {
 
 		$method_transformer = new MethodTransformer();
 
-		$request->set_method( $method_transformer->transform_wp_to_mollie( $payment_method, $payment_method ) );
+		$request->method = $method_transformer->transform_wp_to_mollie( $payment_method, $payment_method );
 
 		/**
 		 * Sequence type.
@@ -572,26 +572,26 @@ class Gateway extends Core_Gateway {
 				)
 			)
 		) {
-			$request->set_sequence_type( 'first' );
+			$request->sequence_type = 'first';
 
 			foreach ( $subscriptions as $subscription ) {
 				$mandate_id = $subscription->get_meta( 'mollie_mandate_id' );
 
 				if ( ! empty( $mandate_id ) ) {
-					$request->set_mandate_id( $mandate_id );
+					$request->mandate_id = $mandate_id;
 				}
 			}
 		}
 
 		if ( ! empty( $sequence_type ) ) {
-			$request->set_sequence_type( $sequence_type );
+			$request->sequence_type = $sequence_type;
 		}
 
-		if ( 'recurring' === $request->get_sequence_type() ) {
-			$request->set_method( null );
+		if ( 'recurring' === $request->sequence_type ) {
+			$request->method = null;
 		}
 
-		if ( 'first' === $request->get_sequence_type() ) {
+		if ( 'first' === $request->sequence_type ) {
 			$first_method = $payment_method;
 
 			switch ( $payment_method ) {
@@ -606,7 +606,7 @@ class Gateway extends Core_Gateway {
 					break;
 			}
 
-			$request->set_method( $method_transformer->transform_wp_to_mollie( $first_method, $first_method ) );
+			$request->method = $method_transformer->transform_wp_to_mollie( $first_method, $first_method );
 		}
 
 		/**
@@ -636,7 +636,7 @@ class Gateway extends Core_Gateway {
 		 */
 		$metadata = \apply_filters( 'pronamic_pay_mollie_payment_metadata', $metadata, $payment );
 
-		$request->set_metadata( $metadata );
+		$request->metadata = $metadata;
 
 		// Card token.
 		if ( Methods::CREDITCARD === $request->method ) {
@@ -647,22 +647,6 @@ class Gateway extends Core_Gateway {
 			}
 		}
 
-		// Billing email.
-		$billing_email = ( null === $customer ) ? null : $customer->get_email();
-
-		/**
-		 * Filters the Mollie payment billing email used for bank transfer payment instructions.
-		 *
-		 * @param string|null $billing_email Billing email.
-		 * @param Payment     $payment       Payment.
-		 * @since 2.2.0
-		 */
-		$billing_email = \apply_filters( 'pronamic_pay_mollie_payment_billing_email', $billing_email, $payment );
-
-		if ( ! empty( $billing_email ) ) {
-			$request->set_billing_email( $billing_email );
-		}
-
 		// Due date.
 		if ( ! empty( $this->config->due_date_days ) ) {
 			try {
@@ -671,7 +655,7 @@ class Gateway extends Core_Gateway {
 				$due_date = null;
 			}
 
-			$request->set_due_date( $due_date );
+			$request->due_date = $due_date;
 		}
 
 		return $request;
@@ -688,9 +672,7 @@ class Gateway extends Core_Gateway {
 	 */
 	private function process_direct_debit_mandate_from_bank_details( Payment $payment, PaymentRequest $request ) {
 		// Process only when method is direct debit.
-		$method = $request->get_method();
-
-		if ( Methods::DIRECT_DEBIT !== $method ) {
+		if ( Methods::DIRECT_DEBIT !== $request->method ) {
 			return;
 		}
 
@@ -702,9 +684,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Process only when mandate is unknown.
-		$mandate_id = $request->get_mandate_id();
-
-		if ( null !== $mandate_id ) {
+		if ( null !== $request->mandate_id ) {
 			return;
 		}
 
@@ -739,8 +719,8 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Charge immediately on-demand.
-		$request->set_sequence_type( 'recurring' );
-		$request->set_mandate_id( (string) $mandate_id );
+		$request->sequence_type = 'recurring';
+		$request->mandate_id    = (string) $mandate_id;
 	}
 
 	/**
