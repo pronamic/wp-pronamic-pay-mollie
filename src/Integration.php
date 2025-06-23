@@ -86,12 +86,6 @@ class Integration extends AbstractGatewayIntegration {
 			\add_action( 'pronamic_pay_mollie_payment_start', $function, 10, 1 );
 		}
 
-		$function = [ $this, 'payment_fulfilled' ];
-
-		if ( ! \has_action( 'pronamic_pay_payment_fulfilled', $function ) ) {
-			\add_action( 'pronamic_pay_payment_fulfilled', $function, 10, 1 );
-		}
-
 		// Tables.
 		$this->register_tables();
 
@@ -456,21 +450,5 @@ class Integration extends AbstractGatewayIntegration {
 		$args['user-agent'] = $this->get_user_agent();
 
 		return $args;
-	}
-
-	/**
-	 * Payment fulfilled.
-	 *
-	 * @param Payment $payment Payment.
-	 * @return void
-	 */
-	public function payment_fulfilled( Payment $payment ): void {
-		$gateway = $payment->get_gateway();
-
-		if ( ! $gateway instanceof Gateway ) {
-			return;
-		}
-
-		$gateway->maybe_create_shipment_for_payment( $payment );
 	}
 }
