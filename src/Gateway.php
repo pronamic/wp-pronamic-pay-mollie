@@ -404,7 +404,7 @@ class Gateway extends Core_Gateway {
 	 *
 	 * @param Payment $payment Payment.
 	 * @return void
-	 * @throws \Exception Throws exception on error creating Mollie customer for payment.
+	 * @throws Error Throws exception on error creating Mollie customer for payment.
 	 * @see Core_Gateway::start()
 	 */
 	public function start( Payment $payment ) {
