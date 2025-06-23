@@ -86,7 +86,7 @@ class LinesTransformer {
 			// Discount amount.
 			$discount_amount = $payment_line->get_discount_amount();
 
-			$line->set_discount_amount( null === $discount_amount ? null : $amount_transformer->transform_wp_to_mollie( $discount_amount ) );
+			$line->discount_amount = ( null === $discount_amount ) ? null : $amount_transformer->transform_wp_to_mollie( $discount_amount );
 		}
 
 		return $lines;
