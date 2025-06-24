@@ -66,7 +66,7 @@
 		"pronamic/wp-http": "^1.2",
 		"pronamic/wp-mollie": "dev-migrating-from-orders-to-payments as 2.0",
 		"woocommerce/action-scheduler": "^3.8",
-		"wp-pay/core": "^4.26"
+		"wp-pay/core": "dev-67-extend-test-meta-box-form-with-extra-fields-shippingbilling-address-lines-etc as 4.26"
 	},
 	"require-dev": {
 		"overtrue/phplint": "^9.0",
