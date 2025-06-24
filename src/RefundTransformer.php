@@ -77,26 +77,6 @@ class RefundTransformer {
 			}
 		}
 
-		if ( null !== $mollie_refund->lines ) {
-			foreach ( $mollie_refund->lines as $mollie_line ) {
-				$id = (string) $mollie_line->get_id();
-
-				if ( \array_key_exists( $id, $map_refund_lines ) ) {
-					$pronamic_refund_line = $map_refund_lines[ $id ];
-
-					$line_transformer->update_mollie_to_pronamic( $mollie_line, $pronamic_refund_line );
-				} else {
-					$pronamic_refund_line = $line_transformer->transform_mollie_to_pronamic( $mollie_line, $pronamic_refund );
-				}
-
-				if ( \array_key_exists( $id, $map_payment_lines ) ) {
-					$pronamic_payment_line = $map_payment_lines[ $id ];
-
-					$pronamic_refund_line->set_payment_line( $pronamic_payment_line );
-				}
-			}
-		}
-
 		$pronamic_refund->meta['mollie_refund_id'] = $mollie_refund->get_id();
 
 		return $pronamic_refund;
