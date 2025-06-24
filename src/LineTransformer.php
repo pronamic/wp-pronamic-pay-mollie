@@ -45,7 +45,7 @@ class LineTransformer {
 		$total_amount = new TaxedMoney(
 			$mollie_line->total_amount->value,
 			$mollie_line->total_amount->currency,
-			$mollie_line->vat_amount->value,
+			( null === $mollie_line->vat_amount ) ? null : $mollie_line->vat_amount->value,
 			$mollie_line->vat_rate
 		);
 
