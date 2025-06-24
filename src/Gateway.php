@@ -607,6 +607,23 @@ class Gateway extends Core_Gateway {
 		}
 
 		/**
+		 * Addresses.
+		 */
+		$address_transformer = new AddressTransformer();
+
+		$billing_address = $payment->get_billing_address();
+
+		if ( null !== $billing_address ) {
+			$request->billing_address = $address_transformer->transform_wp_to_mollie( $billing_address );
+		}
+
+		$shipping_address = $payment->get_shipping_address();
+
+		if ( null !== $shipping_address ) {
+			$request->shipping_address = $address_transformer->transform_wp_to_mollie( $shipping_address );
+		}
+
+		/**
 		 * Direct Debit.
 		 */
 		$this->process_direct_debit_mandate_from_bank_details( $payment, $request );
