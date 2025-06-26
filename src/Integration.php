@@ -351,7 +351,6 @@ class Integration extends AbstractGatewayIntegration {
 				PaymentMethods::DIRECT_DEBIT,
 				PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 				PaymentMethods::DIRECT_DEBIT_IDEAL,
-				PaymentMethods::DIRECT_DEBIT_SOFORT,
 			],
 			true
 		) ) {
