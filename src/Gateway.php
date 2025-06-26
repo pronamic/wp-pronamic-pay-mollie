@@ -249,18 +249,6 @@ class Gateway extends Core_Gateway {
 
 		$this->register_payment_method( $payment_method_direct_debit_ideal );
 
-		// Payment method direct debit and SOFORT.
-		$payment_method_direct_debit_sofort = new PaymentMethod( PaymentMethods::DIRECT_DEBIT_SOFORT );
-		$payment_method_direct_debit_sofort->add_support( 'recurring' );
-
-		$this->register_payment_method( $payment_method_direct_debit_sofort );
-
-		// Sofort.
-		$payment_method_sofort = new PaymentMethod( PaymentMethods::SOFORT );
-		$payment_method_sofort->add_support( 'recurring' );
-
-		$this->register_payment_method( $payment_method_sofort );
-
 		// Swish.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::SWISH ) );
 
@@ -371,7 +359,6 @@ class Gateway extends Core_Gateway {
 			$map = [
 				PaymentMethods::BANCONTACT => PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 				PaymentMethods::IDEAL      => PaymentMethods::DIRECT_DEBIT_IDEAL,
-				PaymentMethods::SOFORT     => PaymentMethods::DIRECT_DEBIT_SOFORT,
 			];
 
 			foreach ( $map as $a => $b ) {
@@ -602,7 +589,6 @@ class Gateway extends Core_Gateway {
 					[
 						PaymentMethods::DIRECT_DEBIT_BANCONTACT,
 						PaymentMethods::DIRECT_DEBIT_IDEAL,
-						PaymentMethods::DIRECT_DEBIT_SOFORT,
 					],
 					true
 				)
@@ -636,9 +622,6 @@ class Gateway extends Core_Gateway {
 					break;
 				case PaymentMethods::DIRECT_DEBIT_IDEAL:
 					$first_method = PaymentMethods::IDEAL;
-					break;
-				case PaymentMethods::DIRECT_DEBIT_SOFORT:
-					$first_method = PaymentMethods::SOFORT;
 					break;
 			}
 
@@ -1078,7 +1061,7 @@ class Gateway extends Core_Gateway {
 
 			if ( $mollie_payment_details->has_property( 'consumerAccount' ) ) {
 				match ( $mollie_payment->get_method() ) {
-					Methods::BELFIUS, Methods::DIRECT_DEBIT, Methods::IDEAL, Methods::KBC, Methods::SOFORT => $consumer_bank_details->set_iban( $mollie_payment_details->get_property( 'consumerAccount' ) ),
+					Methods::BELFIUS, Methods::DIRECT_DEBIT, Methods::IDEAL, Methods::KBC => $consumer_bank_details->set_iban( $mollie_payment_details->get_property( 'consumerAccount' ) ),
 					default => $consumer_bank_details->set_account_number( $mollie_payment_details->get_property( 'consumerAccount' ) ),
 				};
 			}
