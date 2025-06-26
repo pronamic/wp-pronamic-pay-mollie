@@ -35,6 +35,7 @@ class MethodTransformer {
 		PronamicMethod::EPS                     => MollieMethod::EPS,
 		PronamicMethod::GIFT_CARD               => MollieMethod::GIFT_CARD,
 		PronamicMethod::GIROPAY                 => MollieMethod::GIROPAY,
+		PronamicMethod::GOOGLE_PAY              => MollieMethod::CREDITCARD,
 		PronamicMethod::IDEAL                   => MollieMethod::IDEAL,
 		PronamicMethod::IN3                     => MollieMethod::IN3,
 		PronamicMethod::KBC                     => MollieMethod::KBC,
