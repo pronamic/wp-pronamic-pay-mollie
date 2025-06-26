@@ -3,7 +3,7 @@
  * CLI
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Mollie
  */
@@ -451,10 +451,10 @@ class CLI {
 		\WP_CLI::log(
 			\sprintf(
 				'wp pronamic-pay mollie payments cancel $( wp pronamic-pay mollie payments list --api_key=%s --from=%s --is_cancelable --format=%s ) --api_key=%s',
-				\escapeshellarg( $api_key ),
+				\escapeshellarg( (string) $api_key ),
 				\escapeshellarg( $id ),
 				\escapeshellarg( 'ids' ),
-				\escapeshellarg( $api_key )
+				\escapeshellarg( (string) $api_key )
 			)
 		);
 	}

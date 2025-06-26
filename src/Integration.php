@@ -3,7 +3,7 @@
  * Mollie integration.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -64,32 +64,26 @@ class Integration extends AbstractGatewayIntegration {
 		parent::__construct( $args );
 
 		// Filters.
-		$function = [ $this, 'next_payment_delivery_date' ];
+		$function = $this->next_payment_delivery_date( ... );
 
 		if ( ! \has_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function ) ) {
 			\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function, 10, 2 );
 		}
 
-		$function = [ $this, 'http_request_args' ];
+		$function = $this->http_request_args( ... );
 
 		if ( ! \has_filter( 'http_request_args', $function ) ) {
 			// phpcs:ignore WordPressVIPMinimum.Hooks.RestrictedHooks.http_request_args -- Timeout is not adjusted.
 			\add_filter( 'http_request_args', $function, 10, 2 );
 		}
 
-		add_filter( 'pronamic_payment_provider_url_mollie', [ $this, 'payment_provider_url' ], 10, 2 );
+		add_filter( 'pronamic_payment_provider_url_mollie', $this->payment_provider_url( ... ), 10, 2 );
 
 		// Actions.
-		$function = [ $this, 'scheduled_payment_start' ];
+		$function = $this->scheduled_payment_start( ... );
 
 		if ( ! \has_action( 'pronamic_pay_mollie_payment_start', $function ) ) {
 			\add_action( 'pronamic_pay_mollie_payment_start', $function, 10, 1 );
-		}
-
-		$function = [ $this, 'payment_fulfilled' ];
-
-		if ( ! \has_action( 'pronamic_pay_payment_fulfilled', $function ) ) {
-			\add_action( 'pronamic_pay_payment_fulfilled', $function, 10, 1 );
 		}
 
 		// Tables.
@@ -100,7 +94,7 @@ class Integration extends AbstractGatewayIntegration {
 
 		$upgrades = $this->get_upgrades();
 
-		$upgrades->add( new Install( null === $version ? '1.0.0' : $version ) );
+		$upgrades->add( new Install( $version ?? '1.0.0' ) );
 
 		// Scripts.
 		ScriptsController::instance()->setup();
@@ -243,7 +237,7 @@ class Integration extends AbstractGatewayIntegration {
 
 		try {
 			$config->profile_id = $this->get_gateway( $post_id )->get_profile_id();
-		} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch -- No problem.
+		} catch ( \Exception ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch -- No problem.
 			// No problem.
 		}
 
@@ -382,24 +376,12 @@ class Integration extends AbstractGatewayIntegration {
 		 * @link https://help.mollie.com/hc/en-us/articles/115000785649-When-are-direct-debit-payments-processed-and-paid-out-
 		 * @link https://help.mollie.com/hc/en-us/articles/115002540294-What-are-the-payment-methods-processing-times-
 		 */
-		switch ( $day_of_week ) {
-			case 'Monday':
-				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-3 days' );
-
-				break;
-			case 'Saturday':
-				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-2 days' );
-
-				break;
-			case 'Sunday':
-				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-3 days' );
-
-				break;
-			default:
-				$next_payment_delivery_date = $next_payment_delivery_date->modify( '-1 day' );
-
-				break;
-		}
+		$next_payment_delivery_date = match ( $day_of_week ) {
+			'Monday' => $next_payment_delivery_date->modify( '-3 days' ),
+			'Saturday' => $next_payment_delivery_date->modify( '-2 days' ),
+			'Sunday' => $next_payment_delivery_date->modify( '-3 days' ),
+			default => $next_payment_delivery_date->modify( '-1 day' ),
+		};
 
 		$next_payment_delivery_date = $next_payment_delivery_date->setTime( 0, 0, 0 );
 
@@ -456,21 +438,5 @@ class Integration extends AbstractGatewayIntegration {
 		$args['user-agent'] = $this->get_user_agent();
 
 		return $args;
-	}
-
-	/**
-	 * Payment fulfilled.
-	 *
-	 * @param Payment $payment Payment.
-	 * @return void
-	 */
-	public function payment_fulfilled( Payment $payment ): void {
-		$gateway = $payment->get_gateway();
-
-		if ( ! $gateway instanceof Gateway ) {
-			return;
-		}
-
-		$gateway->maybe_create_shipment_for_payment( $payment );
 	}
 }

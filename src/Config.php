@@ -3,7 +3,7 @@
  * Mollie config.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -65,7 +65,7 @@ class Config extends GatewayConfig implements JsonSerializable {
 	 */
 	public function jsonSerialize(): object {
 		return (object) [
-			'@type'   => __CLASS__,
+			'@type'   => self::class,
 			'api_key' => $this->api_key,
 		];
 	}

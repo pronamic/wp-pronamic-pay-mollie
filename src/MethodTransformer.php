@@ -3,7 +3,7 @@
  * Mollie transformer methods.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -73,7 +73,7 @@ class MethodTransformer {
 	 * @param mixed       $fallback       Default payment method.
 	 * @return string|null
 	 */
-	public static function transform_wp_to_mollie( $payment_method, $fallback = null ) {
+	public static function transform_wp_to_mollie( $payment_method, mixed $fallback = null ) {
 		if ( ! \is_scalar( $payment_method ) ) {
 			return null;
 		}
@@ -119,9 +119,7 @@ class MethodTransformer {
 		return \array_keys(
 			\array_filter(
 				self::$map,
-				function ( $value ) use ( $method ) {
-					return ( $value === $method );
-				}
+				fn( $value ) => $value === $method
 			)
 		);
 	}

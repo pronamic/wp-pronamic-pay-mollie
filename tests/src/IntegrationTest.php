@@ -3,7 +3,7 @@
  * Mollie integration test.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -72,7 +72,7 @@ class IntegrationTest extends TestCase {
 			$this->integration->get_id()
 		);
 
-		if ( ! has_filter( $filter, [ $this->integration, 'payment_provider_url' ] ) ) {
+		if ( ! has_filter( $filter, $this->integration->payment_provider_url( ... ) ) ) {
 			return;
 		}
 

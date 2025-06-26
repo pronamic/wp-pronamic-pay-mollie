@@ -3,7 +3,7 @@
  * Address transformer
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
@@ -30,40 +30,18 @@ class AddressTransformer {
 	public function transform_wp_to_mollie( WordPressAddress $address ): MollieAddress {
 		$name = $address->get_name();
 
-		$given_name        = null === $name ? null : $name->get_first_name();
-		$family_name       = null === $name ? null : $name->get_last_name();
-		$email             = $address->get_email();
-		$street_and_number = $address->get_line_1();
-		$city              = $address->get_city();
-		$country           = $address->get_country_code();
+		$mollie_address = new MollieAddress();
 
-		if ( null === $given_name ) {
-			throw new InvalidArgumentException( 'Mollie requires a given name in an address.' );
-		}
+		$mollie_address->given_name        = null === $name ? null : $name->get_first_name();
+		$mollie_address->family_name       = null === $name ? null : $name->get_last_name();
+		$mollie_address->organization_name = $address->get_company_name();
+		$mollie_address->street_and_number = $address->get_line_1();
+		$mollie_address->street_additional = $address->get_line_2();
+		$mollie_address->postal_code       = $address->get_postal_code();
+		$mollie_address->email             = $address->get_email();
 
-		if ( null === $family_name ) {
-			throw new InvalidArgumentException( 'Mollie requires a family name in an address.' );
-		}
-
-		if ( null === $email ) {
-			throw new InvalidArgumentException( 'Mollie requires an email in an address.' );
-		}
-
-		if ( null === $street_and_number ) {
-			throw new InvalidArgumentException( 'Mollie requires a street and number in an address.' );
-		}
-
-		if ( null === $city ) {
-			throw new InvalidArgumentException( 'Mollie requires a city in an address.' );
-		}
-
-		if ( null === $country ) {
-			throw new InvalidArgumentException( 'Mollie requires a country in an address.' );
-		}
-
-		$mollie_address = new MollieAddress( $given_name, $family_name, $email, $street_and_number, $city, $country );
-
-		$phone = $address->get_phone();
+		$phone   = $address->get_phone();
+		$country = $address->get_country_code();
 
 		if ( null !== $phone ) {
 			$phone_util = PhoneNumberUtil::getInstance();
@@ -73,11 +51,11 @@ class AddressTransformer {
 			$phone = $phone_util->format( $phone_number_object, PhoneNumberFormat::E164 );
 		}
 
-		$mollie_address->organization_name = $address->get_company_name();
-		$mollie_address->phone             = $phone;
-		$mollie_address->street_additional = $address->get_line_2();
-		$mollie_address->postal_code       = $address->get_postal_code();
-		$mollie_address->region            = $address->get_region();
+		$mollie_address->phone = $phone;
+
+		$mollie_address->city    = $address->get_city();
+		$mollie_address->region  = $address->get_region();
+		$mollie_address->country = $country;
 
 		return $mollie_address;
 	}

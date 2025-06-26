@@ -3,7 +3,7 @@
  * Page customer
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
@@ -58,7 +58,7 @@ if ( $api_key ) {
 		$response = $client->get_mandate( $mollie_mandate_id, $mollie_customer_id );
 
 		$mollie_mandate = $response;
-	} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+	} catch ( \Exception ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 		// No problem, in case of an error we will not show the remote information.
 	}
 }

@@ -3,7 +3,7 @@
  * Mollie install.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -206,7 +206,7 @@ class Install extends Upgrade {
 		foreach ( $data as $item ) {
 			try {
 				$this->add_foreign_key( $item );
-			} catch ( \Exception $e ) {
+			} catch ( \Exception ) {
 				// Foreign keys are not strictly required.
 				continue;
 			}

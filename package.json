@@ -32,9 +32,9 @@
 		"url": "https://github.com/wp-pay-gateways/mollie/issues"
 	},
 	"devDependencies": {
-		"@wordpress/env": "^9.10.0",
-		"@wordpress/prettier-config": "^3.15.0",
-		"@wordpress/scripts": "^27.9.0",
+		"@wordpress/env": "^10.25.0",
+		"@wordpress/prettier-config": "^4.25.0",
+		"@wordpress/scripts": "^30.18.0",
 		"npm-run-all": "^4.1.5",
 		"prettier": "npm:wp-prettier@^3.0.3"
 	},
@@ -46,7 +46,6 @@
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"lint:style": "wp-scripts lint-style 'assets/src/**/*.scss'",
 		"wp-env-setup": "npm-run-all wp-env-setup-*",
-		"wp-env-setup-mollie": "wp-env run cli wp config set MOLLIE_API_KEY $MOLLIE_API_KEY",
 		"wp-env-setup-plugins": "wp-env run cli wp plugin activate pronamic-pay-mollie",
 		"wp-env-after-start": "npm-run-all wp-env-setup"
 	}

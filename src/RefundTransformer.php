@@ -3,7 +3,7 @@
  * Refund transformer
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Gateways\Mollie
  */
@@ -13,10 +13,8 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Pronamic\WordPress\DateTime\DateTimeImmutable;
 use Pronamic\WordPress\Mollie\AmountTransformer;
 use Pronamic\WordPress\Mollie\Refund as MollieRefund;
-use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Payments\Payment as PronamicPayment;
 use Pronamic\WordPress\Pay\Refunds\Refund as PronamicRefund;
-use Pronamic\WordPress\Pay\Refunds\RefundLines as PronamicRefundLines;
 
 /**
  * Refund transformer class
@@ -75,26 +73,6 @@ class RefundTransformer {
 
 				if ( null !== $meta_id ) {
 					$map_payment_lines[ $meta_id ] = $line;
-				}
-			}
-		}
-
-		if ( null !== $mollie_refund->lines ) {
-			foreach ( $mollie_refund->lines as $mollie_line ) {
-				$id = (string) $mollie_line->get_id();
-
-				if ( \array_key_exists( $id, $map_refund_lines ) ) {
-					$pronamic_refund_line = $map_refund_lines[ $id ];
-
-					$line_transformer->update_mollie_to_pronamic( $mollie_line, $pronamic_refund_line );
-				} else {
-					$pronamic_refund_line = $line_transformer->transform_mollie_to_pronamic( $mollie_line, $pronamic_refund );
-				}
-
-				if ( \array_key_exists( $id, $map_payment_lines ) ) {
-					$pronamic_payment_line = $map_payment_lines[ $id ];
-
-					$pronamic_refund_line->set_payment_line( $pronamic_payment_line );
 				}
 			}
 		}

@@ -3,7 +3,7 @@
  * Mollie card field
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Mollie
  */
@@ -44,7 +44,7 @@ class CardField extends Field {
 	protected function get_element() {
 		try {
 			$profile_id = $this->gateway->get_profile_id();
-		} catch ( \Exception $e ) {
+		} catch ( \Exception ) {
 			return null;
 		}
 

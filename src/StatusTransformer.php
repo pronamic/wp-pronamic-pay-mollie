@@ -3,7 +3,7 @@
  * Status transformer.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -26,22 +26,14 @@ class StatusTransformer {
 	 * @return string|null Pay status.
 	 */
 	public static function transform_mollie_to_wp( $status ) {
-		switch ( $status ) {
-			case MollieStatus::PENDING:
-			case MollieStatus::OPEN:
-				return WordPressStatus::OPEN;
-			case MollieStatus::CANCELED:
-				return WordPressStatus::CANCELLED;
-			case MollieStatus::AUTHORIZED:
-				return WordPressStatus::AUTHORIZED;
-			case MollieStatus::PAID:
-				return WordPressStatus::SUCCESS;
-			case MollieStatus::EXPIRED:
-				return WordPressStatus::EXPIRED;
-			case MollieStatus::FAILED:
-				return WordPressStatus::FAILURE;
-			default:
-				return null;
-		}
+		return match ( $status ) {
+			MollieStatus::PENDING, MollieStatus::OPEN => WordPressStatus::OPEN,
+			MollieStatus::CANCELED => WordPressStatus::CANCELLED,
+			MollieStatus::AUTHORIZED => WordPressStatus::AUTHORIZED,
+			MollieStatus::PAID => WordPressStatus::SUCCESS,
+			MollieStatus::EXPIRED => WordPressStatus::EXPIRED,
+			MollieStatus::FAILED => WordPressStatus::FAILURE,
+			default => null,
+		};
 	}
 }

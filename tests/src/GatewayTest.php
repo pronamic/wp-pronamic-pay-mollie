@@ -3,7 +3,7 @@
  * Mollie gateway test.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay
  */
@@ -12,8 +12,6 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use DateTimeImmutable;
 use Pronamic\WordPress\Http\Factory;
-use Pronamic\WordPress\Http\Response;
-use Pronamic\WordPress\Http\Request;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Customer;
@@ -142,19 +140,9 @@ class GatewayTest extends TestCase {
 
 		$payments_webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/payments/webhook/1' );
 
-		// Orders resource.
-		$order_payment = new Payment();
-
-		$order_payment->set_id( 1 );
-		$order_payment->set_payment_method( PaymentMethods::KLARNA_PAY_LATER );
-		$order_payment->set_source( 'memberpress_transaction' );
-
-		$order_payment_webhook_url = \rest_url( Integration::REST_ROUTE_NAMESPACE . '/orders/webhook/1' );
-
 		remove_filter( 'home_url', $filter_home_url );
 
 		return [
-			[ $home_url, $order_payment, $order_payment_webhook_url ],
 			[ $home_url, $payment, $payments_webhook_url ],
 			[ 'https://localhost/', $payment, null ],
 			[ 'https://example.dev/', $payment, null ],

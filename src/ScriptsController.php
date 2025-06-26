@@ -3,7 +3,7 @@
  * Scripts controller
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2024 Pronamic
+ * @copyright 2005-2025 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Mollie
  */
@@ -40,13 +40,13 @@ class ScriptsController {
 	 * @return void
 	 */
 	public function setup() {
-		if ( \has_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] ) ) {
+		if ( \has_action( 'wp_enqueue_scripts', $this->enqueue_scripts( ... ) ) ) {
 			return;
 		}
 
-		\add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+		\add_action( 'wp_enqueue_scripts', $this->enqueue_scripts( ... ) );
 
-		\add_action( 'wp_print_scripts', [ $this, 'print_scripts' ] );
+		\add_action( 'wp_print_scripts', $this->print_scripts( ... ) );
 	}
 
 	/**
