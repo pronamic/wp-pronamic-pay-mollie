@@ -172,6 +172,12 @@ class Gateway extends Core_Gateway {
 
 		$this->register_payment_method( $payment_method_giropay );
 
+		// Google Pay.
+		$payment_method_google_pay = new PaymentMethod( PaymentMethods::GOOGLE_PAY );
+		$payment_method_google_pay->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_google_pay );
+
 		// iDEAL.
 		$payment_method_ideal = new PaymentMethod( PaymentMethods::IDEAL );
 		$payment_method_ideal->add_support( 'recurring' );
