@@ -113,20 +113,23 @@ class Gateway extends Core_Gateway {
 		$field_mollie_card           = new CardField( 'pronamic_pay_mollie_card_token', $this );
 		$field_mollie_card->meta_key = 'mollie_card_token';
 
+		// Alma.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::ALMA ) );
+
 		// Apple Pay.
 		$payment_method_apple_pay = new PaymentMethod( PaymentMethods::APPLE_PAY );
 		$payment_method_apple_pay->add_support( 'recurring' );
 
 		$this->register_payment_method( $payment_method_apple_pay );
 
+		// BANCOMAT Pay.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANCOMAT_PAY ) );
+
 		// Bancontact.
 		$payment_method_bancontact = new PaymentMethod( PaymentMethods::BANCONTACT );
 		$payment_method_bancontact->add_support( 'recurring' );
 
 		$this->register_payment_method( $payment_method_bancontact );
-
-		// Bank transfer.
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANK_TRANSFER ) );
 
 		// Belfius.
 		$payment_method_belfius = new PaymentMethod( PaymentMethods::BELFIUS );
@@ -137,19 +140,94 @@ class Gateway extends Core_Gateway {
 		// Billie.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::BILLIE ) );
 
-		// Card..
+		// Blik.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BLIK ) );
+
+		// Card.
 		$payment_method_card = new PaymentMethod( PaymentMethods::CARD );
 		$payment_method_card->add_support( 'recurring' );
 		$payment_method_card->add_field( $field_mollie_card );
 
 		$this->register_payment_method( $payment_method_card );
 
-		// Payment method credit card.
+		// Credit card.
 		$payment_method_credit_card = new PaymentMethod( PaymentMethods::CREDIT_CARD );
 		$payment_method_credit_card->add_support( 'recurring' );
 		$payment_method_credit_card->add_field( $field_mollie_card );
 
 		$this->register_payment_method( $payment_method_credit_card );
+
+		// EPS.
+		$payment_method_eps = new PaymentMethod( PaymentMethods::EPS );
+		$payment_method_eps->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_eps );
+
+		// Gift Card.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::GIFT_CARD ) );
+
+		// Giropay.
+		$payment_method_giropay = new PaymentMethod( PaymentMethods::GIROPAY );
+		$payment_method_giropay->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_giropay );
+
+		// iDEAL.
+		$payment_method_ideal = new PaymentMethod( PaymentMethods::IDEAL );
+		$payment_method_ideal->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_ideal );
+
+		// IN3.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::IN3 ) );
+
+		// KBC.
+		$payment_method_kbc = new PaymentMethod( PaymentMethods::KBC );
+		$payment_method_kbc->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_kbc );
+
+		// Klarna.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_LATER ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_NOW ) );
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_OVER_TIME ) );
+
+		// MB Way.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::MB_WAY ) );
+
+		// Multibanco.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::MULTIBANCO ) );
+
+		// MyBank.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::MYBANK ) );
+
+		// Pay by Bank.
+		$payment_method_pay_by_bank = new PaymentMethod( PaymentMethods::PAY_BY_BANK );
+		$payment_method_pay_by_bank->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_pay_by_bank );
+
+		// Payconiq.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::PAYCONIQ ) );
+
+		// PayPal.
+		$payment_method_paypal = new PaymentMethod( PaymentMethods::PAYPAL );
+		$payment_method_paypal->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_paypal );
+
+		// Paysafecard.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::PAYSAFECARD ) );
+
+		// Przelewy24.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::PRZELEWY24 ) );
+
+		// Satispay.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::SATISPAY ) );
+
+		// Bank transfer.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::BANK_TRANSFER ) );
 
 		// Payment method direct debit.
 		$payment_method_direct_debit = new PaymentMethod( PaymentMethods::DIRECT_DEBIT );
@@ -177,62 +255,23 @@ class Gateway extends Core_Gateway {
 
 		$this->register_payment_method( $payment_method_direct_debit_sofort );
 
-		// EPS.
-		$payment_method_eps = new PaymentMethod( PaymentMethods::EPS );
-		$payment_method_eps->add_support( 'recurring' );
-
-		$this->register_payment_method( $payment_method_eps );
-
-		// Giropay.
-		$payment_method_giropay = new PaymentMethod( PaymentMethods::GIROPAY );
-		$payment_method_giropay->add_support( 'recurring' );
-
-		$this->register_payment_method( $payment_method_giropay );
-
-		// Payment method iDEAL.
-		$payment_method_ideal = new PaymentMethod( PaymentMethods::IDEAL );
-		$payment_method_ideal->add_support( 'recurring' );
-
-		$this->register_payment_method( $payment_method_ideal );
-
-		// IN3.
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::IN3 ) );
-
-		// KBC.
-		$payment_method_kbc = new PaymentMethod( PaymentMethods::KBC );
-		$payment_method_kbc->add_support( 'recurring' );
-
-		$this->register_payment_method( $payment_method_kbc );
-
-		// Klarna.
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA ) );
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_LATER ) );
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_NOW ) );
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::KLARNA_PAY_OVER_TIME ) );
-
-		// Pay by Bank.
-		$payment_method_pay_by_bank = new PaymentMethod( PaymentMethods::PAY_BY_BANK );
-		$payment_method_pay_by_bank->add_support( 'recurring' );
-
-		$this->register_payment_method( $payment_method_pay_by_bank );
-
-		// PayPal.
-		$payment_method_paypal = new PaymentMethod( PaymentMethods::PAYPAL );
-		$payment_method_paypal->add_support( 'recurring' );
-
-		$this->register_payment_method( $payment_method_paypal );
-
-		// Przelewy24.
-		$this->register_payment_method( new PaymentMethod( PaymentMethods::PRZELEWY24 ) );
-
 		// Sofort.
 		$payment_method_sofort = new PaymentMethod( PaymentMethods::SOFORT );
 		$payment_method_sofort->add_support( 'recurring' );
 
 		$this->register_payment_method( $payment_method_sofort );
 
+		// Swish.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::SWISH ) );
+
+		// Trustly.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::TRUSTLY ) );
+
 		// TWINT.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::TWINT ) );
+
+		// Vouchers.
+		$this->register_payment_method( new PaymentMethod( PaymentMethods::VOUCHERS ) );
 	}
 
 	/**
