@@ -50,6 +50,7 @@ class MethodTransformer {
 		PronamicMethod::PAYCONIQ                => MollieMethod::PAYCONIQ,
 		PronamicMethod::PAYPAL                  => MollieMethod::PAYPAL,
 		PronamicMethod::PAYSAFECARD             => MollieMethod::PAYSAFECARD,
+		PronamicMethod::POSTEPAY                => MollieMethod::CREDITCARD,
 		PronamicMethod::PRZELEWY24              => MollieMethod::PRZELEWY24,
 		PronamicMethod::SATISPAY                => MollieMethod::SATISPAY,
 		PronamicMethod::BANK_TRANSFER           => MollieMethod::BANKTRANSFER,
