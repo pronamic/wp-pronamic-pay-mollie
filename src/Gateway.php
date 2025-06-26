@@ -624,6 +624,17 @@ class Gateway extends Core_Gateway {
 		}
 
 		/**
+		 * Lines.
+		 */
+		$lines_transformer = new LinesTransformer();
+
+		$lines = $payment->get_lines();
+
+		if ( null !== $lines ) {
+			$request->lines = $lines_transformer->transform_wp_to_mollie( $lines );
+		}
+
+		/**
 		 * Direct Debit.
 		 */
 		$this->process_direct_debit_mandate_from_bank_details( $payment, $request );
