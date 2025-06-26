@@ -226,6 +226,12 @@ class Gateway extends Core_Gateway {
 		// Paysafecard.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::PAYSAFECARD ) );
 
+		// Postepay.
+		$payment_method_postepay = new PaymentMethod( PaymentMethods::POSTEPAY );
+		$payment_method_postepay->add_support( 'recurring' );
+
+		$this->register_payment_method( $payment_method_postepay );
+
 		// Przelewy24.
 		$this->register_payment_method( new PaymentMethod( PaymentMethods::PRZELEWY24 ) );
 
