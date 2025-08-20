@@ -71,13 +71,7 @@ class LinesTransformer {
 
 			$line->type = $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() );
 
-			$negative_amount_allowed_types = [
-				LineType::DISCOUNT,
-				LineType::GIFT_CARD,
-				LineType::STORE_CREDIT,
-			];
-
-			if ( $unit_price->get_value() < 0 && ! \in_array( $line->type, $negative_amount_allowed_types ) ) {
+			if ( $unit_price->get_value() < 0 && ! \in_array( $line->type, $negative_amount_allowed_types, true ) ) {
 				$line->type = LineType::DISCOUNT;
 			}
 
