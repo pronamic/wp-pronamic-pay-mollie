@@ -17,7 +17,7 @@ use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 /**
  * Line type transformer class
  *
- * @link https://docs.mollie.com/reference/v2/orders-api/create-order
+ * @link https://docs.mollie.com/reference/create-payment
  */
 class LineTypeTransformer {
 	/**
