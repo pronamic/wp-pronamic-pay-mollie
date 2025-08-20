@@ -13,6 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use InvalidArgumentException;
 use Pronamic\WordPress\Mollie\AmountTransformer;
 use Pronamic\WordPress\Mollie\Lines as MollieLines;
+use Pronamic\WordPress\Mollie\LineType;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Payments\PaymentLines as WordPressLines;
@@ -63,7 +64,18 @@ class LinesTransformer {
 			);
 
 			$line->type = $line_type_transformer->transform_wp_to_mollie( $payment_line->get_type() );
-			$line->sku  = $payment_line->get_sku();
+
+			$negative_amount_allowed_types = [
+				LineType::DISCOUNT,
+				LineType::GIFT_CARD,
+				LineType::STORE_CREDIT,
+			];
+
+			if ( $unit_price->get_value() < 0 && ! \in_array( $line->type, $negative_amount_allowed_types ) ) {
+				$line->type = LineType::DISCOUNT;
+			}
+
+			$line->sku = $payment_line->get_sku();
 
 			$line->image_url   = $payment_line->get_image_url();
 			$line->product_url = $payment_line->get_product_url();
