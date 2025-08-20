@@ -35,6 +35,12 @@ class LinesTransformer {
 		$amount_transformer    = new AmountTransformer();
 		$line_type_transformer = new LineTypeTransformer();
 
+		$negative_amount_allowed_types = [
+			LineType::DISCOUNT,
+			LineType::GIFT_CARD,
+			LineType::STORE_CREDIT,
+		];
+
 		foreach ( $payment_lines as $payment_line ) {
 			$total_amount = $payment_line->get_total_amount();
 
