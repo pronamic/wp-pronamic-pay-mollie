@@ -7,6 +7,37 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.16.0] - 2025-08-22
+
+### Commits
+
+- Set discount payment line type for lines with negative amount. ([5761bde](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5761bde9dfa9ca98725e4a9b02a1c734d96b6756))
+- Added support for Postepay (#81) ([45af9c8](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/45af9c85ccc59ec2fa0cea68def01d8795fb130f))
+- Added support for Google Pay (#79) ([962395c](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/962395c7ef15a90a6928d6a6d9d531fbb9b742d2))
+- Updated MethodTransformer.php (#77) ([1d763c4](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/1d763c45ead841a12af1de34e8b81a34b759a793))
+- Removed Sofort support (#75) ([7cee8a9](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/7cee8a9043ded7e3e506c9c59ca377f5f852c5c5))
+- Migrating from orders to payments (#74) ([b6ba540](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/b6ba540a41cc60c03eed852cd993aa207f62f09d))
+- Register new payment methods. ([fa44d68](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/fa44d68516aca62464df22b2bee4f6a624103ac1))
+- Added new Mollie method transforms ([9503761](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/9503761d72f1336a2b3f98a56f5ee26b6f1b7617))
+
+### Composer
+
+- Changed `php` from `>=8.1` to `>=8.2`.
+- Changed `giggsey/libphonenumber-for-php-lite` from `^8.13` to `9.0.12`.
+	Release notes: https://github.com/giggsey/libphonenumber-for-php-lite/releases/tag/9.0.12
+- Changed `justinrainbow/json-schema` from `^5.2` to `5.3.0`.
+	Release notes: https://github.com/jsonrainbow/json-schema/releases/tag/5.3.0
+- Changed `pronamic/wp-mollie` from `^1.9` to `v1.10.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v1.10.0
+- Changed `woocommerce/action-scheduler` from `^3.8` to `3.9.3`.
+	Release notes: https://github.com/woocommerce/action-scheduler/releases/tag/3.9.3
+- Changed `wp-pay/core` from `^4.26` to `v4.27.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.27.0
+
+Full set of changes: [`4.15.0...4.16.0`][4.16.0]
+
+[4.16.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.15.0...v4.16.0
+
 ## [4.15.0] - 2025-06-19
 
 ### Added
