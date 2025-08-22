@@ -20,3 +20,6 @@
 
 # PHPUnit
 /.phpunit.result.cache
+
+# PHPLint
+/.phplint.cache/
