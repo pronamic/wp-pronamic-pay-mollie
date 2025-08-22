@@ -64,9 +64,9 @@
 		"giggsey/libphonenumber-for-php-lite": "^9.0",
 		"justinrainbow/json-schema": "^5.3",
 		"pronamic/wp-http": "^1.2",
-		"pronamic/wp-mollie": "dev-main as 2.0",
-		"woocommerce/action-scheduler": "^3.8",
-		"wp-pay/core": "dev-main as 4.3"
+		"pronamic/wp-mollie": "^1.10",
+		"woocommerce/action-scheduler": "^3.9",
+		"wp-pay/core": "^4.27"
 	},
 	"require-dev": {
 		"overtrue/phplint": "^9.0",
@@ -76,7 +76,7 @@
 		"phpstan/extension-installer": "^1.3",
 		"phpstan/phpstan": "^1.11",
 		"pronamic/pronamic-cli": "^1.1",
-		"pronamic/wp-coding-standards": "^2.1",
+		"pronamic/wp-coding-standards": "^2.4",
 		"pronamic/wp-documentor": "^1.4",
 		"rector/rector": "^1.2",
 		"roots/wordpress": "^6.5",
