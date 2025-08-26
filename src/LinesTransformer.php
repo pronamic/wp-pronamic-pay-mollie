@@ -80,17 +80,13 @@ class LinesTransformer {
 			$line->image_url   = $payment_line->get_image_url();
 			$line->product_url = $payment_line->get_product_url();
 
-			$vat_amount = $payment_line->get_tax_amount();
-
-			if ( null !== $vat_amount ) {
-				$line->vat_amount = $amount_transformer->transform_wp_to_mollie( $vat_amount );
-			}
-
 			if ( $total_amount instanceof TaxedMoney ) {
+				$tax_amount     = $total_amount->get_tax_amount();
 				$tax_percentage = $total_amount->get_tax_percentage();
 
-				if ( null !== $tax_percentage ) {
-					$line->vat_rate = Number::from_mixed( $tax_percentage );
+				if ( null !== $tax_percentage && null !== $tax_amount ) {
+					$line->vat_amount = $amount_transformer->transform_wp_to_mollie( $tax_amount );
+					$line->vat_rate   = Number::from_mixed( $tax_percentage );
 				}
 			}
 
