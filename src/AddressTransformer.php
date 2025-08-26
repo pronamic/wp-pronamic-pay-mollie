@@ -38,8 +38,8 @@ class AddressTransformer {
 			$phone_number_object = $phone_util->parse( $phone, $country );
 
 			return $phone_util->format( $phone_number_object, PhoneNumberFormat::E164 );
-		} catch ( \Exception $e ) {
-			return $phone;
+		} catch ( \libphonenumber\NumberParseException $e ) {
+			return null;
 		}
 	}
 
