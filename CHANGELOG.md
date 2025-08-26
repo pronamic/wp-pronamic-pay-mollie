@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.16.1] - 2025-08-26
+
+### Commits
+
+- Improve format phone logic (#85) ([0a0a115](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/0a0a1156de8e3c5cea60ef6555fd7c7857e64753))
+- Improvte payment line VAT logic #87 (#88) ([4f3789f](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/4f3789f9ea1c2b9c0c611dacc990310df841626a))
+
+Full set of changes: [`4.16.0...4.16.1`][4.16.1]
+
+[4.16.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.16.0...v4.16.1
+
 ## [4.16.0] - 2025-08-22
 
 ### Commits
