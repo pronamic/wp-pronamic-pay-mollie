@@ -21,6 +21,29 @@ use Pronamic\WordPress\Pay\Address as WordPressAddress;
  */
 class AddressTransformer {
 	/**
+	 * Format phone number to E.164 format.
+	 *
+	 * @param string|null $phone   Phone number.
+	 * @param string|null $country Country code.
+	 * @return string|null
+	 */
+	private function format_phone( ?string $phone, ?string $country ): ?string {
+		if ( null === $phone ) {
+			return null;
+		}
+
+		try {
+			$phone_util = PhoneNumberUtil::getInstance();
+
+			$phone_number_object = $phone_util->parse( $phone, $country );
+
+			return $phone_util->format( $phone_number_object, PhoneNumberFormat::E164 );
+		} catch ( \Exception $e ) {
+			return $phone;
+		}
+	}
+
+	/**
 	 * Transform from WordPress Pay core address.
 	 *
 	 * @param WordPressAddress $address Address.
@@ -43,15 +66,7 @@ class AddressTransformer {
 		$phone   = $address->get_phone();
 		$country = $address->get_country_code();
 
-		if ( null !== $phone ) {
-			$phone_util = PhoneNumberUtil::getInstance();
-
-			$phone_number_object = $phone_util->parse( $phone, $country );
-
-			$phone = $phone_util->format( $phone_number_object, PhoneNumberFormat::E164 );
-		}
-
-		$mollie_address->phone = $phone;
+		$mollie_address->phone = $this->format_phone( $phone, $country );
 
 		$mollie_address->city    = $address->get_city();
 		$mollie_address->region  = $address->get_region();
