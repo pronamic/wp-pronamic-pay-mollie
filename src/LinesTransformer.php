@@ -52,7 +52,7 @@ class LinesTransformer {
 
 			$name = $payment_line->get_name();
 
-			if ( null === $name ) {
+			if ( null === $name || '' === $name ) {
 				$name = '-';
 			}
 
