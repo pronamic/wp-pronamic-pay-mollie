@@ -53,7 +53,7 @@ class LinesTransformer {
 			$name = $payment_line->get_name();
 
 			if ( null === $name ) {
-				throw new \InvalidArgumentException( 'Payment line name is required.' );
+				$name = '-';
 			}
 
 			$quantity = $payment_line->get_quantity();
