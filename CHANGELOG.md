@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.16.2] - 2025-09-17
+
+### Fixed
+
+- Fixed error "Payment line name is required" by using `-` as default name. ([#89](https://github.com/pronamic/wp-pronamic-pay-mollie/issues/89))
+
+Full set of changes: [`4.16.1...4.16.2`][4.16.2]
+
+[4.16.2]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.16.1...v4.16.2
+
 ## [4.16.1] - 2025-08-26
 
 ### Commits

@@ -1,6 +1,6 @@
 {
 	"name": "mollie",
-	"version": "4.16.1",
+	"version": "4.16.2",
 	"description": "Mollie driver for the WordPress payment processing library.",
 	"author": {
 		"name": "Pronamic",
