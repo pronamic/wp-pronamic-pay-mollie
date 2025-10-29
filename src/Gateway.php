@@ -1211,7 +1211,7 @@ class Gateway extends Core_Gateway {
 
 						$subscription->add_note(
 							\sprintf(
-							/* translators: 1: Mollie chargeback ID, 2: Mollie payment ID */
+								/* translators: 1: Mollie chargeback ID, 2: Mollie payment ID */
 								\__( 'Subscription put on hold due to chargeback `%1$s` of payment `%2$s`.', 'pronamic_ideal' ),
 								\esc_html( $mollie_chargeback->get_id() ),
 								\esc_html( $mollie_payment->get_id() )
