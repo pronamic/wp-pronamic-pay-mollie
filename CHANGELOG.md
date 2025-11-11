@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.16.3] - 2025-11-11
+
+### Commits
+
+- Fixed indent. ([d0f3d15](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/d0f3d15879acdcf63a3e62585486f4013ac5609a))
+- Added this point we shoud not use translation functions. ([32bf457](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/32bf457f0bd7a2800b6a87f5d9582ffad123598f))
+
+Full set of changes: [`4.16.2...4.16.3`][4.16.3]
+
+[4.16.3]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.16.2...v4.16.3
+
 ## [4.16.2] - 2025-09-17
 
 ### Fixed
