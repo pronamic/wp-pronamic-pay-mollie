@@ -71,7 +71,7 @@ class LocaleTransformer {
 		$locale = \strtolower( $locale );
 
 		// Is supported?
-		$supported_lowercase = \array_map( 'strtolower', $supported );
+		$supported_lowercase = \array_map( strtolower( ... ), $supported );
 
 		$search = \array_search( $locale, $supported_lowercase, true );
 
