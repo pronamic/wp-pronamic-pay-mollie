@@ -9,3 +9,5 @@ parameters:
 	ignoreErrors:
 		-
 			identifier: missingType.generics
+	dynamicConstantNames:
+		- WP_CLI
