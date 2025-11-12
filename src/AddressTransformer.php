@@ -98,9 +98,12 @@ class AddressTransformer {
 
 		$mollie_address->phone = $this->format_phone( $phone, $country );
 
-		// A valid postal address consists of streetAndNumber, postalCode, city and country.
-		// If these are not present, we can not send the address to Mollie, unless an e-mail address is present.
-		// https://docs.mollie.com/reference/v2/orders-api/create-order
+		/**
+		 * A valid postal address consists of streetAndNumber, postalCode, city and country.
+		 * If these are not present, we can not send the address to Mollie, unless an e-mail address is present.
+		 *
+		 * @link https://docs.mollie.com/reference/v2/orders-api/create-order
+		 */
 		if ( $has_valid_postal_address ) {
 			$mollie_address->street_and_number = $address->get_line_1();
 			$mollie_address->street_additional = $address->get_line_2();
