@@ -64,12 +64,6 @@ class Integration extends AbstractGatewayIntegration {
 		parent::__construct( $args );
 
 		// Filters.
-		$function = $this->next_payment_delivery_date( ... );
-
-		if ( ! \has_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function ) ) {
-			\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', $function, 10, 2 );
-		}
-
 		$function = $this->http_request_args( ... );
 
 		if ( ! \has_filter( 'http_request_args', $function ) ) {
@@ -316,77 +310,6 @@ class Integration extends AbstractGatewayIntegration {
 
 		$payment->save();
 	}
-
-	/**
-	 * Next payment delivery date.
-	 *
-	 * @param \DateTimeInterface $next_payment_delivery_date Next payment delivery date.
-	 * @param CoreSubscription   $subscription               Subscription.
-	 * @return \DateTimeInterface
-	 */
-	public function next_payment_delivery_date( \DateTimeInterface $next_payment_delivery_date, CoreSubscription $subscription ) {
-		$config_id = $subscription->get_config_id();
-
-		if ( null === $config_id ) {
-			return $next_payment_delivery_date;
-		}
-
-		// Check gateway.
-		$gateway_id = \get_post_meta( $config_id, '_pronamic_gateway_id', true );
-
-		if ( 'mollie' !== $gateway_id ) {
-			return $next_payment_delivery_date;
-		}
-
-		// Check direct debit payment method.
-		$payment_method = $subscription->get_payment_method();
-
-		if ( null === $payment_method ) {
-			return $next_payment_delivery_date;
-		}
-
-		if ( ! in_array(
-			$payment_method,
-			[
-				PaymentMethods::DIRECT_DEBIT,
-				PaymentMethods::DIRECT_DEBIT_BANCONTACT,
-				PaymentMethods::DIRECT_DEBIT_IDEAL,
-			],
-			true
-		) ) {
-			return $next_payment_delivery_date;
-		}
-
-		// Base delivery date on next payment date.
-		$next_payment_date = $subscription->get_next_payment_date();
-
-		if ( ! ( $next_payment_date instanceof \DateTimeImmutable ) ) {
-			return $next_payment_delivery_date;
-		}
-
-		$next_payment_delivery_date = clone $next_payment_date;
-
-		// Textual representation of the day of the week, Sunday through Saturday.
-		$day_of_week = $next_payment_delivery_date->format( 'l' );
-
-		/*
-		 * Subtract days from next payment date for earlier delivery.
-		 *
-		 * @link https://help.mollie.com/hc/en-us/articles/115000785649-When-are-direct-debit-payments-processed-and-paid-out-
-		 * @link https://help.mollie.com/hc/en-us/articles/115002540294-What-are-the-payment-methods-processing-times-
-		 */
-		$next_payment_delivery_date = match ( $day_of_week ) {
-			'Monday' => $next_payment_delivery_date->modify( '-3 days' ),
-			'Saturday' => $next_payment_delivery_date->modify( '-2 days' ),
-			'Sunday' => $next_payment_delivery_date->modify( '-3 days' ),
-			default => $next_payment_delivery_date->modify( '-1 day' ),
-		};
-
-		$next_payment_delivery_date = $next_payment_delivery_date->setTime( 0, 0, 0 );
-
-		return $next_payment_delivery_date;
-	}
-
 
 	/**
 	 * Get user agent value for requests to Mollie.
