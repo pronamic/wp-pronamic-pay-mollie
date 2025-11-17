@@ -7,6 +7,22 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.17.0] - 2025-11-17
+
+### Commits
+
+- Fix: Prevent 422 errors when incomplete billing addresses are sent to Mollie (#96) ([d02c076](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/d02c076f4a30a3d26b0e7dcea82ceaed619eea92))
+- Removed next payment delivery date. ([3ee1c68](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/3ee1c682fd94ccc4c4e54b40a67714728e28b3ca))
+
+### Composer
+
+- Changed `wp-pay/core` from `^4.27` to `v4.28.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.28.0
+
+Full set of changes: [`4.16.3...4.17.0`][4.17.0]
+
+[4.17.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.16.3...v4.17.0
+
 ## [4.16.3] - 2025-11-11
 
 ### Commits
