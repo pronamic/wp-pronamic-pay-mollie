@@ -63,7 +63,7 @@ class LinesTransformer {
 			}
 
 			// Handle decimal quantities.
-			if ( (float) $quantity->to_int() !== (float) $quantity->get_value() ) {
+			if ( ! $quantity->is_whole_number() ) {
 				$name = \sprintf(
 					'%s × %s',
 					$quantity->format_i18n_non_trailing_zeros(),
