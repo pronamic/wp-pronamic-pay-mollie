@@ -62,9 +62,22 @@ class LinesTransformer {
 				throw new \InvalidArgumentException( 'Payment line quantity is required.' );
 			}
 
+			// Handle decimal quantities.
+			if ( ! $quantity->is_whole_number() ) {
+				$name = \sprintf(
+					'%s × %s',
+					$quantity->format_i18n_non_trailing_zeros(),
+					$name
+				);
+
+				$unit_price = $total_amount;
+
+				$quantity = new Number( 1 );
+			}
+
 			$line = $lines->new_line(
 				$name,
-				$quantity,
+				$quantity->to_int(),
 				$amount_transformer->transform_wp_to_mollie( $unit_price ),
 				$amount_transformer->transform_wp_to_mollie( $total_amount ),
 			);
