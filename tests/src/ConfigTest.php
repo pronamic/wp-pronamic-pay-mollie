@@ -13,10 +13,7 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
- * Title: Mollie config tests
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
+ * Mollie config tests class
  *
  * @version 3.0.0
  * @since   3.0.0

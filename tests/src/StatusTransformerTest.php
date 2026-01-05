@@ -15,10 +15,7 @@ use Pronamic\WordPress\Mollie\Statuses as MollieStatus;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
- * Title: Mollie statuses constants tests
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
+ * Mollie statuses constants tests class
  *
  * @version 2.1.0
  * @since   1.0.0

@@ -15,10 +15,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods as PronamicMethod;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
- * Title: Mollie methods test
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
+ * Mollie methods test class
  *
  * @version 2.0.9
  * @since   1.0.0

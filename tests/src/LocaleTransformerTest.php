@@ -14,10 +14,7 @@ use Pronamic\WordPress\Mollie\Locales as MollieLocale;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 /**
- * Title: Mollie locale helper tests
- * Description:
- * Copyright: 2005-2026 Pronamic
- * Company: Pronamic
+ * Mollie locale helper tests class
  *
  * @version 2.1.0
  * @since   1.0.0
