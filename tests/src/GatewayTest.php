@@ -13,7 +13,6 @@ namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 use DateTimeImmutable;
 use Pronamic\WordPress\Http\Factory;
 use Pronamic\WordPress\Money\Money;
-use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
