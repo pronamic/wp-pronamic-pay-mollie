@@ -16,7 +16,6 @@ use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 /**
  * Integration test.
  *
- * @author Reüel van der Steege
  * @version 2.0.5
  */
 class IntegrationTest extends TestCase {

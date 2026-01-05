@@ -18,7 +18,6 @@ use Yoast\PHPUnitPolyfills\TestCases\TestCase;
  * Copyright: 2005-2026 Pronamic
  * Company: Pronamic
  *
- * @author  Remco Tolsma
  * @version 3.0.0
  * @since   3.0.0
  */
