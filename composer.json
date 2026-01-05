@@ -65,6 +65,7 @@
 		"justinrainbow/json-schema": "^5.3",
 		"pronamic/wp-http": "^1.2",
 		"pronamic/wp-mollie": "^1.10",
+		"pronamic/wp-number": "^1.4",
 		"woocommerce/action-scheduler": "^3.9",
 		"wp-pay/core": "^4.28"
 	},
