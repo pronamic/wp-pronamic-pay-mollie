@@ -7,6 +7,22 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.18.0] - 2026-01-05
+
+### Commits
+
+- Merge pull request #97 from pronamic/core-230-payment-line-quantity-type ([1597d11](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/1597d1143d9f9a4099f3d03e4ccc56efac5317d5))
+- Use `Number::is_whole_number()` helper. ([08485d3](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/08485d37299c7c00350663b4ff6c262f89005b59))
+- Updated for quantity `Number` (https://github.com/pronamic/wp-pay-core/issues/230). ([5c3779e](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/5c3779eb37a5127f924c3506ee42e9178aa5fcc1))
+
+### Composer
+
+- Added `pronamic/wp-number` `^1.4`.
+
+Full set of changes: [`4.17.0...4.18.0`][4.18.0]
+
+[4.18.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.17.0...v4.18.0
+
 ## [4.17.0] - 2025-11-17
 
 ### Commits
