@@ -852,7 +852,7 @@ class Gateway extends Core_Gateway {
 	 * @return void
 	 * @throws \Exception Throws exception on error.
 	 */
-	public function maybe_handle_zero_amount_subscription_change( $payment, $customer_id ) {
+	private function maybe_handle_zero_amount_subscription_change( $payment, $customer_id ) {
 		if ( true !== $payment->get_meta( 'is_subscription_change' ) ) {
 			return;
 		}
