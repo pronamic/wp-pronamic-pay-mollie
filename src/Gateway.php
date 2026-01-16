@@ -873,7 +873,7 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::CARD,
 		];
 
-		if ( \in_array( $payment_method, $zero_minimum_supported_methods ) ) {
+		if ( \in_array( $payment_method, $zero_minimum_supported_methods, true ) ) {
 			return;
 		}
 
@@ -896,7 +896,7 @@ class Gateway extends Core_Gateway {
 			PaymentMethods::PAY_BY_BANK,
 		];
 
-		if ( ! \in_array( $payment_method, $sepa_direct_debit_first_methods ) ) {
+		if ( \in_array( $payment_method, $sepa_direct_debit_first_methods, true ) ) {
 			$payment_method = PaymentMethods::DIRECT_DEBIT;
 		}
 
