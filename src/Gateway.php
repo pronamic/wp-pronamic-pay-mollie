@@ -448,6 +448,12 @@ class Gateway extends Core_Gateway {
 	public function start( Payment $payment ) {
 		$request = $this->get_payment_request( $payment );
 
+		$this->maybe_handle_zero_amount_subscription_change( $payment, $request->customer_id );
+
+		if ( PaymentStatus::SUCCESS === $payment->get_status() ) {
+			return;
+		}
+
 		// Create payment.
 		$attempt = (int) $payment->get_meta( 'mollie_create_payment_attempt' );
 		$attempt = empty( $attempt ) ? 1 : $attempt + 1;
@@ -833,6 +839,89 @@ class Gateway extends Core_Gateway {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Handle subscription changes with a zero-amount initial payment.
+	 * 
+	 * For payment methods that do not support zero-amount transactions,
+	 * this skips payment creation and reuses an existing mandate when available.
+	 *
+	 * @param Payment $payment      Payment.
+	 * @param string  $customer_id  Mollie customer ID.
+	 * @return void
+	 * @throws \Exception Throws exception on error.
+	 */
+	public function maybe_handle_zero_amount_subscription_change( $payment, $customer_id ) {
+		if ( true !== $payment->get_meta( 'is_subscription_change' ) ) {
+			return;
+		}
+
+		if ( ! $payment->get_total_amount()->is_zero() ) {
+			return;
+		}
+
+		$payment_method = $payment->get_payment_method();
+
+		/*
+		 * Skip methods supporting zero-amount first payments.
+		 *
+		 * @link https://docs.mollie.com/docs/payment-methods
+		 */
+		$zero_minimum_supported_methods = [
+			PaymentMethods::CREDIT_CARD,
+			PaymentMethods::CARD,
+		];
+
+		if ( \in_array( $payment_method, $zero_minimum_supported_methods ) ) {
+			return;
+		}
+
+		/*
+		 * Check for an existing SEPA Direct Debit mandate for
+		 * payment methods that use it for recurring payments.
+		 *
+		 * @link https://docs.mollie.com/docs/sepa-direct-debit
+		 */
+		$sepa_direct_debit_first_methods = [
+			PaymentMethods::BANCONTACT,
+			PaymentMethods::BELFIUS,
+			PaymentMethods::EPS,
+			PaymentMethods::DIRECT_DEBIT_BANCONTACT,
+			PaymentMethods::DIRECT_DEBIT_IDEAL,
+			PaymentMethods::IDEAL,
+			PaymentMethods::KBC,
+			PaymentMethods::MYBANK,
+			PaymentMethods::TRUSTLY,
+			PaymentMethods::PAY_BY_BANK,
+		];
+
+		if ( ! \in_array( $payment_method, $sepa_direct_debit_first_methods ) ) {
+			$payment_method = PaymentMethods::DIRECT_DEBIT;
+		}
+
+		$mandate_id = $this->has_valid_mandate( $customer_id, $payment_method );
+
+		if ( false === $mandate_id ) {
+			return;
+		}
+
+		foreach ( $payment->get_subscriptions() as $subscription ) {
+			$subscription->set_meta( 'mollie_mandate_id', $mandate_id );
+
+			$subscription->save();
+
+			$subscription->add_note(
+				\sprintf(
+					\__( 'Subscription changed for free using existing Mollie mandate `%s`.', 'pronamic_ideal' ),
+					$mandate_id
+				)
+			);
+		}
+
+		$payment->set_status( PaymentStatus::SUCCESS );
+
+		$payment->save();
 	}
 
 	/**
