@@ -667,7 +667,7 @@ class Gateway extends Core_Gateway {
 		if ( null !== $lines ) {
 			$request->lines = $lines_transformer->transform_wp_to_mollie( $lines );
 
-			/*
+			/**
 			 * Remove payment lines if they do not match the recurring payment amount.
 			 *
 			 * @link https://github.com/pronamic/wp-pronamic-pay-mollie/issues/100
