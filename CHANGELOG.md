@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.19.0] - 2026-01-27
+
+### Commits
+
+- Removed payment lines if they do not match the recurring payment amount. ([c532a0e](https://github.com/pronamic/wp-pronamic-pay-mollie/commit/c532a0e14183e98474b85575a40f115bd1c8caed))
+
+Full set of changes: [`4.18.0...4.19.0`][4.19.0]
+
+[4.19.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.18.0...v4.19.0
+
 ## [4.18.0] - 2026-01-05
 
 ### Commits
