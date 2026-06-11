@@ -718,7 +718,10 @@ class Gateway extends Core_Gateway {
 		// Due date.
 		if ( ! empty( $this->config->due_date_days ) ) {
 			try {
-				$due_date = new DateTime( sprintf( '+%s days', $this->config->due_date_days ) );
+				$due_date = new DateTime(
+					\sprintf( '+%s days', $this->config->due_date_days ),
+					new \DateTimeZone( 'Europe/Amsterdam' )
+				);
 			} catch ( \Exception ) {
 				$due_date = null;
 			}
