@@ -27,6 +27,7 @@ class WebhookController {
 	 */
 	public function setup() {
 		\add_action( 'rest_api_init', $this->rest_api_init( ... ) );
+		\add_action( 'pronamic_pay_mollie_webhook_status_check', $this->check_payment_status( ... ) );
 
 		\add_action( 'wp_loaded', $this->wp_loaded( ... ) );
 	}
@@ -193,16 +194,25 @@ class WebhookController {
 			return $response;
 		}
 
-		// Add note.
-		$note = \__( 'Payment webhook requested by Mollie.', 'pronamic_ideal' );
+		$action_id = \as_enqueue_async_action(
+			'pronamic_pay_mollie_webhook_status_check',
+			[
+				'payment_id' => $payment->get_id(),
+			],
+			'pronamic-pay-mollie'
+		);
+
+		$note = \__( 'Payment status update requested by Mollie webhook.', 'pronamic_ideal' );
 
 		$payment->add_note( $note );
 
+		// Update payment if action could not be scheduled.
+		if ( ! \is_int( $action_id ) || $action_id <= 0 ) {
+			Plugin::update_payment( $payment, false );
+		}
+
 		// Log webhook request.
 		\do_action( 'pronamic_pay_webhook_log_payment', $payment );
-
-		// Update payment.
-		Plugin::update_payment( $payment, false );
 
 		return $response;
 	}
@@ -265,6 +275,22 @@ class WebhookController {
 		Plugin::update_payment( $payment, false );
 
 		return $response;
+	}
+
+	/**
+	 * Check the payment status.
+	 *
+	 * @param int $payment_id Payment ID.
+	 * @return void
+	 */
+	private function check_payment_status( int $payment_id ) {
+		$payment = \get_pronamic_payment( $payment_id );
+
+		if ( null === $payment ) {
+			return;
+		}
+
+		Plugin::update_payment( $payment, false );
 	}
 
 	/**
