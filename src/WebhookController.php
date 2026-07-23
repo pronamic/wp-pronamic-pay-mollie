@@ -27,6 +27,7 @@ class WebhookController {
 	 */
 	public function setup() {
 		\add_action( 'rest_api_init', $this->rest_api_init( ... ) );
+		\add_action( 'pronamic_pay_mollie_webhook_status_check', $this->check_payment_status( ... ) );
 
 		\add_action( 'wp_loaded', $this->wp_loaded( ... ) );
 	}
@@ -193,18 +194,43 @@ class WebhookController {
 			return $response;
 		}
 
-		// Add note.
-		$note = \__( 'Payment webhook requested by Mollie.', 'pronamic_ideal' );
+		$action_id = \as_enqueue_async_action(
+			'pronamic_pay_mollie_webhook_status_check',
+			[
+				'payment_id' => $payment->get_id(),
+			],
+			'pronamic-pay-mollie'
+		);
 
-		$payment->add_note( $note );
+		$payment->add_note( $this->get_webhook_status_check_note( $action_id ) );
+
+		if ( ! \is_int( $action_id ) || $action_id <= 0 ) {
+			// Update payment if action could not be scheduled.
+			Plugin::update_payment( $payment, false );
+		}
 
 		// Log webhook request.
 		\do_action( 'pronamic_pay_webhook_log_payment', $payment );
 
-		// Update payment.
-		Plugin::update_payment( $payment, false );
-
 		return $response;
+	}
+
+	/**
+	 * Get the payment note for a Mollie webhook status check request.
+	 *
+	 * @param mixed $action_id Action Scheduler action ID.
+	 * @return string
+	 */
+	private function get_webhook_status_check_note( $action_id ) {
+		if ( \is_int( $action_id ) && $action_id > 0 ) {
+			/* translators: %d: Action Scheduler action ID. */
+			return \sprintf(
+				\__( 'Mollie webhook received. The payment status will be requested asynchronously via action ID %d.', 'pronamic_ideal' ),
+				$action_id
+			);
+		}
+
+		return \__( 'Mollie webhook received. The payment status will be requested immediately.', 'pronamic_ideal' );
 	}
 
 	/**
@@ -265,6 +291,22 @@ class WebhookController {
 		Plugin::update_payment( $payment, false );
 
 		return $response;
+	}
+
+	/**
+	 * Check the payment status.
+	 *
+	 * @param int $payment_id Payment ID.
+	 * @return void
+	 */
+	private function check_payment_status( int $payment_id ) {
+		$payment = \get_pronamic_payment( $payment_id );
+
+		if ( null === $payment ) {
+			return;
+		}
+
+		Plugin::update_payment( $payment, false );
 	}
 
 	/**
