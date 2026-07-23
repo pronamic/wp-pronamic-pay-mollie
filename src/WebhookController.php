@@ -202,12 +202,10 @@ class WebhookController {
 			'pronamic-pay-mollie'
 		);
 
-		$note = \__( 'Payment status update requested by Mollie webhook.', 'pronamic_ideal' );
+		$payment->add_note( $this->get_webhook_status_check_note( $action_id ) );
 
-		$payment->add_note( $note );
-
-		// Update payment if action could not be scheduled.
 		if ( ! \is_int( $action_id ) || $action_id <= 0 ) {
+			// Update payment if action could not be scheduled.
 			Plugin::update_payment( $payment, false );
 		}
 
@@ -215,6 +213,24 @@ class WebhookController {
 		\do_action( 'pronamic_pay_webhook_log_payment', $payment );
 
 		return $response;
+	}
+
+	/**
+	 * Get the payment note for a Mollie webhook status check request.
+	 *
+	 * @param mixed $action_id Action Scheduler action ID.
+	 * @return string
+	 */
+	private function get_webhook_status_check_note( $action_id ) {
+		if ( \is_int( $action_id ) && $action_id > 0 ) {
+			/* translators: %d: Action Scheduler action ID. */
+			return \sprintf(
+				\__( 'Mollie webhook received. The payment status will be requested asynchronously via action ID %d.', 'pronamic_ideal' ),
+				$action_id
+			);
+		}
+
+		return \__( 'Mollie webhook received. The payment status will be requested immediately.', 'pronamic_ideal' );
 	}
 
 	/**
