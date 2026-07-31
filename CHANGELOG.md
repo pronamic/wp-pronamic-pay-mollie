@@ -7,6 +7,27 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.20.0] - 2026-07-31
+
+### Added
+
+- Deferred Mollie webhook processing with Action Scheduler for improved reliability under load. ([#106](https://github.com/pronamic/wp-pronamic-pay-mollie/pull/106))
+
+### Changed
+
+- Used the `Europe/Amsterdam` timezone for recurring payment due date calculations.
+- Bumped the minimum required WordPress version to 6.8.
+
+### Composer
+
+- Changed `woocommerce/action-scheduler` from `^3.9` to `^3.9 || ^4.0` to allow Action Scheduler 4. ([#104](https://github.com/pronamic/wp-pronamic-pay-mollie/pull/104))
+	Action Scheduler `4.0.0` introduces breaking changes: action arguments are now taken into account when scheduling unique actions, and failed actions are automatically purged after 3 months by default (filterable via `action_scheduler_retention_period_for_failed`).
+	Release notes: https://github.com/woocommerce/action-scheduler/releases/tag/4.0.0
+
+Full set of changes: [`4.19.0...4.20.0`][4.20.0]
+
+[4.20.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.19.0...v4.20.0
+
 ## [4.19.0] - 2026-01-27
 
 ### Commits
