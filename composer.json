@@ -76,14 +76,14 @@
 		"phpmetrics/phpmetrics": "^2.9",
 		"phpstan/extension-installer": "^1.4",
 		"phpstan/phpstan": "^2.1",
-		"pronamic/pronamic-cli": "^1.1",
 		"pronamic/wp-coding-standards": "^2.4",
-		"pronamic/wp-documentor": "^1.4",
+		"solvebeam/wp-hooks-documentor": "^1.4",
 		"rector/rector": "^2.2",
 		"roots/wordpress": "^6.8",
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"vimeo/psalm": "^5.26",
 		"wordpress/sqlite-database-integration": "^2.2",
+		"wp-cli/dist-archive-command": "*",
 		"wp-cli/wp-cli": "^2.12",
 		"wp-phpunit/wp-phpunit": "^6.8",
 		"yoast/phpunit-polyfills": "^4.0"
@@ -95,8 +95,18 @@
 			"@coverage",
 			"@phpstan"
 		],
+		"build": [
+			"rm -rf ./build/stage-1",
+			"rm -rf ./build/pronamic-pay-mollie/*",
+			"npm run build",
+			"rsync --recursive --verbose --exclude-from=.distignore --exclude=/vendor/ ./ ./build/stage-1/",
+			"composer install --no-dev --prefer-dist --optimize-autoloader --working-dir=./build/stage-1/",
+			"rsync --recursive --verbose --exclude-from=.distignore ./build/stage-1/ ./build/pronamic-pay-mollie/",
+			"vendor/bin/wp dist-archive ./build/pronamic-pay-mollie/ --plugin-dirname=pronamic-pay-mollie --force"
+		],
 		"coverage": "XDEBUG_MODE=coverage vendor/bin/phpunit --colors=always --exclude-group=require-database --coverage-clover build/logs/clover.xml --coverage-text",
 		"coveralls": "vendor/bin/php-coveralls -v",
+		"dist-archive": "vendor/bin/wp dist-archive . --plugin-dirname=pronamic-pay-mollie",
 		"phpcbf": "XDEBUG_MODE=off vendor/bin/phpcbf",
 		"phpcs": "XDEBUG_MODE=off vendor/bin/phpcs -s -v",
 		"phplint": "vendor/bin/phplint",
@@ -106,7 +116,7 @@
 		"phpunit": "vendor/bin/phpunit --colors=always --exclude-group=require-database",
 		"psalm": "vendor/bin/psalm",
 		"build-docs": [
-			"vendor/bin/wp-documentor parse src --format=markdown --relative=docs > docs/hooks.md"
+			"vendor/bin/wphd parse src --format=markdown --relative=docs > docs/hooks.md"
 		]
 	}
 }
