@@ -5,6 +5,7 @@
 .github/
 .gitignore
 .phpmetrics.json
+.phplint.cache/
 .phplint.yml
 .wp-env.json
 

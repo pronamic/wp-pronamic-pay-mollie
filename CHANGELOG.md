@@ -4,16 +4,28 @@ All notable changes to this project will be documented in this file.
 
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
-## [Unreleased][unreleased]
+## [4.21.0] - 2026-09-07
+
+### Added
+
+- Added a distribution archive build pipeline.
 
 ### Changed
 
 - Use a bank transfer payment request when setting the Mollie payment due date.
+- Raised the minimum required PHP version to 8.2.
+- Updated the hook documentation tooling and WordPress JavaScript build tooling.
 
 ### Composer
 
-- Changed `pronamic/wp-mollie` from `^1.10` to `^2.0`.
-	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v2.0.0
+- Changed `pronamic/wp-mollie` from `^1.10` to `^2.0`, locked at `v2.0.0`. This is a breaking change that moves the `due_date` property to `BankTransferPaymentRequest`, matching Mollie's supported payment type. Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v2.0.0
+- Replaced `pronamic/wp-documentor` with `solvebeam/wp-hooks-documentor`, locked at `v1.5.1`. The new package modernizes the documentation tooling and provides the renamed `wphd` command used by the build scripts. Release notes: https://github.com/solvebeam/wp-hooks-documentor/releases/tag/v1.5.1
+- Added `wp-cli/dist-archive-command`, locked at `v3.1.0`, to create plugin distribution archives. This release removes existing files from archives and shows the resulting file size. Release notes: https://github.com/wp-cli/dist-archive-command/releases/tag/v3.1.0
+- Removed the unused `pronamic/pronamic-cli` development dependency.
+
+Full set of changes: [`4.20.0...4.21.0`][4.21.0]
+
+[4.21.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.20.0...v4.21.0
 
 ## [4.20.0] - 2026-07-31
 
