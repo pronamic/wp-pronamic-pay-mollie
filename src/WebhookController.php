@@ -223,8 +223,8 @@ class WebhookController {
 	 */
 	private function get_webhook_status_check_note( $action_id ) {
 		if ( \is_int( $action_id ) && $action_id > 0 ) {
-			/* translators: %d: Action Scheduler action ID. */
 			return \sprintf(
+				/* translators: %d: Action Scheduler action ID. */
 				\__( 'Mollie webhook received. The payment status will be requested asynchronously via action ID %d.', 'pronamic_ideal' ),
 				$action_id
 			);
