@@ -5,7 +5,15 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+
+### Changed
+
+- Use a bank transfer payment request when setting the Mollie payment due date.
+
+### Composer
+
+- Changed `pronamic/wp-mollie` from `^1.10` to `^2.0`.
+	Release notes: https://github.com/pronamic/wp-mollie/releases/tag/v2.0.0
 
 ## [4.20.0] - 2026-07-31
 
