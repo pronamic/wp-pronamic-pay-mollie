@@ -26,6 +26,7 @@ use Pronamic\WordPress\Pay\Refunds\Refund;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Mollie\AmountTransformer;
+use Pronamic\WordPress\Mollie\BankTransferPaymentRequest;
 use Pronamic\WordPress\Mollie\Client;
 use Pronamic\WordPress\Mollie\Customer;
 use Pronamic\WordPress\Mollie\Error;
@@ -527,7 +528,13 @@ class Gateway extends Core_Gateway {
 
 		$amount_transformer = new AmountTransformer();
 
-		$request = new PaymentRequest(
+		$payment_method = $payment->get_payment_method();
+
+		$request_class = PaymentMethods::BANK_TRANSFER === $payment_method
+			? BankTransferPaymentRequest::class
+			: PaymentRequest::class;
+
+		$request = new $request_class(
 			$amount_transformer->transform_wp_to_mollie( $payment->get_total_amount() ),
 			$description
 		);
@@ -575,8 +582,6 @@ class Gateway extends Core_Gateway {
 		 *
 		 * Leap of faith if the WordPress payment method could not transform to a Mollie method?
 		 */
-		$payment_method = $payment->get_payment_method();
-
 		$method_transformer = new MethodTransformer();
 
 		$request->method = $method_transformer->transform_wp_to_mollie( $payment_method, $payment_method );
@@ -716,7 +721,7 @@ class Gateway extends Core_Gateway {
 		}
 
 		// Due date.
-		if ( ! empty( $this->config->due_date_days ) ) {
+		if ( $request instanceof BankTransferPaymentRequest && ! empty( $this->config->due_date_days ) ) {
 			try {
 				$due_date = new DateTime(
 					\sprintf( '+%s days', $this->config->due_date_days ),

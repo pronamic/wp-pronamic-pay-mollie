@@ -11,9 +11,13 @@
 namespace Pronamic\WordPress\Pay\Gateways\Mollie;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use Pronamic\WordPress\Http\Factory;
+use Pronamic\WordPress\Mollie\BankTransferPaymentRequest;
+use Pronamic\WordPress\Mollie\PaymentRequest;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Customer;
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
@@ -89,6 +93,67 @@ class GatewayTest extends TestCase {
 		}
 
 		$this->gateway = new Gateway( $config );
+	}
+
+	/**
+	 * Test bank transfer payment request.
+	 */
+	public function test_bank_transfer_payment_request() {
+		$this->set_gateway(
+			[
+				'due_date_days' => 12,
+			]
+		);
+
+		$request = $this->get_payment_request( PaymentMethods::BANK_TRANSFER );
+
+		$this->assertInstanceOf( BankTransferPaymentRequest::class, $request );
+
+		$data = (array) $request->jsonSerialize();
+
+		$expected_due_date = new DateTimeImmutable( '+12 days', new DateTimeZone( 'Europe/Amsterdam' ) );
+
+		$this->assertSame( $expected_due_date->format( 'Y-m-d' ), $data['dueDate'] );
+	}
+
+	/**
+	 * Test non-bank transfer payment request.
+	 */
+	public function test_non_bank_transfer_payment_request() {
+		$this->set_gateway(
+			[
+				'due_date_days' => 12,
+			]
+		);
+
+		$request = $this->get_payment_request( PaymentMethods::IDEAL );
+
+		$this->assertInstanceOf( PaymentRequest::class, $request );
+		$this->assertNotInstanceOf( BankTransferPaymentRequest::class, $request );
+		$this->assertArrayNotHasKey( 'dueDate', (array) $request->jsonSerialize() );
+	}
+
+	/**
+	 * Get Mollie payment request for a payment method.
+	 *
+	 * @param string $payment_method Payment method.
+	 * @return PaymentRequest
+	 */
+	private function get_payment_request( $payment_method ) {
+		$payment = new Payment();
+
+		$payment->set_description( 'Test payment' );
+		$payment->set_total_amount( new Money( '10', 'EUR' ) );
+		$payment->set_payment_method( $payment_method );
+		$payment->set_meta( 'mollie_sequence_type', 'recurring' );
+
+		$method = new \ReflectionMethod( $this->gateway, 'get_payment_request' );
+
+		$request = $method->invoke( $this->gateway, $payment );
+
+		$this->assertInstanceOf( PaymentRequest::class, $request );
+
+		return $request;
 	}
 
 	/**

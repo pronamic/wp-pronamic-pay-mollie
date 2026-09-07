@@ -64,7 +64,7 @@
 		"giggsey/libphonenumber-for-php-lite": "^9.0",
 		"justinrainbow/json-schema": "^5.3",
 		"pronamic/wp-http": "^1.2",
-		"pronamic/wp-mollie": "^1.10",
+		"pronamic/wp-mollie": "^2.0",
 		"pronamic/wp-number": "^1.4",
 		"woocommerce/action-scheduler": "^3.9 || ^4.0",
 		"wp-pay/core": "^4.28"
