@@ -8,7 +8,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ### Composer
 
-- Allow `justinrainbow/json-schema` `^6.8` while retaining `^5.3` compatibility.
+- Require `justinrainbow/json-schema` `^6.8` instead of `^5.3`.
 
 ## [4.21.0] - 2026-09-07
 
