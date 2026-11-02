@@ -6,9 +6,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased]
 
+## [4.22.0] - 2026-11-02
+
 ### Composer
 
-- Require `justinrainbow/json-schema` `^6.8` instead of `^5.3`.
+- Changed `automattic/jetpack-autoloader` from `^3.0 || ^4.0 || ^5.0` to `^3.0 || ^4.0 || ^5.0 || ^6.0` to allow Jetpack Autoloader 6.x. Jetpack Autoloader 6.0.0 only raises its minimum PHP version to 7.4. Release notes: https://github.com/Automattic/jetpack-autoloader/blob/v6.0.0/CHANGELOG.md
+- Changed `justinrainbow/json-schema` from `^5.3` to `^6.8`. Version 6 is a new major release of the JSON Schema validator with improved type coercion, `const` support and centralized error handling. Upstream marks 6.8.0 as broken; 6.8.1 restores its changes. Release notes: https://github.com/jsonrainbow/json-schema/releases/tag/6.0.0 and https://github.com/jsonrainbow/json-schema/releases/tag/6.8.1
+
+Full set of changes: [`4.21.0...4.22.0`][4.22.0]
+
+[4.22.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.21.0...v4.22.0
 
 ## [4.21.0] - 2026-09-07
 
@@ -817,7 +824,7 @@ Full set of changes: [`4.6.0...4.7.0`][4.7.0]
 ## 1.0.0 - 2015-01-19
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.6.0...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/v4.22.0...HEAD
 [4.6.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.5.0...4.6.0
 [4.5.0]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.1...4.5.0
 [4.4.1]: https://github.com/pronamic/wp-pronamic-pay-mollie/compare/4.4.0...4.4.1
