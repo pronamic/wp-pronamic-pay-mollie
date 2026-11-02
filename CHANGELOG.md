@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
+## [Unreleased]
+
+### Composer
+
+- Allow `justinrainbow/json-schema` `^6.8` while retaining `^5.3` compatibility.
+
 ## [4.21.0] - 2026-09-07
 
 ### Added
